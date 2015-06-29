@@ -14,15 +14,26 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.pojomapper;
+package de.braintags.io.vertx.pojomapper.annotation.lifecycle;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * IWrite is responsible for all write actions into the connected datasource. It performs inserts and updates.
+ * Methods, which are marked by this annotation will be called before the instance is saved in the datastore
  * 
  * @author Michael Remme
  * 
  */
 
-public interface IWrite<T> extends IDataAccessObject<T> {
+@Documented
+@Inherited
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD })
+public @interface BeforeSave {
 
 }

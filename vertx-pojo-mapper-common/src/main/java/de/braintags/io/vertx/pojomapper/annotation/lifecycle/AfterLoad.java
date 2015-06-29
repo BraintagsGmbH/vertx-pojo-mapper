@@ -14,15 +14,26 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.pojomapper;
+package de.braintags.io.vertx.pojomapper.annotation.lifecycle;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * IDelete is responsible for the deletion of instances from the connected datastore
+ * Methods which are flaged with this annotation will be called directly after the object is loaded from the datastore
  * 
  * @author Michael Remme
  * 
  */
 
-public interface IDelete<T> extends IDataAccessObject<T> {
+@Documented
+@Inherited
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD })
+public @interface AfterLoad {
 
 }

@@ -14,15 +14,22 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.pojomapper;
+package de.braintags.io.vertx.pojomapper.exception;
 
 /**
- * 
+ * Exception is thrown in case of problems during dynamic class access
  * 
  * @author Michael Remme
  * 
  */
 
-public interface IDataAccessObject<T> {
+public class ClassAccessException extends RuntimeException {
+  public ClassAccessException(String message) {
+    super(message);
+  }
+
+  public ClassAccessException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

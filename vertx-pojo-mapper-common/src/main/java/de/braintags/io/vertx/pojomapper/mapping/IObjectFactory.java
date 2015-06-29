@@ -14,15 +14,23 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.pojomapper;
+package de.braintags.io.vertx.pojomapper.mapping;
 
 /**
- * IMapper is responsible to collect information about the mapped class
+ * IObjectFactory is used to create new instances for a mapper.
  * 
  * @author Michael Remme
  * 
  */
 
-public interface IMapper<T> {
+public interface IObjectFactory {
+
+  /**
+   * Creates an instance of the given class.
+   * 
+   * @param clazz
+   * @return
+   */
+  <T> T createInstance(Class<T> clazz);
 
 }

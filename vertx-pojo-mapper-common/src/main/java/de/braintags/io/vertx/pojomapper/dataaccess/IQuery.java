@@ -14,7 +14,8 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.pojomapper;
+package de.braintags.io.vertx.pojomapper.dataaccess;
+
 
 /**
  * 

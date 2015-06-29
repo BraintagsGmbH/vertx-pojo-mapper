@@ -24,7 +24,7 @@
  */
 @Document(fileName = "index.adoc")
 @GenModule(name = "vertx-pojo-mapper-common")
-package io.vertx.ext.pojomapper;
+package de.braintags.io.vertx.pojomapper;
 
 import io.vertx.codegen.annotations.GenModule;
 import io.vertx.docgen.Document;

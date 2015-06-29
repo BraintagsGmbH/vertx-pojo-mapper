@@ -14,23 +14,26 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.pojomapper;
+package de.braintags.io.vertx.pojomapper.annotation.lifecycle;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * IMapperFactory is responsible to create and store instances of {@link IMapper} for all classes, which shall be
- * persisted into the datastore
+ * Methods which are marked with this annotation will be called after the object was stored in the datastore
  * 
  * @author Michael Remme
  * 
  */
-public interface IMapperFactory {
 
-  /**
-   * Retrieve the {@link IMapper} for the given class
-   * 
-   * @param mapperClass
-   * @return
-   */
-  IMapper<?> getMapper(Class<?> mapperClass);
+@Documented
+@Inherited
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD })
+public @interface AfterSave {
 
 }

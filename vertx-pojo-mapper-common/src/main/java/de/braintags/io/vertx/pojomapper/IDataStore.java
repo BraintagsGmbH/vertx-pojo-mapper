@@ -14,7 +14,14 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.pojomapper;
+package de.braintags.io.vertx.pojomapper;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.IDelete;
+import de.braintags.io.vertx.pojomapper.dataaccess.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.IWrite;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.ITypeHandler;
 
 /**
  * IDataStore contains information about the destination datastore and creates the handler objects
@@ -59,4 +66,11 @@ public interface IDataStore {
    */
   IMapperFactory getMapperFactory();
 
+  /**
+   * Get the propriate {@link ITypeHandler} for the field
+   * 
+   * @param field
+   * @return
+   */
+  ITypeHandler getTypeHandler(IField field);
 }
