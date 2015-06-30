@@ -14,31 +14,28 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mapping;
+package de.braintags.io.vertx.pojomapper.typehandler;
 
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 
 /**
- * Describes a field of an {@link IMapper}
+ * The ITypeHandlerFactory is used to create the convenient {@link ITypeHandler} for an implementation of
+ * {@link IDataStore}
  * 
  * @author Michael Remme
  * 
  */
 
-public interface IField {
+public interface ITypeHandlerFactory {
 
   /**
-   * Get the fitting {@link IPropertyAccessor} for the current field
+   * Get the conventient {@link ITypeHandler} for the given field
    * 
-   * @return
+   * @param field
+   *          the field
+   * @return a fitting {@link ITypeHandler}
    */
-  public IPropertyAccessor getPropertyAccessor();
-
-  /**
-   * Get the fitting {@link ITypeHandler} which is responsible to change data into and from the propriate format
-   * 
-   * @return
-   */
-  public ITypeHandler getTypeHandler();
+  ITypeHandler getTypeHandler(IField field);
 
 }

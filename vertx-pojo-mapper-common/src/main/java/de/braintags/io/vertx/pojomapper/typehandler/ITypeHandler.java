@@ -14,7 +14,7 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mapping;
+package de.braintags.io.vertx.pojomapper.typehandler;
 
 /**
  * The ITypehandler is responsible to change original values into the required format of the used datastore

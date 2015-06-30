@@ -19,10 +19,9 @@ package de.braintags.io.vertx.pojomapper;
 import de.braintags.io.vertx.pojomapper.dataaccess.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.IWrite;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
-import de.braintags.io.vertx.pojomapper.mapping.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 /**
  * 
@@ -77,10 +76,10 @@ public class TestDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getTypeHandler(de.braintags.io.vertx.pojomapper.mapping.IField)
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getTypeHandlerFactory()
    */
   @Override
-  public ITypeHandler getTypeHandler(IField field) {
+  public ITypeHandlerFactory getTypeHandlerFactory() {
     return null;
   }
 

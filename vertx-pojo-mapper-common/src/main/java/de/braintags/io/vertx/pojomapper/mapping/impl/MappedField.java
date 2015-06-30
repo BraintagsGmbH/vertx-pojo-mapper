@@ -20,7 +20,7 @@ import java.lang.reflect.Field;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
-import de.braintags.io.vertx.pojomapper.mapping.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
  * 
@@ -46,7 +46,7 @@ public class MappedField implements IField {
   }
 
   private void init() {
-    typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandler(this);
+    typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
   }
 
   /*
@@ -55,7 +55,7 @@ public class MappedField implements IField {
    * @see de.braintags.io.vertx.pojomapper.mapping.IField#getPropertyDescriptor()
    */
   @Override
-  public IPropertyAccessor getPropertyDescriptor() {
+  public IPropertyAccessor getPropertyAccessor() {
     return accessor;
   }
 
