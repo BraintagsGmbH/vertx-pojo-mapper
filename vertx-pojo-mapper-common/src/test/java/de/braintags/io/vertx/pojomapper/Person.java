@@ -16,6 +16,13 @@
 
 package de.braintags.io.vertx.pojomapper;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.annotation.Index;
+import de.braintags.io.vertx.pojomapper.annotation.IndexField;
+import de.braintags.io.vertx.pojomapper.annotation.IndexOptions;
+import de.braintags.io.vertx.pojomapper.annotation.Indexes;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
+
 /**
  * Person is used as mapper class
  * 
@@ -23,7 +30,9 @@ package de.braintags.io.vertx.pojomapper;
  * 
  */
 
-public class Person {
+@Entity(name = "PersonColumn")
+@Indexes(@Index(fields = { @IndexField(fieldName = "name"), @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
+public class Person extends AbstractPerson {
   private String name;
   public Double weight;
 
@@ -33,6 +42,7 @@ public class Person {
   /**
    * @return the name
    */
+  @Override
   public String getName() {
     return name;
   }
@@ -41,8 +51,20 @@ public class Person {
    * @param name
    *          the name to set
    */
+  @Override
   public void setName(String name) {
     this.name = name;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IPerson#beforeLoadFromInterface()
+   */
+  @Override
+  @BeforeLoad
+  public void beforeLoadFromInterface() {
+    System.out.println("handleBeforeLoad");
   }
 
 }

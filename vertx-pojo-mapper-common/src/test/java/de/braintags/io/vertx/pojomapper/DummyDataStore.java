@@ -30,8 +30,9 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
  * 
  */
 
-public class TestDataStore implements IDataStore {
+public class DummyDataStore implements IDataStore {
   IMapperFactory mf = new MapperFactory(this);
+  ITypeHandlerFactory tf = new DummyTypeHandlerFactory();
 
   /*
    * (non-Javadoc)
@@ -80,7 +81,7 @@ public class TestDataStore implements IDataStore {
    */
   @Override
   public ITypeHandlerFactory getTypeHandlerFactory() {
-    return null;
+    return tf;
   }
 
 }

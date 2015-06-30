@@ -14,25 +14,33 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mapping;
+package de.braintags.io.vertx.pojomapper.mapping.impl;
+
+import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 
 /**
- * IMapperFactory is responsible to create and store instances of {@link IMapper} for all classes, which shall be
- * persisted into the datastore
+ * Default implementation of {@link IObjectFactory}
  * 
  * @author Michael Remme
  * 
  */
-public interface IMapperFactory {
+
+public class DefaultObjectFactory implements IObjectFactory {
 
   /**
-   * Retrieve the {@link IMapper} for the given class
    * 
-   * @param mapperClass
-   * @return
-   * @throws Exception
-   *           any Exception which can occur in the init process
    */
-  IMapper getMapper(Class<?> mapperClass) throws Exception;
+  public DefaultObjectFactory() {
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IObjectFactory#createInstance(java.lang.Class)
+   */
+  @Override
+  public <T> T createInstance(Class<T> clazz) {
+    throw new UnsupportedOperationException();
+  }
 
 }

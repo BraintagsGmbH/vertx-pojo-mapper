@@ -14,33 +14,23 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mapping.impl;
+package de.braintags.io.vertx.pojomapper;
 
-import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
+import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultObjectFactory;
 
 /**
- * Default implementation of {@link IObjectFactory}
+ * 
  * 
  * @author Michael Remme
  * 
  */
 
-public class ObjectFactory implements IObjectFactory {
+public class DummyObjectFactory extends DefaultObjectFactory {
 
   /**
    * 
    */
-  public ObjectFactory() {
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IObjectFactory#createInstance(java.lang.Class)
-   */
-  @Override
-  public <T> T createInstance(Class<T> clazz) {
-    throw new UnsupportedOperationException();
+  public DummyObjectFactory() {
   }
 
 }

@@ -14,25 +14,32 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mapping;
+package de.braintags.io.vertx.pojomapper.annotation;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * IMapperFactory is responsible to create and store instances of {@link IMapper} for all classes, which shall be
- * persisted into the datastore
+ * Defines one field of the index
  * 
  * @author Michael Remme
  * 
  */
-public interface IMapperFactory {
 
+@Documented
+@Inherited
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.ANNOTATION_TYPE })
+public @interface IndexField {
   /**
-   * Retrieve the {@link IMapper} for the given class
+   * The name of the field to be used for the index
    * 
-   * @param mapperClass
    * @return
-   * @throws Exception
-   *           any Exception which can occur in the init process
    */
-  IMapper getMapper(Class<?> mapperClass) throws Exception;
+  String fieldName();
 
 }

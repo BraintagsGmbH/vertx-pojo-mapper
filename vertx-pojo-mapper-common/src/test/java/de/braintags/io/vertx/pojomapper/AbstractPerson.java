@@ -14,25 +14,24 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mapping;
+package de.braintags.io.vertx.pojomapper;
+
+import de.braintags.io.vertx.pojomapper.annotation.ObjectFactory;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 
 /**
- * IMapperFactory is responsible to create and store instances of {@link IMapper} for all classes, which shall be
- * persisted into the datastore
+ * 
  * 
  * @author Michael Remme
  * 
  */
-public interface IMapperFactory {
 
-  /**
-   * Retrieve the {@link IMapper} for the given class
-   * 
-   * @param mapperClass
-   * @return
-   * @throws Exception
-   *           any Exception which can occur in the init process
-   */
-  IMapper getMapper(Class<?> mapperClass) throws Exception;
+@ObjectFactory(className = "de.braintags.io.vertx.pojomapper.DummyObjectFactory")
+public abstract class AbstractPerson implements IPerson {
+
+  @BeforeLoad
+  public void handleBeforeLoad() {
+    System.out.println("handleBeforeLoad");
+  }
 
 }

@@ -14,25 +14,29 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mapping;
+package de.braintags.io.vertx.pojomapper;
+
 
 /**
- * IMapperFactory is responsible to create and store instances of {@link IMapper} for all classes, which shall be
- * persisted into the datastore
+ * 
  * 
  * @author Michael Remme
  * 
  */
-public interface IMapperFactory {
+
+public interface IPerson {
 
   /**
-   * Retrieve the {@link IMapper} for the given class
-   * 
-   * @param mapperClass
-   * @return
-   * @throws Exception
-   *           any Exception which can occur in the init process
+   * @return the name
    */
-  IMapper getMapper(Class<?> mapperClass) throws Exception;
+  public String getName();
+
+  /**
+   * @param name
+   *          the name to set
+   */
+  public void setName(String name);
+
+  public void beforeLoadFromInterface();
 
 }

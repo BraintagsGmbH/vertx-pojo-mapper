@@ -47,7 +47,7 @@ public class MapperFactory implements IMapperFactory {
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapperFactory#getMapper(java.lang.Class)
    */
   @Override
-  public IMapper getMapper(Class<?> mapperClass) {
+  public IMapper getMapper(Class<?> mapperClass) throws Exception {
     String className = mapperClass.getName();
     if (mappedClasses.containsKey(className))
       return mappedClasses.get(className);
