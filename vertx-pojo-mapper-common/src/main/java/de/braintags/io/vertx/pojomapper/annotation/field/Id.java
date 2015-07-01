@@ -14,7 +14,7 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.annotation;
+package de.braintags.io.vertx.pojomapper.annotation.field;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

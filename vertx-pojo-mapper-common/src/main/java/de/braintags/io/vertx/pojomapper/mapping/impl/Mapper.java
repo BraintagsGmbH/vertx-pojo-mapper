@@ -61,6 +61,7 @@ public class Mapper implements IMapper {
   private MapperFactory mapperFactory;
   private Class<?> mapperClass;
   private Entity entity;
+  private Map<Class<? extends Annotation>, IField[]> fieldCache = new HashMap<Class<? extends Annotation>, IField[]>();
 
   /**
    * all annotations which shall be examined for the mapper class itself
@@ -275,4 +276,42 @@ public class Mapper implements IMapper {
   public Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
     return existingClassAnnotations.get(annotationClass);
   }
+
+  /**
+   * Add an Annotation, for which the Mapper shall be checked. Existing annotations of that type can be requested by
+   * method {@link #getAnnotation(Class)}
+   * 
+   * @param annotation
+   *          the Annotation class, which we are interested in
+   */
+  public static void addInterestingAnnotation(final Class<? extends Annotation> annotation) {
+    CLASS_ANNOTATIONS.add(annotation);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getAnnotatedFields(java.lang.Class)
+   */
+  @Override
+  public IField[] getAnnotatedFields(Class<? extends Annotation> annotationClass) {
+    if (!fieldCache.containsKey(annotationClass)) {
+      IField[] result = new IField[0];
+      for (MappedField field : mappedFields.values()) {
+        if (field.getAnnotation(annotationClass) != null) {
+          IField[] newArray = new IField[result.length + 1];
+          System.arraycopy(result, 0, newArray, 0, result.length);
+          result = newArray;
+          result[result.length - 1] = field;
+        }
+      }
+      fieldCache.put(annotationClass, result);
+    }
+
+    IField[] result = fieldCache.get(annotationClass);
+    if (result.length == 0)
+      return null;
+    return result;
+  }
+
 }

@@ -91,8 +91,17 @@ public interface IMapper {
    * Get a defined {@link Annotation} of the given class
    * 
    * @param annotationClass
-   *          a defined annotation or null
-   * @return
+   *          the annotation class where we are interested in
+   * @return a defined annotation or null
    */
   public Annotation getAnnotation(Class<? extends Annotation> annotationClass);
+
+  /**
+   * Get all {@link IField} of the current mapper, which are annotated with the specified class
+   * 
+   * @param annotationClass
+   *          the annotation class where we are interested in
+   * @return found fields or null, if none is annotated with the given annotation class
+   */
+  public IField[] getAnnotatedFields(Class<? extends Annotation> annotationClass);
 }

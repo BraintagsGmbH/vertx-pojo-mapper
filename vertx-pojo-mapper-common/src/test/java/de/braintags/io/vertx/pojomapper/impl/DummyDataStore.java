@@ -14,8 +14,9 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper;
+package de.braintags.io.vertx.pojomapper.impl;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.IWrite;

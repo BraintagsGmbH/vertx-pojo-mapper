@@ -14,11 +14,9 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper;
+package de.braintags.io.vertx.pojomapper.impl;
 
-import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
+import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultObjectFactory;
 
 /**
  * 
@@ -27,20 +25,12 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
  * 
  */
 
-public class DummyTypeHandlerFactory implements ITypeHandlerFactory {
+public class DummyObjectFactory extends DefaultObjectFactory {
 
   /**
    * 
    */
-  public DummyTypeHandlerFactory() {
-  }
-
-  /* (non-Javadoc)
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory#getTypeHandler(de.braintags.io.vertx.pojomapper.mapping.IField)
-   */
-  @Override
-  public ITypeHandler getTypeHandler(IField field) {
-    return null;
+  public DummyObjectFactory() {
   }
 
 }

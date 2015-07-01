@@ -14,13 +14,19 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper;
+package de.braintags.io.vertx.pojomapper.mapper;
+
+import java.util.Collection;
+import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.Index;
 import de.braintags.io.vertx.pojomapper.annotation.IndexField;
 import de.braintags.io.vertx.pojomapper.annotation.IndexOptions;
 import de.braintags.io.vertx.pojomapper.annotation.Indexes;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import de.braintags.io.vertx.pojomapper.annotation.field.Property;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 
 /**
@@ -33,7 +39,20 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 @Entity(name = "PersonColumn")
 @Indexes(@Index(fields = { @IndexField(fieldName = "name"), @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
 public class Person extends AbstractPerson {
+  @Id
+  public String idField;
   private String name;
+
+  @Referenced
+  public Animal animal;
+
+  public Map<String, Object> myMap;
+
+  public Class<? extends Double> myClass;
+
+  public Collection<String> stories;
+
+  @Property("WEIGHT")
   public Double weight;
 
   private String hiddenString;

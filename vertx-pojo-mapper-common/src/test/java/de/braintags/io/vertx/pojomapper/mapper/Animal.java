@@ -14,9 +14,7 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper;
-
-import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultObjectFactory;
+package de.braintags.io.vertx.pojomapper.mapper;
 
 /**
  * 
@@ -25,12 +23,14 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultObjectFactory;
  * 
  */
 
-public class DummyObjectFactory extends DefaultObjectFactory {
+public class Animal {
+
+  public String name;
 
   /**
    * 
    */
-  public DummyObjectFactory() {
+  public Animal() {
   }
 
 }

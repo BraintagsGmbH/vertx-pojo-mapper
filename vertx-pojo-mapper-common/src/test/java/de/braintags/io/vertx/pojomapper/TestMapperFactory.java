@@ -27,7 +27,14 @@ import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.Index;
 import de.braintags.io.vertx.pojomapper.annotation.IndexOptions;
 import de.braintags.io.vertx.pojomapper.annotation.Indexes;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import de.braintags.io.vertx.pojomapper.annotation.field.Property;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
+import de.braintags.io.vertx.pojomapper.impl.DummyDataStore;
+import de.braintags.io.vertx.pojomapper.impl.DummyObjectFactory;
+import de.braintags.io.vertx.pojomapper.mapper.Person;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 
@@ -52,7 +59,7 @@ public class TestMapperFactory {
 
   @Test
   public void testNumberOfProperties() {
-    Assert.assertEquals("unexpected numer of properties", 2, mapperDef.getFieldNames().size());
+    Assert.assertEquals("unexpected numer of properties", 7, mapperDef.getFieldNames().size());
   }
 
   @Test
@@ -97,6 +104,70 @@ public class TestMapperFactory {
         Assert.assertEquals("wrong parameter unique in IndexOptions", false, options.unique());
       }
     }
+  }
+
+  @Test
+  public void testProperty() {
+    Property ann = (Property) mapperDef.getField("weight").getAnnotation(Property.class);
+    if (ann == null)
+      Assert.fail("Annotation Property must not be null");
+    else
+      Assert.assertEquals("wrong name in Property", "WEIGHT", ann.value());
+  }
+
+  @Test
+  public void testId() {
+    Id ann = (Id) mapperDef.getField("idField").getAnnotation(Id.class);
+    if (ann == null)
+      Assert.fail("Annotation Id must not be null");
+  }
+
+  @Test
+  public void testReferenced() {
+    Referenced ann = (Referenced) mapperDef.getField("animal").getAnnotation(Referenced.class);
+    if (ann == null)
+      Assert.fail("Annotation Referenced must not be null");
+  }
+
+  @Test
+  public void testGetAnnotatedFields() {
+    IField[] fields = mapperDef.getAnnotatedFields(Referenced.class);
+    if (fields == null || fields.length != 1)
+      Assert.fail("WrongNumber of annotated fields with Referenced");
+  }
+
+  @Test
+  public void testParametrizedField() {
+    IField field = mapperDef.getField("stories");
+    Assert.assertFalse("this should not be a single value", field.isSingleValue());
+    Assert.assertFalse("this should not be an array", field.isArray());
+    Assert.assertTrue("this should be a Collection", field.isCollection());
+    Assert.assertEquals(1, field.getTypeParameters().size());
+  }
+
+  @Test
+  public void testSubType() {
+    IField field = mapperDef.getField("stories");
+    Assert.assertEquals("subtype should be String", String.class, field.getSubType());
+    Assert.assertEquals("subclass should be String", String.class, field.getSubClass());
+
+    field = mapperDef.getField("name");
+    Assert.assertNull(field.getSubType());
+    Assert.assertNull(field.getSubClass());
+
+  }
+
+  @Test
+  public void testWildcard() {
+    IField field = mapperDef.getField("myClass");
+    Assert.assertEquals(1, field.getTypeParameters().size());
+  }
+
+  @Test
+  public void testMap() {
+    IField field = mapperDef.getField("myMap");
+    Assert.assertTrue(field.isMap());
+    Assert.assertEquals(2, field.getTypeParameters().size());
   }
 
 }
