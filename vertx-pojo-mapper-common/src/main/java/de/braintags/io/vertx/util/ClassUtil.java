@@ -176,6 +176,7 @@ public class ClassUtil {
       throw new RuntimeException("Generic TypeVariable not supported!");
 
     // TODO remove this check
+    log.info("********* remove the check in ClassUtil by the time");
     Class<?> returnClass2 = getClass(t);
     if (returnClass == null && returnClass2 != null)
       throw new IllegalArgumentException("result not equal");

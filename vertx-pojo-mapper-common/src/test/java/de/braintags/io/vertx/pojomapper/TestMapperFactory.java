@@ -124,7 +124,8 @@ public class TestMapperFactory {
 
   @Test
   public void testReferenced() {
-    Referenced ann = (Referenced) mapperDef.getField("animal").getAnnotation(Referenced.class);
+    IField field = mapperDef.getField("animal");
+    Referenced ann = (Referenced) field.getAnnotation(Referenced.class);
     if (ann == null)
       Assert.fail("Annotation Referenced must not be null");
   }

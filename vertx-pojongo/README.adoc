@@ -1,6 +1,3 @@
-# Vert.x Mongo Auth
+# vertx-pojongo
 
-This module contains contains a Vert.x auth implementation which uses a Vert.x mongo client to query 
-user/role/permission information.
-
-Please see the documentation for more information.
+implementation of vertx-pojo-mapper for mongo

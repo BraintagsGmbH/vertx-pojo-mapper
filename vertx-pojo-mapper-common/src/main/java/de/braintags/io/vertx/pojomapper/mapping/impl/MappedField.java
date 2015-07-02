@@ -457,4 +457,17 @@ public class MappedField implements IField {
     return existingClassAnnotations.containsKey(ann);
   }
 
+  /**
+   * returns the full name of the class plus java field name
+   * 
+   * @return the name
+   */
+  public String getFullName() {
+    return field.getDeclaringClass().getName() + "." + field.getName();
+  }
+
+  @Override
+  public String toString() {
+    return getFullName();
+  }
 }
