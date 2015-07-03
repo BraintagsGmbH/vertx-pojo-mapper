@@ -1,0 +1,3 @@
+# vertx-pojo-mapper-json
+
+mainly stuff for the serialization of POJO to Json and back
