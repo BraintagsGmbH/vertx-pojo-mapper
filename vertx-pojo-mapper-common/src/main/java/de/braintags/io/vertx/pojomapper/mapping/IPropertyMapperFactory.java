@@ -16,34 +16,22 @@
 
 package de.braintags.io.vertx.pojomapper.mapping;
 
-import io.vertx.codegen.annotations.Fluent;
-import de.braintags.io.vertx.pojomapper.IDataStore;
-
 /**
- * The IStoreObject is building the bridge between the propriate format coming from out of the used {@link IDataStore}
- * and the rest of the application. This can be a Json object or an internal format for later use of a ResultSet for
- * instance
+ * Factory to build instances of {@link IPropertyMapper}
  * 
  * @author Michael Remme
  * 
  */
 
-public interface IStoreObject {
+public interface IPropertyMapperFactory {
 
   /**
+   * Get an instance of {@link IPropertyMapper}
    * 
-   * @param property
-   * @return
+   * @param cls
+   *          teh interface, for which an implementation shall be retrieved. This can be {@link IPropertyMapper},
+   *          {@link IEmbeddedMapper} or {@link IReferencedMapper}
+   * @return an imeplementation of the required interface
    */
-  public Object get(IField field);
-
-  /**
-   * Adds a new property into the internal container
-   * 
-   * @param property
-   * @param value
-   * @return
-   */
-  @Fluent
-  public IStoreObject put(IField field, Object value);
+  public IPropertyMapper getPropertyMapper(Class<? extends IPropertyMapper> cls);
 }

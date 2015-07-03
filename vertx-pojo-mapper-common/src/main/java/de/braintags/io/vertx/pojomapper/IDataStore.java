@@ -20,6 +20,8 @@ import de.braintags.io.vertx.pojomapper.dataaccess.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.IWrite;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 /**
@@ -71,4 +73,12 @@ public interface IDataStore {
    * @return the {@link ITypeHandlerFactory}
    */
   ITypeHandlerFactory getTypeHandlerFactory();
+
+  /**
+   * Get the instance of {@link IPropertyMapperFactory} which is used by the current implementation
+   * 
+   * @return the {@link IPropertyMapperFactory} to retrieve new instances of {@link IPropertyMapper}
+   */
+  public IPropertyMapperFactory getPropertyMapperFactory();
+
 }

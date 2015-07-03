@@ -19,8 +19,8 @@ package de.braintags.io.vertx.pojomapper.mapping;
 import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
 
 /**
- * An accessor to a property within a Java class. The exact location and access of the property is left to the
- * implementation class.
+ * An accessor to a property within a Java class, to read and write the value of a field. The exact location and access
+ * of the property is left to the implementation class.
  * 
  * @author Michael Remme
  * 
