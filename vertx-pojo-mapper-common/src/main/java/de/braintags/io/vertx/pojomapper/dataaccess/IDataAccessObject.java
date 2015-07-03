@@ -33,4 +33,12 @@ public interface IDataAccessObject<T> {
    * @return the {@link IDataStore}
    */
   IDataStore getDataStore();
+
+  /**
+   * Get the underlaying mapper class of the instance
+   * 
+   * @return the class
+   */
+  public Class<T> getMapperClass();
+
 }

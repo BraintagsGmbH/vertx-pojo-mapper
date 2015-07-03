@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * IWrite is responsible for all write actions into the connected datasource. It performs inserts and updates.
@@ -26,4 +28,5 @@ package de.braintags.io.vertx.pojomapper.dataaccess;
 
 public interface IWrite<T> extends IDataAccessObject<T> {
 
+  public void save(final T mapper, Handler<AsyncResult<T>> resultHandler);
 }
