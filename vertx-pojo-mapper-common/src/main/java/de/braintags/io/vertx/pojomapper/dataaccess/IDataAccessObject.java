@@ -17,9 +17,10 @@
 package de.braintags.io.vertx.pojomapper.dataaccess;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 
 /**
- * 
+ * describes common methods for all dataaccess objects
  * 
  * @author Michael Remme
  * 
@@ -40,5 +41,12 @@ public interface IDataAccessObject<T> {
    * @return the class
    */
   public Class<T> getMapperClass();
+
+  /**
+   * Get the underlaying instance of {@link IMapper}
+   * 
+   * @return the mapper
+   */
+  public IMapper getMapper();
 
 }

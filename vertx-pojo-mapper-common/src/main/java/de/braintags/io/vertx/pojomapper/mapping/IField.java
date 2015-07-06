@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
@@ -34,6 +35,27 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  */
 
 public interface IField {
+
+  /**
+   * Get the simple name of the field, like defined in the mapper class
+   * 
+   * @return the name
+   */
+  public String getName();
+
+  /**
+   * Get the full name of the field
+   * 
+   * @return the classname.fieldname
+   */
+  public String getFullName();
+
+  /**
+   * Get the name of the field in the {@link IDataStore}
+   * 
+   * @return
+   */
+  public String getMappedFieldName();
 
   /**
    * Get the fitting {@link IPropertyAccessor} for the current field

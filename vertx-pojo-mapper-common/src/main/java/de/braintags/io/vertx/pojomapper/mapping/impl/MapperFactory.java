@@ -24,7 +24,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 
 /**
- * 
+ * Default implementation of {@link IMapperFactory}
  * 
  * @author Michael Remme
  * 
@@ -47,7 +47,7 @@ public class MapperFactory implements IMapperFactory {
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapperFactory#getMapper(java.lang.Class)
    */
   @Override
-  public IMapper getMapper(Class<?> mapperClass) throws Exception {
+  public IMapper getMapper(Class<?> mapperClass) {
     String className = mapperClass.getName();
     if (mappedClasses.containsKey(className))
       return mappedClasses.get(className);

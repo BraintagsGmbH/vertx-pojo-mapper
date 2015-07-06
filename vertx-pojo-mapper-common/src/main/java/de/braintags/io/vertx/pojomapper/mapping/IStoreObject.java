@@ -28,12 +28,14 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
  * 
  */
 
-public interface IStoreObject {
+public interface IStoreObject<T> {
 
   /**
+   * Get the defined property in the propriate format of the current driver
    * 
    * @param property
-   * @return
+   *          the {@link IField} describing the property
+   * @return the value of the property in the propriate format of the current implementation of the {@link IDataStore}
    */
   public Object get(IField field);
 
@@ -41,9 +43,18 @@ public interface IStoreObject {
    * Adds a new property into the internal container
    * 
    * @param property
+   *          the {@link IField} used to describe the property
    * @param value
-   * @return
+   *          the value to be stored in the proprietary format
+   * @return a reference to itself
    */
   @Fluent
-  public IStoreObject put(IField field, Object value);
+  public IStoreObject<T> put(IField field, Object value);
+
+  /**
+   * Get the raw container, which stores the information
+   * 
+   * @return the container
+   */
+  public T getContainer();
 }

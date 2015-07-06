@@ -40,6 +40,7 @@ import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.field.ConstructorArguments;
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
@@ -69,7 +70,7 @@ public class MappedField implements IField {
    * Annotations which shall be checked for a field definition
    */
   private static final List<Class<? extends Annotation>> FIELD_ANNOTATIONS = Arrays.asList(Id.class, Property.class,
-      Referenced.class);
+      Referenced.class, Embedded.class);
 
   /**
    * Class annotations which were found inside the current definition
@@ -85,6 +86,7 @@ public class MappedField implements IField {
 
   private Type mapKeyType;
   private Type subType;
+  private String mappedFieldName;
 
   /**
    * 
@@ -92,6 +94,7 @@ public class MappedField implements IField {
   public MappedField(Field field, IPropertyAccessor accessor, Mapper mapper) {
     this.accessor = accessor;
     this.field = field;
+    this.mappedFieldName = field.getName();
     field.setAccessible(true);
     realType = field.getType();
     this.mapper = mapper;
@@ -110,10 +113,18 @@ public class MappedField implements IField {
 
   private void init() {
     typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
+    computePropertyName();
     computeAnnotations();
     computeType();
     computeConstructor();
     computeMultivalued();
+  }
+
+  private void computePropertyName() {
+    if (field.isAnnotationPresent(Property.class)) {
+      Property prop = field.getAnnotation(Property.class);
+      mappedFieldName = prop.value();
+    }
   }
 
   private Constructor<?> computeConstructor() {
@@ -462,6 +473,7 @@ public class MappedField implements IField {
    * 
    * @return the name
    */
+  @Override
   public String getFullName() {
     return field.getDeclaringClass().getName() + "." + field.getName();
   }
@@ -469,5 +481,15 @@ public class MappedField implements IField {
   @Override
   public String toString() {
     return getFullName();
+  }
+
+  @Override
+  public String getName() {
+    return field.getName();
+  }
+
+  @Override
+  public String getMappedFieldName() {
+    return mappedFieldName;
   }
 }

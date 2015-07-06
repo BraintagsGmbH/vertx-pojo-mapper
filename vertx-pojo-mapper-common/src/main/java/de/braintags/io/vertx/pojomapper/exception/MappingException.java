@@ -17,7 +17,7 @@
 package de.braintags.io.vertx.pojomapper.exception;
 
 /**
- * 
+ * An exception which is thrown during the mapping process
  * 
  * @author Michael Remme
  * 

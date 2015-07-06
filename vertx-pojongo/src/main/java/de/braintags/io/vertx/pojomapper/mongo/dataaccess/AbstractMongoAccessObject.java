@@ -22,16 +22,13 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 
 /**
- * 
- * 
  * @author Michael Remme
- * 
  */
 
 public abstract class AbstractMongoAccessObject<T> implements IDataAccessObject<T> {
-  private Class<T> mapperClass;
+  private Class<T>       mapperClass;
   private MongoDataStore datastore;
-  private IMapper mapper;
+  private IMapper        mapper;
 
   /**
    * 
@@ -60,6 +57,14 @@ public abstract class AbstractMongoAccessObject<T> implements IDataAccessObject<
   @Override
   public Class<T> getMapperClass() {
     return mapperClass;
+  }
+
+  /* (non-Javadoc)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject#getMapper()
+   */
+  @Override
+  public IMapper getMapper() {
+    return mapper;
   }
 
 }

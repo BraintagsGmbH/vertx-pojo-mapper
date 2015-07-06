@@ -28,5 +28,23 @@ import io.vertx.core.Handler;
 
 public interface IWrite<T> extends IDataAccessObject<T> {
 
-  public void save(final T mapper, Handler<AsyncResult<T>> resultHandler);
+  /**
+   * Add an entity to be saved
+   * 
+   * @param mapper
+   *          the mapper to be saved
+   */
+  public void add(final T mapper);
+
+  /**
+   * SAve the entities inside the current instance
+   * 
+   * @param resultHandler
+   *          a handler, which will receive information about the save result
+   */
+  public void save(Handler<AsyncResult<IWriteResult>> resultHandler);
+
+  interface IWriteResult {
+
+  }
 }

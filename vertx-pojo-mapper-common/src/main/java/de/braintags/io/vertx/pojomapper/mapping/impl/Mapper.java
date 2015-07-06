@@ -41,6 +41,7 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeDelete;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.exception.ClassAccessException;
+import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
@@ -88,7 +89,7 @@ public class Mapper implements IMapper {
    * @throws Exception
    * 
    */
-  public Mapper(Class<?> mapperClass, MapperFactory mapperFactory) throws Exception {
+  public Mapper(Class<?> mapperClass, MapperFactory mapperFactory) {
     this.mapperFactory = mapperFactory;
     this.mapperClass = mapperClass;
     init();
@@ -104,7 +105,7 @@ public class Mapper implements IMapper {
     return objectFactory;
   }
 
-  private void init() throws Exception {
+  private void init() {
     computePersistentFields();
     computeLifeCycleAnnotations();
     computeClassAnnotations();
@@ -117,13 +118,17 @@ public class Mapper implements IMapper {
       entity = mapperClass.getAnnotation(Entity.class);
   }
 
-  private void computeObjectFactory() throws Exception {
+  private void computeObjectFactory() {
     if (mapperClass.isAnnotationPresent(ObjectFactory.class)) {
       ObjectFactory ofAnn = mapperClass.getAnnotation(ObjectFactory.class);
       String className = ofAnn.className();
-      Class<?> ofClass = Class.forName(className);
-      IObjectFactory of = (IObjectFactory) ofClass.newInstance();
-      this.objectFactory = of;
+      try {
+        Class<?> ofClass = Class.forName(className);
+        IObjectFactory of = (IObjectFactory) ofClass.newInstance();
+        this.objectFactory = of;
+      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        throw new MappingException("Problems in mapping process", e);
+      }
     }
   }
 
