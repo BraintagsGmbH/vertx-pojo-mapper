@@ -17,8 +17,10 @@
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
  * 
@@ -36,13 +38,23 @@ public class DefaultPropertyMapper implements IPropertyMapper {
   }
 
   @Override
-  public void intoStoreObject(Object mapper, IStoreObject storeObject, IField field) {
-    throw new UnsupportedOperationException();
+  public void intoStoreObject(Object mapper, IStoreObject<?> storeObject, IField field) {
+    ITypeHandler th = field.getTypeHandler();
+    IPropertyAccessor pAcc = field.getPropertyAccessor();
+    Object javaValue = pAcc.readData(mapper);
+    Object dbValue = th.intoStore(javaValue);
+    if (dbValue != null)
+      storeObject.put(field, dbValue);
   }
 
   @Override
-  public void fromStoreObject(Object mapper, IStoreObject storeObject, IField field) {
-    throw new UnsupportedOperationException();
+  public void fromStoreObject(Object mapper, IStoreObject<?> storeObject, IField field) {
+    ITypeHandler th = field.getTypeHandler();
+    IPropertyAccessor pAcc = field.getPropertyAccessor();
+    Object dbValue = storeObject.get(field);
+    Object javaValue = th.fromStore(dbValue);
+    if (javaValue != null)
+      pAcc.writeData(mapper, javaValue);
   }
 
 }

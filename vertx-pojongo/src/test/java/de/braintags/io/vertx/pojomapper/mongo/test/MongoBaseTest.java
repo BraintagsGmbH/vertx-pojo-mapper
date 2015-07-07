@@ -178,11 +178,15 @@ public abstract class MongoBaseTest extends VertxTestBase {
       int count = toDrop.size();
       if (!toDrop.isEmpty()) {
         for (String collection : toDrop) {
-          mongoClient.dropCollection(collection, onSuccess(v -> {
-            if (collCount.incrementAndGet() == count) {
-              latch.countDown();
-            }
-          }));
+          if (collection.startsWith("system.")) {
+            latch.countDown();
+          } else {
+            mongoClient.dropCollection(collection, onSuccess(v -> {
+              if (collCount.incrementAndGet() == count) {
+                latch.countDown();
+              }
+            }));
+          }
         }
       } else {
         latch.countDown();

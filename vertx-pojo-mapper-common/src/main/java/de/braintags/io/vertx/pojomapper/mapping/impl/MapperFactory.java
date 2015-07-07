@@ -51,9 +51,20 @@ public class MapperFactory implements IMapperFactory {
     String className = mapperClass.getName();
     if (mappedClasses.containsKey(className))
       return mappedClasses.get(className);
-    Mapper mapper = new Mapper(mapperClass, this);
+    Mapper mapper = createMapper(mapperClass);
     mappedClasses.put(className, mapper);
     return mapper;
+  }
+
+  /**
+   * Creates a new instance of IMapper for the given class
+   * 
+   * @param mapperClass
+   *          the class to be mapped
+   * @return the mapper
+   */
+  protected Mapper createMapper(Class mapperClass) {
+    return new Mapper(mapperClass, this);
   }
 
   /**

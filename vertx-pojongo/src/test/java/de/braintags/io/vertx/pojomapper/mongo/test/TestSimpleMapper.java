@@ -65,6 +65,8 @@ public class TestSimpleMapper extends MongoBaseTest {
   @Test
   public void testSimpleMapper() {
     SimpleMapper sm = new SimpleMapper();
+    sm.id = "testId";
+    sm.name = "testName";
     IWrite<SimpleMapper> write = getDataStore().createWrite(SimpleMapper.class);
     write.add(sm);
     write.save(result -> {

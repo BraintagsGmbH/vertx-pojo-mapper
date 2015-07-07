@@ -42,7 +42,7 @@ public class CharacterTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public Object fromStore(Object source) {
-    return null;
+    return source;
   }
 
   /*
@@ -52,7 +52,7 @@ public class CharacterTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public Object intoStore(Object source) {
-    return null;
+    return source;
   }
 
 }

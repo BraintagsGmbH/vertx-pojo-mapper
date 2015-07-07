@@ -36,6 +36,7 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.Indexes;
 import de.braintags.io.vertx.pojomapper.annotation.ObjectFactory;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
@@ -48,6 +49,7 @@ import de.braintags.io.vertx.pojomapper.exception.MethodAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.util.ClassUtil;
 
@@ -63,10 +65,12 @@ import de.braintags.io.vertx.util.ClassUtil;
 public class Mapper implements IMapper {
   private IObjectFactory objectFactory = new DefaultObjectFactory();
   private Map<String, MappedField> mappedFields = new HashMap<String, MappedField>();
+  private IField idField;
   private MapperFactory mapperFactory;
   private Class<?> mapperClass;
   private Entity entity;
   private Map<Class<? extends Annotation>, IField[]> fieldCache = new HashMap<Class<? extends Annotation>, IField[]>();
+  private String dataStoreName;
 
   /**
    * all annotations which shall be examined for the mapper class itself
@@ -115,11 +119,23 @@ public class Mapper implements IMapper {
     computeClassAnnotations();
     computeEntity();
     computeObjectFactory();
+    validate();
+  }
+
+  /**
+   * Validation for required properties etc
+   */
+  private void validate() {
+    if (idField == null)
+      throw new MappingException("No id-field specified in mapper " + getMapperClass().getName());
   }
 
   private void computeEntity() {
-    if (mapperClass.isAnnotationPresent(Entity.class))
+    if (mapperClass.isAnnotationPresent(Entity.class)) {
       entity = mapperClass.getAnnotation(Entity.class);
+      dataStoreName = entity.name();
+    } else
+      dataStoreName = mapperClass.getSimpleName();
   }
 
   private void computeObjectFactory() {
@@ -193,7 +209,7 @@ public class Mapper implements IMapper {
           JavaBeanAccessor accessor = new JavaBeanAccessor(beanDescriptors[i]);
           String name = accessor.getName();
           Field field = mapperClass.getDeclaredField(name);
-          mappedFields.put(name, new MappedField(field, accessor, this));
+          addMappedField(name, createMappedField(field, accessor));
         }
       }
     } catch (IntrospectionException | NoSuchFieldException e) {
@@ -212,9 +228,22 @@ public class Mapper implements IMapper {
       if (!Modifier.isTransient(fieldModifiers)
           && (Modifier.isPublic(fieldModifiers) && !Modifier.isStatic(fieldModifiers))) {
         JavaFieldAccessor accessor = new JavaFieldAccessor(field);
-        mappedFields.put(accessor.getName(), new MappedField(field, accessor, this));
+        addMappedField(accessor.getName(), createMappedField(field, accessor));
       }
     }
+  }
+
+  protected MappedField createMappedField(Field field, IPropertyAccessor accessor) {
+    return new MappedField(field, accessor, this);
+  }
+
+  private void addMappedField(String name, MappedField mf) {
+    if (mf.hasAnnotation(Id.class)) {
+      if (idField != null)
+        throw new MappingException("duplicate Id field definition found for mapper " + getMapperClass());
+      idField = mf;
+    }
+    mappedFields.put(name, mf);
   }
 
   /**
@@ -331,20 +360,22 @@ public class Mapper implements IMapper {
   @Override
   public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity) {
     List<Method> methods = getLifecycleMethods(annotationClass);
-    for (Method method : methods) {
-      method.setAccessible(true);
-      Object[] args = null;
-      if (method.getParameterCount() > 0) {
-        args = createMethodArgs(method, entity);
-      }
+    if (methods != null) {
+      for (Method method : methods) {
+        method.setAccessible(true);
+        Object[] args = null;
+        if (method.getParameterCount() > 0) {
+          args = createMethodArgs(method, entity);
+        }
 
-      try {
-        Object result = method.invoke(entity, args);
-        if (result != null)
-          throw new UnsupportedOperationException("Not yet supported, return value of annotated lifecyle methods: "
-              + result.getClass().getName());
-      } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-        throw new MethodAccessException(e);
+        try {
+          Object result = method.invoke(entity, args);
+          if (result != null)
+            throw new UnsupportedOperationException("Not yet supported, return value of annotated lifecyle methods: "
+                + result.getClass().getName());
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+          throw new MethodAccessException(e);
+        }
       }
     }
   }
@@ -358,5 +389,10 @@ public class Mapper implements IMapper {
    */
   private Object[] createMethodArgs(Method method, Object entity) {
     throw new UnsupportedOperationException("Not yet supported, dynamic generation of arguments");
+  }
+
+  @Override
+  public String getDataStoreName() {
+    return dataStoreName;
   }
 }

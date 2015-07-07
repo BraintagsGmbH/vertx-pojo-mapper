@@ -46,7 +46,7 @@ public interface IPropertyMapper {
    * @param field
    *          the {@link IField} to be handled
    */
-  void intoStoreObject(Object mapper, IStoreObject storeObject, IField field);
+  void intoStoreObject(Object mapper, IStoreObject<?> storeObject, IField field);
 
   /**
    * fetch the content from the {@link IStoreObject} and store it inside the mapper
@@ -58,6 +58,6 @@ public interface IPropertyMapper {
    * @param field
    *          the {@link IField} to be handled
    */
-  void fromStoreObject(Object mapper, IStoreObject storeObject, IField field);
+  void fromStoreObject(Object mapper, IStoreObject<?> storeObject, IField field);
 
 }

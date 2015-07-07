@@ -17,7 +17,9 @@
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.ext.mongo.MongoClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,8 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.dataaccess.IWrite;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 
 /**
@@ -98,6 +102,42 @@ public class MongoWrite<T> extends AbstractMongoAccessObject<T> implements IWrit
    * @param resultHandler
    */
   private void doSave(MongoStoreObject storeObject, Handler<AsyncResult<IWriteResult>> resultHandler) {
-    throw new UnsupportedOperationException();
+    MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
+    IMapper mapper = getMapper();
+    String column = mapper.getDataStoreName();
+
+    mongoClient.save(column, storeObject.getContainer(), result -> {
+      if (result.failed()) {
+        Future<IWriteResult> future = Future.failedFuture(result.cause());
+        resultHandler.handle(future);
+        return;
+      } else {
+        String id = result.result();
+        Future<IWriteResult> future = Future.succeededFuture(new MongoWriteResult(storeObject, id));
+        resultHandler.handle(future);
+      }
+    });
+
+  }
+
+  class MongoWriteResult implements IWriteResult {
+    private IStoreObject<?> sto;
+    private String id;
+
+    MongoWriteResult(IStoreObject<?> sto, String id) {
+      this.sto = sto;
+      this.id = id;
+    }
+
+    @Override
+    public IStoreObject<?> getStoreObject() {
+      return sto;
+    }
+
+    @Override
+    public Object getId() {
+      return id;
+    }
+
   }
 }

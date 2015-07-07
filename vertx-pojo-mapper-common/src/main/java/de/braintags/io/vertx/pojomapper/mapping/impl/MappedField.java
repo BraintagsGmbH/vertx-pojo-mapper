@@ -98,7 +98,6 @@ public class MappedField implements IField {
   public MappedField(Field field, IPropertyAccessor accessor, Mapper mapper) {
     this.accessor = accessor;
     this.field = field;
-    this.mappedFieldName = field.getName();
     field.setAccessible(true);
     realType = field.getType();
     this.mapper = mapper;
@@ -115,35 +114,36 @@ public class MappedField implements IField {
     computeType();
   }
 
-  private void init() {
-    computePropertyName();
-    computePropertyMapper();
-    typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
+  protected void init() {
     computeAnnotations();
+    mappedFieldName = computePropertyName();
+    propertyMapper = computePropertyMapper();
+    typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
     computeType();
     computeConstructor();
     computeMultivalued();
   }
 
-  private void computePropertyName() {
+  protected IPropertyMapper computePropertyMapper() {
     IDataStore store = mapper.getMapperFactory().getDataStore();
     if (field.isAnnotationPresent(Embedded.class)) {
-      propertyMapper = store.getPropertyMapperFactory().getPropertyMapper(IEmbeddedMapper.class);
+      return store.getPropertyMapperFactory().getPropertyMapper(IEmbeddedMapper.class);
     } else if (field.isAnnotationPresent(Referenced.class)) {
-      propertyMapper = store.getPropertyMapperFactory().getPropertyMapper(IReferencedMapper.class);
+      return store.getPropertyMapperFactory().getPropertyMapper(IReferencedMapper.class);
     } else {
-      propertyMapper = store.getPropertyMapperFactory().getPropertyMapper(IPropertyMapper.class);
+      return store.getPropertyMapperFactory().getPropertyMapper(IPropertyMapper.class);
     }
   }
 
-  private void computePropertyMapper() {
+  protected String computePropertyName() {
     if (field.isAnnotationPresent(Property.class)) {
       Property prop = field.getAnnotation(Property.class);
-      mappedFieldName = prop.value();
+      return prop.value();
     }
+    return getField().getName();
   }
 
-  private Constructor<?> computeConstructor() {
+  protected Constructor<?> computeConstructor() {
     Constructor<?> constructor = null;
     Class<?> type = null;
     // get the first annotation with a concreteClass that isn't Object.class
@@ -197,7 +197,7 @@ public class MappedField implements IField {
     return constructor;
   }
 
-  private void computeMultivalued() {
+  protected void computeMultivalued() {
     if (realType.isArray() || Collection.class.isAssignableFrom(realType) || Map.class.isAssignableFrom(realType)
         || GenericArrayType.class.isAssignableFrom(genericType.getClass())) {
 
@@ -269,7 +269,7 @@ public class MappedField implements IField {
     }
   }
 
-  private void computeAnnotations() {
+  protected void computeAnnotations() {
     for (Class<? extends Annotation> annClass : FIELD_ANNOTATIONS) {
       Annotation ann = field.getAnnotation(annClass);
       if (ann != null)

@@ -26,7 +26,9 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoWrite;
+import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapperFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.StringTypeHandlerFactory;
 
 /**
  * An {@link IDataStore} which is dealing with {@link MongoClient}
@@ -37,8 +39,9 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 public class MongoDataStore implements IDataStore {
   private MongoClient client;
-  private MapperFactory mapperFactory = new MapperFactory(this);
+  private MapperFactory mapperFactory = new MongoMapperFactory(this);
   private IPropertyMapperFactory propertyMapperFactory = new DefaultPropertyMapperFactory();
+  private ITypeHandlerFactory thf = new StringTypeHandlerFactory();
 
   /**
    * 
@@ -94,7 +97,7 @@ public class MongoDataStore implements IDataStore {
    */
   @Override
   public ITypeHandlerFactory getTypeHandlerFactory() {
-    return null;
+    return thf;
   }
 
   /*
@@ -105,6 +108,15 @@ public class MongoDataStore implements IDataStore {
   @Override
   public IPropertyMapperFactory getPropertyMapperFactory() {
     return propertyMapperFactory;
+  }
+
+  /**
+   * Get the underlaying instance of {@link MongoClient}
+   * 
+   * @return the client
+   */
+  public MongoClient getMongoClient() {
+    return client;
   }
 
 }

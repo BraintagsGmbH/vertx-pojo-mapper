@@ -17,6 +17,7 @@
 package de.braintags.io.vertx.pojomapper;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
@@ -54,7 +55,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ObjectT
  */
 
 public class TestMapperFactory {
-  public static final int NUMBER_OF_PROPERTIES = 8;
+  public static final int NUMBER_OF_PROPERTIES = 9;
   private static IDataStore dataStore = new DummyDataStore();
   private static IMapper mapperDef = null;
 
@@ -128,7 +129,9 @@ public class TestMapperFactory {
     assertTrue("Not an instance of CharacterTypeHandler",
         mapperDef.getField("name").getTypeHandler() instanceof CharacterTypeHandler);
     assertTrue("Not an instance of ObjectTypeHandler",
-        mapperDef.getField("animal").getTypeHandler() instanceof ObjectTypeHandler);
+        mapperDef.getField("rabbit").getTypeHandler() instanceof ObjectTypeHandler);
+    assertNull("@Embedded must be null", mapperDef.getField("chicken").getTypeHandler());
+    assertNull("@Referenced must be null", mapperDef.getField("animal").getTypeHandler());
 
   }
 

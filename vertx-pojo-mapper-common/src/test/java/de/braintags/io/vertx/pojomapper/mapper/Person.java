@@ -50,6 +50,8 @@ public class Person extends AbstractPerson {
   @Embedded
   public Animal chicken;
 
+  public Animal rabbit;
+
   public Map<String, Object> myMap;
 
   public Class<? extends Double> myClass;

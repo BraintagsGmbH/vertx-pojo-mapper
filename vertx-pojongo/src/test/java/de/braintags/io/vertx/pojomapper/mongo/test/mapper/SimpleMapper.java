@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+
 /**
  * A simple mapper with some beans properties
  *
@@ -24,6 +26,8 @@ package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
  */
 
 public class SimpleMapper {
+  @Id
+  public String id;
   public String name;
   private String secondProperty;
 

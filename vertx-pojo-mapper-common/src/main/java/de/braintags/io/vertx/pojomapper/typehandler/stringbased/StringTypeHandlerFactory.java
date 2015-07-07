@@ -65,8 +65,7 @@ public class StringTypeHandlerFactory implements ITypeHandlerFactory {
    */
   @Override
   public ITypeHandler getTypeHandler(IField field) {
-    if (field.getPropertyAccessor() instanceof IReferencedMapper
-        || field.getPropertyAccessor() instanceof IEmbeddedMapper)
+    if (field.getPropertyMapper() instanceof IReferencedMapper || field.getPropertyMapper() instanceof IEmbeddedMapper)
       return null;
     Class<?> fieldClass = field.getType();
     if (cachedTypeHandler.containsKey(fieldClass))
