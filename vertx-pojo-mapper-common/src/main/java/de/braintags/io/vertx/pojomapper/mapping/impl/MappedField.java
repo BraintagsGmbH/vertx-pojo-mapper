@@ -45,9 +45,12 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
+import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
+import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.util.ClassUtil;
 
@@ -65,6 +68,7 @@ public class MappedField implements IField {
   private Field field;
   private Mapper mapper;
   private ITypeHandler typeHandler;
+  private IPropertyMapper propertyMapper;
   private final List<IField> typeParameters = new ArrayList<IField>();
   /**
    * Annotations which shall be checked for a field definition
@@ -114,6 +118,7 @@ public class MappedField implements IField {
   private void init() {
     typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
     computePropertyName();
+    computePropertyMapper();
     computeAnnotations();
     computeType();
     computeConstructor();
@@ -121,6 +126,17 @@ public class MappedField implements IField {
   }
 
   private void computePropertyName() {
+    IDataStore store = mapper.getMapperFactory().getDataStore();
+    if (field.isAnnotationPresent(Embedded.class)) {
+      propertyMapper = store.getPropertyMapperFactory().getPropertyMapper(IEmbeddedMapper.class);
+    } else if (field.isAnnotationPresent(Referenced.class)) {
+      propertyMapper = store.getPropertyMapperFactory().getPropertyMapper(IReferencedMapper.class);
+    } else {
+      propertyMapper = store.getPropertyMapperFactory().getPropertyMapper(IPropertyMapper.class);
+    }
+  }
+
+  private void computePropertyMapper() {
     if (field.isAnnotationPresent(Property.class)) {
       Property prop = field.getAnnotation(Property.class);
       mappedFieldName = prop.value();
@@ -491,5 +507,10 @@ public class MappedField implements IField {
   @Override
   public String getMappedFieldName() {
     return mappedFieldName;
+  }
+
+  @Override
+  public IPropertyMapper getPropertyMapper() {
+    return propertyMapper;
   }
 }

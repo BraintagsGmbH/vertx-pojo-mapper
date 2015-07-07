@@ -72,6 +72,13 @@ public interface IField {
   public ITypeHandler getTypeHandler();
 
   /**
+   * Get the fitting {@link IPropertyMapper} for the current field.
+   * 
+   * @return an instance of {@link IPropertyMapper}, {@link IEmbeddedMapper} or {@link IReferencedMapper}
+   */
+  public IPropertyMapper getPropertyMapper();
+
+  /**
    * Get a defined {@link Annotation} of the given class
    * 
    * @param annotationClass

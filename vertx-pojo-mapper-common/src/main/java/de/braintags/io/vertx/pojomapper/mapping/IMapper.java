@@ -104,4 +104,16 @@ public interface IMapper {
    * @return found fields or null, if none is annotated with the given annotation class
    */
   public IField[] getAnnotatedFields(Class<? extends Annotation> annotationClass);
+
+  /**
+   * Execute those lifecycle methods which are annotated by the given lifecycle annotation like {@link BeforeLoad},
+   * {@link BeforeSave}, {@link BeforeDelete}, {@link AfterLoad}, {@link AfterSave}, {@link AfterDelete}
+   * 
+   * @param annotationClass
+   *          execute all methods, which are annotated by this annotation
+   * @param entity
+   *          the entity to be handled
+   */
+  public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity);
+
 }

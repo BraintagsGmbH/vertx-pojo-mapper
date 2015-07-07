@@ -14,7 +14,7 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.json;
+package de.braintags.io.vertx.pojomapper.json.dataaccess;
 
 import io.vertx.core.json.JsonObject;
 import de.braintags.io.vertx.pojomapper.mapping.IField;

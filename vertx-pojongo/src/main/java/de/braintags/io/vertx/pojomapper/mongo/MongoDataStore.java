@@ -24,6 +24,9 @@ import de.braintags.io.vertx.pojomapper.dataaccess.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.IWrite;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultPropertyMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
+import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoWrite;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 /**
@@ -35,6 +38,8 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 public class MongoDataStore implements IDataStore {
   private MongoClient client;
+  private MapperFactory mapperFactory = new MapperFactory(this);
+  private IPropertyMapperFactory propertyMapperFactory = new DefaultPropertyMapperFactory();
 
   /**
    * 
@@ -60,7 +65,7 @@ public class MongoDataStore implements IDataStore {
    */
   @Override
   public <T> IWrite<T> createWrite(Class<T> mapper) {
-    return null;
+    return new MongoWrite<>(mapper, this);
   }
 
   /*
@@ -80,7 +85,7 @@ public class MongoDataStore implements IDataStore {
    */
   @Override
   public IMapperFactory getMapperFactory() {
-    return null;
+    return mapperFactory;
   }
 
   /*
@@ -100,7 +105,7 @@ public class MongoDataStore implements IDataStore {
    */
   @Override
   public IPropertyMapperFactory getPropertyMapperFactory() {
-    return null;
+    return propertyMapperFactory;
   }
 
 }

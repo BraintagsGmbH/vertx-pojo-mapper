@@ -16,7 +16,7 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
-import de.braintags.io.vertx.pojomapper.json.JsonStoreObject;
+import de.braintags.io.vertx.pojomapper.json.dataaccess.JsonStoreObject;
 
 /**
  * 

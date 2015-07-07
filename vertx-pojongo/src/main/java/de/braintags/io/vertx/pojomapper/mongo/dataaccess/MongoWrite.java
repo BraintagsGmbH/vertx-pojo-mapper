@@ -25,6 +25,7 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.dataaccess.IWrite;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 
 /**
@@ -56,15 +57,18 @@ public class MongoWrite<T> extends AbstractMongoAccessObject<T> implements IWrit
 
   private void save(T entity, Handler<AsyncResult<IWriteResult>> resultHandler) {
     executePreSave(entity);
-    MongoStoreObject storeObject = createStoreObject();
+    MongoStoreObject storeObject = createStoreObject(entity);
     doSave(storeObject, resultHandler);
     executePostSave(entity);
   }
 
-  private MongoStoreObject createStoreObject() {
+  private MongoStoreObject createStoreObject(T entity) {
     MongoStoreObject store = new MongoStoreObject();
-
-    throw new UnsupportedOperationException();
+    for (String fieldName : getMapper().getFieldNames()) {
+      IField field = getMapper().getField(fieldName);
+      field.getPropertyMapper().intoStoreObject(entity, store, field);
+    }
+    return store;
   }
 
   /**
@@ -74,8 +78,7 @@ public class MongoWrite<T> extends AbstractMongoAccessObject<T> implements IWrit
    *          the entity to be handled
    */
   private void executePreSave(T entity) {
-    throw new UnsupportedOperationException();
-
+    getMapper().executeLifecycle(AfterSave.class, entity);
   }
 
   /**
@@ -85,8 +88,7 @@ public class MongoWrite<T> extends AbstractMongoAccessObject<T> implements IWrit
    *          the entity to be handled
    */
   private void executePostSave(T entity) {
-    throw new UnsupportedOperationException();
-
+    getMapper().executeLifecycle(BeforeSave.class, entity);
   }
 
   /**

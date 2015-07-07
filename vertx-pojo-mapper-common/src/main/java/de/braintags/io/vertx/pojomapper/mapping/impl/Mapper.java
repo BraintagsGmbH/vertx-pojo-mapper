@@ -22,6 +22,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.Indexes;
 import de.braintags.io.vertx.pojomapper.annotation.ObjectFactory;
@@ -42,9 +44,11 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.exception.ClassAccessException;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
+import de.braintags.io.vertx.pojomapper.exception.MethodAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.util.ClassUtil;
 
 /**
@@ -319,4 +323,40 @@ public class Mapper implements IMapper {
     return result;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#executeLifecycle(java.lang.Class, java.lang.Object)
+   */
+  @Override
+  public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity) {
+    List<Method> methods = getLifecycleMethods(annotationClass);
+    for (Method method : methods) {
+      method.setAccessible(true);
+      Object[] args = null;
+      if (method.getParameterCount() > 0) {
+        args = createMethodArgs(method, entity);
+      }
+
+      try {
+        Object result = method.invoke(entity, args);
+        if (result != null)
+          throw new UnsupportedOperationException("Not yet supported, return value of annotated lifecyle methods: "
+              + result.getClass().getName());
+      } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        throw new MethodAccessException(e);
+      }
+    }
+  }
+
+  /**
+   * Lets try to generate some arguments like {@link IDataStore}, {@link IStoreObject} for instance?
+   * 
+   * @param method
+   * @param entity
+   * @return
+   */
+  private Object[] createMethodArgs(Method method, Object entity) {
+    throw new UnsupportedOperationException("Not yet supported, dynamic generation of arguments");
+  }
 }

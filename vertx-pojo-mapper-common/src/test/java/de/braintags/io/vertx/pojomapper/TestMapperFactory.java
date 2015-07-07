@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper;
 
+import static org.junit.Assert.assertTrue;
+
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -34,9 +36,12 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.impl.DummyDataStore;
 import de.braintags.io.vertx.pojomapper.impl.DummyObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapper.Person;
+import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
 
 /**
  * 
@@ -46,6 +51,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
  */
 
 public class TestMapperFactory {
+  public static final int NUMBER_OF_PROPERTIES = 8;
   private static IDataStore dataStore = new DummyDataStore();
   private static IMapper mapperDef = null;
 
@@ -59,7 +65,7 @@ public class TestMapperFactory {
 
   @Test
   public void testNumberOfProperties() {
-    Assert.assertEquals("unexpected numer of properties", 7, mapperDef.getFieldNames().size());
+    Assert.assertEquals("unexpected numer of properties", NUMBER_OF_PROPERTIES, mapperDef.getFieldNames().size());
   }
 
   @Test
@@ -108,6 +114,14 @@ public class TestMapperFactory {
 
   @Test
   public void testProperty() {
+    assertTrue(mapperDef.getField("weight").getPropertyMapper() instanceof IPropertyMapper);
+    assertTrue(mapperDef.getField("animal").getPropertyMapper() instanceof IReferencedMapper);
+    assertTrue(mapperDef.getField("chicken").getPropertyMapper() instanceof IEmbeddedMapper);
+
+  }
+
+  @Test
+  public void testPropertyMapper() {
     Property ann = (Property) mapperDef.getField("weight").getAnnotation(Property.class);
     if (ann == null)
       Assert.fail("Annotation Property must not be null");

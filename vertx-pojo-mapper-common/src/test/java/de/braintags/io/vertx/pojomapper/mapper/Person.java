@@ -24,6 +24,7 @@ import de.braintags.io.vertx.pojomapper.annotation.Index;
 import de.braintags.io.vertx.pojomapper.annotation.IndexField;
 import de.braintags.io.vertx.pojomapper.annotation.IndexOptions;
 import de.braintags.io.vertx.pojomapper.annotation.Indexes;
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
@@ -45,6 +46,9 @@ public class Person extends AbstractPerson {
 
   @Referenced
   public Animal animal;
+
+  @Embedded
+  public Animal chicken;
 
   public Map<String, Object> myMap;
 

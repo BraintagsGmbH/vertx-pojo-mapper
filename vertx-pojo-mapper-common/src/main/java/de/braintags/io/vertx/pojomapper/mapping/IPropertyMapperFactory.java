@@ -29,7 +29,7 @@ public interface IPropertyMapperFactory {
    * Get an instance of {@link IPropertyMapper}
    * 
    * @param cls
-   *          teh interface, for which an implementation shall be retrieved. This can be {@link IPropertyMapper},
+   *          the interface, for which an implementation shall be retrieved. This can be {@link IPropertyMapper},
    *          {@link IEmbeddedMapper} or {@link IReferencedMapper}
    * @return an imeplementation of the required interface
    */
