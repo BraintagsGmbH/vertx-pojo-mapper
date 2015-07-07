@@ -38,10 +38,22 @@
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
+			<artifactId>vertx-mongo-service</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.vertx</groupId>
 			<artifactId>vertx-pojo-mapper-json</artifactId>
 	    	<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-mongo-service</artifactId>
+			<scope>test</scope>
+			<classifier>tests</classifier>
+			<version>${stack.version}</version>
+		</dependency>
 		
 		
 	</dependencies>

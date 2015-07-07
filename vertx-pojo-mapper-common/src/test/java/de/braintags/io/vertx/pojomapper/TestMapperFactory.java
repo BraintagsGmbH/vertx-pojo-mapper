@@ -16,6 +16,7 @@
 
 package de.braintags.io.vertx.pojomapper;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
@@ -42,6 +43,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.CharacterTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ObjectTypeHandler;
 
 /**
  * 
@@ -121,12 +124,21 @@ public class TestMapperFactory {
   }
 
   @Test
+  public void testTypeHandler() {
+    assertTrue("Not an instance of CharacterTypeHandler",
+        mapperDef.getField("name").getTypeHandler() instanceof CharacterTypeHandler);
+    assertTrue("Not an instance of ObjectTypeHandler",
+        mapperDef.getField("animal").getTypeHandler() instanceof ObjectTypeHandler);
+
+  }
+
+  @Test
   public void testPropertyMapper() {
     Property ann = (Property) mapperDef.getField("weight").getAnnotation(Property.class);
     if (ann == null)
       Assert.fail("Annotation Property must not be null");
     else
-      Assert.assertEquals("wrong name in Property", "WEIGHT", ann.value());
+      assertEquals("wrong name in Property", "WEIGHT", ann.value());
   }
 
   @Test

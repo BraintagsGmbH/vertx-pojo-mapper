@@ -42,4 +42,24 @@ public interface ITypeHandler {
    * @return
    */
   Object intoStore(Object source);
+
+  /**
+   * Checks wether the given cls is matching excact this typehandler. Typically a typehandler defines a set of classes,
+   * which it will handle. Here it will be checked for equality
+   * 
+   * @param cls
+   *          the class to be checked
+   * @return true, if this typehandler handles excact this class
+   */
+  public boolean matchesExcact(Class<?> cls);
+
+  /**
+   * Checks wether the given cls is an instance of one of the classes, which the typehandler shall deal with.
+   * 
+   * @param cls
+   *          the class to be checked
+   * @return true, if this typehandler handling this class
+   */
+  public boolean matchesInstance(Class<?> cls);
+
 }

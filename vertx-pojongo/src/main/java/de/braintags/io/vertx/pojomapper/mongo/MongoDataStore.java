@@ -16,8 +16,7 @@
 
 package de.braintags.io.vertx.pojomapper.mongo;
 
-import com.mongodb.async.client.MongoClient;
-
+import io.vertx.ext.mongo.MongoClient;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.IQuery;

@@ -116,9 +116,9 @@ public class MappedField implements IField {
   }
 
   private void init() {
-    typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
     computePropertyName();
     computePropertyMapper();
+    typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
     computeAnnotations();
     computeType();
     computeConstructor();

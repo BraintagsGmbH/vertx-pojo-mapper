@@ -14,33 +14,38 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.impl;
-
-import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
+package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
 /**
- * 
- * 
+ * A simple mapper with some beans properties
+ *
  * @author Michael Remme
  * 
  */
 
-public class DummyTypeHandlerFactory implements ITypeHandlerFactory {
+public class SimpleMapper {
+  public String name;
+  private String secondProperty;
 
   /**
    * 
    */
-  public DummyTypeHandlerFactory() {
+  public SimpleMapper() {
   }
 
-  /* (non-Javadoc)
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory#getTypeHandler(de.braintags.io.vertx.pojomapper.mapping.IField)
+  /**
+   * @return the secondProperty
    */
-  @Override
-  public ITypeHandler getTypeHandler(IField field) {
-    return null;
+  public final String getSecondProperty() {
+    return secondProperty;
+  }
+
+  /**
+   * @param secondProperty
+   *          the secondProperty to set
+   */
+  public final void setSecondProperty(String secondProperty) {
+    this.secondProperty = secondProperty;
   }
 
 }
