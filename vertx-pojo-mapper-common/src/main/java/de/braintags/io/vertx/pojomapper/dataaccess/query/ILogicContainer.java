@@ -17,23 +17,12 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
 /**
- * Defines the logic of the field arguments of a query
+ * a container to define AND / OR sequences
  * 
  * @author Michael Remme
  * 
  */
 
-public interface IFieldParameter<T extends IQueryContainer> {
-
-  /**
-   * Defines a query argument which fits exact the given argumentT
-   * 
-   * @param value
-   *          the value to search for
-   * @return the parent {@link IQueryContainer} to enable chaining of commands
-   */
-  T is(Object value);
-
-  T contains(Object value);
+public interface ILogicContainer extends IQueryContainer {
 
 }

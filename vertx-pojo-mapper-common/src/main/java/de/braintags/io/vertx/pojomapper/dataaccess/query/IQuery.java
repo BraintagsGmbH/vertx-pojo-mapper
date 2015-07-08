@@ -46,13 +46,4 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    */
   public void executeCount(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
 
-  /**
-   * Add a query for a specified field
-   * 
-   * @param fieldName
-   *          the name of the field
-   * @return an instance of {@link IFieldParameter}
-   */
-  public IFieldParameter field(String fieldName);
-
 }
