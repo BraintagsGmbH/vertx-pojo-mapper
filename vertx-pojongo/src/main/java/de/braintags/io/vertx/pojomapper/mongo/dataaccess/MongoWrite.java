@@ -105,6 +105,7 @@ public class MongoWrite<T> extends AbstractMongoAccessObject<T> implements IWrit
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
     IMapper mapper = getMapper();
     String column = mapper.getDataStoreName();
+    final String currentId = (String) storeObject.get(mapper.getIdField());
 
     mongoClient.save(column, storeObject.getContainer(), result -> {
       if (result.failed()) {
@@ -113,6 +114,8 @@ public class MongoWrite<T> extends AbstractMongoAccessObject<T> implements IWrit
         return;
       } else {
         String id = result.result();
+        if (id == null)
+          id = currentId;
         Future<IWriteResult> future = Future.succeededFuture(new MongoWriteResult(storeObject, id));
         resultHandler.handle(future);
       }

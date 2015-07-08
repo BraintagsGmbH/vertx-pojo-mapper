@@ -395,4 +395,9 @@ public class Mapper implements IMapper {
   public String getDataStoreName() {
     return dataStoreName;
   }
+
+  @Override
+  public IField getIdField() {
+    return idField;
+  }
 }

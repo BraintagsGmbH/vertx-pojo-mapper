@@ -79,6 +79,13 @@ public interface IMapper {
   public IField getField(String name);
 
   /**
+   * Get the {@link IField} which is defined to be the id
+   * 
+   * @return the id field
+   */
+  public IField getIdField();
+
+  /**
    * Get the methods of the mapper which are annotated by the given lifecycle annotation like {@link BeforeLoad},
    * {@link BeforeSave}, {@link BeforeDelete}, {@link AfterLoad}, {@link AfterSave}, {@link AfterDelete}
    * 

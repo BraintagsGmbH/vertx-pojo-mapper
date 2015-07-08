@@ -27,6 +27,12 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.IWrite.IWriteResult;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
+import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMappedField;
+import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
+import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapperFactory;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.SimpleMapper;
 
 /**
@@ -63,17 +69,51 @@ public class TestSimpleMapper extends MongoBaseTest {
   }
 
   @Test
-  public void testSimpleMapper() {
+  public void test_01_MapperStructure() {
+    assertTrue(getDataStore() instanceof MongoDataStore);
+    assertTrue(getDataStore().getMapperFactory() instanceof MongoMapperFactory);
+    IMapper mapper = getDataStore().getMapperFactory().getMapper(SimpleMapper.class);
+    assertTrue(mapper instanceof MongoMapper);
+    IField field = mapper.getField("name");
+    assertTrue(field instanceof MongoMappedField);
+  }
+
+  @Test
+  public void test_02_SimpleMapper() {
     SimpleMapper sm = new SimpleMapper();
-    sm.id = "testId";
     sm.name = "testName";
+    sm.setSecondProperty("my second property");
+
+    // ResultContainer rc = write(sm, true);
+    // if (rc.assertionError != null)
+    // throw rc.assertionError;
+    //
+    // await();
+
     IWrite<SimpleMapper> write = getDataStore().createWrite(SimpleMapper.class);
     write.add(sm);
     write.save(result -> {
-      assertTrue(resultFine(result));
+      checkWriteResult(result);
+
+      sm.id = (String) result.result().getId();
+      sm.name = "testNameModified";
+      sm.setSecondProperty("my modified property");
+      IWrite<SimpleMapper> write2 = getDataStore().createWrite(SimpleMapper.class);
+      write2.add(sm);
+      write2.save(result2 -> {
+        checkWriteResult(result2);
+
+      });
 
     });
 
+  }
+
+  private void checkWriteResult(AsyncResult<IWriteResult> result) {
+    assertTrue(resultFine(result));
+    assertNotNull(result.result());
+    assertNotNull(result.result().getStoreObject());
+    assertNotNull(result.result().getId());
   }
 
   boolean resultFine(AsyncResult<IWriteResult> result) {
@@ -82,5 +122,10 @@ public class TestSimpleMapper extends MongoBaseTest {
       return false;
     }
     return true;
+  }
+
+  class ResultContainer {
+    AssertionError assertionError;
+    IWriteResult writeResult;
   }
 }
