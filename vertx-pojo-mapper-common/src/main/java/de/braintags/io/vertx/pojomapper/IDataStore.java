@@ -16,9 +16,9 @@
 
 package de.braintags.io.vertx.pojomapper;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.IDelete;
-import de.braintags.io.vertx.pojomapper.dataaccess.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.IWrite;
+import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;

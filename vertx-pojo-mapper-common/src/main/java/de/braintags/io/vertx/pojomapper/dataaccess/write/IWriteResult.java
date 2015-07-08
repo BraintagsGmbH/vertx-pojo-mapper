@@ -14,16 +14,30 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.dataaccess;
+package de.braintags.io.vertx.pojomapper.dataaccess.write;
 
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 
 /**
- * IDelete is responsible for the deletion of instances from the connected datastore
+ * This object is created by a save action and contains the information about the action
+ * 
  * 
  * @author Michael Remme
- * 
+ *
  */
+public interface IWriteResult {
 
-public interface IDelete<T> extends IDataAccessObject<T> {
+  /**
+   * Get the instance of {@link IStoreObject}, which was created during the save action
+   * 
+   * @return
+   */
+  public IStoreObject<?> getStoreObject();
 
+  /**
+   * Get the id of the saved object
+   * 
+   * @return
+   */
+  public Object getId();
 }

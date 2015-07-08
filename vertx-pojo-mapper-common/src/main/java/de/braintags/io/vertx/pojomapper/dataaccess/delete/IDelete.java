@@ -14,16 +14,18 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.dataaccess;
+package de.braintags.io.vertx.pojomapper.dataaccess.delete;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject;
 
 
 /**
- * 
+ * IDelete is responsible for the deletion of instances from the connected datastore
  * 
  * @author Michael Remme
  * 
  */
 
-public interface IQuery<T> extends IDataAccessObject {
+public interface IDelete<T> extends IDataAccessObject<T> {
 
 }
