@@ -16,16 +16,43 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject;
 
-
 /**
- * 
+ * Define and execute queries inside the connected {@link IDataStore}
  * 
  * @author Michael Remme
  * 
  */
 
-public interface IQuery<T> extends IDataAccessObject {
+public interface IQuery<T> extends IDataAccessObject<T> {
+
+  /**
+   * Execute the query
+   * 
+   * @param resultHandler
+   *          contains the {@link IQueryResult}
+   */
+  public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
+
+  /**
+   * Execute the query by counting the fitting objects
+   * 
+   * @param resultHandler
+   *          contains the {@link IQueryResult}
+   */
+  public void executeCount(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
+
+  /**
+   * Add a query for a specified field
+   * 
+   * @param fieldName
+   *          the name of the field
+   * @return an instance of {@link IFieldParameter}
+   */
+  public IFieldParameter field(String fieldName);
 
 }
