@@ -14,29 +14,36 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.dataaccess.query;
+package de.braintags.io.vertx.pojomapper.dataaccess.write.impl;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 
 /**
- * a container to define AND / OR sequences
+ * 
  * 
  * @author Michael Remme
  * 
  */
 
-public interface ILogicContainer<T extends IQueryContainer> extends IQueryContainer {
+public class WriteResult implements IWriteResult {
 
-  /**
-   * Get the {@link QueryLogic} of the current definition
-   * 
-   * @return the logic
-   */
-  public QueryLogic getLogic();
+  private IStoreObject<?> sto;
+  private String id;
 
-  /**
-   * Retrive the parent instance, which contains the current instance
-   * 
-   * @return the parent
-   */
-  public T parent();
+  public WriteResult(IStoreObject<?> sto, String id) {
+    this.sto = sto;
+    this.id = id;
+  }
+
+  @Override
+  public IStoreObject<?> getStoreObject() {
+    return sto;
+  }
+
+  @Override
+  public Object getId() {
+    return id;
+  }
 
 }

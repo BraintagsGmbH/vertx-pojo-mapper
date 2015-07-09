@@ -28,7 +28,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject;
  * 
  */
 
-public interface IQuery<T> extends IDataAccessObject<T> {
+public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
 
   /**
    * Execute the query

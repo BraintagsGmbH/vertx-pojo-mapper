@@ -26,11 +26,12 @@ import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
+import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 
 /**
@@ -38,7 +39,7 @@ import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
  * @param <T>
  */
 
-public class MongoWrite<T> extends AbstractMongoAccessObject<T> implements IWrite<T> {
+public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite<T> {
   private List<T> objectsToSave = new ArrayList<T>();
 
   /**
@@ -117,31 +118,11 @@ public class MongoWrite<T> extends AbstractMongoAccessObject<T> implements IWrit
         String id = result.result();
         if (id == null)
           id = currentId;
-        Future<IWriteResult> future = Future.succeededFuture(new MongoWriteResult(storeObject, id));
+        Future<IWriteResult> future = Future.succeededFuture(new WriteResult(storeObject, id));
         resultHandler.handle(future);
       }
     });
 
   }
 
-  class MongoWriteResult implements IWriteResult {
-    private IStoreObject<?> sto;
-    private String id;
-
-    MongoWriteResult(IStoreObject<?> sto, String id) {
-      this.sto = sto;
-      this.id = id;
-    }
-
-    @Override
-    public IStoreObject<?> getStoreObject() {
-      return sto;
-    }
-
-    @Override
-    public Object getId() {
-      return id;
-    }
-
-  }
 }

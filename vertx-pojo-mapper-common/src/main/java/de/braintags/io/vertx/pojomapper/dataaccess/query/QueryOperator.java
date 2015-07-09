@@ -17,26 +17,13 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
 /**
- * a container to define AND / OR sequences
+ * Defines the operators for a query
  * 
  * @author Michael Remme
  * 
  */
 
-public interface ILogicContainer<T extends IQueryContainer> extends IQueryContainer {
-
-  /**
-   * Get the {@link QueryLogic} of the current definition
-   * 
-   * @return the logic
-   */
-  public QueryLogic getLogic();
-
-  /**
-   * Retrive the parent instance, which contains the current instance
-   * 
-   * @return the parent
-   */
-  public T parent();
+public enum QueryOperator {
+  is, contains, larger, smaller, larger_equal, smaller_equal;
 
 }

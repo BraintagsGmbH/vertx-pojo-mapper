@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+
 /**
  * Defines the logic of the field arguments of a query
  * 
@@ -26,6 +28,27 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query;
 public interface IFieldParameter<T extends IQueryContainer> {
 
   /**
+   * Get the underlaying {@link IField} of the current definition
+   * 
+   * @return the field
+   */
+  IField getField();
+
+  /**
+   * Get the underlaying {@link QueryOperator}
+   * 
+   * @return the operator
+   */
+  QueryOperator getOperator();
+
+  /**
+   * Get the underlaying value
+   * 
+   * @return the value
+   */
+  Object getValue();
+
+  /**
    * Defines a query argument which fits exact the given argumentT
    * 
    * @param value
@@ -34,6 +57,13 @@ public interface IFieldParameter<T extends IQueryContainer> {
    */
   T is(Object value);
 
+  /**
+   * Defines a query argument where the value is contained in the given field
+   * 
+   * @param value
+   *          the value to search for
+   * @return the parent {@link IQueryContainer} to enable chaining of commands
+   */
   T contains(Object value);
 
 }

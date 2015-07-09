@@ -41,7 +41,7 @@ public interface IQueryContainer {
    *          the name of the field to search for
    * @return an instance of {@link IFieldParameter}
    */
-  IFieldParameter<? extends ILogicContainer> and(String fieldName);
+  IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> and(String fieldName);
 
   /**
    * Start an "or" sequence
@@ -50,6 +50,6 @@ public interface IQueryContainer {
    *          the name of the field to search for
    * @return an instance of {@link IFieldParameter}
    */
-  IFieldParameter<? extends ILogicContainer> or(String fieldName);
+  IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> or(String fieldName);
 
 }

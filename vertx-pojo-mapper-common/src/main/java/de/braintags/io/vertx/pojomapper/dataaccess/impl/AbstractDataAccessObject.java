@@ -14,26 +14,29 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
+package de.braintags.io.vertx.pojomapper.dataaccess.impl;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 
 /**
+ * 
+ * 
  * @author Michael Remme
+ * 
  */
 
-public abstract class AbstractMongoAccessObject<T> implements IDataAccessObject<T> {
-  private Class<T>       mapperClass;
-  private MongoDataStore datastore;
-  private IMapper        mapper;
+public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T> {
+
+  private Class<T> mapperClass;
+  private IDataStore datastore;
+  private IMapper mapper;
 
   /**
    * 
    */
-  public AbstractMongoAccessObject(final Class<T> mapperClass, MongoDataStore datastore) {
+  public AbstractDataAccessObject(final Class<T> mapperClass, IDataStore datastore) {
     this.mapperClass = mapperClass;
     this.datastore = datastore;
     this.mapper = datastore.getMapperFactory().getMapper(mapperClass);
@@ -59,7 +62,9 @@ public abstract class AbstractMongoAccessObject<T> implements IDataAccessObject<
     return mapperClass;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject#getMapper()
    */
   @Override
