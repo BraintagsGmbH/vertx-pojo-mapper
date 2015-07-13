@@ -16,9 +16,6 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +23,6 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 
 /**
@@ -36,7 +32,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
  * 
  */
 
-public class Query<T> extends AbstractDataAccessObject<T> implements IQuery<T> {
+public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQuery<T> {
   private List<Object> filters = new ArrayList<Object>();
 
   /**
@@ -47,14 +43,13 @@ public class Query<T> extends AbstractDataAccessObject<T> implements IQuery<T> {
     super(mapperClass, datastore);
   }
 
-  @Override
-  public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void executeCount(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    throw new UnsupportedOperationException();
+  /**
+   * Get the filters, which were defined for the current query
+   * 
+   * @return the filters
+   */
+  public List<Object> getFilters() {
+    return filters;
   }
 
   @Override
@@ -63,8 +58,6 @@ public class Query<T> extends AbstractDataAccessObject<T> implements IQuery<T> {
     filters.add(param);
     return param;
   }
-
-  // public IFieldParameter<LogicContainer<IQueryContainer>> and(String fieldName) {
 
   @Override
   public IFieldParameter<LogicContainer<Query<T>>> and(String fieldName) {

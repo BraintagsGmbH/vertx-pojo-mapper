@@ -16,16 +16,16 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
-import java.util.Iterator;
+import java.util.Collection;
 
 /**
- * The result of an executed {@link IQuery}. Acts as an {@link Iterator}, so that implementations can decide to perform
- * a lazy load of found results
+ * The result of an executed {@link IQuery}. Acts as an unmodifyable {@link Collection}, so that implementations can
+ * decide to perform a lazy load of found results
  * 
  * @author Michael Remme
  * 
  */
 
-public interface IQueryResult<T> extends Iterator<T> {
+public interface IQueryResult<T> extends Collection<T> {
 
 }

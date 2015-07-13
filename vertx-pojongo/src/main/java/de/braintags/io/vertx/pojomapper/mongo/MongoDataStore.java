@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
+import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoQuery;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoWrite;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapperFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
@@ -57,7 +58,7 @@ public class MongoDataStore implements IDataStore {
    */
   @Override
   public <T> IQuery<T> createQuery(Class<T> mapper) {
-    return null;
+    return new MongoQuery<T>(mapper, this);
   }
 
   /*
@@ -67,7 +68,7 @@ public class MongoDataStore implements IDataStore {
    */
   @Override
   public <T> IWrite<T> createWrite(Class<T> mapper) {
-    return new MongoWrite<>(mapper, this);
+    return new MongoWrite<T>(mapper, this);
   }
 
   /*
