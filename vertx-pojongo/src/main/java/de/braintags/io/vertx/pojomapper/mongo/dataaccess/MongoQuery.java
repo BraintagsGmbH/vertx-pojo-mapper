@@ -108,7 +108,8 @@ public class MongoQuery<T> extends Query<T> {
     String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
     Object value = fieldParameter.getValue();
     Object storeObject = field.getTypeHandler().intoStore(value);
-    qDef.put(field.getMappedFieldName(), new JsonObject().put(mongoOperator, storeObject));
+    JsonObject arg = new JsonObject().put(mongoOperator, storeObject);
+    qDef.put(field.getMappedFieldName(), arg);
   }
 
   private void applyLogicParameter(JsonObject qDef, ILogicContainer<?> logicContainer) {
