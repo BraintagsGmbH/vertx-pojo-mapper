@@ -97,12 +97,22 @@ public class TestSimpleMapper extends MongoBaseTest {
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
 
+    // SimpleQuery for all records
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
     resultContainer = find(query);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
     SimpleMapper foundSm = (SimpleMapper) resultContainer.queryResult.iterator().next();
     assertTrue(sm.equals(foundSm));
+
+    // search inside name field
+    query.field("name").is("testNameModified");
+    resultContainer = find(query);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+    foundSm = (SimpleMapper) resultContainer.queryResult.iterator().next();
+    assertTrue(sm.equals(foundSm));
+
   }
 
   private ResultContainer find(IQuery<SimpleMapper> query) {

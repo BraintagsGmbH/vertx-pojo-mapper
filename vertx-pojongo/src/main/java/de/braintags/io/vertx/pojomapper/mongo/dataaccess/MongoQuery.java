@@ -28,9 +28,9 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
 
@@ -54,8 +54,8 @@ public class MongoQuery<T> extends Query<T> {
   @Override
   public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     try {
-      MongoStoreObject storeObject = createQueryStoreObject();
-      doFind(storeObject, resultHandler);
+      JsonObject query = createQueryDefinition();
+      doFind(query, resultHandler);
     } catch (Throwable e) {
       Future<IQueryResult<T>> future = Future.failedFuture(e);
       resultHandler.handle(future);
@@ -67,10 +67,9 @@ public class MongoQuery<T> extends Query<T> {
     throw new UnsupportedOperationException();
   }
 
-  private void doFind(MongoStoreObject storeObject, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  private void doFind(JsonObject query, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
     String column = getMapper().getDataStoreName();
-    JsonObject query = storeObject.getContainer();
     mongoClient.find(column, query, qResult -> {
       if (qResult.failed()) {
         Future<IQueryResult<T>> future = Future.failedFuture(qResult.cause());
@@ -88,12 +87,12 @@ public class MongoQuery<T> extends Query<T> {
     return new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(), (MongoMapper) getMapper());
   }
 
-  private MongoStoreObject createQueryStoreObject() {
-    MongoStoreObject qDef = new MongoStoreObject(getMapper());
+  private JsonObject createQueryDefinition() {
+    JsonObject qDef = new JsonObject();
     Iterator<?> arguments = getFilters().iterator();
     while (arguments.hasNext()) {
-      IQueryContainer container = (IQueryContainer) arguments.next();
-      // TODO replace this with a Factory
+      Object container = arguments.next();
+      // TODO replace this with a Factory?
       if (container instanceof IFieldParameter<?>) {
         applyFieldParameter(qDef, (IFieldParameter<?>) container);
       } else if (container instanceof ILogicContainer<?>) {
@@ -104,12 +103,16 @@ public class MongoQuery<T> extends Query<T> {
     return qDef;
   }
 
-  private void applyFieldParameter(MongoStoreObject qDef, IFieldParameter<?> fieldParameter) {
-    // fieldParameter.g
+  private void applyFieldParameter(JsonObject qDef, IFieldParameter<?> fieldParameter) {
+    IField field = fieldParameter.getField();
+    String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
+    Object value = fieldParameter.getValue();
+    Object storeObject = field.getTypeHandler().intoStore(value);
+    qDef.put(field.getMappedFieldName(), new JsonObject().put(mongoOperator, storeObject));
   }
 
-  private void applyLogicParameter(MongoStoreObject qDef, ILogicContainer<?> logicContainer) {
-
+  private void applyLogicParameter(JsonObject qDef, ILogicContainer<?> logicContainer) {
+    throw new UnsupportedOperationException();
   }
 
   /*

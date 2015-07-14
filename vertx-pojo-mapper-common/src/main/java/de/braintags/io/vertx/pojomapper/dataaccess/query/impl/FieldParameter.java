@@ -59,12 +59,72 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
 
   @Override
   public T is(Object value) {
-    return addValue(QueryOperator.is, container);
+    return addValue(QueryOperator.EQUALS, container);
   }
 
   @Override
-  public T contains(Object value) {
-    return addValue(QueryOperator.contains, container);
+  public T isNot(Object value) {
+    return addValue(QueryOperator.NOT_EQUALS, container);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#larger(java.lang.Object)
+   */
+  @Override
+  public T larger(Object value) {
+    return addValue(QueryOperator.LARGER, container);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#largerEqual(java.lang.Object)
+   */
+  @Override
+  public T largerEqual(Object value) {
+    return addValue(QueryOperator.LARGER_EQUAL, container);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#less(java.lang.Object)
+   */
+  @Override
+  public T less(Object value) {
+    return addValue(QueryOperator.SMALLER, container);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#lessEqual(java.lang.Object)
+   */
+  @Override
+  public T lessEqual(Object value) {
+    return addValue(QueryOperator.SMALLER_EQUAL, container);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#in(java.lang.Object)
+   */
+  @Override
+  public T in(Object value) {
+    return addValue(QueryOperator.IN, container);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#notIn(java.lang.Object)
+   */
+  @Override
+  public T notIn(Object value) {
+    return addValue(QueryOperator.NOT_IN, container);
   }
 
   private T addValue(QueryOperator op, Object value) {

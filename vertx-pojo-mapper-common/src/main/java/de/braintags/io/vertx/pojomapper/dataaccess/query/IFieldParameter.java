@@ -58,12 +58,60 @@ public interface IFieldParameter<T extends IQueryContainer> {
   T is(Object value);
 
   /**
-   * Defines a query argument where the value is contained in the given field
+   * Defines a query argument where the value is not equal in the given field
    * 
    * @param value
    *          the value to search for
    * @return the parent {@link IQueryContainer} to enable chaining of commands
    */
-  T contains(Object value);
+  T isNot(Object value);
+
+  /**
+   * Defines a query argument where the value is larger in the given field
+   * 
+   * @param value
+   * @return
+   */
+  T larger(Object value);
+
+  /**
+   * Defines a query argument where the value is larger or equal in the given field
+   * 
+   * @param value
+   * @return
+   */
+  T largerEqual(Object value);
+
+  /**
+   * Defines a query argument where the value is less in the given field
+   * 
+   * @param value
+   * @return
+   */
+  T less(Object value);
+
+  /**
+   * Defines a query argument where the value is less or equal in the given field
+   * 
+   * @param value
+   * @return
+   */
+  T lessEqual(Object value);
+
+  /**
+   * Defines a query argument where the value is in the values in the given field
+   * 
+   * @param value
+   * @return
+   */
+  T in(Object value);
+
+  /**
+   * Defines a query argument where the value is not in the values in the given field
+   * 
+   * @param value
+   * @return
+   */
+  T notIn(Object value);
 
 }

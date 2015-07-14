@@ -29,10 +29,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 public class MongoStoreObject extends JsonStoreObject {
   private Object entity = null;
 
-  public MongoStoreObject(IMapper mapper) {
-    super(mapper);
-  }
-
   /**
    * Creates a new instance, where the internal container is filled from the contents of the given entity
    */
