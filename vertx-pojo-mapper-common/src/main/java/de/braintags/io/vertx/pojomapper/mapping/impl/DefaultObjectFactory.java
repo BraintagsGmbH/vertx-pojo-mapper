@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
+import de.braintags.io.vertx.pojomapper.exception.MappingException;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 
 /**
@@ -26,11 +28,13 @@ import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
  */
 
 public class DefaultObjectFactory implements IObjectFactory {
+  private IMapper mapper;
 
   /**
    * 
    */
-  public DefaultObjectFactory() {
+  public DefaultObjectFactory(IMapper mapper) {
+    this.mapper = mapper;
   }
 
   /*
@@ -40,7 +44,11 @@ public class DefaultObjectFactory implements IObjectFactory {
    */
   @Override
   public <T> T createInstance(Class<T> clazz) {
-    throw new UnsupportedOperationException();
+    try {
+      return clazz.newInstance();
+    } catch (InstantiationException | IllegalAccessException e) {
+      throw new MappingException(e);
+    }
   }
 
 }

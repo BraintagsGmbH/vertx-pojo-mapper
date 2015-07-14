@@ -18,6 +18,7 @@ package de.braintags.io.vertx.pojomapper.json.dataaccess;
 
 import io.vertx.core.json.JsonObject;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 
 /**
@@ -28,18 +29,23 @@ import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 
 public class JsonStoreObject implements IStoreObject<JsonObject> {
   private JsonObject jsonObject;
+  private IMapper mapper;
 
   /**
    * 
    */
-  public JsonStoreObject() {
+  public JsonStoreObject(IMapper mapper) {
+    if (mapper == null)
+      throw new NullPointerException("Mapper must not be null");
+    this.mapper = mapper;
     this.jsonObject = new JsonObject();
   }
 
   /**
    * 
    */
-  public JsonStoreObject(JsonObject jsonObject) {
+  public JsonStoreObject(JsonObject jsonObject, IMapper mapper) {
+    this(mapper);
     this.jsonObject = jsonObject;
   }
 
@@ -68,6 +74,13 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   @Override
   public JsonObject getContainer() {
     return jsonObject;
+  }
+
+  /**
+   * @return the mapper
+   */
+  public IMapper getMapper() {
+    return mapper;
   }
 
 }

@@ -48,7 +48,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
   private static final Logger log = LoggerFactory.getLogger(MongoBaseTest.class);
 
   private static MongodExecutable exe;
-  private MongoClient mongoClient;
+  private static MongoClient mongoClient;
   private MongoDataStore mongoDataStore;
 
   /**
@@ -172,6 +172,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
    *          the latch to be used
    */
   protected void dropCollections(CountDownLatch latch) {
+    log.info("DROPPING COLLECTIONS");
     // Drop all the collections in the db
     mongoClient.getCollections(onSuccess(toDrop -> {
       AtomicInteger collCount = new AtomicInteger();

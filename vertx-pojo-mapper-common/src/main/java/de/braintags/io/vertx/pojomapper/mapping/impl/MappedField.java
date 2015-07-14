@@ -91,6 +91,7 @@ public class MappedField implements IField {
   private Type mapKeyType;
   private Type subType;
   private String mappedFieldName;
+  private Constructor<?> constructor;
 
   /**
    * 
@@ -120,7 +121,7 @@ public class MappedField implements IField {
     propertyMapper = computePropertyMapper();
     typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
     computeType();
-    computeConstructor();
+    constructor = computeConstructor();
     computeMultivalued();
   }
 

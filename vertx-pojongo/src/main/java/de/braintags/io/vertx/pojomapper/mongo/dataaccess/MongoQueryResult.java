@@ -22,8 +22,11 @@ import java.util.AbstractCollection;
 import java.util.Iterator;
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
+import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
 
 /**
  * 
@@ -35,6 +38,7 @@ import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 public class MongoQueryResult<T> extends AbstractCollection<T> implements IQueryResult<T> {
   @SuppressWarnings("unused")
   private MongoDataStore store;
+  private MongoMapper mapper;
 
   /**
    * Contains the original result from mongo
@@ -45,9 +49,12 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
   /**
    * 
    */
-  public MongoQueryResult(List<JsonObject> jsonResult, MongoDataStore store) {
+  @SuppressWarnings("unchecked")
+  public MongoQueryResult(List<JsonObject> jsonResult, MongoDataStore store, MongoMapper mapper) {
+    this.mapper = mapper;
     this.store = store;
     this.jsonResult = jsonResult;
+    pojoResult = (T[]) new Object[jsonResult.size()];
   }
 
   /*
@@ -72,7 +79,8 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
 
   private void generatePojo(int i) {
     JsonObject sourceObject = jsonResult.get(i);
-    throw new UnsupportedOperationException();
+    MongoStoreObject storeObject = new MongoStoreObject(sourceObject, getMapper());
+    pojoResult[i] = (T) storeObject.getEntity();
   }
 
   class QueryResultIterator implements Iterator<T> {
@@ -101,5 +109,25 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
       return pojoResult[currentIndex++];
     }
 
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult#getDataStore()
+   */
+  @Override
+  public IDataStore getDataStore() {
+    return store;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult#getMapper()
+   */
+  @Override
+  public IMapper getMapper() {
+    return mapper;
   }
 }

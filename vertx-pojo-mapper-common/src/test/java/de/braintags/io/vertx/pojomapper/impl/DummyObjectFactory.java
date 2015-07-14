@@ -16,6 +16,7 @@
 
 package de.braintags.io.vertx.pojomapper.impl;
 
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultObjectFactory;
 
 /**
@@ -30,7 +31,8 @@ public class DummyObjectFactory extends DefaultObjectFactory {
   /**
    * 
    */
-  public DummyObjectFactory() {
+  public DummyObjectFactory(IMapper mapper) {
+    super(mapper);
   }
 
 }

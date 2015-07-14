@@ -59,11 +59,4 @@ public interface IQueryContainer {
    */
   public Object parent();
 
-  /**
-   * Get the IQuery, where the current instance is part from
-   * 
-   * @return the query
-   */
-  public IQuery<?> getQuery();
-
 }

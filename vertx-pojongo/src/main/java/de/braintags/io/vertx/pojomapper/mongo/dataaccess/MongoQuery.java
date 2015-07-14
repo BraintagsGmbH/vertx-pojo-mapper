@@ -32,6 +32,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
+import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
 
 /**
  * 
@@ -52,8 +53,13 @@ public class MongoQuery<T> extends Query<T> {
 
   @Override
   public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    MongoStoreObject storeObject = createQueryStoreObject();
-    doFind(storeObject, resultHandler);
+    try {
+      MongoStoreObject storeObject = createQueryStoreObject();
+      doFind(storeObject, resultHandler);
+    } catch (Throwable e) {
+      Future<IQueryResult<T>> future = Future.failedFuture(e);
+      resultHandler.handle(future);
+    }
   }
 
   @Override
@@ -79,31 +85,41 @@ public class MongoQuery<T> extends Query<T> {
   }
 
   private IQueryResult<T> createQueryResult(List<JsonObject> findList) {
-    return new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore());
+    return new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(), (MongoMapper) getMapper());
   }
 
   private MongoStoreObject createQueryStoreObject() {
-    MongoStoreObject qDef = new MongoStoreObject();
+    MongoStoreObject qDef = new MongoStoreObject(getMapper());
     Iterator<?> arguments = getFilters().iterator();
     while (arguments.hasNext()) {
       IQueryContainer container = (IQueryContainer) arguments.next();
       // TODO replace this with a Factory
       if (container instanceof IFieldParameter<?>) {
-        applyFieldParameter((IFieldParameter<?>) container);
+        applyFieldParameter(qDef, (IFieldParameter<?>) container);
       } else if (container instanceof ILogicContainer<?>) {
-        applyLogicParameter((ILogicContainer<?>) container);
+        applyLogicParameter(qDef, (ILogicContainer<?>) container);
       } else
         throw new UnsupportedOperationException("unsupported type of query argument: " + container.getClass().getName());
     }
     return qDef;
   }
 
-  private void applyFieldParameter(IFieldParameter<?> fieldParameter) {
+  private void applyFieldParameter(MongoStoreObject qDef, IFieldParameter<?> fieldParameter) {
     // fieldParameter.g
   }
 
-  private void applyLogicParameter(ILogicContainer<?> fieldParameter) {
+  private void applyLogicParameter(MongoStoreObject qDef, ILogicContainer<?> logicContainer) {
 
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#parent()
+   */
+  @Override
+  public Object parent() {
+    return null;
   }
 
 }

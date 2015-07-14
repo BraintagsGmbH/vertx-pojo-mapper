@@ -30,7 +30,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 
@@ -63,18 +62,9 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
 
   private void save(T entity, Handler<AsyncResult<IWriteResult>> resultHandler) {
     executePreSave(entity);
-    MongoStoreObject storeObject = createStoreObject(entity);
+    MongoStoreObject storeObject = new MongoStoreObject(getMapper(), entity);
     doSave(storeObject, resultHandler);
     executePostSave(entity);
-  }
-
-  private MongoStoreObject createStoreObject(T entity) {
-    MongoStoreObject store = new MongoStoreObject();
-    for (String fieldName : getMapper().getFieldNames()) {
-      IField field = getMapper().getField(fieldName);
-      field.getPropertyMapper().intoStoreObject(entity, store, field);
-    }
-    return store;
   }
 
   /**

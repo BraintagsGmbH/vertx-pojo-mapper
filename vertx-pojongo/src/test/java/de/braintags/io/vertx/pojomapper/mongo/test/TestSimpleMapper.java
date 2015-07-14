@@ -20,6 +20,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
+import java.util.concurrent.CountDownLatch;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -85,41 +87,81 @@ public class TestSimpleMapper extends MongoBaseTest {
     SimpleMapper sm = new SimpleMapper();
     sm.name = "testName";
     sm.setSecondProperty("my second property");
+    ResultContainer resultContainer = saveRecord(sm);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+    sm.id = (String) resultContainer.writeResult.getId();
+    sm.name = "testNameModified";
+    sm.setSecondProperty("my modified property");
+    resultContainer = saveRecord(sm);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
 
-    // ResultContainer rc = write(sm, true);
-    // if (rc.assertionError != null)
-    // throw rc.assertionError;
-    //
-    // await();
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    resultContainer = find(query);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+    SimpleMapper foundSm = (SimpleMapper) resultContainer.queryResult.iterator().next();
+    assertTrue(sm.equals(foundSm));
+  }
 
-    IWrite<SimpleMapper> write = getDataStore().createWrite(SimpleMapper.class);
-    write.add(sm);
-    write.save(result -> {
-      checkWriteResult(result);
-
-      sm.id = (String) result.result().getId();
-      sm.name = "testNameModified";
-      sm.setSecondProperty("my modified property");
-      IWrite<SimpleMapper> write2 = getDataStore().createWrite(SimpleMapper.class);
-      write2.add(sm);
-      write2.save(result2 -> {
-        checkWriteResult(result2);
-
-        IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
-        query.execute(qResult -> {
-          checkQueryResult(qResult);
-        });
-
-      });
-
+  private ResultContainer find(IQuery<SimpleMapper> query) {
+    ResultContainer resultContainer = new ResultContainer();
+    CountDownLatch latch = new CountDownLatch(1);
+    query.execute(result -> {
+      try {
+        resultContainer.queryResult = result.result();
+        checkQueryResult(result);
+      } catch (AssertionError e) {
+        resultContainer.assertionError = e;
+      } catch (Throwable e) {
+        resultContainer.assertionError = new AssertionError(e);
+      } finally {
+        latch.countDown();
+      }
     });
 
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    return resultContainer;
   }
 
   private void checkQueryResult(AsyncResult<IQueryResult<SimpleMapper>> qResult) {
     assertTrue(resultFine(qResult));
-    assertNotNull(qResult.result());
-    assertTrue(qResult.result().iterator().hasNext());
+    IQueryResult<SimpleMapper> qr = qResult.result();
+    assertNotNull(qr);
+    assertTrue(qr.iterator().hasNext());
+    SimpleMapper mapper = qr.iterator().next();
+    assertNotNull(mapper);
+  }
+
+  private ResultContainer saveRecord(SimpleMapper sm) {
+    ResultContainer resultContainer = new ResultContainer();
+    CountDownLatch latch = new CountDownLatch(1);
+    IWrite<SimpleMapper> write = getDataStore().createWrite(SimpleMapper.class);
+    write.add(sm);
+    write.save(result -> {
+      try {
+        resultContainer.writeResult = result.result();
+        checkWriteResult(result);
+      } catch (AssertionError e) {
+        resultContainer.assertionError = e;
+      } catch (Throwable e) {
+        resultContainer.assertionError = new AssertionError(e);
+      } finally {
+        latch.countDown();
+      }
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    return resultContainer;
   }
 
   private void checkWriteResult(AsyncResult<IWriteResult> result) {
@@ -140,5 +182,6 @@ public class TestSimpleMapper extends MongoBaseTest {
   class ResultContainer {
     AssertionError assertionError;
     IWriteResult writeResult;
+    IQueryResult<?> queryResult;
   }
 }

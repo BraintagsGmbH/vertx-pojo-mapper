@@ -21,10 +21,8 @@ import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 
 /**
  * 
@@ -33,7 +31,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
  * 
  */
 
-public class LogicContainer<T extends IQueryContainer> implements ILogicContainer<T> {
+public class LogicContainer<T extends IQueryContainer> extends AbstractQueryContainer<IQueryContainer> implements
+    ILogicContainer<T> {
   private List<Object> filters = new ArrayList<Object>();
   private T parent;
   private QueryLogic logic;
@@ -42,7 +41,7 @@ public class LogicContainer<T extends IQueryContainer> implements ILogicContaine
    * 
    */
   public LogicContainer(T parent, QueryLogic logic) {
-    this.parent = parent;
+    super(parent);
     this.logic = logic;
   }
 
@@ -53,8 +52,8 @@ public class LogicContainer<T extends IQueryContainer> implements ILogicContaine
    */
   @Override
   public IFieldParameter<LogicContainer<T>> field(String fieldName) {
-    FieldParameter<LogicContainer<T>> param = new FieldParameter<LogicContainer<T>>(this, getMapper().getField(
-        fieldName));
+    FieldParameter<LogicContainer<T>> param = new FieldParameter<LogicContainer<T>>(this, getQuery().getMapper()
+        .getField(fieldName));
     filters.add(param);
     return param;
   }
@@ -98,22 +97,4 @@ public class LogicContainer<T extends IQueryContainer> implements ILogicContaine
     return parent;
   }
 
-  /**
-   * Fetch the mapper of the IQuery, which must be one parent or parent-parent etc.
-   * 
-   * @return
-   */
-  private IMapper getMapper() {
-    ILogicContainer<?> container = this;
-    while (container.parent() != null) {
-      if (container.parent() instanceof ILogicContainer<?>) {
-        container = (ILogicContainer<?>) container.parent();
-      } else if (container instanceof IQuery<?>) {
-        return ((IQuery<?>) container).getMapper();
-      } else {
-        throw new UnsupportedOperationException("unsupported parent: " + container.getClass().getName());
-      }
-    }
-    return null;
-  }
 }

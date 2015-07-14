@@ -52,4 +52,12 @@ public class SimpleMapper {
     this.secondProperty = secondProperty;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    SimpleMapper compare = (SimpleMapper) o;
+
+    return o != null && compare.id.equals(id) && compare.name.equals(name)
+        && compare.secondProperty.equals(secondProperty);
+  }
+
 }
