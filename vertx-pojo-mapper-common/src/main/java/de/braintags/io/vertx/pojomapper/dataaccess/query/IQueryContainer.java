@@ -17,7 +17,7 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
 /**
- * 
+ * A general description of a container, which will contain different search definitions
  * 
  * @author Michael Remme
  * 
@@ -51,5 +51,19 @@ public interface IQueryContainer {
    * @return an instance of {@link IFieldParameter}
    */
   IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> or(String fieldName);
+
+  /**
+   * Get the parent instance of the current object
+   * 
+   * @return
+   */
+  public Object parent();
+
+  /**
+   * Get the IQuery, where the current instance is part from
+   * 
+   * @return the query
+   */
+  public IQuery<?> getQuery();
 
 }

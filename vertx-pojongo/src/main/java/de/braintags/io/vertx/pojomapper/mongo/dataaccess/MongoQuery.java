@@ -87,6 +87,7 @@ public class MongoQuery<T> extends Query<T> {
     Iterator<?> arguments = getFilters().iterator();
     while (arguments.hasNext()) {
       IQueryContainer container = (IQueryContainer) arguments.next();
+      // TODO replace this with a Factory
       if (container instanceof IFieldParameter<?>) {
         applyFieldParameter((IFieldParameter<?>) container);
       } else if (container instanceof ILogicContainer<?>) {
@@ -98,7 +99,7 @@ public class MongoQuery<T> extends Query<T> {
   }
 
   private void applyFieldParameter(IFieldParameter<?> fieldParameter) {
-
+    // fieldParameter.g
   }
 
   private void applyLogicParameter(ILogicContainer<?> fieldParameter) {
