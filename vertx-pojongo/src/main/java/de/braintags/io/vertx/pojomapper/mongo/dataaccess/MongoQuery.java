@@ -22,15 +22,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
 
-import java.util.Iterator;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
 
@@ -62,6 +58,15 @@ public class MongoQuery<T> extends Query<T> {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeExplain(io.vertx.core.Handler)
+   */
+  @Override
+  public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  }
+
   @Override
   public void executeCount(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     throw new UnsupportedOperationException();
@@ -80,7 +85,6 @@ public class MongoQuery<T> extends Query<T> {
         resultHandler.handle(future);
       }
     });
-
   }
 
   private IQueryResult<T> createQueryResult(List<JsonObject> findList) {
@@ -88,32 +92,9 @@ public class MongoQuery<T> extends Query<T> {
   }
 
   private JsonObject createQueryDefinition() {
-    JsonObject qDef = new JsonObject();
-    Iterator<?> arguments = getFilters().iterator();
-    while (arguments.hasNext()) {
-      Object container = arguments.next();
-      // TODO replace this with a Factory?
-      if (container instanceof IFieldParameter<?>) {
-        applyFieldParameter(qDef, (IFieldParameter<?>) container);
-      } else if (container instanceof ILogicContainer<?>) {
-        applyLogicParameter(qDef, (ILogicContainer<?>) container);
-      } else
-        throw new UnsupportedOperationException("unsupported type of query argument: " + container.getClass().getName());
-    }
-    return qDef;
-  }
-
-  private void applyFieldParameter(JsonObject qDef, IFieldParameter<?> fieldParameter) {
-    IField field = fieldParameter.getField();
-    String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
-    Object value = fieldParameter.getValue();
-    Object storeObject = field.getTypeHandler().intoStore(value);
-    JsonObject arg = new JsonObject().put(mongoOperator, storeObject);
-    qDef.put(field.getMappedFieldName(), arg);
-  }
-
-  private void applyLogicParameter(JsonObject qDef, ILogicContainer<?> logicContainer) {
-    throw new UnsupportedOperationException();
+    MongoQueryRambler rambler = new MongoQueryRambler();
+    executeQueryRambler(rambler);
+    return rambler.getJsonObject();
   }
 
   /*

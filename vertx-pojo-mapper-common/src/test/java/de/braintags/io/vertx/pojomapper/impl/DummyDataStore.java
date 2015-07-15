@@ -143,5 +143,15 @@ public class DummyDataStore implements IDataStore {
       return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeExplain(io.vertx.core.Handler)
+     */
+    @Override
+    public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+      throw new UnsupportedOperationException();
+    }
+
   }
 }

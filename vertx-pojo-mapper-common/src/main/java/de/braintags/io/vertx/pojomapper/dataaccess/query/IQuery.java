@@ -46,4 +46,12 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    */
   public void executeCount(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
 
+  /**
+   * Execute the query with the option explain and sends back the suitable information
+   * 
+   * @param resultHandler
+   *          contains the {@link IQueryResult}
+   */
+  public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
+
 }
