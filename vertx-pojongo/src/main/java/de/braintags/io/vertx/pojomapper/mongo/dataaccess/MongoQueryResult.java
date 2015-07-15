@@ -39,7 +39,6 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
   @SuppressWarnings("unused")
   private MongoDataStore store;
   private MongoMapper mapper;
-  private JsonObject orignalQuery;
 
   /**
    * Contains the original result from mongo
@@ -51,12 +50,11 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
    * 
    */
   @SuppressWarnings("unchecked")
-  public MongoQueryResult(List<JsonObject> jsonResult, MongoDataStore store, MongoMapper mapper, JsonObject orignalQuery) {
+  public MongoQueryResult(List<JsonObject> jsonResult, MongoDataStore store, MongoMapper mapper) {
     this.mapper = mapper;
     this.store = store;
     this.jsonResult = jsonResult;
     pojoResult = (T[]) new Object[jsonResult.size()];
-    this.orignalQuery = orignalQuery;
   }
 
   /*
@@ -131,15 +129,5 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
   @Override
   public IMapper getMapper() {
     return mapper;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult#getQuery()
-   */
-  @Override
-  public Object getOriginalQuery() {
-    return orignalQuery;
   }
 }

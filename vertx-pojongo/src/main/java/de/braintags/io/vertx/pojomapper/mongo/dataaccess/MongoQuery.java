@@ -80,15 +80,15 @@ public class MongoQuery<T> extends Query<T> {
         Future<IQueryResult<T>> future = Future.failedFuture(qResult.cause());
         resultHandler.handle(future);
       } else {
-        IQueryResult<T> qR = createQueryResult(qResult.result(), query);
+        IQueryResult<T> qR = createQueryResult(qResult.result());
         Future<IQueryResult<T>> future = Future.succeededFuture(qR);
         resultHandler.handle(future);
       }
     });
   }
 
-  private IQueryResult<T> createQueryResult(List<JsonObject> findList, JsonObject query) {
-    return new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(), (MongoMapper) getMapper(), query);
+  private IQueryResult<T> createQueryResult(List<JsonObject> findList) {
+    return new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(), (MongoMapper) getMapper());
   }
 
   private JsonObject createQueryDefinition() {

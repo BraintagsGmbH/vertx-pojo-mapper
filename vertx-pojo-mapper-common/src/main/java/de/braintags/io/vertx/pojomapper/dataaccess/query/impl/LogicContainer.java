@@ -117,9 +117,19 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
       if (filter instanceof IRamblerSource) {
         ((IRamblerSource) filter).applyTo(rambler);
       } else
-        logger.warn("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName());
+        throw new UnsupportedOperationException("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName());
     }
     rambler.reduceLevel();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#getChildren()
+   */
+  @Override
+  public List<Object> getChildren() {
+    return filters;
   }
 
 }

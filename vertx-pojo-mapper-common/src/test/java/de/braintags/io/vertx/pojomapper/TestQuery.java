@@ -40,7 +40,7 @@ public class TestQuery {
 
   @Test
   public void test() {
-    Query<Person> query = (Query) dataStore.createQuery(Person.class);
+    Query<Person> query = (Query<Person>) dataStore.createQuery(Person.class);
     IFieldParameter<Query<Person>> fp = query.field("name");
     query = fp.is("peter");
     IFieldParameter<LogicContainer<Query<Person>>> fplc = query.and("weight");
@@ -51,7 +51,7 @@ public class TestQuery {
     query.executeQueryRambler(rambler);
     logger.info("--- stop Rambler");
 
-    for (Object arg : query.getFilters()) {
+    for (Object arg : query.getChildren()) {
       if (arg instanceof IFieldParameter) {
         IFieldParameter<?> fm = (IFieldParameter<?>) arg;
         logger.info(fm.getValue());

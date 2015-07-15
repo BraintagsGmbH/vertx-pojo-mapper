@@ -33,13 +33,6 @@ public class QueryOperatorTranslator {
   public QueryOperatorTranslator() {
   }
 
-  /**
-   * Translate the {@link QueryOperator} into the String expression fitting for Mongo
-   * 
-   * @param op
-   *          the operator
-   * @return the suitable expression
-   */
   public static String translate(QueryOperator op) {
     switch (op) {
     case EQUALS:

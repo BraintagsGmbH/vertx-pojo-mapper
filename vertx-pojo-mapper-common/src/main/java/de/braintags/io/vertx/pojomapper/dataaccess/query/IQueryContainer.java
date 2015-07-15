@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
+import java.util.List;
+
 /**
  * A general description of a container, which will contain different search definitions
  * 
@@ -58,5 +60,12 @@ public interface IQueryContainer {
    * @return
    */
   public Object parent();
+
+  /**
+   * Get the child definitions
+   * 
+   * @return the children
+   */
+  public List<Object> getChildren();
 
 }

@@ -47,15 +47,6 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     super(mapperClass, datastore);
   }
 
-  /**
-   * Get the filters, which were defined for the current query
-   * 
-   * @return the filters
-   */
-  public List<Object> getFilters() {
-    return filters;
-  }
-
   @Override
   public IFieldParameter<Query<T>> field(String fieldName) {
     FieldParameter<Query<T>> param = new FieldParameter<Query<T>>(this, getMapper().getField(fieldName));
@@ -91,9 +82,19 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
       if (filter instanceof IRamblerSource) {
         ((IRamblerSource) filter).applyTo(rambler);
       } else
-        logger.warn("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName());
+        throw new UnsupportedOperationException("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName());
     }
     rambler.reduceLevel();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#getChildren()
+   */
+  @Override
+  public List<Object> getChildren() {
+    return filters;
   }
 
 }

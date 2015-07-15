@@ -36,10 +36,6 @@ public class MongoQueryRambler implements IQueryRambler {
   @SuppressWarnings("unused")
   private int level;
   private JsonObject qDef = new JsonObject();
-  /**
-   * This object switches during the processing queue to subobjects, which must be filled
-   */
-  private JsonObject currentJsonObject = qDef;
 
   /**
    * 
@@ -87,8 +83,6 @@ public class MongoQueryRambler implements IQueryRambler {
    */
   @Override
   public void apply(ILogicContainer<?> container) {
-    String logic = QueryLogicTranslator.translate(container.getLogic());
-
     throw new UnsupportedOperationException();
   }
 
