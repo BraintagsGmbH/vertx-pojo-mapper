@@ -16,6 +16,7 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 
 /**
@@ -25,12 +26,12 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
  * 
  */
 
-public class QueryOperatorTranslator {
+public class QueryLogicTranslator {
 
   /**
    * 
    */
-  public QueryOperatorTranslator() {
+  public QueryLogicTranslator() {
   }
 
   /**
@@ -40,27 +41,15 @@ public class QueryOperatorTranslator {
    *          the operator
    * @return the suitable expression
    */
-  public static String translate(QueryOperator op) {
-    switch (op) {
-    case EQUALS:
-      return "$eq";
-    case NOT_EQUALS:
-      return "$ne";
-    case LARGER:
-      return "$gt";
-    case LARGER_EQUAL:
-      return "$gte";
-    case SMALLER:
-      return "$lt";
-    case SMALLER_EQUAL:
-      return "$lte";
-    case IN:
-      return "$in";
-    case NOT_IN:
-      return "$nin";
+  public static String translate(QueryLogic logic) {
+    switch (logic) {
+    case AND:
+      return "$and";
+    case OR:
+      return "$or";
 
     default:
-      throw new UnsupportedOperationException("No translator for " + op);
+      throw new UnsupportedOperationException("No translator for " + logic);
     }
   }
 }

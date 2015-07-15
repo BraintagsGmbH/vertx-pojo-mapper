@@ -44,4 +44,12 @@ public interface IQueryResult<T> extends Collection<T> {
    * @return
    */
   public IMapper getMapper();
+
+  /**
+   * Get the original query, which was executed in the datastore
+   * 
+   * @return teh query
+   */
+  public Object getOriginalQuery();
+
 }
