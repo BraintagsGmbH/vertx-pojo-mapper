@@ -111,15 +111,14 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
    */
   @Override
   public void applyTo(IQueryRambler rambler) {
-    rambler.apply(this);
-    rambler.raiseLevel();
+    rambler.start(this);
     for (Object filter : filters) {
       if (filter instanceof IRamblerSource) {
         ((IRamblerSource) filter).applyTo(rambler);
       } else
         throw new UnsupportedOperationException("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName());
     }
-    rambler.reduceLevel();
+    rambler.stop(this);
   }
 
   /*

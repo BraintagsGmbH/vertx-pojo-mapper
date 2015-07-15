@@ -16,20 +16,15 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.test;
 
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.MongoClient;
-import io.vertx.ext.mongo.MongoService;
 import io.vertx.test.core.VertxTestBase;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.flapdoodle.embed.mongo.MongodExecutable;
@@ -87,8 +82,8 @@ public abstract class MongoBaseTest extends VertxTestBase {
     return null;
   }
 
-  @BeforeClass
   public static void startMongo() {
+    log.info("STARTING MONGO");
     if (getConnectionString() == null) {
       try {
         IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
@@ -101,8 +96,10 @@ public abstract class MongoBaseTest extends VertxTestBase {
     }
   }
 
-  @AfterClass
   public static void stopMongo() {
+    log.info("STOPPING MONGO");
+    if (mongoClient != null)
+      mongoClient.close();
     if (exe != null) {
       exe.stop();
     }
@@ -124,13 +121,17 @@ public abstract class MongoBaseTest extends VertxTestBase {
 
   private void initMongoClient() {
     JsonObject config = getConfig();
-
-    DeploymentOptions options = new DeploymentOptions().setConfig(config);
+    log.info("init MongoClient with " + config);
+    mongoClient = MongoClient.createNonShared(vertx, config);
     CountDownLatch latch = new CountDownLatch(1);
-    vertx.deployVerticle("service:io.vertx.mongo-service", options, onSuccess(id -> {
-      mongoClient = MongoService.createEventBusProxy(vertx, "vertx.mongo");
-      dropCollections(latch);
-    }));
+    mongoClient.getCollections(resultHandler -> {
+      if (resultHandler.failed()) {
+        log.error("", resultHandler.cause());
+      } else {
+        log.info(String.format("found %d collections", resultHandler.result().size()));
+      }
+      latch.countDown();
+    });
     try {
       awaitLatch(latch);
     } catch (InterruptedException e) {
@@ -166,33 +167,49 @@ public abstract class MongoBaseTest extends VertxTestBase {
   }
 
   /**
-   * Method drops all collections which are starting with the prefix {@link #TABLE_PREFIX}
+   * Method drops all non system collections
    * 
    * @param latch
    *          the latch to be used
    */
-  protected void dropCollections(CountDownLatch latch) {
+  protected void dropCollections() {
     log.info("DROPPING COLLECTIONS");
     // Drop all the collections in the db
-    mongoClient.getCollections(onSuccess(toDrop -> {
-      AtomicInteger collCount = new AtomicInteger();
-      int count = toDrop.size();
-      if (!toDrop.isEmpty()) {
-        for (String collection : toDrop) {
+    CountDownLatch externalLatch = new CountDownLatch(1);
+    mongoClient.getCollections(colls -> {
+      if (colls.failed()) {
+        log.error(colls.cause());
+      } else {
+        List<String> collections = colls.result();
+        CountDownLatch internalLatch = new CountDownLatch(collections.size());
+        for (String collection : collections) {
           if (collection.startsWith("system.")) {
-            latch.countDown();
+            log.info("NOT Dropping: " + collection);
+            internalLatch.countDown();
           } else {
-            mongoClient.dropCollection(collection, onSuccess(v -> {
-              if (collCount.incrementAndGet() == count) {
-                latch.countDown();
+            mongoClient.dropCollection(collection, dropResult -> {
+              log.info("DROPPING: " + collection);
+              if (dropResult.failed()) {
+                log.error("", dropResult.cause());
               }
-            }));
+              internalLatch.countDown();
+            });
           }
         }
-      } else {
-        latch.countDown();
+        try {
+          awaitLatch(internalLatch);
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
       }
-    }));
+      externalLatch.countDown();
+    });
+
+    try {
+      awaitLatch(externalLatch);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }

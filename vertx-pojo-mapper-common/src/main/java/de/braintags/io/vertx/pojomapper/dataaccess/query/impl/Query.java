@@ -76,15 +76,14 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    *          the rambler to be filled
    */
   public void executeQueryRambler(IQueryRambler rambler) {
-    rambler.apply(this);
-    rambler.raiseLevel();
+    rambler.start(this);
     for (Object filter : filters) {
       if (filter instanceof IRamblerSource) {
         ((IRamblerSource) filter).applyTo(rambler);
       } else
         throw new UnsupportedOperationException("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName());
     }
-    rambler.reduceLevel();
+    rambler.stop(this);
   }
 
   /*

@@ -142,7 +142,8 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
    */
   @Override
   public void applyTo(IQueryRambler rambler) {
-    rambler.apply(this);
+    rambler.start(this);
+    rambler.stop(this);
   }
 
 }

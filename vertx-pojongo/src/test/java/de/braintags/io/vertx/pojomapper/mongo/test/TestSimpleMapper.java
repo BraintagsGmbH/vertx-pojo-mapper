@@ -23,7 +23,6 @@ import io.vertx.core.logging.LoggerFactory;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -53,7 +52,6 @@ public class TestSimpleMapper extends MongoBaseTest {
   public static void beforeClass() throws Exception {
     System.setProperty("connection_string", "mongodb://localhost:27017");
     System.setProperty("db_name", "PojongoTestDatabase");
-
     MongoBaseTest.startMongo();
   }
 
@@ -66,10 +64,11 @@ public class TestSimpleMapper extends MongoBaseTest {
    * @throws java.lang.Exception
    */
   @Override
-  @Before
   public void setUp() throws Exception {
+    logger.info("-->> setup");
     super.setUp();
     getMongoClient();
+    dropCollections();
   }
 
   @Test
@@ -102,6 +101,7 @@ public class TestSimpleMapper extends MongoBaseTest {
     resultContainer = find(query);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
+    assertEquals(1, resultContainer.queryResult.size());
     SimpleMapper foundSm = (SimpleMapper) resultContainer.queryResult.iterator().next();
     assertTrue(sm.equals(foundSm));
 
@@ -110,9 +110,74 @@ public class TestSimpleMapper extends MongoBaseTest {
     resultContainer = find(query);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
+    assertEquals(1, resultContainer.queryResult.size());
     foundSm = (SimpleMapper) resultContainer.queryResult.iterator().next();
     assertTrue(sm.equals(foundSm));
 
+  }
+
+  @Test
+  public void performOr() {
+    SimpleMapper sm = new SimpleMapper();
+    sm.name = "Oder";
+    sm.setSecondProperty("erste");
+    ResultContainer resultContainer = saveRecord(sm);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    sm = new SimpleMapper();
+    sm.name = "Oder";
+    sm.setSecondProperty("zweite");
+    resultContainer = saveRecord(sm);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    query.field("name").is("Oder");
+    resultContainer = find(query);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+    assertEquals(2, resultContainer.queryResult.size());
+
+    query = getDataStore().createQuery(SimpleMapper.class);
+    query.or("secondProperty").is("erste").field("secondProperty").is("zweite");
+    resultContainer = find(query);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+    logger.info(resultContainer.queryResult.getOriginalQuery());
+    assertEquals(2, resultContainer.queryResult.size());
+    logger.info(resultContainer.queryResult.getOriginalQuery());
+
+  }
+
+  @Test
+  public void performQueryMultipleFields() {
+    SimpleMapper sm = new SimpleMapper();
+    sm.name = "Dublette";
+    sm.setSecondProperty("erste");
+    ResultContainer resultContainer = saveRecord(sm);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    sm = new SimpleMapper();
+    sm.name = "Dublette";
+    sm.setSecondProperty("zweite");
+    resultContainer = saveRecord(sm);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    query.field("name").is("Dublette");
+    resultContainer = find(query);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+    assertEquals(2, resultContainer.queryResult.size());
+    query.field("secondProperty").is("erste");
+    resultContainer = find(query);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+    assertEquals(1, resultContainer.queryResult.size());
+    logger.info(resultContainer.queryResult.getOriginalQuery());
   }
 
   private ResultContainer find(IQuery<SimpleMapper> query) {

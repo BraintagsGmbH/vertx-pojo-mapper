@@ -16,8 +16,12 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
+
+import java.util.ArrayDeque;
+
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
@@ -33,9 +37,9 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
  */
 
 public class MongoQueryRambler implements IQueryRambler {
-  @SuppressWarnings("unused")
-  private int level;
   private JsonObject qDef = new JsonObject();
+  private Object currentObject = qDef;
+  private ArrayDeque<Object> deque = new ArrayDeque<>();
 
   /**
    * 
@@ -43,71 +47,99 @@ public class MongoQueryRambler implements IQueryRambler {
   public MongoQueryRambler() {
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#raiseLevel()
-   */
-  @Override
-  public void raiseLevel() {
-    ++level;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#reduceLevel()
-   */
-  @Override
-  public void reduceLevel() {
-    --level;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#apply(de.braintags.io.vertx.pojomapper.dataaccess
-   * .query.IQuery)
-   */
-  @Override
-  public void apply(IQuery<?> query) {
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#apply(de.braintags.io.vertx.pojomapper.dataaccess
-   * .query.ILogicContainer)
-   */
-  @Override
-  public void apply(ILogicContainer<?> container) {
-    throw new UnsupportedOperationException();
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#apply(de.braintags.io.vertx.pojomapper.dataaccess
-   * .query.IFieldParameter)
-   */
-  @Override
-  public void apply(IFieldParameter<?> fieldParameter) {
-    IField field = fieldParameter.getField();
-    String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
-    Object value = fieldParameter.getValue();
-    Object storeObject = field.getTypeHandler().intoStore(value);
-    JsonObject arg = new JsonObject().put(mongoOperator, storeObject);
-    qDef.put(field.getMappedFieldName(), arg);
-  }
-
   /**
    * @return the jsonObject
    */
   public JsonObject getJsonObject() {
     return qDef;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess
+   * .query.IQuery)
+   */
+  @Override
+  public void start(IQuery<?> query) {
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess
+   * .query.IQuery)
+   */
+  @Override
+  public void stop(IQuery<?> query) {
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess
+   * .query.ILogicContainer)
+   */
+  @Override
+  public void start(ILogicContainer<?> container) {
+    String logic = QueryLogicTranslator.translate(container.getLogic());
+    JsonArray array = new JsonArray();
+    add(logic, array);
+    deque.addLast(currentObject);
+    currentObject = array;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess
+   * .query.ILogicContainer)
+   */
+  @Override
+  public void stop(ILogicContainer<?> container) {
+    currentObject = deque.pollLast();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess
+   * .query.IFieldParameter)
+   */
+  @Override
+  public void start(IFieldParameter<?> fieldParameter) {
+    IField field = fieldParameter.getField();
+    String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
+    Object value = fieldParameter.getValue();
+    Object storeObject = field.getTypeHandler().intoStore(value);
+    JsonObject arg = new JsonObject().put(mongoOperator, storeObject);
+    add(field.getMappedFieldName(), arg);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess
+   * .query.IFieldParameter)
+   */
+  @Override
+  public void stop(IFieldParameter<?> fieldParameter) {
+  }
+
+  private void add(String key, Object objectToAdd) {
+    if (currentObject instanceof JsonObject) {
+      ((JsonObject) currentObject).put(key, objectToAdd);
+    } else if (currentObject instanceof JsonArray) {
+      JsonObject ob = new JsonObject().put(key, objectToAdd);
+      ((JsonArray) currentObject).add(ob);
+    } else
+      throw new UnsupportedOperationException("no definition to add for " + currentObject.getClass().getName());
   }
 
 }

@@ -40,23 +40,11 @@ public class LoggerQueryRamber implements IQueryRambler {
   public LoggerQueryRamber() {
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#raiseHirarchyLevel()
-   */
-  @Override
   public void raiseLevel() {
     ++level;
     setHirarchyString();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#reduceLevel()
-   */
-  @Override
   public void reduceLevel() {
     --level;
     setHirarchyString();
@@ -70,41 +58,37 @@ public class LoggerQueryRamber implements IQueryRambler {
     levelPrefix = prefixBuffer.toString();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#apply(de.braintags.io.vertx.pojomapper.dataaccess
-   * .query.IQuery)
-   */
   @Override
-  public void apply(IQuery<?> query) {
-    log("query in: " + query.getMapper().getDataStoreName());
+  public void start(IQuery<?> query) {
+    log("start query in: " + query.getMapper().getDataStoreName());
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#apply(de.braintags.io.vertx.pojomapper.dataaccess
-   * .query.ILogicContainer)
-   */
   @Override
-  public void apply(ILogicContainer<?> container) {
+  public void stop(IQuery<?> query) {
+    log("stop query ");
+  }
+
+  @Override
+  public void start(ILogicContainer<?> container) {
+    raiseLevel();
     log(container.getLogic().toString());
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#apply(de.braintags.io.vertx.pojomapper.dataaccess
-   * .query.IFieldParameter)
-   */
   @Override
-  public void apply(IFieldParameter<?> fieldParameter) {
+  public void stop(ILogicContainer<?> container) {
+    reduceLevel();
+  }
+
+  @Override
+  public void start(IFieldParameter<?> fieldParameter) {
+    raiseLevel();
     log(fieldParameter.getField().getName() + " " + fieldParameter.getOperator().toString() + " "
         + fieldParameter.getValue());
+  }
+
+  @Override
+  public void stop(IFieldParameter<?> fieldParameter) {
+    reduceLevel();
   }
 
   private final void log(String message) {

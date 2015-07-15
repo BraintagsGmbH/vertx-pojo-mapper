@@ -36,9 +36,9 @@ import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
  */
 
 public class MongoQueryResult<T> extends AbstractCollection<T> implements IQueryResult<T> {
-  @SuppressWarnings("unused")
   private MongoDataStore store;
   private MongoMapper mapper;
+  private JsonObject originalQuery;
 
   /**
    * Contains the original result from mongo
@@ -50,10 +50,12 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
    * 
    */
   @SuppressWarnings("unchecked")
-  public MongoQueryResult(List<JsonObject> jsonResult, MongoDataStore store, MongoMapper mapper) {
+  public MongoQueryResult(List<JsonObject> jsonResult, MongoDataStore store, MongoMapper mapper,
+      JsonObject originalQuery) {
     this.mapper = mapper;
     this.store = store;
     this.jsonResult = jsonResult;
+    this.originalQuery = originalQuery;
     pojoResult = (T[]) new Object[jsonResult.size()];
   }
 
@@ -77,6 +79,7 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
     return pojoResult.length;
   }
 
+  @SuppressWarnings("unchecked")
   private void generatePojo(int i) {
     JsonObject sourceObject = jsonResult.get(i);
     MongoStoreObject storeObject = new MongoStoreObject(sourceObject, getMapper());
@@ -129,5 +132,15 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
   @Override
   public IMapper getMapper() {
     return mapper;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult#getOriginalQuery()
+   */
+  @Override
+  public Object getOriginalQuery() {
+    return originalQuery;
   }
 }

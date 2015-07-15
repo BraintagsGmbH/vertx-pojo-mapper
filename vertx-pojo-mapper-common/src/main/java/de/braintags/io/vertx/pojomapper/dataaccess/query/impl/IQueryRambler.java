@@ -32,38 +32,51 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 public interface IQueryRambler {
 
   /**
-   * Raises the hierarchy level of the container. The {@link IQuery} itself is level 0
-   * 
-   */
-  void raiseLevel();
-
-  /**
-   * Reduces the hierarchy level of the container.
-   */
-  void reduceLevel();
-
-  /**
-   * Apply the {@link IQuery} itself
+   * Start applying the {@link IQuery} itself
    * 
    * @param query
    *          the query to be applied
    */
-  void apply(IQuery<?> query);
+  void start(IQuery<?> query);
 
   /**
-   * Apply an {@link ILogicContainer}
+   * Stop applying the {@link IQuery} itself
+   * 
+   * @param query
+   *          the query to be applied
+   */
+  void stop(IQuery<?> query);
+
+  /**
+   * Start applying an {@link ILogicContainer}
    * 
    * @param container
    *          the container to be applied
    */
-  void apply(ILogicContainer<?> container);
+  void start(ILogicContainer<?> container);
 
   /**
-   * Apply an {@link IFieldParameter}
+   * Stop applying an {@link ILogicContainer}
+   * 
+   * @param container
+   *          the container to be applied
+   */
+  void stop(ILogicContainer<?> container);
+
+  /**
+   * Start applying an {@link IFieldParameter}
    * 
    * @param fieldParameter
    *          the field paremeter to be applied
    */
-  void apply(IFieldParameter<?> fieldParameter);
+  void start(IFieldParameter<?> fieldParameter);
+
+  /**
+   * Stop applying an {@link IFieldParameter}
+   * 
+   * @param fieldParameter
+   *          the field paremeter to be applied
+   */
+  void stop(IFieldParameter<?> fieldParameter);
 
 }
