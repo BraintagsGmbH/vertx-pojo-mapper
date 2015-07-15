@@ -33,4 +33,18 @@ public interface IObjectFactory {
    */
   <T> T createInstance(Class<T> clazz);
 
+  /**
+   * Set the Mapper, where the IObjectFactory is contained
+   * 
+   * @param mapper
+   *          the {@link IMapper}
+   */
+  void setMapper(IMapper mapper);
+
+  /**
+   * Get the Mapper, where the IObjectFactory is contained
+   * 
+   * @return the {@link IMapper}
+   */
+  IMapper getMapper();
 }

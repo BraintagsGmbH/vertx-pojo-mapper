@@ -33,8 +33,7 @@ public class DefaultObjectFactory implements IObjectFactory {
   /**
    * 
    */
-  public DefaultObjectFactory(IMapper mapper) {
-    this.mapper = mapper;
+  public DefaultObjectFactory() {
   }
 
   /*
@@ -49,6 +48,27 @@ public class DefaultObjectFactory implements IObjectFactory {
     } catch (InstantiationException | IllegalAccessException e) {
       throw new MappingException(e);
     }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.mapping.IObjectFactory#setMapper(de.braintags.io.vertx.pojomapper.mapping.IMapper)
+   */
+  @Override
+  public void setMapper(IMapper mapper) {
+    this.mapper = mapper;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IObjectFactory#getMapper()
+   */
+  @Override
+  public IMapper getMapper() {
+    return mapper;
   }
 
 }

@@ -63,7 +63,7 @@ import de.braintags.io.vertx.util.ClassUtil;
  */
 
 public class Mapper implements IMapper {
-  private IObjectFactory objectFactory = new DefaultObjectFactory(this);
+  private IObjectFactory objectFactory;
   private Map<String, MappedField> mappedFields = new HashMap<String, MappedField>();
   private IField idField;
   private MapperFactory mapperFactory;
@@ -100,6 +100,8 @@ public class Mapper implements IMapper {
   public Mapper(Class<?> mapperClass, MapperFactory mapperFactory) {
     this.mapperFactory = mapperFactory;
     this.mapperClass = mapperClass;
+    this.objectFactory = new DefaultObjectFactory();
+    this.objectFactory.setMapper(this);
     init();
   }
 

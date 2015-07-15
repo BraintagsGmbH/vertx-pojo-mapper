@@ -28,7 +28,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
  * 
  */
 
-public class FieldParameter<T extends IQueryContainer> implements IFieldParameter<T> {
+public class FieldParameter<T extends IQueryContainer> implements IFieldParameter<T>, IRamblerSource {
   private IField field;
   private Object value;
   private QueryOperator operator;
@@ -59,12 +59,12 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
 
   @Override
   public T is(Object value) {
-    return addValue(QueryOperator.EQUALS, container);
+    return addValue(QueryOperator.EQUALS, value);
   }
 
   @Override
   public T isNot(Object value) {
-    return addValue(QueryOperator.NOT_EQUALS, container);
+    return addValue(QueryOperator.NOT_EQUALS, value);
   }
 
   /*
@@ -74,7 +74,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
    */
   @Override
   public T larger(Object value) {
-    return addValue(QueryOperator.LARGER, container);
+    return addValue(QueryOperator.LARGER, value);
   }
 
   /*
@@ -84,7 +84,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
    */
   @Override
   public T largerEqual(Object value) {
-    return addValue(QueryOperator.LARGER_EQUAL, container);
+    return addValue(QueryOperator.LARGER_EQUAL, value);
   }
 
   /*
@@ -94,7 +94,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
    */
   @Override
   public T less(Object value) {
-    return addValue(QueryOperator.SMALLER, container);
+    return addValue(QueryOperator.SMALLER, value);
   }
 
   /*
@@ -104,7 +104,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
    */
   @Override
   public T lessEqual(Object value) {
-    return addValue(QueryOperator.SMALLER_EQUAL, container);
+    return addValue(QueryOperator.SMALLER_EQUAL, value);
   }
 
   /*
@@ -114,7 +114,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
    */
   @Override
   public T in(Object value) {
-    return addValue(QueryOperator.IN, container);
+    return addValue(QueryOperator.IN, value);
   }
 
   /*
@@ -124,13 +124,25 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
    */
   @Override
   public T notIn(Object value) {
-    return addValue(QueryOperator.NOT_IN, container);
+    return addValue(QueryOperator.NOT_IN, value);
   }
 
   private T addValue(QueryOperator op, Object value) {
     this.operator = op;
     this.value = value;
     return container;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IRamblerSource#applyTo(de.braintags.io.vertx.pojomapper.
+   * dataaccess.query.impl.IQueryRambler)
+   */
+  @Override
+  public void applyTo(IQueryRambler rambler) {
+    rambler.apply(this);
   }
 
 }

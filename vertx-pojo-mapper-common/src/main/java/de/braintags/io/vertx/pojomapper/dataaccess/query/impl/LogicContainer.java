@@ -16,6 +16,9 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +35,10 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
  */
 
 public class LogicContainer<T extends IQueryContainer> extends AbstractQueryContainer<IQueryContainer> implements
-    ILogicContainer<T> {
+    ILogicContainer<T>, IRamblerSource {
+  private static final Logger logger = LoggerFactory.getLogger(LogicContainer.class);
   private List<Object> filters = new ArrayList<Object>();
-  private T parent;
+  // private T parent;
   private QueryLogic logic;
 
   /**
@@ -92,9 +96,30 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
     return logic;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public T parent() {
-    return parent;
+    return (T) super.parent();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IRamblerSource#applyTo(de.braintags.io.vertx.pojomapper.
+   * dataaccess.query.impl.IQueryRambler)
+   */
+  @Override
+  public void applyTo(IQueryRambler rambler) {
+    rambler.apply(this);
+    rambler.raiseLevel();
+    for (Object filter : filters) {
+      if (filter instanceof IRamblerSource) {
+        ((IRamblerSource) filter).applyTo(rambler);
+      } else
+        logger.warn("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName());
+    }
+    rambler.reduceLevel();
   }
 
 }

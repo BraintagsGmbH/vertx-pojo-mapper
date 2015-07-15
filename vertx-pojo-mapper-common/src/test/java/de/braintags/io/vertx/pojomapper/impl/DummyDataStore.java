@@ -16,9 +16,13 @@
 
 package de.braintags.io.vertx.pojomapper.impl;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
@@ -46,7 +50,7 @@ public class DummyDataStore implements IDataStore {
    */
   @Override
   public <T> IQuery<T> createQuery(Class<T> mapper) {
-    return null;
+    return new DummyQuery<T>(mapper, this);
   }
 
   /*
@@ -99,4 +103,45 @@ public class DummyDataStore implements IDataStore {
     return pmf;
   }
 
+  class DummyQuery<T> extends Query<T> {
+
+    /**
+     * @param mapperClass
+     * @param datastore
+     */
+    public DummyQuery(Class<T> mapperClass, IDataStore datastore) {
+      super(mapperClass, datastore);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
+     */
+    @Override
+    public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+      throw new UnsupportedOperationException();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
+     */
+    @Override
+    public void executeCount(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+      throw new UnsupportedOperationException();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#parent()
+     */
+    @Override
+    public Object parent() {
+      return null;
+    }
+
+  }
 }

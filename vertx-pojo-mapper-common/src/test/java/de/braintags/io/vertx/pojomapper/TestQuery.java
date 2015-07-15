@@ -16,24 +16,47 @@
 
 package de.braintags.io.vertx.pojomapper;
 
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.LoggerQueryRamber;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.LogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.impl.DummyDataStore;
 import de.braintags.io.vertx.pojomapper.mapper.Person;
 
 public class TestQuery {
+  private static Logger logger = LoggerFactory.getLogger(TestQuery.class);
   private static IDataStore dataStore = new DummyDataStore();
 
   @Before
   public void setUp() throws Exception {
+    LoggerFactory.initialise();
   }
 
   @Test
   public void test() {
     Query<Person> query = (Query) dataStore.createQuery(Person.class);
-    query.field("name").contains("peter").and("weight").is(15).parent();
+    IFieldParameter<Query<Person>> fp = query.field("name");
+    query = fp.is("peter");
+    IFieldParameter<LogicContainer<Query<Person>>> fplc = query.and("weight");
+    LogicContainer<Query<Person>> lc = fplc.is(15);
+    query = lc.parent();
+    logger.info("--- start Rambler");
+    LoggerQueryRamber rambler = new LoggerQueryRamber();
+    query.executeQueryRambler(rambler);
+    logger.info("--- stop Rambler");
+
+    for (Object arg : query.getFilters()) {
+      if (arg instanceof IFieldParameter) {
+        IFieldParameter<?> fm = (IFieldParameter<?>) arg;
+        logger.info(fm.getValue());
+      }
+    }
 
   }
 }

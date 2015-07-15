@@ -14,23 +14,20 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.impl;
-
-import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultObjectFactory;
+package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
 /**
- * 
+ * All elements of a query, which contain this interface will be called to fill a {@link IQueryRambler}
  * 
  * @author Michael Remme
  * 
  */
 
-public class DummyObjectFactory extends DefaultObjectFactory {
+public interface IRamblerSource {
 
   /**
-   * @param mapper
+   * 
+   * @param rambler
    */
-  public DummyObjectFactory() {
-  }
-
+  void applyTo(IQueryRambler rambler);
 }
