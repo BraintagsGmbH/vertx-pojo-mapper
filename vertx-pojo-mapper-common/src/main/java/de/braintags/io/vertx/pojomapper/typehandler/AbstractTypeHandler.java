@@ -29,10 +29,7 @@ import java.util.List;
 public abstract class AbstractTypeHandler implements ITypeHandler {
   private final List<Class<?>> classesToHandle;
 
-  /**
-   * 
-   */
-  public AbstractTypeHandler(Class<?>[] classesToDeal) {
+  public AbstractTypeHandler(Class<?>... classesToDeal) {
     classesToHandle = Arrays.asList(classesToDeal);
   }
 

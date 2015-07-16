@@ -56,7 +56,7 @@ public class TypeHandlerTest extends MongoBaseTest {
   }
 
   @Test
-  public void testString() {
+  public void testSaveAndRead() {
 
     TypehandlerTestMapper sm = new TypehandlerTestMapper();
     ResultContainer resultContainer = saveRecord(sm);
@@ -71,6 +71,7 @@ public class TypeHandlerTest extends MongoBaseTest {
 
     TypehandlerTestMapper foundSm = (TypehandlerTestMapper) resultContainer.queryResult.iterator().next();
     assertTrue(sm.equals(foundSm));
+    logger.info("finished!");
   }
 
   /* ****************************************************

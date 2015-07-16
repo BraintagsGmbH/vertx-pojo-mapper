@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
+import java.util.Date;
+
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
@@ -31,6 +33,12 @@ public class TypehandlerTestMapper {
   public String id;
   public String stringField = "myString";
   public int myInt = 5;
+  public Integer myInteger = new Integer(14);
+  public float myFloat = 5.88f;
+  public Float myFloatOb = new Float(12.5);
+  public boolean myBo = true;
+  public Boolean myBoolean = new Boolean(false);
+  public Date javaDate = new Date(System.currentTimeMillis());
 
   /**
    * 
@@ -44,6 +52,18 @@ public class TypehandlerTestMapper {
     if (!compare.stringField.equals(stringField))
       return false;
     if (compare.myInt != myInt)
+      return false;
+    if (compare.myFloat != myFloat)
+      return false;
+    if (!compare.myInteger.equals(myInteger))
+      return false;
+    if (!compare.myFloatOb.equals(myFloatOb))
+      return false;
+    if (compare.myBo != myBo)
+      return false;
+    if (!compare.myBoolean.equals(myBoolean))
+      return false;
+    if (!compare.javaDate.equals(javaDate))
       return false;
 
     return true;

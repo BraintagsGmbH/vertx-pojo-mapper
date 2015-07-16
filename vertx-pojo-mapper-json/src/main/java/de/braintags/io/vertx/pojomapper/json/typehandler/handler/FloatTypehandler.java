@@ -14,7 +14,7 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers;
+package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 
@@ -25,13 +25,13 @@ import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
  * 
  */
 
-public class CharacterTypeHandler extends AbstractTypeHandler {
+public class FloatTypehandler extends AbstractTypeHandler {
 
   /**
-   * 
+   * @param classesToDeal
    */
-  public CharacterTypeHandler() {
-    super(CharSequence.class);
+  public FloatTypehandler() {
+    super(float.class, Float.class, float[].class, Float[].class);
   }
 
   /*
@@ -41,7 +41,7 @@ public class CharacterTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public Object fromStore(Object source) {
-    return source;
+    return ((Double) source).floatValue();
   }
 
   /*
@@ -51,7 +51,7 @@ public class CharacterTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public Object intoStore(Object source) {
-    return source;
+    return ((Float) source).doubleValue();
   }
 
 }
