@@ -20,6 +20,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.AfterClass;
@@ -148,7 +150,7 @@ public class TestSimpleMapper extends MongoBaseTest {
   }
 
   /**
-   * Suche: Name = "AndOr" AND ( secondProperty="AndOr 1" OR secondProperty="AndOr 2" )
+   * Search: Name = "AndOr" AND ( secondProperty="AndOr 1" OR secondProperty="AndOr 2" )
    */
   @Test
   public void testAndOr() {
@@ -161,10 +163,59 @@ public class TestSimpleMapper extends MongoBaseTest {
       throw resultContainer.assertionError;
   }
 
+  /**
+   * Search:
+   */
+  @Test
+  public void testIn() {
+    createDemoRecords();
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    List<String> it = Arrays.asList("Dublette", "AndOr");
+    query.field("name").in(it);
+
+    ResultContainer resultContainer = find(query, 5);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
+  /**
+   * Search:
+   */
+  @Test
+  public void testNotIn() {
+    createDemoRecords();
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    List<String> it = Arrays.asList("erste", "zweite");
+    query.field("secondProperty").notIn(it);
+
+    ResultContainer resultContainer = find(query, 3);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
+  /**
+   * Search:
+   */
+  @Test
+  public void testIsNot() {
+    createDemoRecords();
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    query.field("name").isNot("Dublette");
+
+    ResultContainer resultContainer = find(query, 3);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
+  /* ****************************************************
+   * Helper Part
+   */
+
   private void createDemoRecords() {
     SimpleMapper sm = new SimpleMapper();
     sm.name = "Dublette";
     sm.setSecondProperty("erste");
+    sm.intValue = 10;
     ResultContainer resultContainer = saveRecord(sm);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
@@ -172,6 +223,7 @@ public class TestSimpleMapper extends MongoBaseTest {
     sm = new SimpleMapper();
     sm.name = "Dublette";
     sm.setSecondProperty("zweite");
+    sm.intValue = 11;
     resultContainer = saveRecord(sm);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
@@ -180,6 +232,7 @@ public class TestSimpleMapper extends MongoBaseTest {
       sm = new SimpleMapper();
       sm.name = "AndOr";
       sm.setSecondProperty("AndOr " + i);
+      sm.intValue = i + 1;
       resultContainer = saveRecord(sm);
       if (resultContainer.assertionError != null)
         throw resultContainer.assertionError;

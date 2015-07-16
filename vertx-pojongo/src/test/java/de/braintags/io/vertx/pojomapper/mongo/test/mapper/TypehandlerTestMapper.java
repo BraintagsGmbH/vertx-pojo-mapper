@@ -17,48 +17,36 @@
 package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
- * A simple mapper with some beans properties
- *
+ * Mapper with all properties to test {@link ITypeHandler}
+ * 
  * @author Michael Remme
  * 
  */
 
-public class SimpleMapper {
+public class TypehandlerTestMapper {
   @Id
   public String id;
-  public String name;
-  private String secondProperty;
-  public int intValue;
+  public String stringField = "myString";
+  public int myInt = 5;
 
   /**
    * 
    */
-  public SimpleMapper() {
-  }
-
-  /**
-   * @return the secondProperty
-   */
-  public final String getSecondProperty() {
-    return secondProperty;
-  }
-
-  /**
-   * @param secondProperty
-   *          the secondProperty to set
-   */
-  public final void setSecondProperty(String secondProperty) {
-    this.secondProperty = secondProperty;
+  public TypehandlerTestMapper() {
   }
 
   @Override
-  public boolean equals(Object o) {
-    SimpleMapper compare = (SimpleMapper) o;
+  public boolean equals(Object ob) {
+    TypehandlerTestMapper compare = (TypehandlerTestMapper) ob;
+    if (!compare.stringField.equals(stringField))
+      return false;
+    if (compare.myInt != myInt)
+      return false;
 
-    return o != null && compare.id.equals(id) && compare.name.equals(name)
-        && compare.secondProperty.equals(secondProperty);
+    return true;
   }
 
 }

@@ -55,7 +55,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ObjectT
  */
 
 public class TestMapperFactory {
-  public static final int NUMBER_OF_PROPERTIES = 9;
+  public static final int NUMBER_OF_PROPERTIES = Person.NUMBER_OF_PROPERTIES;
   private static IDataStore dataStore = new DummyDataStore();
   private static IMapper mapperDef = null;
 
@@ -121,6 +121,7 @@ public class TestMapperFactory {
     assertTrue(mapperDef.getField("weight").getPropertyMapper() instanceof IPropertyMapper);
     assertTrue(mapperDef.getField("animal").getPropertyMapper() instanceof IReferencedMapper);
     assertTrue(mapperDef.getField("chicken").getPropertyMapper() instanceof IEmbeddedMapper);
+    assertTrue(mapperDef.getField("intValue").getPropertyMapper() instanceof IPropertyMapper);
 
   }
 

@@ -40,6 +40,8 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 @Entity(name = "PersonColumn")
 @Indexes(@Index(fields = { @IndexField(fieldName = "name"), @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
 public class Person extends AbstractPerson {
+  public static final int NUMBER_OF_PROPERTIES = 10;
+
   @Id
   public String idField;
   private String name;
@@ -60,6 +62,8 @@ public class Person extends AbstractPerson {
 
   @Property("WEIGHT")
   public Double weight;
+
+  public int intValue;
 
   private String hiddenString;
   public transient String transientString;

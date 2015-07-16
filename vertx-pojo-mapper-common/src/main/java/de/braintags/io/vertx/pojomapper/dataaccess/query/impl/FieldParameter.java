@@ -113,7 +113,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#in(java.lang.Object)
    */
   @Override
-  public T in(Object value) {
+  public T in(Iterable<?> value) {
     return addValue(QueryOperator.IN, value);
   }
 
@@ -123,7 +123,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#notIn(java.lang.Object)
    */
   @Override
-  public T notIn(Object value) {
+  public T notIn(Iterable<?> value) {
     return addValue(QueryOperator.NOT_IN, value);
   }
 

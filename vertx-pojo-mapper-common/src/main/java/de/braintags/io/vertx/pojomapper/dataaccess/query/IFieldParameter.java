@@ -70,7 +70,8 @@ public interface IFieldParameter<T extends IQueryContainer> {
    * Defines a query argument where the value is larger in the given field
    * 
    * @param value
-   * @return
+   *          the value to be checked
+   * @return the parent {@link IQueryContainer} to enable chaining of commands
    */
   T larger(Object value);
 
@@ -78,7 +79,8 @@ public interface IFieldParameter<T extends IQueryContainer> {
    * Defines a query argument where the value is larger or equal in the given field
    * 
    * @param value
-   * @return
+   *          the value to be checked
+   * @return the parent {@link IQueryContainer} to enable chaining of commands
    */
   T largerEqual(Object value);
 
@@ -86,7 +88,7 @@ public interface IFieldParameter<T extends IQueryContainer> {
    * Defines a query argument where the value is less in the given field
    * 
    * @param value
-   * @return
+   * @return the parent {@link IQueryContainer} to enable chaining of commands
    */
   T less(Object value);
 
@@ -94,7 +96,8 @@ public interface IFieldParameter<T extends IQueryContainer> {
    * Defines a query argument where the value is less or equal in the given field
    * 
    * @param value
-   * @return
+   *          the value to be checked
+   * @return the parent {@link IQueryContainer} to enable chaining of commands
    */
   T lessEqual(Object value);
 
@@ -102,16 +105,18 @@ public interface IFieldParameter<T extends IQueryContainer> {
    * Defines a query argument where the value is in the values in the given field
    * 
    * @param value
-   * @return
+   *          values to be checked as {@link Iterable}
+   * @return the parent {@link IQueryContainer} to enable chaining of commands
    */
-  T in(Object value);
+  T in(Iterable<?> value);
 
   /**
-   * Defines a query argument where the value is not in the values in the given field
+   * Defines a query argument where the value is not in the values
    * 
    * @param value
-   * @return
+   *          values to be checked as {@link Iterable}
+   * @return the parent {@link IQueryContainer} to enable chaining of commands
    */
-  T notIn(Object value);
+  T notIn(Iterable<?> value);
 
 }

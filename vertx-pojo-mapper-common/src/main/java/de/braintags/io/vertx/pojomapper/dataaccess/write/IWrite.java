@@ -35,7 +35,7 @@ public interface IWrite<T> extends IDataAccessObject<T> {
    * @param mapper
    *          the mapper to be saved
    */
-  public void add(final T mapper);
+  public void add(T mapper);
 
   /**
    * Save the entities inside the current instance
