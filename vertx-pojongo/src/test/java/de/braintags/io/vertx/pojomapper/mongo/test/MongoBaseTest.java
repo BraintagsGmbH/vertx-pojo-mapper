@@ -16,10 +16,12 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.test;
 
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.MongoClient;
+import io.vertx.ext.mongo.MongoService;
 import io.vertx.test.core.VertxTestBase;
 
 import java.io.IOException;
@@ -62,6 +64,32 @@ public abstract class MongoBaseTest extends VertxTestBase {
    */
   protected static String getDatabaseName() {
     return getProperty("db_name");
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.test.core.VertxTestBase#setUp()
+   */
+  @Override
+  public final void setUp() throws Exception {
+    log.info("-->> setup");
+    super.setUp();
+    getMongoClient();
+    dropCollections();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.test.core.VertxTestBase#tearDown()
+   */
+  @Override
+  protected void tearDown() throws Exception {
+    log.info("tearDown");
+    super.tearDown();
+    mongoClient.close();
+    mongoClient = null;
   }
 
   /**
@@ -122,7 +150,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
   private void initMongoClient() {
     JsonObject config = getConfig();
     log.info("init MongoClient with " + config);
-    mongoClient = MongoClient.createNonShared(vertx, config);
+    mongoClient = MongoClient.createShared(vertx, config);
     CountDownLatch latch = new CountDownLatch(1);
     mongoClient.getCollections(resultHandler -> {
       if (resultHandler.failed()) {
@@ -137,6 +165,24 @@ public abstract class MongoBaseTest extends VertxTestBase {
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private void initMongoService() {
+    JsonObject config = getConfig();
+    log.info("init MongoService with " + config);
+    DeploymentOptions options = new DeploymentOptions().setConfig(config);
+    CountDownLatch latch = new CountDownLatch(1);
+    vertx.deployVerticle("service:io.vertx.mongo-service", options, onSuccess(id -> {
+      mongoClient = MongoService.createEventBusProxy(vertx, "vertx.mongo");
+      latch.countDown();
+      ;
+    }));
+    try {
+      awaitLatch(latch);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+
   }
 
   public MongoDataStore getDataStore() {
@@ -177,6 +223,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
     // Drop all the collections in the db
     CountDownLatch externalLatch = new CountDownLatch(1);
     mongoClient.getCollections(colls -> {
+      log.info("handling collections result");
       if (colls.failed()) {
         log.error(colls.cause());
       } else {

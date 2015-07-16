@@ -46,19 +46,6 @@ public class TestBaseTest extends MongoBaseTest {
     MongoBaseTest.stopMongo();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see io.vertx.test.core.VertxTestBase#setUp()
-   */
-  @Override
-  public void setUp() throws Exception {
-    log.info("-->> setup");
-    super.setUp();
-    getMongoClient();
-    dropCollections();
-  }
-
   @Override
   protected VertxOptions getOptions() {
     VertxOptions options = new VertxOptions();
@@ -76,11 +63,13 @@ public class TestBaseTest extends MongoBaseTest {
   @Test
   public void simpleTest() {
     log.info("-->>test");
+    testComplete();
   }
 
   @Test
   public void simpleTest2() {
     log.info("-->>test");
+    testComplete();
   }
 
 }

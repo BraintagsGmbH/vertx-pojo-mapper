@@ -60,19 +60,8 @@ public class TestSimpleMapper extends MongoBaseTest {
     MongoBaseTest.stopMongo();
   }
 
-  /**
-   * @throws java.lang.Exception
-   */
-  @Override
-  public void setUp() throws Exception {
-    logger.info("-->> setup");
-    super.setUp();
-    getMongoClient();
-    dropCollections();
-  }
-
   @Test
-  public void test_01_MapperStructure() {
+  public void testMapperStructure() {
     assertTrue(getDataStore() instanceof MongoDataStore);
     assertTrue(getDataStore().getMapperFactory() instanceof MongoMapperFactory);
     IMapper mapper = getDataStore().getMapperFactory().getMapper(SimpleMapper.class);
@@ -82,7 +71,7 @@ public class TestSimpleMapper extends MongoBaseTest {
   }
 
   @Test
-  public void test_02_SimpleMapper() {
+  public void testSimpleMapper() {
     SimpleMapper sm = new SimpleMapper();
     sm.name = "testName";
     sm.setSecondProperty("my second property");
@@ -98,95 +87,117 @@ public class TestSimpleMapper extends MongoBaseTest {
 
     // SimpleQuery for all records
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
-    resultContainer = find(query);
+    resultContainer = find(query, 1);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
-    assertEquals(1, resultContainer.queryResult.size());
+
     SimpleMapper foundSm = (SimpleMapper) resultContainer.queryResult.iterator().next();
     assertTrue(sm.equals(foundSm));
 
     // search inside name field
     query.field("name").is("testNameModified");
-    resultContainer = find(query);
+    resultContainer = find(query, 1);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
-    assertEquals(1, resultContainer.queryResult.size());
     foundSm = (SimpleMapper) resultContainer.queryResult.iterator().next();
     assertTrue(sm.equals(foundSm));
 
   }
 
   @Test
-  public void performOr() {
-    SimpleMapper sm = new SimpleMapper();
-    sm.name = "Oder";
-    sm.setSecondProperty("erste");
-    ResultContainer resultContainer = saveRecord(sm);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
-    sm = new SimpleMapper();
-    sm.name = "Oder";
-    sm.setSecondProperty("zweite");
-    resultContainer = saveRecord(sm);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
-    query.field("name").is("Oder");
-    resultContainer = find(query);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-    assertEquals(2, resultContainer.queryResult.size());
-
-    query = getDataStore().createQuery(SimpleMapper.class);
-    query.or("secondProperty").is("erste").field("secondProperty").is("zweite");
-    resultContainer = find(query);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-    logger.info(resultContainer.queryResult.getOriginalQuery());
-    assertEquals(2, resultContainer.queryResult.size());
-    logger.info(resultContainer.queryResult.getOriginalQuery());
-
-  }
-
-  @Test
-  public void performQueryMultipleFields() {
-    SimpleMapper sm = new SimpleMapper();
-    sm.name = "Dublette";
-    sm.setSecondProperty("erste");
-    ResultContainer resultContainer = saveRecord(sm);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
-    sm = new SimpleMapper();
-    sm.name = "Dublette";
-    sm.setSecondProperty("zweite");
-    resultContainer = saveRecord(sm);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
+  public void testSimpleOr() {
+    createDemoRecords();
 
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
     query.field("name").is("Dublette");
-    resultContainer = find(query);
+    ResultContainer resultContainer = find(query, 2);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
-    assertEquals(2, resultContainer.queryResult.size());
-    query.field("secondProperty").is("erste");
-    resultContainer = find(query);
+
+    query = getDataStore().createQuery(SimpleMapper.class);
+    query.or("secondProperty").is("erste").field("secondProperty").is("zweite");
+    resultContainer = find(query, 2);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
-    assertEquals(1, resultContainer.queryResult.size());
-    logger.info(resultContainer.queryResult.getOriginalQuery());
   }
 
-  private ResultContainer find(IQuery<SimpleMapper> query) {
+  @Test
+  public void testSimpleAnd() {
+    createDemoRecords();
+
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    query.and("name").is("Dublette").field("secondProperty").is("erste");
+    ResultContainer resultContainer = find(query, 1);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
+  @Test
+  public void testQueryMultipleFields() {
+    createDemoRecords();
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    query.field("name").is("Dublette");
+    ResultContainer resultContainer = find(query, 2);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    query.field("secondProperty").is("erste");
+    resultContainer = find(query, 1);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
+  /**
+   * Suche: Name = "AndOr" AND ( secondProperty="AndOr 1" OR secondProperty="AndOr 2" )
+   */
+  @Test
+  public void testAndOr() {
+    createDemoRecords();
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    query.and("name").is("AndOr").or("secondProperty").is("AndOr 1").field("secondProperty").is("AndOr 2");
+
+    ResultContainer resultContainer = find(query, 2);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
+  private void createDemoRecords() {
+    SimpleMapper sm = new SimpleMapper();
+    sm.name = "Dublette";
+    sm.setSecondProperty("erste");
+    ResultContainer resultContainer = saveRecord(sm);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    sm = new SimpleMapper();
+    sm.name = "Dublette";
+    sm.setSecondProperty("zweite");
+    resultContainer = saveRecord(sm);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    for (int i = 0; i < 3; i++) {
+      sm = new SimpleMapper();
+      sm.name = "AndOr";
+      sm.setSecondProperty("AndOr " + i);
+      resultContainer = saveRecord(sm);
+      if (resultContainer.assertionError != null)
+        throw resultContainer.assertionError;
+    }
+
+  }
+
+  private ResultContainer find(IQuery<SimpleMapper> query, int expectedResult) {
     ResultContainer resultContainer = new ResultContainer();
     CountDownLatch latch = new CountDownLatch(1);
     query.execute(result -> {
       try {
         resultContainer.queryResult = result.result();
         checkQueryResult(result);
+
+        assertEquals(expectedResult, resultContainer.queryResult.size());
+        logger.info(resultContainer.queryResult.getOriginalQuery());
+
       } catch (AssertionError e) {
         resultContainer.assertionError = e;
       } catch (Throwable e) {
@@ -201,6 +212,7 @@ public class TestSimpleMapper extends MongoBaseTest {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
+
     return resultContainer;
   }
 
