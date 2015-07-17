@@ -167,6 +167,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
     }
   }
 
+  @SuppressWarnings("unused")
   private void initMongoService() {
     JsonObject config = getConfig();
     log.info("init MongoService with " + config);
