@@ -18,32 +18,13 @@ mainly stuff for the serialization of POJO to Json and back
     registerTypeHandler(new PropertiesHandler()); -> Hashtable
     registerTypeHandler(new MapHandler());
     registerTypeHandler(new MapEntryHandler());
+    registerTypeHandler(new NullObjectHandler());
 
 
 
     // IMPORTANT: Do not change order of following handlers
 
-
-
-
-
-byte
-
-    
-    registerTypeHandler(new NullObjectHandler());
-    registerTypeHandler(new ObjectReferenceHandler());
-    registerTypeHandler(new OidHandler());
-    registerTypeHandler(new PermissionMapHandler());
-    registerTypeHandler(new PropertyMapHandler());
-
-
-
-    registerTypeHandler(new NodeHandler());
-    registerTypeHandler(new UidHandler());
-    registerTypeHandler(new URIHandler());
-    registerTypeHandler(new URLHandler());
     registerTypeHandler(new ZipHandler());
-    registerTypeHandler(new CharacterHandler());
 
     registerTypeHandler(new BinaryDocumentHandler());
     registerTypeHandler(new PeriodHandler());

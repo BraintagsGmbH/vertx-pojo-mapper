@@ -19,6 +19,10 @@ package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -64,11 +68,19 @@ public class TypehandlerTestMapper {
   public Character character = new Character('c');
   public byte byteValue = 123;
   public Byte byteObject = 88;
+  public URI uri;
+  public URL url;
 
   /**
    * 
    */
   public TypehandlerTestMapper() {
+    try {
+      uri = new URI("https://www.braintags.de/impressum");
+      url = new URL("https://www.braintag.de/rebutton");
+    } catch (URISyntaxException | MalformedURLException e) {
+      throw new MappingException(e);
+    }
   }
 
   @Override
