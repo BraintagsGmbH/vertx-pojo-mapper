@@ -116,7 +116,7 @@ public class MongoQueryRambler implements IQueryRambler {
     IField field = fieldParameter.getField();
     String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
     Object value = fieldParameter.getValue();
-    Object storeObject = field.getTypeHandler().intoStore(value);
+    Object storeObject = field.getTypeHandler().intoStore(value, field);
     JsonObject arg = new JsonObject().put(mongoOperator, storeObject);
     add(field.getMappedFieldName(), arg);
   }

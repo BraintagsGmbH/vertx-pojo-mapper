@@ -43,7 +43,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object javaValue = pAcc.readData(mapper);
-    Object dbValue = th.intoStore(javaValue);
+    Object dbValue = th.intoStore(javaValue, field);
     if (javaValue != null && dbValue == null)
       throw new TypeHandlerException(String.format("Value conversion failed: original = %s, conversion = NULL",
           String.valueOf(javaValue)));
@@ -56,7 +56,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object dbValue = storeObject.get(field);
-    Object javaValue = th.fromStore(dbValue);
+    Object javaValue = th.fromStore(dbValue, field);
     if (javaValue == null && dbValue != null)
       throw new TypeHandlerException(String.format("Value conversion failed: original = %s, conversion = NULL",
           String.valueOf(dbValue)));

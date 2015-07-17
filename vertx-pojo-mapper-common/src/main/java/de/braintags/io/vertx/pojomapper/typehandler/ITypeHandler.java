@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.typehandler;
 
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+
 /**
  * The ITypehandler is responsible to change original values into the required format of the used datastore
  * 
@@ -30,18 +32,24 @@ public interface ITypeHandler {
    * needed format and type
    * 
    * @param source
-   * @return
+   *          the source, which was read from the datastore
+   * @param field
+   *          the underlaying field information
+   * @return the transformed value storable in the java instance
    */
-  Object fromStore(Object source);
+  Object fromStore(Object source, IField field);
 
   /**
    * This method is called when an object shall be persisted into the datastore and shall change the value into the
    * needed format of the datastore
    * 
    * @param source
-   * @return
+   *          the source, which was read from the java instance
+   * @param field
+   *          the underlaying field information
+   * @return the transformed value storable in the datastore
    */
-  Object intoStore(Object source);
+  Object intoStore(Object source, IField field);
 
   /**
    * Checks wether the given cls is matching excact this typehandler. Typically a typehandler defines a set of classes,
