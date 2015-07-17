@@ -26,33 +26,35 @@ import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
  * 
  */
 
-public class FloatTypeHandler extends AbstractTypeHandler {
+public class ByteTypeHandler extends AbstractTypeHandler {
 
   /**
    * @param classesToDeal
    */
-  public FloatTypeHandler() {
-    super(float.class, Float.class, float[].class, Float[].class);
+  public ByteTypeHandler() {
+    super(byte.class, Byte.class);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
   public Object fromStore(Object source, IField field) {
-    return source == null ? source : ((Double) source).floatValue();
+    return Byte.parseByte((String) source);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
   public Object intoStore(Object source, IField field) {
-    return source == null ? source : ((Float) source).doubleValue();
+    return String.valueOf(source);
   }
 
 }

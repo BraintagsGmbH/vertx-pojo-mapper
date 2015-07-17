@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import java.util.Calendar;
+
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 
@@ -26,33 +28,39 @@ import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
  * 
  */
 
-public class FloatTypeHandler extends AbstractTypeHandler {
+public class CalendarTypeHandler extends AbstractTypeHandler {
 
   /**
    * @param classesToDeal
    */
-  public FloatTypeHandler() {
-    super(float.class, Float.class, float[].class, Float[].class);
+  public CalendarTypeHandler() {
+    super(Calendar.class);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
   public Object fromStore(Object source, IField field) {
-    return source == null ? source : ((Double) source).floatValue();
+    if (source == null)
+      return source;
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(((Long) source).longValue());
+    return cal;
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
   public Object intoStore(Object source, IField field) {
-    return source == null ? source : ((Float) source).doubleValue();
+    return source == null ? source : ((Calendar) source).getTimeInMillis();
   }
 
 }

@@ -29,30 +29,32 @@ import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 public class CharacterTypeHandler extends AbstractTypeHandler {
 
   /**
-   * 
+   * @param classesToDeal
    */
   public CharacterTypeHandler() {
-    super(CharSequence.class);
+    super(char.class, Character.class);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
   public Object fromStore(Object source, IField field) {
-    return source;
+    return source == null ? null : ((String) source).toCharArray();
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
   public Object intoStore(Object source, IField field) {
-    return source;
+    return source == null ? null : source.toString();
   }
 
 }

@@ -5,45 +5,39 @@ mainly stuff for the serialization of POJO to Json and back
 
     registerTypeHandler(new ObjectHandler());
     registerTypeHandler(new ArrayHandler());
+		char[]
+		Character[]
+		byte[]
+    
+    
     registerTypeHandler(new ByteHandler());
     registerTypeHandler(new ClassHandler());
     registerTypeHandler(new EnumHandler());
     registerTypeHandler(new CollectionHandler());
     registerTypeHandler(new LocaleHandler());
+    registerTypeHandler(new PropertiesHandler()); -> Hashtable
+    registerTypeHandler(new MapHandler());
+    registerTypeHandler(new MapEntryHandler());
 
 
 
     // IMPORTANT: Do not change order of following handlers
-    registerTypeHandler(getDateHandler());
-    registerTypeHandler(new DateSQLHandler());
 
-    registerTypeHandler(new FloatHandler());
-    registerTypeHandler(new IntegerHandler());
-    registerTypeHandler(new ShortHandler());
-    registerTypeHandler(new LongHandler());
-    registerTypeHandler(new DoubleHandler());
-    registerTypeHandler(new DoubleKfmHandler());
 
-    registerTypeHandler(new BigDecimalHandler());
-    registerTypeHandler(new BigIntegerHandler());
-    registerTypeHandler(new MapHandler());
-    registerTypeHandler(new MapEntryHandler());
+
+
+
+byte
+
+    
     registerTypeHandler(new NullObjectHandler());
     registerTypeHandler(new ObjectReferenceHandler());
     registerTypeHandler(new OidHandler());
     registerTypeHandler(new PermissionMapHandler());
-    registerTypeHandler(new PropertiesHandler());
     registerTypeHandler(new PropertyMapHandler());
-    registerTypeHandler(new StringPersistentHandler());
 
-    if (allowNullString)
-      registerTypeHandler(new NullStringHandler());
-    else
-      registerTypeHandler(new StringHandler());
 
-    registerTypeHandler(new StringBufferHandler());
-    registerTypeHandler(new TimeHandler());
-    registerTypeHandler(getTimestampHandler());
+
     registerTypeHandler(new NodeHandler());
     registerTypeHandler(new UidHandler());
     registerTypeHandler(new URIHandler());
@@ -52,5 +46,4 @@ mainly stuff for the serialization of POJO to Json and back
     registerTypeHandler(new CharacterHandler());
 
     registerTypeHandler(new BinaryDocumentHandler());
-    registerTypeHandler(new DateTimeHandler());
     registerTypeHandler(new PeriodHandler());

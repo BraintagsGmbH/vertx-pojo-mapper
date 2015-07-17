@@ -16,9 +16,16 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Date;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
@@ -39,6 +46,24 @@ public class TypehandlerTestMapper {
   public boolean myBo = true;
   public Boolean myBoolean = new Boolean(false);
   public Date javaDate = new Date(System.currentTimeMillis());
+  public java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+  public Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+  public Calendar calendar = Calendar.getInstance();
+  public Time time = new Time(System.currentTimeMillis());
+  public short shortvalue = 3;
+  public Short shortObject = new Short((short) 5);
+  public long longvalue = 6666666666666666l;
+  public Long longObject = new Long(88888888888888l);
+  public double doubleValue = 333.5555;
+  public Double doubleObject = new Double(44.9999);
+  public BigDecimal bigDecimal = new BigDecimal(23.44);
+  public BigInteger bigInteger = new BigInteger("99999999");
+  public StringBuffer buffer = new StringBuffer("test string buffer content");
+
+  public char charValue = 'a';
+  public Character character = new Character('c');
+  public byte byteValue = 123;
+  public Byte byteObject = 88;
 
   /**
    * 
@@ -48,25 +73,41 @@ public class TypehandlerTestMapper {
 
   @Override
   public boolean equals(Object ob) {
-    TypehandlerTestMapper compare = (TypehandlerTestMapper) ob;
-    if (!compare.stringField.equals(stringField))
-      return false;
-    if (compare.myInt != myInt)
-      return false;
-    if (compare.myFloat != myFloat)
-      return false;
-    if (!compare.myInteger.equals(myInteger))
-      return false;
-    if (!compare.myFloatOb.equals(myFloatOb))
-      return false;
-    if (compare.myBo != myBo)
-      return false;
-    if (!compare.myBoolean.equals(myBoolean))
-      return false;
-    if (!compare.javaDate.equals(javaDate))
-      return false;
+    Field[] fields = getClass().getFields();
+    for (Field field : fields) {
+      compare(field, ob);
+    }
 
     return true;
   }
 
+  private boolean compare(Field field, Object compare) {
+    if (field.getName().equals("id"))
+      return true;
+    if (field.getName().equals("buffer")) {
+      @SuppressWarnings("unused")
+      String test = "test";
+    }
+    try {
+      Object value = field.get(this);
+      Object compareValue = field.get(compare);
+      equalValues(value, compareValue, field.getName());
+      return true;
+    } catch (Exception e) {
+      throw new RuntimeException("Error in field " + field.getName(), e);
+    }
+
+  }
+
+  private boolean equalValues(Object value, Object compareValue, String fieldName) {
+    if (value == null && compareValue == null)
+      return true;
+    if (value instanceof CharSequence) {
+      value = value.toString();
+      compareValue = compareValue.toString();
+    }
+    if (!value.equals(compareValue))
+      throw new MappingException("Contents are not equal: " + fieldName);
+    return true;
+  }
 }

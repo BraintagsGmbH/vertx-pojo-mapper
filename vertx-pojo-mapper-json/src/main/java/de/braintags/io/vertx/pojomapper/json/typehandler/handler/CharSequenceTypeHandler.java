@@ -18,44 +18,41 @@ package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
 
 import de.braintags.io.vertx.pojomapper.exception.ClassAccessException;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
- * An {@link ITypeHandler} which is dealing {@link Date}. Currently its only dealing with the long value of a Date.
- * Could be modified to the use of ISO-8601 ( "$date", "1937-09-21T00:00:00+00:00" ) and the use of a date scanner (
- * eutil ). Question is: is it needed to store a Date / Time in a readable format in Mongo?
+ * 
  * 
  * @author Michael Remme
  * 
  */
 
-public class DateTypeHandler extends AbstractTypeHandler {
+public class CharSequenceTypeHandler extends AbstractTypeHandler {
 
   /**
    * @param classesToDeal
    */
-  public DateTypeHandler() {
-    super(Date.class);
+  public CharSequenceTypeHandler() {
+    super(CharSequence.class);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
   public Object fromStore(Object source, IField field) {
     if (source == null)
-      return source;
-    Constructor<?> constr = field.getConstructor(long.class);
+      return null;
+    Constructor<?> constr = field.getConstructor(String.class);
     if (constr == null)
-      throw new MappingException("Contructor not found with long as parameter");
+      throw new MappingException("Contructor not found with String as parameter for field " + field.getFullName());
     try {
       return constr.newInstance(source);
     } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -66,11 +63,12 @@ public class DateTypeHandler extends AbstractTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
   public Object intoStore(Object source, IField field) {
-    return source == null ? source : ((Date) source).getTime();
+    return source == null ? source : ((CharSequence) source).toString();
   }
 
 }

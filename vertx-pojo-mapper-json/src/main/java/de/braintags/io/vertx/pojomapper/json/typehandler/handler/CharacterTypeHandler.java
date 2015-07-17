@@ -26,33 +26,41 @@ import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
  * 
  */
 
-public class FloatTypeHandler extends AbstractTypeHandler {
+public class CharacterTypeHandler extends AbstractTypeHandler {
 
   /**
    * @param classesToDeal
    */
-  public FloatTypeHandler() {
-    super(float.class, Float.class, float[].class, Float[].class);
+  public CharacterTypeHandler() {
+    super(char.class, Character.class);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
   public Object fromStore(Object source, IField field) {
-    return source == null ? source : ((Double) source).floatValue();
+    if (source == null)
+      return null;
+    final char[] chars = ((String) source).toCharArray();
+    if (chars.length == 1) {
+      return chars[0];
+    } else {
+      return null;
+    }
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
   public Object intoStore(Object source, IField field) {
-    return source == null ? source : ((Float) source).doubleValue();
+    return source == null ? null : source.toString();
   }
-
 }

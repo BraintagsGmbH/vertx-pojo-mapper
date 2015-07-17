@@ -19,9 +19,16 @@ package de.braintags.io.vertx.pojomapper.json.typehandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.BigDecimalTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.BigIntegerTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ByteTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CalendarTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CharSequenceTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CharacterTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.FloatTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ShortTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
@@ -39,6 +46,22 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
   static {
     definedTypeHandlers.add(new FloatTypeHandler());
     definedTypeHandlers.add(new DateTypeHandler());
+    definedTypeHandlers.add(new ShortTypeHandler());
+    definedTypeHandlers.add(new CalendarTypeHandler());
+    definedTypeHandlers.add(new BigDecimalTypeHandler());
+    definedTypeHandlers.add(new BigIntegerTypeHandler());
+    definedTypeHandlers.add(new CharSequenceTypeHandler());
+    definedTypeHandlers.add(new CharacterTypeHandler());
+    definedTypeHandlers.add(new ByteTypeHandler());
+
+    // definedTypeHandlers.add(new ());
+    // definedTypeHandlers.add(new ());
+    // definedTypeHandlers.add(new ());
+    // definedTypeHandlers.add(new ());
+    // definedTypeHandlers.add(new ());
+    // definedTypeHandlers.add(new ());
+    // definedTypeHandlers.add(new ());
+
   }
 
   /**
