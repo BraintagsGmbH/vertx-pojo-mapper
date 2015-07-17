@@ -17,6 +17,7 @@
 package de.braintags.io.vertx.pojomapper.mapping;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -102,6 +103,13 @@ public interface IField {
    * @return the mapper
    */
   public IMapper getMapper();
+
+  /**
+   * Get the constructor with the given parameters
+   * 
+   * @return a constructor with the arguments or null
+   */
+  public Constructor<?> getConstructor(Class<?>... parameters);
 
   /**
    * Get the underlaying {@link Field}

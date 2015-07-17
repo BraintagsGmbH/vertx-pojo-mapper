@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -143,6 +144,22 @@ public class TestMapperFactory {
       Assert.fail("Annotation Property must not be null");
     else
       assertEquals("wrong name in Property", "WEIGHT", ann.value());
+  }
+
+  @Test
+  public void testConstructor() {
+    IField mapperField = mapperDef.getField("timeStamp");
+    Constructor<?> con = mapperField.getConstructor();
+    con = mapperField.getConstructor();
+    Assert.assertNull(con);
+    con = mapperField.getConstructor(long.class);
+    Assert.assertNotNull(con);
+    con = mapperField.getConstructor(Long.class);
+    Assert.assertNull(con);
+
+    mapperField = mapperDef.getField("name");
+    con = mapperField.getConstructor();
+    Assert.assertNotNull(con);
   }
 
   @Test

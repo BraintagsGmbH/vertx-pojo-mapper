@@ -47,6 +47,8 @@ public class DateTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public Object fromStore(Object source, IField field) {
+    Class<?> dateClass = field.getType();
+
     return null;
   }
 

@@ -25,7 +25,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.GenericDeclaration;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -39,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.annotation.field.ConcreteClass;
 import de.braintags.io.vertx.pojomapper.annotation.field.ConstructorArguments;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
@@ -74,7 +74,7 @@ public class MappedField implements IField {
    * Annotations which shall be checked for a field definition
    */
   private static final List<Class<? extends Annotation>> FIELD_ANNOTATIONS = Arrays.asList(Id.class, Property.class,
-      Referenced.class, Embedded.class);
+      Referenced.class, Embedded.class, ConcreteClass.class);
 
   /**
    * Class annotations which were found inside the current definition
@@ -91,7 +91,7 @@ public class MappedField implements IField {
   private Type mapKeyType;
   private Type subType;
   private String mappedFieldName;
-  private Constructor<?> constructor;
+  private HashMap<String, Constructor<?>> constructors = new HashMap<String, Constructor<?>>();
 
   /**
    * 
@@ -121,7 +121,7 @@ public class MappedField implements IField {
     propertyMapper = computePropertyMapper();
     typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
     computeType();
-    constructor = computeConstructor();
+    // computeConstructor();
     computeMultivalued();
   }
 
@@ -144,35 +144,30 @@ public class MappedField implements IField {
     return getField().getName();
   }
 
-  protected Constructor<?> computeConstructor() {
+  // TODO Yet needed?
+  private Constructor<?> computeConstructor() {
     Constructor<?> constructor = null;
     Class<?> type = null;
     // get the first annotation with a concreteClass that isn't Object.class
-    for (final Annotation an : existingClassAnnotations.values()) {
-      try {
-        final Method m = an.getClass().getMethod("concreteClass");
-        m.setAccessible(true);
-        final Object o = m.invoke(an);
-        if (o != null && !(o.equals(Object.class))) {
-          type = (Class<?>) o;
-          break;
-        }
-      } catch (NoSuchMethodException e) {
-        // do nothing
-      } catch (IllegalArgumentException e) {
-        log.warn("There should not be an argument", e);
-      } catch (Exception e) {
-        log.warn("", e);
+    Annotation cA = getAnnotation(ConcreteClass.class);
+    if (cA != null) {
+      Class<?> conClass = ((ConcreteClass) cA).value();
+      if (conClass != null && !(conClass.equals(Object.class))) {
+        type = conClass;
       }
     }
 
     if (type != null) {
+      // TODO change this. First check for the existence of ConstructorArguments and build a Constructor from that. Then
+      // check for default constructor
       try {
         constructor = type.getDeclaredConstructor();
         constructor.setAccessible(true);
       } catch (NoSuchMethodException e) {
         if (!hasAnnotation(ConstructorArguments.class)) {
-          log.warn("No usable constructor for " + type.getName(), e);
+          throw new MappingException(String.format(
+              "Field %s has no default constructor and no arguments defined. Use annotation ConstructorArguments!",
+              getName()), e);
         }
       }
     } else {
@@ -513,5 +508,36 @@ public class MappedField implements IField {
   @Override
   public IPropertyMapper getPropertyMapper() {
     return propertyMapper;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getConstructor(java.lang.Class[])
+   */
+  @Override
+  public Constructor<?> getConstructor(Class<?>... parameters) {
+    String code = generateKey(parameters);
+    if (constructors.containsKey(code))
+      return constructors.get(code);
+    Class<?> clz = getType();
+    Constructor<?> constructor = null;
+    try {
+      constructor = clz.getDeclaredConstructor(parameters);
+      constructors.put(code, constructor);
+    } catch (NoSuchMethodException | SecurityException e) {
+      constructors.put(code, constructor);
+    }
+    return constructor;
+  }
+
+  private String generateKey(Class<?>... parameters) {
+    if (parameters.length == 0)
+      return "default";
+    String key = "";
+    for (Class<?> cls : parameters) {
+      key += cls.getName();
+    }
+    return key;
   }
 }
