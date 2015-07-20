@@ -16,7 +16,15 @@
 
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 
@@ -29,6 +37,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 
 public class DefaultObjectFactory implements IObjectFactory {
   private IMapper mapper;
+  private Class<?> DEFAULT_LIST_CLASS = ArrayList.class;
+  private Class<?> DEFAULT_SET_CLASS = HashSet.class;
 
   /**
    * 
@@ -69,6 +79,38 @@ public class DefaultObjectFactory implements IObjectFactory {
   @Override
   public IMapper getMapper() {
     return mapper;
+  }
+
+  @Override
+  public Collection<?> createCollection(IField field) {
+    if (field.isSet()) {
+      return createSet(field);
+    } else
+      return createList(field);
+  }
+
+  private Set<?> createSet(IField field) {
+    if (field.getConstructor() != null)
+      return newInstance(field.getConstructor(), DEFAULT_SET_CLASS);
+  }
+
+  private List<?> createList(IField field) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * creates an instance of testType (if it isn't Object.class or null) or fallbackType
+   */
+  private <T> T newInstance(final Constructor<T> tryMe, final Class<T> fallbackType) {
+    if (tryMe != null) {
+      tryMe.setAccessible(true);
+      try {
+        return tryMe.newInstance();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return createInst(fallbackType);
   }
 
 }

@@ -68,6 +68,7 @@ public class MappedField implements IField {
   private Field field;
   private Mapper mapper;
   private ITypeHandler typeHandler;
+  private ITypeHandler subTypeHandler;
   private IPropertyMapper propertyMapper;
   private final List<IField> typeParameters = new ArrayList<IField>();
   /**
@@ -113,6 +114,7 @@ public class MappedField implements IField {
     this.mapper = mapper;
     genericType = type;
     computeType();
+    computeSubTypeHandler();
   }
 
   protected void init() {
@@ -123,6 +125,12 @@ public class MappedField implements IField {
     computeType();
     // computeConstructor();
     computeMultivalued();
+
+  }
+
+  private void computeSubTypeHandler() {
+    if (getSubClass() != null && getSubClass() != Object.class)
+      subTypeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(getSubClass());
   }
 
   protected IPropertyMapper computePropertyMapper() {
@@ -539,5 +547,15 @@ public class MappedField implements IField {
       key += cls.getName();
     }
     return key;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getSubTypeHandler()
+   */
+  @Override
+  public ITypeHandler getSubTypeHandler() {
+    return subTypeHandler;
   }
 }

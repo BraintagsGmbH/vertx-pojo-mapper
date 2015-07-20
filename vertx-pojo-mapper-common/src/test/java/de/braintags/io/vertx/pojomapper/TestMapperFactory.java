@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.List;
 
 import org.junit.Assert;
@@ -38,6 +39,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.impl.DummyDataStore;
 import de.braintags.io.vertx.pojomapper.impl.DummyObjectFactory;
+import de.braintags.io.vertx.pojomapper.mapper.Animal;
 import de.braintags.io.vertx.pojomapper.mapper.Person;
 import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -45,7 +47,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
-import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.CharacterTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ObjectTypeHandler;
 
 /**
@@ -128,11 +130,14 @@ public class TestMapperFactory {
 
   @Test
   public void testTypeHandler() {
-    assertTrue("Not an instance of CharacterTypeHandler",
-        mapperDef.getField("name").getTypeHandler() instanceof CharacterTypeHandler);
-    assertTrue("Not an instance of ObjectTypeHandler",
-        mapperDef.getField("rabbit").getTypeHandler() instanceof ObjectTypeHandler);
-    assertNull("@Embedded must be null", mapperDef.getField("chicken").getTypeHandler());
+    ITypeHandler th = mapperDef.getField("name").getTypeHandler();
+    assertTrue("Not an instance of CharacterTypeHandler", th instanceof ObjectTypeHandler);
+    th = mapperDef.getField("rabbit").getTypeHandler();
+    assertTrue("Not an instance of ObjectTypeHandler", th instanceof ObjectTypeHandler);
+
+    th = mapperDef.getField("chicken").getTypeHandler();
+    assertNull("@Embedded must be null", th);
+
     assertNull("@Referenced must be null", mapperDef.getField("animal").getTypeHandler());
 
   }
@@ -160,6 +165,11 @@ public class TestMapperFactory {
     mapperField = mapperDef.getField("name");
     con = mapperField.getConstructor();
     Assert.assertNotNull(con);
+
+    mapperField = mapperDef.getField("listWithConstructor");
+    con = mapperField.getConstructor();
+    Assert.assertNotNull(con);
+
   }
 
   @Test
@@ -216,6 +226,28 @@ public class TestMapperFactory {
     IField field = mapperDef.getField("myMap");
     Assert.assertTrue(field.isMap());
     Assert.assertEquals(2, field.getTypeParameters().size());
+  }
+
+  @Test
+  public void testList() {
+    IField field = mapperDef.getField("listAnimals");
+    Assert.assertTrue(field.isCollection());
+    Class subClass = field.getSubClass();
+    Type subType = field.getSubType();
+
+    Assert.assertEquals(subClass, Animal.class);
+    Assert.assertEquals(subType, Animal.class);
+  }
+
+  @Test
+  public void testUnknownSubtype() {
+    IField field = mapperDef.getField("unknownSubType");
+    Assert.assertTrue(field.isCollection());
+    Class subClass = field.getSubClass();
+    Type subType = field.getSubType();
+
+    Assert.assertEquals(subClass, Object.class);
+    Assert.assertEquals(subType, Object.class);
   }
 
 }

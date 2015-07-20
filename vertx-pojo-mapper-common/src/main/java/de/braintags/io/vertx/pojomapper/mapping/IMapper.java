@@ -131,4 +131,11 @@ public interface IMapper {
    */
   public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity);
 
+  /**
+   * Get the parent {@link IMapperFactory}
+   * 
+   * @return the factory
+   */
+  public IMapperFactory getMapperFactory();
+
 }

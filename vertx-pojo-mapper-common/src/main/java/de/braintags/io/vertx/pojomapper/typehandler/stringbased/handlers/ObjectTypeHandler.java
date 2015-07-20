@@ -43,7 +43,7 @@ public class ObjectTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public Object fromStore(Object source, IField field) {
-    return null;
+    return source;
   }
 
   /*
@@ -53,7 +53,7 @@ public class ObjectTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public Object intoStore(Object source, IField field) {
-    return null;
+    return source;
   }
 
 }

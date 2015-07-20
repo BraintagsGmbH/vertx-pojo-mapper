@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ByteTypeHandler
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CalendarTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CharSequenceTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CharacterTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.FloatTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler;
@@ -57,8 +58,8 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     definedTypeHandlers.add(new ByteTypeHandler());
     definedTypeHandlers.add(new URITypeHandler());
     definedTypeHandlers.add(new URLTypeHandler());
+    definedTypeHandlers.add(new CollectionTypeHandler());
 
-    // definedTypeHandlers.add(new ());
     // definedTypeHandlers.add(new ());
     // definedTypeHandlers.add(new ());
     // definedTypeHandlers.add(new ());

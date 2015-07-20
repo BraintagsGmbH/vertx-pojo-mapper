@@ -25,8 +25,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
@@ -70,6 +72,9 @@ public class TypehandlerTestMapper {
   public Byte byteObject = 88;
   public URI uri;
   public URL url;
+
+  // complexer objects
+  public List arrayList = Arrays.asList("Eins", "Zwei", "drei");
 
   /**
    * 

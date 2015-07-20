@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.mapping;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
+
 /**
  * IMapperFactory is responsible to create and store instances of {@link IMapper} for all classes, which shall be
  * persisted into the datastore
@@ -34,5 +36,12 @@ public interface IMapperFactory {
    *           any Exception which can occur in the init process
    */
   IMapper getMapper(Class<?> mapperClass);
+
+  /**
+   * Get the {@link IDataStore} which created the current instance
+   * 
+   * @return
+   */
+  IDataStore getDataStore();
 
 }

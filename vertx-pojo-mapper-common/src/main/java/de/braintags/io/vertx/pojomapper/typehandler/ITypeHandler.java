@@ -28,6 +28,24 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
 public interface ITypeHandler {
 
   /**
+   * Returned by method {@link #matches(IField)} to specify that the current typehandler won't handle the given field
+   */
+  public static final short MATCH_NONE = 0;
+
+  /**
+   * Returned by method {@link #matches(IField)} to specify that the current typehandler handles the given field in a
+   * minor way. For instance, if the class of the field is not direct the class, which the typehandler deals with, but
+   * an instance of
+   */
+  public static final short MATCH_MINOR = 1;
+
+  /**
+   * Returned by method {@link #matches(IField)} to specify that the current typehandler handles the given field in a
+   * major way. For instance, if the class of the field is the direct class
+   */
+  public static final short MATCH_MAJOR = 2;
+
+  /**
    * This method is called when a value is read from a field of a mapped object and must change the value into the
    * needed format and type
    * 
@@ -52,22 +70,23 @@ public interface ITypeHandler {
   Object intoStore(Object source, IField field);
 
   /**
-   * Checks wether the given cls is matching excact this typehandler. Typically a typehandler defines a set of classes,
-   * which it will handle. Here it will be checked for equality
+   * Checks wether the given {@link IField} is matching the criteria in the current instance. The method returns a
+   * graded result, one of {@link #MATCH_NONE}, {@link #MATCH_MINOR} or {@link #MATCH_MAJOR}
    * 
-   * @param cls
-   *          the class to be checked
-   * @return true, if this typehandler handles excact this class
+   * @param field
+   *          the field to be checked
+   * @return 0 ( zero ) if the Typ
    */
-  public boolean matchesExcact(Class<?> cls);
+  public short matches(IField field);
 
   /**
-   * Checks wether the given cls is an instance of one of the classes, which the typehandler shall deal with.
+   * Checks wether the given {@link Class} is matching the criteria in the current instance. The method returns a graded
+   * result, one of {@link #MATCH_NONE}, {@link #MATCH_MINOR} or {@link #MATCH_MAJOR}
    * 
    * @param cls
-   *          the class to be checked
-   * @return true, if this typehandler handling this class
+   *          the Class to be checked
+   * @return 0 ( zero ) if the Typ
    */
-  public boolean matchesInstance(Class<?> cls);
+  public short matches(Class<?> cls);
 
 }

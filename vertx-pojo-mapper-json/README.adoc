@@ -13,7 +13,13 @@ mainly stuff for the serialization of POJO to Json and back
     registerTypeHandler(new ByteHandler());
     registerTypeHandler(new ClassHandler());
     registerTypeHandler(new EnumHandler());
-    registerTypeHandler(new CollectionHandler());
+    registerTypeHandler(new CollectionHandler()); 
+    	List<String>
+    	List<Person>
+    	@Referenced
+    	List<Person>  =>> List als Liste, Inhalte referenziert
+    	
+    
     registerTypeHandler(new LocaleHandler());
     registerTypeHandler(new PropertiesHandler()); -> Hashtable
     registerTypeHandler(new MapHandler());
@@ -22,7 +28,6 @@ mainly stuff for the serialization of POJO to Json and back
 
 
 
-    // IMPORTANT: Do not change order of following handlers
 
     registerTypeHandler(new ZipHandler());
 
@@ -31,4 +36,10 @@ mainly stuff for the serialization of POJO to Json and back
 
     
     Trigger testen
+    
+    Embedded
+    
+    Referenced
+    
+    Generics
     

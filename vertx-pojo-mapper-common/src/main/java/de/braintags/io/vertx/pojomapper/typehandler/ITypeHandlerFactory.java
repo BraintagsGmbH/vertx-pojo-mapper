@@ -38,4 +38,13 @@ public interface ITypeHandlerFactory {
    */
   ITypeHandler getTypeHandler(IField field);
 
+  /**
+   * Get the conventient {@link ITypeHandler} for the given Class
+   * 
+   * @param cls
+   *          the class
+   * @return a fitting {@link ITypeHandler}
+   */
+  ITypeHandler getTypeHandler(Class<?> cls);
+
 }

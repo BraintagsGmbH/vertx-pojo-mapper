@@ -19,6 +19,8 @@ package de.braintags.io.vertx.pojomapper.typehandler;
 import java.util.Arrays;
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+
 /**
  * Abstract implementation of {@link ITypeHandler} which handles
  * 
@@ -39,26 +41,26 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#matchesExcact(java.lang.Class)
    */
   @Override
-  public boolean matchesExcact(Class<?> cls) {
-    for (Class<?> dCls : classesToHandle) {
-      if (dCls.equals(cls))
-        return true;
-    }
-    return false;
+  public short matches(IField field) {
+    return matches(field.getType());
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#matchesInstance(java.lang.Class)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#matches(java.lang.Class)
    */
   @Override
-  public boolean matchesInstance(Class<?> cls) {
+  public short matches(Class<?> cls) {
+    for (Class<?> dCls : classesToHandle) {
+      if (dCls.equals(cls))
+        return MATCH_MAJOR;
+    }
     for (Class<?> dCls : classesToHandle) {
       if (dCls.isAssignableFrom(cls))
-        return true;
+        return MATCH_MINOR;
     }
-    return false;
+    return MATCH_NONE;
   }
 
 }

@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.mapping;
 
+import java.util.Collection;
+
 /**
  * IObjectFactory is used to create new instances for a mapper.
  * 
@@ -32,6 +34,15 @@ public interface IObjectFactory {
    * @return
    */
   <T> T createInstance(Class<T> clazz);
+
+  /**
+   * Create a new instance of {@link Collection}
+   * 
+   * @param field
+   *          the {@link IField} definition
+   * @return a new {@link Collection}
+   */
+  Collection<?> createCollection(IField field);
 
   /**
    * Set the Mapper, where the IObjectFactory is contained

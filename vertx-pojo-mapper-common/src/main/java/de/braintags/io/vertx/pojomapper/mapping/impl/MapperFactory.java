@@ -63,7 +63,7 @@ public class MapperFactory implements IMapperFactory {
    *          the class to be mapped
    * @return the mapper
    */
-  protected Mapper createMapper(Class mapperClass) {
+  protected Mapper createMapper(Class<?> mapperClass) {
     return new Mapper(mapperClass, this);
   }
 
@@ -72,7 +72,8 @@ public class MapperFactory implements IMapperFactory {
    * 
    * @return the datastore
    */
-  IDataStore getDataStore() {
+  @Override
+  public IDataStore getDataStore() {
     return dataStore;
   }
 }

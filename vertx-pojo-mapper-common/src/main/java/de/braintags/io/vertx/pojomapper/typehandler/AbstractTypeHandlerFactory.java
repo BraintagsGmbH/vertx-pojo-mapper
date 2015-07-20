@@ -57,29 +57,77 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
     Class<?> fieldClass = field.getType();
     if (cachedTypeHandler.containsKey(fieldClass))
       return cachedTypeHandler.get(fieldClass);
-    ITypeHandler handler = examineExcactMatch(fieldClass);
-    if (handler == null)
-      handler = examineInstanceOfMatch(fieldClass);
+    ITypeHandler handler = examineMatch(field);
     if (handler == null)
       handler = getDefaultTypeHandler();
     cachedTypeHandler.put(fieldClass, handler);
     return handler;
   }
 
-  private ITypeHandler examineExcactMatch(Class<?> cls) {
-    for (ITypeHandler th : getDefinedTypehandlers()) {
-      if (th.matchesExcact(cls))
-        return th;
-    }
-    return null;
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory#getTypeHandler(java.lang.Class)
+   */
+  @Override
+  public ITypeHandler getTypeHandler(Class<?> fieldClass) {
+    if (cachedTypeHandler.containsKey(fieldClass))
+      return cachedTypeHandler.get(fieldClass);
+    ITypeHandler handler = examineMatch(fieldClass);
+    if (handler == null)
+      handler = getDefaultTypeHandler();
+    cachedTypeHandler.put(fieldClass, handler);
+    return handler;
   }
 
-  private ITypeHandler examineInstanceOfMatch(Class<?> cls) {
+  /**
+   * Checks for a valid TypeHandler by respecting graded results
+   * 
+   * @param field
+   * @return
+   */
+  private ITypeHandler examineMatch(Class<?> cls) {
+    ITypeHandler returnHandler = null;
     for (ITypeHandler th : getDefinedTypehandlers()) {
-      if (th.matchesInstance(cls))
+      short matchResult = th.matches(cls);
+      switch (matchResult) {
+      case ITypeHandler.MATCH_MAJOR:
         return th;
+
+      case ITypeHandler.MATCH_MINOR:
+        returnHandler = th;
+        break;
+
+      default:
+        break;
+      }
     }
-    return null;
+    return returnHandler;
+  }
+
+  /**
+   * Checks for a valid TypeHandler by respecting graded results
+   * 
+   * @param field
+   * @return
+   */
+  private ITypeHandler examineMatch(IField field) {
+    ITypeHandler returnHandler = null;
+    for (ITypeHandler th : getDefinedTypehandlers()) {
+      short matchResult = th.matches(field);
+      switch (matchResult) {
+      case ITypeHandler.MATCH_MAJOR:
+        return th;
+
+      case ITypeHandler.MATCH_MINOR:
+        returnHandler = th;
+        break;
+
+      default:
+        break;
+      }
+    }
+    return returnHandler;
   }
 
   /**

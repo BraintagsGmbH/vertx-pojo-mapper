@@ -17,7 +17,9 @@
 package de.braintags.io.vertx.pojomapper.mapper;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
@@ -41,7 +43,7 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 @Entity(name = "PersonColumn")
 @Indexes(@Index(fields = { @IndexField(fieldName = "name"), @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
 public class Person extends AbstractPerson {
-  public static final int NUMBER_OF_PROPERTIES = 11;
+  public static final int NUMBER_OF_PROPERTIES = 14;
 
   @Id
   public String idField;
@@ -62,6 +64,12 @@ public class Person extends AbstractPerson {
   public Class<? extends Double> myClass;
 
   public Collection<String> stories;
+
+  public List<Animal> listAnimals;
+
+  public List unknownSubType;
+
+  public ArrayList<String> listWithConstructor;
 
   @Property("WEIGHT")
   public Double weight;

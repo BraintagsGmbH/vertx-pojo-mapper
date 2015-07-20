@@ -253,7 +253,8 @@ public class Mapper implements IMapper {
    * 
    * @return
    */
-  MapperFactory getMapperFactory() {
+  @Override
+  public MapperFactory getMapperFactory() {
     return mapperFactory;
   }
 

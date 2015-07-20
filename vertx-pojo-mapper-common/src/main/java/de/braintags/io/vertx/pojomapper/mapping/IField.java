@@ -154,6 +154,14 @@ public interface IField {
   public Class<?> getSubClass();
 
   /**
+   * If the java field is a list/array/map and the type of the members can be examined, then here the propriate
+   * ITypeHandler is returned
+   * 
+   * @return the {@link ITypeHandler} to deal with the subtype, or NULL if subtype can't be read
+   */
+  public ITypeHandler getSubTypeHandler();
+
+  /**
    * If the java field is a list / array / map the the sub type is returned
    * 
    * @return the subtype
