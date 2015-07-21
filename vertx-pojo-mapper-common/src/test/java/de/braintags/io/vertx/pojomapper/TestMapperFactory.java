@@ -47,6 +47,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
+import de.braintags.io.vertx.pojomapper.mapping.impl.ParametrizedMappedField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ObjectTypeHandler;
 
@@ -201,6 +202,15 @@ public class TestMapperFactory {
     Assert.assertFalse("this should not be an array", field.isArray());
     Assert.assertTrue("this should be a Collection", field.isCollection());
     Assert.assertEquals(1, field.getTypeParameters().size());
+
+    field = mapperDef.getField("myMap");
+    boolean parametrizedField = false;
+    for (IField parField : field.getTypeParameters()) {
+      if (parField instanceof ParametrizedMappedField)
+        parametrizedField = true;
+    }
+    Assert.assertTrue("tpyeParameters of field 'myMap' must contain ParametrizedMappedField", parametrizedField);
+
   }
 
   @Test

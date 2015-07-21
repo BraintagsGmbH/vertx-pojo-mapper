@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
@@ -77,6 +78,9 @@ public class TypehandlerTestMapper {
 
   public List arrayList = Arrays.asList("Eins", "Zwei", "drei"); // no subtype defined
   public List mixedList = Arrays.asList("Eins", "Zwei", 5, "vier", new Long(99994444)); // no subtype defined
+
+  @Referenced
+  public Subclass embeddedSubClass = new Subclass();
 
   /**
    * 
@@ -128,5 +132,23 @@ public class TypehandlerTestMapper {
     if (!value.equals(compareValue))
       throw new MappingException("Contents are not equal: " + fieldName);
     return true;
+  }
+
+  class Subclass {
+    @Id
+    public String id;
+    public String name = "testname";
+    public Double myDouble = new Double("88.32");
+
+    @Override
+    public boolean equals(Object ob) {
+      Field[] fields = getClass().getFields();
+      for (Field field : fields) {
+        compare(field, ob);
+      }
+
+      return true;
+    }
+
   }
 }

@@ -39,25 +39,25 @@ public interface IPropertyMapper {
   /**
    * place the content of the given {@link IField} into the {@link IStoreObject}
    * 
-   * @param mapper
+   * @param entity
    *          the mapper object to be handled
    * @param storeObject
    *          the instance of {@link IStoreObject} where the content shall be placed
    * @param field
    *          the {@link IField} to be handled
    */
-  void intoStoreObject(Object mapper, IStoreObject<?> storeObject, IField field);
+  void intoStoreObject(Object entity, IStoreObject<?> storeObject, IField field);
 
   /**
    * fetch the content from the {@link IStoreObject} and store it inside the mapper
    * 
-   * @param mapper
+   * @param entity
    *          the mapper to be handled
    * @param storeObject
    *          the instance of {@link IStoreObject}, where the content shall be fetched from
    * @param field
    *          the {@link IField} to be handled
    */
-  void fromStoreObject(Object mapper, IStoreObject<?> storeObject, IField field);
+  void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field);
 
 }
