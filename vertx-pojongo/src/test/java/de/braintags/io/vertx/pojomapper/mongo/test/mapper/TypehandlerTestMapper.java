@@ -80,7 +80,7 @@ public class TypehandlerTestMapper {
   public List mixedList = Arrays.asList("Eins", "Zwei", 5, "vier", new Long(99994444)); // no subtype defined
 
   @Referenced
-  public Subclass embeddedSubClass = new Subclass();
+  public SimpleMapper simpleMapper;
 
   /**
    * 
@@ -134,21 +134,4 @@ public class TypehandlerTestMapper {
     return true;
   }
 
-  class Subclass {
-    @Id
-    public String id;
-    public String name = "testname";
-    public Double myDouble = new Double("88.32");
-
-    @Override
-    public boolean equals(Object ob) {
-      Field[] fields = getClass().getFields();
-      for (Field field : fields) {
-        compare(field, ob);
-      }
-
-      return true;
-    }
-
-  }
 }

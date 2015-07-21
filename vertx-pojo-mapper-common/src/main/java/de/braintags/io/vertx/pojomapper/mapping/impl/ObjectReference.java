@@ -19,7 +19,8 @@ package de.braintags.io.vertx.pojomapper.mapping.impl;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 
 /**
- * An object reference is used to store a reference to an instance, which is annotated with {@link Referenced}
+ * An object reference is used to store a reference to an instance into a mapped entity, where the field is annotated as
+ * {@link Referenced}
  * 
  * @author Michael Remme
  * 
@@ -42,6 +43,9 @@ public class ObjectReference {
   }
 
   /**
+   * The reference of the instance. When written into the datastore, this will be the real instance. When read from the
+   * datastore, this will be the ID of the referenced instance
+   * 
    * @return the reference
    */
   public final Object getReference() {
@@ -49,6 +53,9 @@ public class ObjectReference {
   }
 
   /**
+   * The reference of the instance. When written into the datastore, this will be the real instance. When read from the
+   * datastore, this will be the ID of the referenced instance
+   * 
    * @param reference
    *          the reference to set
    */

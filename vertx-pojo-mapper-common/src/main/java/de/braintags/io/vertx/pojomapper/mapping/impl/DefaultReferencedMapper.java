@@ -18,9 +18,7 @@ package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import java.util.Map;
 
-import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
@@ -56,7 +54,7 @@ public class DefaultReferencedMapper implements IReferencedMapper {
       return;
     if (field.isMap()) {
       writeMap((Map<?, ?>) javaValue, storeObject, field);
-    } else if (!field.isArray()) {
+    } else if (field.isArray()) {
       writeArray((Object[]) javaValue, storeObject, field);
     } else if (!field.isSingleValue()) {
       writeCollection((Iterable<?>) javaValue, storeObject, field);
@@ -89,18 +87,11 @@ public class DefaultReferencedMapper implements IReferencedMapper {
    *          the field, where the reference is stored inside
    */
   private void writeSingleValue(final Object referencedObject, final IStoreObject<?> storeObject, final IField field) {
+    ObjectReference ref = new ObjectReference(referencedObject);
     IMapperFactory mf = field.getMapper().getMapperFactory();
-    IMapper subMapper = mf.getMapper(referencedObject.getClass());
-    IField idField = subMapper.getIdField();
-    Object id = idField.getPropertyAccessor().readData(referencedObject);
-    if (id == null) {
-      throw new MappingException(String.format(
-          "@Id field of mapper %s is null. Save the child record before saving the parent", referencedObject.getClass()
-              .getName()));
-    }
-    ObjectReference ref = new ObjectReference(id);
     ITypeHandler handler = mf.getDataStore().getTypeHandlerFactory().getTypeHandler(ref.getClass());
-    handler.intoStore(ref, field);
+    Object writeValue = handler.intoStore(ref, field);
+    storeObject.put(field, writeValue);
   }
 
   /*
@@ -113,7 +104,7 @@ public class DefaultReferencedMapper implements IReferencedMapper {
   public void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field) {
     if (field.isMap()) {
       readMap(storeObject, field);
-    } else if (!field.isArray()) {
+    } else if (field.isArray()) {
       readArray(storeObject, field);
     } else if (!field.isSingleValue()) {
       readCollection(storeObject, field);

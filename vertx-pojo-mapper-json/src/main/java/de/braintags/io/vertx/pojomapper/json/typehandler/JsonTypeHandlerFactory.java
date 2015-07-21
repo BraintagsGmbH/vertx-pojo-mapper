@@ -28,6 +28,7 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CharacterTypeHa
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.FloatTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectReferenceTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ShortTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.URITypeHandler;
@@ -59,8 +60,8 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     definedTypeHandlers.add(new URITypeHandler());
     definedTypeHandlers.add(new URLTypeHandler());
     definedTypeHandlers.add(new CollectionTypeHandler());
+    definedTypeHandlers.add(new ObjectReferenceTypeHandler());
 
-    // definedTypeHandlers.add(new ());
     // definedTypeHandlers.add(new ());
     // definedTypeHandlers.add(new ());
     // definedTypeHandlers.add(new ());

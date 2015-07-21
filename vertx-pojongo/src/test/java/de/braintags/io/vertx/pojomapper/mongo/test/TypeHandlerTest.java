@@ -30,6 +30,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.SimpleMapper;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.TypehandlerTestMapper;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
@@ -57,9 +58,16 @@ public class TypeHandlerTest extends MongoBaseTest {
 
   @Test
   public void testSaveAndRead() {
+    SimpleMapper sc = new SimpleMapper();
+    ResultContainer resultContainer = saveRecord(sc);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+    sc.id = (String) resultContainer.writeResult.getId();
 
     TypehandlerTestMapper sm = new TypehandlerTestMapper();
-    ResultContainer resultContainer = saveRecord(sm);
+    sm.simpleMapper = sc;
+
+    resultContainer = saveRecord(sm);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
 
@@ -120,6 +128,32 @@ public class TypeHandlerTest extends MongoBaseTest {
     ResultContainer resultContainer = new ResultContainer();
     CountDownLatch latch = new CountDownLatch(1);
     IWrite<TypehandlerTestMapper> write = getDataStore().createWrite(TypehandlerTestMapper.class);
+    write.add(sm);
+    write.save(result -> {
+      try {
+        resultContainer.writeResult = result.result();
+        checkWriteResult(result);
+      } catch (AssertionError e) {
+        resultContainer.assertionError = e;
+      } catch (Throwable e) {
+        resultContainer.assertionError = new AssertionError(e);
+      } finally {
+        latch.countDown();
+      }
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    return resultContainer;
+  }
+
+  private ResultContainer saveRecord(SimpleMapper sm) {
+    ResultContainer resultContainer = new ResultContainer();
+    CountDownLatch latch = new CountDownLatch(1);
+    IWrite<SimpleMapper> write = getDataStore().createWrite(SimpleMapper.class);
     write.add(sm);
     write.save(result -> {
       try {
