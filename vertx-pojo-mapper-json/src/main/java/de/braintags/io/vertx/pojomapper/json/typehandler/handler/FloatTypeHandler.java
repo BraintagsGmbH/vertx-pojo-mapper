@@ -41,7 +41,7 @@ public class FloatTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object)
    */
   @Override
-  public Object fromStore(Object source, IField field) {
+  public Object fromStore(Object source, IField field, Class<?> cls) {
     return source == null ? source : ((Double) source).floatValue();
   }
 

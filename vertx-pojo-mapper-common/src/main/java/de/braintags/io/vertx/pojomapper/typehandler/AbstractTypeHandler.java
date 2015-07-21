@@ -16,10 +16,13 @@
 
 package de.braintags.io.vertx.pojomapper.typehandler;
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.util.ClassUtil;
 
 /**
  * Abstract implementation of {@link ITypeHandler} which handles
@@ -61,6 +64,27 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
         return MATCH_MINOR;
     }
     return MATCH_NONE;
+  }
+
+  /**
+   * Get a fitting constructor
+   * 
+   * @param field
+   *          the field to be used
+   * @param cls
+   *          if field is null, then the class will be used as source
+   * @param arguments
+   *          the arguments for the constructor
+   * @return a fitting {@link Constructor}
+   */
+  public Constructor<?> getConstructor(IField field, Class<?> cls, Class<?>... arguments) {
+    if (field != null) {
+      Constructor<?> constr = field.getConstructor(String.class);
+      if (constr == null)
+        throw new MappingException("Contructor not found with String as parameter for field " + field.getFullName());
+      return constr;
+    }
+    return ClassUtil.getConstructor(cls, arguments);
   }
 
 }

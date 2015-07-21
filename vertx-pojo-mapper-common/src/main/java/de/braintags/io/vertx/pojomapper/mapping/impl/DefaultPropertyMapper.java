@@ -56,7 +56,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object dbValue = storeObject.get(field);
-    Object javaValue = th.fromStore(dbValue, field);
+    Object javaValue = th.fromStore(dbValue, field, null);
     if (javaValue == null && dbValue != null)
       throw new TypeHandlerException(String.format("Value conversion failed: original = %s, conversion = NULL",
           String.valueOf(dbValue)));

@@ -50,7 +50,7 @@ public class DateTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object)
    */
   @Override
-  public Object fromStore(Object source, IField field) {
+  public Object fromStore(Object source, IField field, Class<?> cls) {
     if (source == null)
       return source;
     Constructor<?> constr = field.getConstructor(long.class);

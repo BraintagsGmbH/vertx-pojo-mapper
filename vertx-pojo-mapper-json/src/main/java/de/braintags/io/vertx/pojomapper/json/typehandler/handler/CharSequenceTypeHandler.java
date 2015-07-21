@@ -20,7 +20,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import de.braintags.io.vertx.pojomapper.exception.ClassAccessException;
-import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 
@@ -47,12 +46,10 @@ public class CharSequenceTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object fromStore(Object source, IField field) {
+  public Object fromStore(Object source, IField field, Class<?> cls) {
     if (source == null)
       return null;
-    Constructor<?> constr = field.getConstructor(String.class);
-    if (constr == null)
-      throw new MappingException("Contructor not found with String as parameter for field " + field.getFullName());
+    Constructor<?> constr = getConstructor(field, cls, String.class);
     try {
       return constr.newInstance(source);
     } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {

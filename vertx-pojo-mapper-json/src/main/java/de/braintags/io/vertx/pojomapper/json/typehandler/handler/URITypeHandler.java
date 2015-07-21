@@ -44,7 +44,7 @@ public class URITypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object fromStore(Object source, IField field) {
+  public Object fromStore(Object source, IField field, Class<?> cls) {
     return URI.create((String) source);
   }
 

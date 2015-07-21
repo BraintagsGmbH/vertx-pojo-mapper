@@ -74,7 +74,9 @@ public class TypehandlerTestMapper {
   public URL url;
 
   // complexer objects
-  public List arrayList = Arrays.asList("Eins", "Zwei", "drei");
+
+  public List arrayList = Arrays.asList("Eins", "Zwei", "drei"); // no subtype defined
+  public List mixedList = Arrays.asList("Eins", "Zwei", 5, "vier", new Long(99994444)); // no subtype defined
 
   /**
    * 

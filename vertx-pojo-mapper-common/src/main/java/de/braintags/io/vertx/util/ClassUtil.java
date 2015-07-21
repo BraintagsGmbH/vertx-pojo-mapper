@@ -20,6 +20,7 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.GenericDeclaration;
@@ -45,6 +46,23 @@ import de.braintags.io.vertx.pojomapper.exception.MappingException;
 
 public class ClassUtil {
   private static final Logger log = LoggerFactory.getLogger(ClassUtil.class);
+
+  /**
+   * Get a defined {@link Constructor} of the given class with the arguments
+   * 
+   * @param cls
+   *          the class to be examined
+   * @param arguments
+   *          the arguments of the contructor
+   * @return a fitting constructor
+   */
+  public static Constructor<?> getConstructor(Class<?> cls, Class<?>... arguments) {
+    try {
+      return cls.getDeclaredConstructor(arguments);
+    } catch (NoSuchMethodException | SecurityException e) {
+      throw new MappingException(e);
+    }
+  }
 
   /**
    * Get a list of all methods declared in the supplied class, and all its superclasses (except java.lang.Object),

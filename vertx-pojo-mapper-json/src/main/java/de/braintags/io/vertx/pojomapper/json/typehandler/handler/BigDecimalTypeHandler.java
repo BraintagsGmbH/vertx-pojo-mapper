@@ -44,7 +44,7 @@ public class BigDecimalTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object fromStore(Object source, IField field) {
+  public Object fromStore(Object source, IField field, Class<?> cls) {
     return source == null ? source : new BigDecimal((Double) source);
   }
 

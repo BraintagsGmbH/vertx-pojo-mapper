@@ -85,32 +85,33 @@ public class DefaultObjectFactory implements IObjectFactory {
   public Collection<?> createCollection(IField field) {
     if (field.isSet()) {
       return createSet(field);
-    } else
+    } else if (field.isCollection())
       return createList(field);
+    else
+      throw new UnsupportedOperationException("this should not land here");
   }
 
   private Set<?> createSet(IField field) {
-    if (field.getConstructor() != null)
-      return newInstance(field.getConstructor(), DEFAULT_SET_CLASS);
+    return (Set<?>) newInstance(field.getConstructor(), DEFAULT_SET_CLASS);
   }
 
   private List<?> createList(IField field) {
-    throw new UnsupportedOperationException();
+    return (List<?>) newInstance(field.getConstructor(), DEFAULT_LIST_CLASS);
   }
 
   /**
    * creates an instance of testType (if it isn't Object.class or null) or fallbackType
    */
-  private <T> T newInstance(final Constructor<T> tryMe, final Class<T> fallbackType) {
-    if (tryMe != null) {
-      tryMe.setAccessible(true);
+  private Object newInstance(final Constructor<?> constructor, final Class<?> fallbackType) {
+    if (constructor != null) {
+      constructor.setAccessible(true);
       try {
-        return tryMe.newInstance();
+        return constructor.newInstance();
       } catch (Exception e) {
-        throw new RuntimeException(e);
+        throw new MappingException(e);
       }
     }
-    return createInst(fallbackType);
+    return createInstance(fallbackType);
   }
 
 }
