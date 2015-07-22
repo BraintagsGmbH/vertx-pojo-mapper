@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import de.braintags.io.vertx.pojomapper.exception.ClassAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 
 /**
  * 
@@ -46,14 +47,14 @@ public class CharSequenceTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object fromStore(Object source, IField field, Class<?> cls) {
-    if (source == null)
-      return null;
-    Constructor<?> constr = getConstructor(field, cls, String.class);
-    try {
-      return constr.newInstance(source);
-    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new ClassAccessException("", e);
+  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+    if (source != null) {
+      Constructor<?> constr = getConstructor(field, cls, String.class);
+      try {
+        typeHandlerResult.setResult(constr.newInstance(source));
+      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        throw new ClassAccessException("", e);
+      }
     }
   }
 
@@ -64,8 +65,8 @@ public class CharSequenceTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object intoStore(Object source, IField field) {
-    return source == null ? source : ((CharSequence) source).toString();
+  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
+    typeHandlerResult.setResult(source == null ? source : ((CharSequence) source).toString());
   }
 
 }

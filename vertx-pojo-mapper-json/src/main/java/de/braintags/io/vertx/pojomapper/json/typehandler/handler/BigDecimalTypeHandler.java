@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 
 /**
  * 
@@ -44,8 +45,8 @@ public class BigDecimalTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object fromStore(Object source, IField field, Class<?> cls) {
-    return source == null ? source : new BigDecimal((Double) source);
+  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+    typeHandlerResult.setResult(source == null ? source : new BigDecimal((Double) source));
   }
 
   /*
@@ -55,8 +56,8 @@ public class BigDecimalTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object intoStore(Object source, IField field) {
-    return source == null ? source : ((BigDecimal) source).doubleValue();
+  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
+    typeHandlerResult.setResult(source == null ? source : ((BigDecimal) source).doubleValue());
   }
 
 }

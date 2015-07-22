@@ -59,15 +59,16 @@ public class TypeHandlerTest extends MongoBaseTest {
   @Test
   public void testSaveAndRead() {
     SimpleMapper sc = new SimpleMapper();
-    ResultContainer resultContainer = saveRecord(sc);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-    sc.id = (String) resultContainer.writeResult.getId();
+
+    // ResultContainer resultContainer = saveRecord(sc);
+    // if (resultContainer.assertionError != null)
+    // throw resultContainer.assertionError;
+    // sc.id = (String) resultContainer.writeResult.getId();
 
     TypehandlerTestMapper sm = new TypehandlerTestMapper();
     sm.simpleMapper = sc;
 
-    resultContainer = saveRecord(sm);
+    ResultContainer resultContainer = saveRecord(sm);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
 

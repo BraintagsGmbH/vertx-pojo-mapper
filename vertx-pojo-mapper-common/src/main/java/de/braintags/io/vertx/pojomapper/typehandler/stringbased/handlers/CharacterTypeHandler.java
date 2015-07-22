@@ -18,6 +18,7 @@ package de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 
 /**
  * 
@@ -42,8 +43,8 @@ public class CharacterTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object fromStore(Object source, IField field, Class<?> cls) {
-    return source == null ? null : ((String) source).toCharArray();
+  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+    typeHandlerResult.setResult(source == null ? null : ((String) source).toCharArray());
   }
 
   /*
@@ -53,8 +54,8 @@ public class CharacterTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object intoStore(Object source, IField field) {
-    return source == null ? null : source.toString();
+  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
+    typeHandlerResult.setResult(source == null ? null : source.toString());
   }
 
 }

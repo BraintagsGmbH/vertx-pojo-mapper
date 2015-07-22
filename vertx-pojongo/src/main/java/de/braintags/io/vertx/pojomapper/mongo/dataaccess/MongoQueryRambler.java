@@ -27,6 +27,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 
 /**
  * Implementation fills the contents into a {@link JsonObject} which then can be used as source for
@@ -116,7 +117,10 @@ public class MongoQueryRambler implements IQueryRambler {
     IField field = fieldParameter.getField();
     String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
     Object value = fieldParameter.getValue();
-    Object storeObject = field.getTypeHandler().intoStore(value, field);
+    DefaultTypeHandlerResult thResult = new DefaultTypeHandlerResult();
+    field.getTypeHandler().intoStore(value, field, thResult);
+    thResult.validate();
+    Object storeObject = thResult.getResult();
     JsonObject arg = new JsonObject().put(mongoOperator, storeObject);
     add(field.getMappedFieldName(), arg);
   }

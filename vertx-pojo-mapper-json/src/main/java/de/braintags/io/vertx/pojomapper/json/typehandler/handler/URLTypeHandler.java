@@ -22,6 +22,7 @@ import java.net.URL;
 import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 
 /**
  * 
@@ -46,9 +47,9 @@ public class URLTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object fromStore(Object source, IField field, Class<?> cls) {
+  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
     try {
-      return new URL((String) source);
+      typeHandlerResult.setResult(new URL((String) source));
     } catch (MalformedURLException e) {
       throw new TypeHandlerException(e);
     }
@@ -61,8 +62,8 @@ public class URLTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object intoStore(Object source, IField field) {
-    return source == null ? source : ((URL) source).toString();
+  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
+    typeHandlerResult.setResult(source == null ? source : ((URL) source).toString());
   }
 
 }

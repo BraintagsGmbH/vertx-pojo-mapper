@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 
 /**
  * An {@link ITypeHandler} which is dealing {@link Date}. Currently its only dealing with the long value of a Date.
@@ -50,17 +51,19 @@ public class DateTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object)
    */
   @Override
-  public Object fromStore(Object source, IField field, Class<?> cls) {
-    if (source == null)
-      return source;
-    Constructor<?> constr = field.getConstructor(long.class);
-    if (constr == null)
-      throw new MappingException("Contructor not found with long as parameter");
-    try {
-      return constr.newInstance(source);
-    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new ClassAccessException("", e);
+  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+    Object result = null;
+    if (source != null) {
+      Constructor<?> constr = field.getConstructor(long.class);
+      if (constr == null)
+        throw new MappingException("Contructor not found with long as parameter");
+      try {
+        result = constr.newInstance(source);
+      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        throw new ClassAccessException("", e);
+      }
     }
+    typeHandlerResult.setResult(result);
   }
 
   /*
@@ -69,8 +72,8 @@ public class DateTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object)
    */
   @Override
-  public Object intoStore(Object source, IField field) {
-    return source == null ? source : ((Date) source).getTime();
+  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
+    typeHandlerResult.setResult(source == null ? source : ((Date) source).getTime());
   }
 
 }

@@ -24,6 +24,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 
 /**
  * 
@@ -90,8 +91,10 @@ public class DefaultReferencedMapper implements IReferencedMapper {
     ObjectReference ref = new ObjectReference(referencedObject);
     IMapperFactory mf = field.getMapper().getMapperFactory();
     ITypeHandler handler = mf.getDataStore().getTypeHandlerFactory().getTypeHandler(ref.getClass());
-    Object writeValue = handler.intoStore(ref, field);
-    storeObject.put(field, writeValue);
+    DefaultTypeHandlerResult result = new DefaultTypeHandlerResult();
+    handler.intoStore(ref, field, result);
+    result.validate();
+    storeObject.put(field, result.getResult());
   }
 
   /*

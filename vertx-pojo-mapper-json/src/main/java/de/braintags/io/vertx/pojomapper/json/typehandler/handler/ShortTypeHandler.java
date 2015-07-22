@@ -18,6 +18,7 @@ package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 
 /**
  * 
@@ -42,8 +43,8 @@ public class ShortTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object fromStore(Object source, IField field, Class<?> cls) {
-    return source == null ? source : ((Integer) source).shortValue();
+  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+    typeHandlerResult.setResult(source == null ? source : ((Integer) source).shortValue());
   }
 
   /*
@@ -53,8 +54,8 @@ public class ShortTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object intoStore(Object source, IField field) {
-    return source == null ? source : ((Short) source).intValue();
+  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
+    typeHandlerResult.setResult(source == null ? source : ((Short) source).intValue());
   }
 
 }

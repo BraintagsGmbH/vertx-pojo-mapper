@@ -43,3 +43,8 @@ mainly stuff for the serialization of POJO to Json and back
     
     Generics
     
+    
+    Implementation: 
+    dirty-flag von Records, Speichern von dirty records
+    Code Injection allgemein
+    

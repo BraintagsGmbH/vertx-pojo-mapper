@@ -22,6 +22,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 
 /**
  * 
@@ -43,7 +44,11 @@ public class DefaultPropertyMapper implements IPropertyMapper {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object javaValue = pAcc.readData(mapper);
-    Object dbValue = th.intoStore(javaValue, field);
+    DefaultTypeHandlerResult result = new DefaultTypeHandlerResult();
+
+    th.intoStore(javaValue, field, result);
+    result.validate();
+    Object dbValue = result.getResult();
     if (javaValue != null && dbValue == null)
       throw new TypeHandlerException(String.format("Value conversion failed: original = %s, conversion = NULL",
           String.valueOf(javaValue)));
@@ -56,7 +61,10 @@ public class DefaultPropertyMapper implements IPropertyMapper {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object dbValue = storeObject.get(field);
-    Object javaValue = th.fromStore(dbValue, field, null);
+    DefaultTypeHandlerResult result = new DefaultTypeHandlerResult();
+    th.fromStore(dbValue, field, null, result);
+    result.validate();
+    Object javaValue = result.getResult();
     if (javaValue == null && dbValue != null)
       throw new TypeHandlerException(String.format("Value conversion failed: original = %s, conversion = NULL",
           String.valueOf(dbValue)));

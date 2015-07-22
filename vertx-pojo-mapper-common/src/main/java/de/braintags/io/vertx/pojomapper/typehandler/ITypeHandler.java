@@ -55,9 +55,10 @@ public interface ITypeHandler {
    *          the underlaying field information
    * @param cls
    *          if a caller can't access some {@link IField} information, then the resulting class should be defined here
-   * @return the transformed value storable in the java instance
+   * @param typeHandlerResult
+   *          the method will store the result inside the {@link ITypeHandlerResult}
    */
-  Object fromStore(Object source, IField field, Class<?> cls);
+  void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult);
 
   /**
    * This method is called when an object shall be persisted into the datastore and shall change the value into the
@@ -67,9 +68,10 @@ public interface ITypeHandler {
    *          the source, which was read from the java instance
    * @param field
    *          the underlaying field information
-   * @return the transformed value storable in the datastore
+   * @param typeHandlerResult
+   *          the method will store the result inside the {@link ITypeHandlerResult}
    */
-  Object intoStore(Object source, IField field);
+  void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult);
 
   /**
    * Checks wether the given {@link IField} is matching the criteria in the current instance. The method returns a

@@ -20,6 +20,7 @@ import java.util.Calendar;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 
 /**
  * 
@@ -44,12 +45,12 @@ public class CalendarTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object fromStore(Object source, IField field, Class<?> cls) {
-    if (source == null)
-      return source;
-    Calendar cal = Calendar.getInstance();
-    cal.setTimeInMillis(((Long) source).longValue());
-    return cal;
+  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+    if (source != null) {
+      Calendar cal = Calendar.getInstance();
+      cal.setTimeInMillis(((Long) source).longValue());
+      typeHandlerResult.setResult(cal);
+    }
   }
 
   /*
@@ -59,8 +60,8 @@ public class CalendarTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object intoStore(Object source, IField field) {
-    return source == null ? source : ((Calendar) source).getTimeInMillis();
+  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
+    typeHandlerResult.setResult(source == null ? source : ((Calendar) source).getTimeInMillis());
   }
 
 }

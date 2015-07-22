@@ -25,6 +25,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.impl.Mapper;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 
 /**
  * Deals all fields, which contain {@link Collection} content, in spite of maps
@@ -50,23 +52,26 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
    */
   @SuppressWarnings("unchecked")
   @Override
-  public Object fromStore(Object source, IField field, Class<?> cls) {
-    if (source == null)
-      return null;
-    @SuppressWarnings("rawtypes")
-    Collection coll = field.getMapper().getObjectFactory().createCollection(field);
-    Iterator<?> ji = ((JsonArray) source).iterator();
-    ITypeHandler subHandler = field.getSubTypeHandler();
-    while (ji.hasNext()) {
-      Object o = ji.next();
-      if (subHandler != null) {
-        Object dest = subHandler.fromStore(o, null, field.getSubClass());
-        coll.add(dest);
-      } else {
-        coll.add(o);
+  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+    if (source != null) {
+      @SuppressWarnings("rawtypes")
+      Collection coll = field.getMapper().getObjectFactory().createCollection(field);
+      Iterator<?> ji = ((JsonArray) source).iterator();
+      ITypeHandler subHandler = field.getSubTypeHandler();
+      while (ji.hasNext()) {
+        Object o = ji.next();
+        if (subHandler != null) {
+          DefaultTypeHandlerResult tmpResult = new DefaultTypeHandlerResult();
+          subHandler.fromStore(o, null, field.getSubClass(), tmpResult);
+          tmpResult.validate();
+          Object dest = tmpResult.getResult();
+          coll.add(dest);
+        } else {
+          coll.add(o);
+        }
       }
+      typeHandlerResult.setResult(coll);
     }
-    return coll;
   }
 
   /*
@@ -76,32 +81,36 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public Object intoStore(Object source, IField field) {
-    if (source == null)
-      return null;
-    JsonArray jsonArray = new JsonArray();
-    if (!((Collection<?>) source).isEmpty()) {
-      Iterator<?> sourceIt = ((Collection<?>) source).iterator();
-      ITypeHandler subHandler = field.getSubTypeHandler();
-      boolean determineSubhandler = subHandler == null;
-      Class<?> valueClass = null;
-      while (sourceIt.hasNext()) {
-        Object value = sourceIt.next();
-        if (determineSubhandler) {
-          boolean valueClassChanged = valueClass != null && value.getClass() != valueClass;
-          valueClass = value.getClass();
-          if (subHandler == null || valueClassChanged) {
-            subHandler = ((Mapper) field.getMapper()).getMapperFactory().getDataStore().getTypeHandlerFactory()
-                .getTypeHandler(value.getClass());
-            // TODO could it be useful to write the class of the value into the field, to restore it proper from
-            // datastore?
+  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
+    JsonArray jsonArray = null;
+    if (source != null) {
+      jsonArray = new JsonArray();
+      if (!((Collection<?>) source).isEmpty()) {
+        Iterator<?> sourceIt = ((Collection<?>) source).iterator();
+        ITypeHandler subHandler = field.getSubTypeHandler();
+        boolean determineSubhandler = subHandler == null;
+        Class<?> valueClass = null;
+        while (sourceIt.hasNext()) {
+          Object value = sourceIt.next();
+          if (determineSubhandler) {
+            boolean valueClassChanged = valueClass != null && value.getClass() != valueClass;
+            valueClass = value.getClass();
+            if (subHandler == null || valueClassChanged) {
+              subHandler = ((Mapper) field.getMapper()).getMapperFactory().getDataStore().getTypeHandlerFactory()
+                  .getTypeHandler(value.getClass());
+              // TODO could it be useful to write the class of the value into the field, to restore it proper from
+              // datastore?
+            }
           }
+          DefaultTypeHandlerResult tmpResult = new DefaultTypeHandlerResult();
+          subHandler.intoStore(value, null, tmpResult);
+          tmpResult.validate();
+          jsonArray.add(tmpResult.getResult());
         }
-        jsonArray.add(subHandler.intoStore(value, null));
-      }
 
+      }
     }
 
-    return jsonArray;
+    typeHandlerResult.setResult(jsonArray);
   }
 }

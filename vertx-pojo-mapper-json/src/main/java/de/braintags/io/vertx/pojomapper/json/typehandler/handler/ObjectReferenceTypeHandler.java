@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
@@ -23,6 +25,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ObjectReference;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 
 /**
  * Handles instances of {@link ObjectReference}.
@@ -47,8 +51,8 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class)
    */
   @Override
-  public Object fromStore(Object source, IField field, Class<?> cls) {
-    return null;
+  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+    typeHandlerResult.setResult(null);
   }
 
   /*
@@ -57,20 +61,36 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
-  public Object intoStore(Object source, IField field) {
-    ObjectReference ref = (ObjectReference) source;
+  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
+    Object obToReference = ((ObjectReference) source).getReference();
     IMapperFactory mf = field.getMapper().getMapperFactory();
-    IMapper subMapper = mf.getMapper(ref.getReference().getClass());
-    IField idField = subMapper.getIdField();
-    Object id = idField.getPropertyAccessor().readData(ref.getReference());
-    if (id == null) {
-      throw new MappingException(String.format(
-          "@Id field of mapper %s is null. Save the child record before saving the parent", ref.getReference()
-              .getClass().getName()));
-    }
-    ITypeHandler th = mf.getDataStore().getTypeHandlerFactory().getTypeHandler(id.getClass());
-    return th.intoStore(id, field);
+    IMapper subMapper = mf.getMapper(obToReference.getClass());
+    IDataStore store = mf.getDataStore();
+    IWrite<Object> write = (IWrite<Object>) store.createWrite(obToReference.getClass());
+    write.add(obToReference);
+
+    write.save(result -> {
+      if (result.failed()) {
+        typeHandlerResult.setException(result.cause());
+      } else {
+        IField idField = subMapper.getIdField();
+        Object id = result.result().getId();
+        if (id == null)
+          id = idField.getPropertyAccessor().readData(obToReference);
+        if (id == null) {
+          throw new MappingException(String.format("Error after saving instancde: @Id field of mapper %s is null.",
+              obToReference.getClass().getName()));
+        }
+        ITypeHandler th = mf.getDataStore().getTypeHandlerFactory().getTypeHandler(id.getClass());
+        DefaultTypeHandlerResult tmpResult = new DefaultTypeHandlerResult();
+        th.intoStore(id, field, tmpResult);
+        tmpResult.validate();
+        typeHandlerResult.setResult(tmpResult.getResult());
+      }
+
+    });
   }
 
 }
