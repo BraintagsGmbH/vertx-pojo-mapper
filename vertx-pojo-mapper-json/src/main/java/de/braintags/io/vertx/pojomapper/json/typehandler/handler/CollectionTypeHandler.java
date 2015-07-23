@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 
 import java.util.Collection;
@@ -26,7 +28,6 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.Mapper;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
-import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 
 /**
  * Deals all fields, which contain {@link Collection} content, in spite of maps
@@ -52,8 +53,10 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
    */
   @SuppressWarnings("unchecked")
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+  public void fromStore(Object source, IField field, Class<?> cls,
+      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (source != null) {
+      // TODO CountDownLatch needed?
       @SuppressWarnings("rawtypes")
       Collection coll = field.getMapper().getObjectFactory().createCollection(field);
       Iterator<?> ji = ((JsonArray) source).iterator();
@@ -61,17 +64,21 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
       while (ji.hasNext()) {
         Object o = ji.next();
         if (subHandler != null) {
-          DefaultTypeHandlerResult tmpResult = new DefaultTypeHandlerResult();
-          subHandler.fromStore(o, null, field.getSubClass(), tmpResult);
-          tmpResult.validate();
-          Object dest = tmpResult.getResult();
-          coll.add(dest);
+          subHandler.fromStore(o, null, field.getSubClass(), tmpResult -> {
+            if (tmpResult.failed()) {
+              resultHandler.handle(tmpResult);
+            } else {
+              Object dest = tmpResult.result().getResult();
+              coll.add(dest);
+            }
+          });
         } else {
           coll.add(o);
         }
       }
-      typeHandlerResult.setResult(coll);
-    }
+      success(coll, resultHandler);
+    } else
+      success(null, resultHandler);
   }
 
   /*
@@ -81,10 +88,10 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
-    JsonArray jsonArray = null;
+  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (source != null) {
-      jsonArray = new JsonArray();
+      // TODO CountDownLatch needed?
+      JsonArray jsonArray = new JsonArray();
       if (!((Collection<?>) source).isEmpty()) {
         Iterator<?> sourceIt = ((Collection<?>) source).iterator();
         ITypeHandler subHandler = field.getSubTypeHandler();
@@ -102,15 +109,18 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
               // datastore?
             }
           }
-          DefaultTypeHandlerResult tmpResult = new DefaultTypeHandlerResult();
-          subHandler.intoStore(value, null, tmpResult);
-          tmpResult.validate();
-          jsonArray.add(tmpResult.getResult());
+          subHandler.intoStore(value, null, tmpResult -> {
+            if (tmpResult.failed()) {
+              resultHandler.handle(tmpResult);
+            } else {
+              ITypeHandlerResult thResult = tmpResult.result();
+              jsonArray.add(thResult.getResult());
+            }
+          });
         }
-
       }
-    }
-
-    typeHandlerResult.setResult(jsonArray);
+      success(jsonArray, resultHandler);
+    } else
+      success(null, resultHandler);
   }
 }

@@ -27,12 +27,18 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 
 public class DefaultTypeHandlerResult implements ITypeHandlerResult {
   private Object thResult;
-  private Throwable e;
 
   /**
    * 
    */
   public DefaultTypeHandlerResult() {
+  }
+
+  /**
+   * 
+   */
+  public DefaultTypeHandlerResult(Object result) {
+    this.thResult = result;
   }
 
   /*
@@ -53,23 +59,6 @@ public class DefaultTypeHandlerResult implements ITypeHandlerResult {
   @Override
   public Object getResult() {
     return thResult;
-  }
-
-  @Override
-  public void setException(Throwable e) {
-    this.e = e;
-  }
-
-  @Override
-  public Throwable getException() {
-    return e;
-  }
-
-  @Override
-  public void validate() {
-    if (e != null) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
-    }
   }
 
 }

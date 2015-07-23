@@ -109,7 +109,7 @@ public class TypehandlerTestMapper {
       return true;
     if (field.getName().equals("buffer")) {
       @SuppressWarnings("unused")
-      String test = "test";
+      String test = "test ";
     }
     try {
       Object value = field.get(this);

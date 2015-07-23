@@ -16,10 +16,12 @@
 
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
@@ -47,11 +49,12 @@ public class URLTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+  public void fromStore(Object source, IField field, Class<?> cls,
+      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     try {
-      typeHandlerResult.setResult(new URL((String) source));
+      success(new URL((String) source), resultHandler);
     } catch (MalformedURLException e) {
-      throw new TypeHandlerException(e);
+      fail(e, resultHandler);
     }
   }
 
@@ -62,8 +65,8 @@ public class URLTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
-    typeHandlerResult.setResult(source == null ? source : ((URL) source).toString());
+  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    success(source == null ? source : ((URL) source).toString(), resultHandler);
   }
 
 }

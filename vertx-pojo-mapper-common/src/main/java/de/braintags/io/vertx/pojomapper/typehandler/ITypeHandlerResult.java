@@ -39,24 +39,4 @@ public interface ITypeHandlerResult {
    */
   Object getResult();
 
-  /**
-   * If an error occured, it's stored here
-   * 
-   * @param e
-   *          the error
-   */
-  void setException(Throwable e);
-
-  /**
-   * If an error occured, it's stored here
-   * 
-   * @return the error
-   */
-  Throwable getException();
-
-  /**
-   * If the instance contains an Exception, it is thrown as RuntimeException
-   */
-  void validate();
-
 }

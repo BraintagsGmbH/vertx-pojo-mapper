@@ -16,6 +16,9 @@
 
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
 import java.util.Calendar;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -45,12 +48,15 @@ public class CalendarTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+  public void fromStore(Object source, IField field, Class<?> cls,
+      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (source != null) {
       Calendar cal = Calendar.getInstance();
       cal.setTimeInMillis(((Long) source).longValue());
-      typeHandlerResult.setResult(cal);
-    }
+      success(cal, resultHandler);
+    } else
+      success(null, resultHandler);
+
   }
 
   /*
@@ -60,8 +66,8 @@ public class CalendarTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
-    typeHandlerResult.setResult(source == null ? source : ((Calendar) source).getTimeInMillis());
+  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    success(source == null ? source : ((Calendar) source).getTimeInMillis(), resultHandler);
   }
 
 }

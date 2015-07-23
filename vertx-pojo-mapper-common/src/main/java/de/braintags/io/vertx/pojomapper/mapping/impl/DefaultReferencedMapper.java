@@ -18,6 +18,7 @@ package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import java.util.Map;
 
+import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
@@ -112,7 +113,7 @@ public class DefaultReferencedMapper implements IReferencedMapper {
     } else if (!field.isSingleValue()) {
       readCollection(storeObject, field);
     } else {
-      readSingleValue(storeObject, field);
+      readSingleValue(entity, storeObject, field);
     }
   }
 
@@ -128,7 +129,21 @@ public class DefaultReferencedMapper implements IReferencedMapper {
     throw new UnsupportedOperationException();
   }
 
-  private void readSingleValue(final IStoreObject<?> storeObject, final IField field) {
-    throw new UnsupportedOperationException();
+  private void readSingleValue(Object entity, final IStoreObject<?> storeObject, final IField field) {
+    ITypeHandler handler = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
+        .getTypeHandler(ObjectReference.class);
+
+    IPropertyAccessor pAcc = field.getPropertyAccessor();
+    Object dbValue = storeObject.get(field);
+    DefaultTypeHandlerResult result = new DefaultTypeHandlerResult();
+    handler.fromStore(dbValue, field, null, result);
+    result.validate();
+
+    Object javaValue = result.getResult();
+    if (javaValue == null && dbValue != null)
+      throw new TypeHandlerException(String.format("Value conversion failed: original = %s, conversion = NULL",
+          String.valueOf(dbValue)));
+    if (javaValue != null)
+      pAcc.writeData(entity, javaValue);
   }
 }

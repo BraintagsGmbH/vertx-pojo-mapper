@@ -16,12 +16,17 @@
 
 package de.braintags.io.vertx.pojomapper.typehandler;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 import de.braintags.io.vertx.util.ClassUtil;
 
 /**
@@ -87,4 +92,30 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
     return ClassUtil.getConstructor(cls, arguments);
   }
 
+  /**
+   * Creates an instance of {@link ITypeHandlerResult} and calls the handler
+   * 
+   * @param result
+   *          the result to be sent to the caller
+   * @param resultHandler
+   *          the caller
+   */
+  protected void success(Object result, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    DefaultTypeHandlerResult thResult = new DefaultTypeHandlerResult(result);
+    Future<ITypeHandlerResult> future = Future.succeededFuture(thResult);
+    resultHandler.handle(future);
+  }
+
+  /**
+   * Calls the caller to inform about an error
+   * 
+   * @param thr
+   *          the Throwable, which occured
+   * @param resultHandler
+   *          the caller
+   */
+  protected void fail(Throwable thr, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    Future<ITypeHandlerResult> future = Future.failedFuture(thr);
+    resultHandler.handle(future);
+  }
 }

@@ -16,6 +16,9 @@
 
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
 import java.net.URI;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -45,8 +48,9 @@ public class URITypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
-    typeHandlerResult.setResult(URI.create((String) source));
+  public void fromStore(Object source, IField field, Class<?> cls,
+      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    success(URI.create((String) source), resultHandler);
   }
 
   /*
@@ -56,8 +60,8 @@ public class URITypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
-    typeHandlerResult.setResult(source == null ? source : ((URI) source).toString());
+  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    success(source == null ? source : ((URI) source).toString(), resultHandler);
   }
 
 }

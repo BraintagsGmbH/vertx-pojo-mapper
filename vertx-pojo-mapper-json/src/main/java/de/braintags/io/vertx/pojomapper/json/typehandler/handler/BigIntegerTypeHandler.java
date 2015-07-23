@@ -16,6 +16,9 @@
 
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
 import java.math.BigInteger;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -45,8 +48,9 @@ public class BigIntegerTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
-    typeHandlerResult.setResult(source == null ? source : new BigInteger((String) source));
+  public void fromStore(Object source, IField field, Class<?> cls,
+      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    success(source == null ? source : new BigInteger((String) source), resultHandler);
   }
 
   /*
@@ -56,8 +60,8 @@ public class BigIntegerTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
-    typeHandlerResult.setResult(source == null ? source : ((BigInteger) source).toString());
+  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    success(source == null ? source : ((BigInteger) source).toString(), resultHandler);
   }
 
 }

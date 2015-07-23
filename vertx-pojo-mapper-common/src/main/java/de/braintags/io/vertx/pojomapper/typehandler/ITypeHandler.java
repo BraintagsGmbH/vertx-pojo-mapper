@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.typehandler;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 
 /**
@@ -55,10 +57,10 @@ public interface ITypeHandler {
    *          the underlaying field information
    * @param cls
    *          if a caller can't access some {@link IField} information, then the resulting class should be defined here
-   * @param typeHandlerResult
+   * @param resultHandler
    *          the method will store the result inside the {@link ITypeHandlerResult}
    */
-  void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult);
+  void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> resultHandler);
 
   /**
    * This method is called when an object shall be persisted into the datastore and shall change the value into the
@@ -68,10 +70,10 @@ public interface ITypeHandler {
    *          the source, which was read from the java instance
    * @param field
    *          the underlaying field information
-   * @param typeHandlerResult
+   * @param resultHandler
    *          the method will store the result inside the {@link ITypeHandlerResult}
    */
-  void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult);
+  void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler);
 
   /**
    * Checks wether the given {@link IField} is matching the criteria in the current instance. The method returns a

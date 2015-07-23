@@ -16,11 +16,13 @@
 
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
-import de.braintags.io.vertx.pojomapper.exception.ClassAccessException;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
@@ -51,19 +53,23 @@ public class DateTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+  public void fromStore(Object source, IField field, Class<?> cls,
+      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     Object result = null;
     if (source != null) {
       Constructor<?> constr = field.getConstructor(long.class);
-      if (constr == null)
-        throw new MappingException("Contructor not found with long as parameter");
+      if (constr == null) {
+        fail(new MappingException("Contructor not found with long as parameter"), resultHandler);
+        return;
+      }
       try {
         result = constr.newInstance(source);
       } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-        throw new ClassAccessException("", e);
+        fail(e, resultHandler);
+        return;
       }
     }
-    typeHandlerResult.setResult(result);
+    success(result, resultHandler);
   }
 
   /*
@@ -72,8 +78,8 @@ public class DateTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object)
    */
   @Override
-  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
-    typeHandlerResult.setResult(source == null ? source : ((Date) source).getTime());
+  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    success(source == null ? source : ((Date) source).getTime(), resultHandler);
   }
 
 }

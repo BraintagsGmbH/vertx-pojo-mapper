@@ -48,3 +48,5 @@ mainly stuff for the serialization of POJO to Json and back
     dirty-flag von Records, Speichern von dirty records
     Code Injection allgemein
     
+    
+    CollectionTypeHandler prüfen, ob CountDownLatch notwendig ist

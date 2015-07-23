@@ -16,10 +16,12 @@
 
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import de.braintags.io.vertx.pojomapper.exception.ClassAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
@@ -47,15 +49,18 @@ public class CharSequenceTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, ITypeHandlerResult typeHandlerResult) {
+  public void fromStore(Object source, IField field, Class<?> cls,
+      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (source != null) {
       Constructor<?> constr = getConstructor(field, cls, String.class);
       try {
-        typeHandlerResult.setResult(constr.newInstance(source));
+        success(constr.newInstance(source), resultHandler);
       } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-        throw new ClassAccessException("", e);
+        fail(e, resultHandler);
+        return;
       }
-    }
+    } else
+      success(null, resultHandler);
   }
 
   /*
@@ -65,8 +70,8 @@ public class CharSequenceTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void intoStore(Object source, IField field, ITypeHandlerResult typeHandlerResult) {
-    typeHandlerResult.setResult(source == null ? source : ((CharSequence) source).toString());
+  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    success(source == null ? source : ((CharSequence) source).toString(), resultHandler);
   }
 
 }
