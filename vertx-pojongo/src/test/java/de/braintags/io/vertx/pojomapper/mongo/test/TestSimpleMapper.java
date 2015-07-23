@@ -31,7 +31,6 @@ import org.junit.Test;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
-import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
@@ -304,24 +303,4 @@ public class TestSimpleMapper extends MongoBaseTest {
     return resultContainer;
   }
 
-  private void checkWriteResult(AsyncResult<IWriteResult> result) {
-    assertTrue(resultFine(result));
-    assertNotNull(result.result());
-    assertNotNull(result.result().getStoreObject());
-    assertNotNull(result.result().getId());
-  }
-
-  boolean resultFine(AsyncResult<?> result) {
-    if (result.failed()) {
-      logger.error("", result.cause());
-      return false;
-    }
-    return true;
-  }
-
-  class ResultContainer {
-    AssertionError assertionError;
-    IWriteResult writeResult;
-    IQueryResult<?> queryResult;
-  }
 }

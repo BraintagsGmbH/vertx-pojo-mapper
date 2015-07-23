@@ -16,6 +16,7 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.test;
 
+import io.vertx.core.AsyncResult;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
@@ -258,6 +260,21 @@ public abstract class MongoBaseTest extends VertxTestBase {
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public void checkWriteResult(AsyncResult<IWriteResult> result) {
+    assertTrue(resultFine(result));
+    assertNotNull(result.result());
+    assertNotNull(result.result().getStoreObject());
+    assertNotNull(result.result().getId());
+  }
+
+  public boolean resultFine(AsyncResult<?> result) {
+    if (result.failed()) {
+      log.error("", result.cause());
+      return false;
+    }
+    return true;
   }
 
 }

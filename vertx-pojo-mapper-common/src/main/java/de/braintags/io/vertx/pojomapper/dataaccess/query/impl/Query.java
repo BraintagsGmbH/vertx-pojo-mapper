@@ -16,6 +16,9 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
@@ -27,6 +30,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
+import de.braintags.io.vertx.util.ErrorObject;
 
 /**
  * 
@@ -75,13 +79,28 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @param rambler
    *          the rambler to be filled
    */
-  public void executeQueryRambler(IQueryRambler rambler) {
+  public void executeQueryRambler(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     rambler.start(this);
+    ErrorObject error = new ErrorObject();
     for (Object filter : filters) {
       if (filter instanceof IRamblerSource) {
-        ((IRamblerSource) filter).applyTo(rambler);
-      } else
-        throw new UnsupportedOperationException("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName());
+        ((IRamblerSource) filter).applyTo(rambler, result -> {
+          if (result.failed()) {
+            resultHandler.handle(result);
+          } else {
+            // nothing to do here
+          }
+        });
+        if (error.isError()) {
+          resultHandler.handle((AsyncResult<Void>) error.toFuture());
+          return;
+        }
+
+      } else {
+        resultHandler.handle(Future.failedFuture(new UnsupportedOperationException(
+            "NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName())));
+        return;
+      }
     }
     rambler.stop(this);
   }

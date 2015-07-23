@@ -17,6 +17,7 @@
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 import java.util.Map;
@@ -28,7 +29,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
-import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 
 /**
  * 
@@ -52,7 +52,8 @@ public class DefaultReferencedMapper implements IReferencedMapper {
    * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void intoStoreObject(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler) {
+  public void intoStoreObject(Object entity, IStoreObject<?> storeObject, IField field,
+      Handler<AsyncResult<Void>> handler) {
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object javaValue = pAcc.readData(entity);
     if (javaValue == null)
@@ -64,7 +65,7 @@ public class DefaultReferencedMapper implements IReferencedMapper {
     } else if (!field.isSingleValue()) {
       writeCollection((Iterable<?>) javaValue, storeObject, field);
     } else {
-      writeSingleValue(javaValue, storeObject, field);
+      writeSingleValue(javaValue, storeObject, field, handler);
     }
   }
 
@@ -91,14 +92,21 @@ public class DefaultReferencedMapper implements IReferencedMapper {
    * @param field
    *          the field, where the reference is stored inside
    */
-  private void writeSingleValue(final Object referencedObject, final IStoreObject<?> storeObject, final IField field) {
+  private void writeSingleValue(final Object referencedObject, final IStoreObject<?> storeObject, final IField field,
+      Handler<AsyncResult<Void>> handler) {
     ObjectReference ref = new ObjectReference(referencedObject);
     IMapperFactory mf = field.getMapper().getMapperFactory();
-    ITypeHandler handler = mf.getDataStore().getTypeHandlerFactory().getTypeHandler(ref.getClass());
-    DefaultTypeHandlerResult result = new DefaultTypeHandlerResult();
-    handler.intoStore(ref, field, result);
-    result.validate();
-    storeObject.put(field, result.getResult());
+    ITypeHandler th = mf.getDataStore().getTypeHandlerFactory().getTypeHandler(ref.getClass());
+    th.intoStore(ref, field, result -> {
+      if (result.failed()) {
+        Future<Void> future = Future.failedFuture(result.cause());
+        handler.handle(future);
+        return;
+      } else {
+        storeObject.put(field, result.result().getResult());
+      }
+
+    });
   }
 
   /*
@@ -108,7 +116,8 @@ public class DefaultReferencedMapper implements IReferencedMapper {
    * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler) {
+  public void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field,
+      Handler<AsyncResult<Void>> handler) {
     if (field.isMap()) {
       readMap(storeObject, field);
     } else if (field.isArray()) {
@@ -116,7 +125,7 @@ public class DefaultReferencedMapper implements IReferencedMapper {
     } else if (!field.isSingleValue()) {
       readCollection(storeObject, field);
     } else {
-      readSingleValue(entity, storeObject, field);
+      readSingleValue(entity, storeObject, field, handler);
     }
   }
 
@@ -132,21 +141,38 @@ public class DefaultReferencedMapper implements IReferencedMapper {
     throw new UnsupportedOperationException();
   }
 
-  private void readSingleValue(Object entity, final IStoreObject<?> storeObject, final IField field) {
-    ITypeHandler handler = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
+  private void readSingleValue(Object entity, final IStoreObject<?> storeObject, final IField field,
+      Handler<AsyncResult<Void>> handler) {
+    ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
         .getTypeHandler(ObjectReference.class);
 
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object dbValue = storeObject.get(field);
-    DefaultTypeHandlerResult result = new DefaultTypeHandlerResult();
-    handler.fromStore(dbValue, field, null, result);
-    result.validate();
 
-    Object javaValue = result.getResult();
-    if (javaValue == null && dbValue != null)
-      throw new TypeHandlerException(String.format("Value conversion failed: original = %s, conversion = NULL",
-          String.valueOf(dbValue)));
-    if (javaValue != null)
-      pAcc.writeData(entity, javaValue);
+    th.fromStore(
+        dbValue,
+        field,
+        null,
+        result -> {
+          if (result.failed()) {
+            Future<Void> future = Future.failedFuture(result.cause());
+            handler.handle(future);
+            return;
+          } else {
+            Object javaValue = result.result().getResult();
+            if (javaValue == null && dbValue != null) {
+              Future<Void> future = Future.failedFuture(new TypeHandlerException(String.format(
+                  "Value conversion failed: original = %s, conversion = NULL", String.valueOf(dbValue))));
+              handler.handle(future);
+              return;
+            }
+            if (javaValue != null)
+              pAcc.writeData(entity, javaValue);
+            Future<Void> future = Future.succeededFuture();
+            handler.handle(future);
+            return;
+          }
+        });
+
   }
 }

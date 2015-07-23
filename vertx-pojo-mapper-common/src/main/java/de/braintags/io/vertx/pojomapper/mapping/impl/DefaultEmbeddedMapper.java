@@ -41,10 +41,12 @@ public class DefaultEmbeddedMapper implements IEmbeddedMapper {
    * (non-Javadoc)
    * 
    * @see de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper#intoStoreObject(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField)
+   * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField,
+   * io.vertx.core.Handler)
    */
   @Override
-  public void intoStoreObject(Object mapper, IStoreObject storeObject, IField field, Handler<AsyncResult<Void>> handler) {
+  public void intoStoreObject(Object entity, IStoreObject<?> storeObject, IField field,
+      Handler<AsyncResult<Void>> handler) {
     throw new UnsupportedOperationException();
   }
 
@@ -52,10 +54,12 @@ public class DefaultEmbeddedMapper implements IEmbeddedMapper {
    * (non-Javadoc)
    * 
    * @see de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper#fromStoreObject(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField)
+   * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField,
+   * io.vertx.core.Handler)
    */
   @Override
-  public void fromStoreObject(Object mapper, IStoreObject storeObject, IField field, Handler<AsyncResult<Void>> handler) {
+  public void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field,
+      Handler<AsyncResult<Void>> handler) {
     throw new UnsupportedOperationException();
   }
 

@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
@@ -68,8 +70,10 @@ public interface IQueryRambler {
    * 
    * @param fieldParameter
    *          the field paremeter to be applied
+   * @param resultHandler
+   *          the handler to be called
    */
-  void start(IFieldParameter<?> fieldParameter);
+  void start(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler);
 
   /**
    * Stop applying an {@link IFieldParameter}

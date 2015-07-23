@@ -29,7 +29,6 @@ import org.junit.Test;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
-import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.SimpleMapper;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.TypehandlerTestMapper;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -175,27 +174,6 @@ public class TypeHandlerTest extends MongoBaseTest {
       e.printStackTrace();
     }
     return resultContainer;
-  }
-
-  private void checkWriteResult(AsyncResult<IWriteResult> result) {
-    assertTrue(resultFine(result));
-    assertNotNull(result.result());
-    assertNotNull(result.result().getStoreObject());
-    assertNotNull(result.result().getId());
-  }
-
-  boolean resultFine(AsyncResult<?> result) {
-    if (result.failed()) {
-      logger.error("", result.cause());
-      return false;
-    }
-    return true;
-  }
-
-  class ResultContainer {
-    AssertionError assertionError;
-    IWriteResult writeResult;
-    IQueryResult<?> queryResult;
   }
 
 }

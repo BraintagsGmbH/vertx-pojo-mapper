@@ -48,15 +48,22 @@ public class TestQuery {
     query = lc.parent();
     logger.info("--- start Rambler");
     LoggerQueryRamber rambler = new LoggerQueryRamber();
-    query.executeQueryRambler(rambler);
-    logger.info("--- stop Rambler");
 
-    for (Object arg : query.getChildren()) {
-      if (arg instanceof IFieldParameter) {
-        IFieldParameter<?> fm = (IFieldParameter<?>) arg;
-        logger.info(fm.getValue());
+    final Query<Person> exQuery = query;
+    exQuery.executeQueryRambler(rambler, result -> {
+      if (result.failed()) {
+
+      } else {
+        logger.info("--- stop Rambler");
+
+        for (Object arg : exQuery.getChildren()) {
+          if (arg instanceof IFieldParameter) {
+            IFieldParameter<?> fm = (IFieldParameter<?>) arg;
+            logger.info(fm.getValue());
+          }
+        }
       }
-    }
+    });
 
   }
 }

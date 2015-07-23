@@ -16,6 +16,9 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
 /**
  * All elements of a query, which contain this interface will be called to fill a {@link IQueryRambler}
  * 
@@ -26,8 +29,9 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 public interface IRamblerSource {
 
   /**
+   * apply the current instance to the {@link IQueryRambler}
    * 
    * @param rambler
    */
-  void applyTo(IQueryRambler rambler);
+  void applyTo(IQueryRambler ramblerHandler, Handler<AsyncResult<Void>> resultHandler);
 }

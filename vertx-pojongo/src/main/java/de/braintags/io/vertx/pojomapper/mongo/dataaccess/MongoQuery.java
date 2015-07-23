@@ -50,8 +50,13 @@ public class MongoQuery<T> extends Query<T> {
   @Override
   public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     try {
-      JsonObject query = createQueryDefinition();
-      doFind(query, resultHandler);
+      createQueryDefinition(result -> {
+        if (result.failed()) {
+          resultHandler.handle(Future.failedFuture(result.cause()));
+        } else {
+          doFind(result.result(), resultHandler);
+        }
+      });
     } catch (Throwable e) {
       Future<IQueryResult<T>> future = Future.failedFuture(e);
       resultHandler.handle(future);
@@ -91,10 +96,15 @@ public class MongoQuery<T> extends Query<T> {
     return new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(), (MongoMapper) getMapper(), query);
   }
 
-  private JsonObject createQueryDefinition() {
+  private void createQueryDefinition(Handler<AsyncResult<JsonObject>> resultHandler) {
     MongoQueryRambler rambler = new MongoQueryRambler();
-    executeQueryRambler(rambler);
-    return rambler.getJsonObject();
+    executeQueryRambler(rambler, result -> {
+      if (result.failed()) {
+        resultHandler.handle(Future.failedFuture(result.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(rambler.getJsonObject()));
+      }
+    });
   }
 
   /*

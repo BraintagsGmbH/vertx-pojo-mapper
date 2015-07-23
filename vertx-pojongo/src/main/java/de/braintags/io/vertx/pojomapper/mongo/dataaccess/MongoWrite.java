@@ -63,7 +63,13 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
   private void save(T entity, Handler<AsyncResult<IWriteResult>> resultHandler) {
     executePreSave(entity);
     MongoStoreObject storeObject = new MongoStoreObject(getMapper(), entity);
-    doSave(entity, storeObject, resultHandler);
+    storeObject.initFromEntity(result -> {
+      if (result.failed()) {
+        resultHandler.handle(Future.failedFuture(result.cause()));
+      } else {
+        doSave(entity, storeObject, resultHandler);
+      }
+    });
   }
 
   /**

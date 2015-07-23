@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
@@ -141,9 +143,14 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
    * dataaccess.query.impl.IQueryRambler)
    */
   @Override
-  public void applyTo(IQueryRambler rambler) {
-    rambler.start(this);
-    rambler.stop(this);
+  public void applyTo(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
+    rambler.start(this, result -> {
+      if (result.failed()) {
+        resultHandler.handle(result);
+      } else {
+        rambler.stop(this);
+      }
+    });
   }
 
 }

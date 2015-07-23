@@ -16,19 +16,15 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.test;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 
-/**
- * 
- * 
- * @author Michael Remme
- * 
- */
+public class ResultContainer {
+  public AssertionError assertionError;
+  public IWriteResult writeResult;
+  public IQueryResult<?> queryResult;
 
-@RunWith(Suite.class)
-@SuiteClasses({ TestBaseTest.class, TestSimpleInsert.class, TypeHandlerTest.class, TestSimpleMapper.class })
-public class AllTestsPojongo {
+  public ResultContainer() {
+  }
 
 }

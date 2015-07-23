@@ -16,6 +16,9 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
@@ -27,7 +30,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 
 /**
  * Implementation fills the contents into a {@link JsonObject} which then can be used as source for
@@ -113,16 +115,21 @@ public class MongoQueryRambler implements IQueryRambler {
    * .query.IFieldParameter)
    */
   @Override
-  public void start(IFieldParameter<?> fieldParameter) {
+  public void start(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
     IField field = fieldParameter.getField();
     String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
     Object value = fieldParameter.getValue();
-    DefaultTypeHandlerResult thResult = new DefaultTypeHandlerResult();
-    field.getTypeHandler().intoStore(value, field, thResult);
-    thResult.validate();
-    Object storeObject = thResult.getResult();
-    JsonObject arg = new JsonObject().put(mongoOperator, storeObject);
-    add(field.getMappedFieldName(), arg);
+
+    field.getTypeHandler().intoStore(value, field, result -> {
+      if (result.failed()) {
+        resultHandler.handle(Future.failedFuture(result.cause()));
+      } else {
+        Object storeObject = result.result().getResult();
+        JsonObject arg = new JsonObject().put(mongoOperator, storeObject);
+        add(field.getMappedFieldName(), arg);
+        resultHandler.handle(Future.succeededFuture());
+      }
+    });
   }
 
   /*

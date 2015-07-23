@@ -16,6 +16,9 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
@@ -80,10 +83,11 @@ public class LoggerQueryRamber implements IQueryRambler {
   }
 
   @Override
-  public void start(IFieldParameter<?> fieldParameter) {
+  public void start(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
     raiseLevel();
     log(fieldParameter.getField().getName() + " " + fieldParameter.getOperator().toString() + " "
         + fieldParameter.getValue());
+    resultHandler.handle(Future.succeededFuture());
   }
 
   @Override

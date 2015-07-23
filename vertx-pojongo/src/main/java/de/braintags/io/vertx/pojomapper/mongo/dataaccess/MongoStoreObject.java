@@ -16,10 +16,14 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import de.braintags.io.vertx.pojomapper.json.dataaccess.JsonStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.util.ErrorObject;
 
 /**
  * 
@@ -35,7 +39,6 @@ public class MongoStoreObject extends JsonStoreObject {
   public MongoStoreObject(IMapper mapper, Object entity) {
     super(mapper);
     this.entity = entity;
-    initFromEntity(entity, mapper);
   }
 
   /**
@@ -47,25 +50,62 @@ public class MongoStoreObject extends JsonStoreObject {
 
   public Object getEntity() {
     if (entity == null) {
-      initToEntity();
+      throw new NullPointerException("Call method initToEntity first ");
     }
     return entity;
   }
 
-  private void initToEntity() {
+  /**
+   * Initialize the internal entity
+   * 
+   * @param handler
+   */
+  @SuppressWarnings("unchecked")
+  public void initToEntity(Handler<AsyncResult<Void>> handler) {
     Object o = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
+    ErrorObject error = new ErrorObject();
     for (String fieldName : getMapper().getFieldNames()) {
       IField field = getMapper().getField(fieldName);
-      field.getPropertyMapper().fromStoreObject(o, this, field, null);
+      field.getPropertyMapper().fromStoreObject(o, this, field, result -> {
+        if (result.failed()) {
+          error.setError(result.cause());
+        } else {
+
+        }
+      });
+      if (error.isError()) {
+        handler.handle((AsyncResult<Void>) error.toFuture());
+        return;
+      }
     }
     entity = o;
+    handler.handle(Future.succeededFuture());
   }
 
-  private void initFromEntity(Object entity, IMapper mapper) {
+  /**
+   * Initialize the internal entity into the StoreObject
+   * 
+   * @param handler
+   */
+  @SuppressWarnings("unchecked")
+  public void initFromEntity(Handler<AsyncResult<Void>> handler) {
+    ErrorObject error = new ErrorObject();
+    IMapper mapper = getMapper();
     for (String fieldName : mapper.getFieldNames()) {
       IField field = mapper.getField(fieldName);
-      field.getPropertyMapper().intoStoreObject(entity, this, field, null);
+      field.getPropertyMapper().intoStoreObject(entity, this, field, result -> {
+        if (result.failed()) {
+          error.setError(result.cause());
+        } else {
+
+        }
+      });
+      if (error.isError()) {
+        handler.handle((AsyncResult<Void>) error.toFuture());
+        return;
+      }
     }
+    handler.handle(Future.succeededFuture());
   }
 
 }
