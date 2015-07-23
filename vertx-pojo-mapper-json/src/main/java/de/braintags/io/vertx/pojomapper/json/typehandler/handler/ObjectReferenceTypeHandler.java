@@ -19,8 +19,10 @@ package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
+import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
@@ -54,15 +56,27 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    Class mapperClass = field.getType();
+    Class<?> mapperClass = field.getType();
     if (mapperClass == null)
       mapperClass = cls;
     IMapperFactory mf = field.getMapper().getMapperFactory();
-    mf.getMapper(mapperClass);
+    IMapper subMapper = mf.getMapper(mapperClass);
     IDataStore store = mf.getDataStore();
-
-    resultHandler.setResult(null);
-    throw new UnsupportedOperationException();
+    IQuery<?> query = (IQuery<?>) store.createQuery(mapperClass).field(subMapper.getIdField().getMappedFieldName())
+        .is(source);
+    query.execute(result -> {
+      if (result.failed()) {
+        fail(result.cause(), resultHandler);
+      } else {
+        if (result.result().size() != 1) {
+          fail(new PropertyAccessException("expected to find 1 record, but found " + result.result().size()),
+              resultHandler);
+          return;
+        }
+        success(result.result().iterator().next(), resultHandler);
+      }
+      return;
+    });
   }
 
   /*
@@ -71,7 +85,7 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({ "unchecked" })
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     Object obToReference = ((ObjectReference) source).getReference();

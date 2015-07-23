@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.mapping;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 
 /**
@@ -45,8 +47,10 @@ public interface IPropertyMapper {
    *          the instance of {@link IStoreObject} where the content shall be placed
    * @param field
    *          the {@link IField} to be handled
+   * @param handler
+   *          the handler to be called
    */
-  void intoStoreObject(Object entity, IStoreObject<?> storeObject, IField field);
+  void intoStoreObject(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler);
 
   /**
    * fetch the content from the {@link IStoreObject} and store it inside the mapper
@@ -57,7 +61,9 @@ public interface IPropertyMapper {
    *          the instance of {@link IStoreObject}, where the content shall be fetched from
    * @param field
    *          the {@link IField} to be handled
+   * @param handler
+   *          the handler to be called
    */
-  void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field);
+  void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler);
 
 }

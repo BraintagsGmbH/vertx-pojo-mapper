@@ -16,6 +16,9 @@
 
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
 import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
@@ -49,7 +52,7 @@ public class DefaultReferencedMapper implements IReferencedMapper {
    * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void intoStoreObject(Object entity, IStoreObject<?> storeObject, IField field) {
+  public void intoStoreObject(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler) {
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object javaValue = pAcc.readData(entity);
     if (javaValue == null)
@@ -105,7 +108,7 @@ public class DefaultReferencedMapper implements IReferencedMapper {
    * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field) {
+  public void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler) {
     if (field.isMap()) {
       readMap(storeObject, field);
     } else if (field.isArray()) {

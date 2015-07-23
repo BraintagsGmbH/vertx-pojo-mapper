@@ -16,13 +16,15 @@
 
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
-import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 
 /**
  * 
@@ -40,36 +42,61 @@ public class DefaultPropertyMapper implements IPropertyMapper {
   }
 
   @Override
-  public void intoStoreObject(Object mapper, IStoreObject<?> storeObject, IField field) {
+  public void intoStoreObject(Object mapper, IStoreObject<?> storeObject, IField field,
+      Handler<AsyncResult<Void>> handler) {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object javaValue = pAcc.readData(mapper);
-    DefaultTypeHandlerResult result = new DefaultTypeHandlerResult();
 
-    th.intoStore(javaValue, field, result);
-    result.validate();
-    Object dbValue = result.getResult();
-    if (javaValue != null && dbValue == null)
-      throw new TypeHandlerException(String.format("Value conversion failed: original = %s, conversion = NULL",
-          String.valueOf(javaValue)));
-    if (dbValue != null)
-      storeObject.put(field, dbValue);
+    th.intoStore(
+        javaValue,
+        field,
+        result -> {
+          if (result.failed()) {
+            handler.handle(Future.failedFuture(result.cause()));
+          } else {
+            Object dbValue = result.result().getResult();
+            if (javaValue != null && dbValue == null) {
+              Future<Void> future = Future.failedFuture(new TypeHandlerException(String.format(
+                  "Value conversion failed: original = %s, conversion = NULL", String.valueOf(javaValue))));
+              handler.handle(future);
+              return;
+            }
+            if (dbValue != null)
+              storeObject.put(field, dbValue);
+            handler.handle(Future.succeededFuture());
+          }
+          return;
+        });
   }
 
   @Override
-  public void fromStoreObject(Object mapper, IStoreObject<?> storeObject, IField field) {
+  public void fromStoreObject(Object mapper, IStoreObject<?> storeObject, IField field,
+      Handler<AsyncResult<Void>> handler) {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object dbValue = storeObject.get(field);
-    DefaultTypeHandlerResult result = new DefaultTypeHandlerResult();
-    th.fromStore(dbValue, field, null, result);
-    result.validate();
-    Object javaValue = result.getResult();
-    if (javaValue == null && dbValue != null)
-      throw new TypeHandlerException(String.format("Value conversion failed: original = %s, conversion = NULL",
-          String.valueOf(dbValue)));
-    if (javaValue != null)
-      pAcc.writeData(mapper, javaValue);
-  }
 
+    th.fromStore(
+        dbValue,
+        field,
+        null,
+        result -> {
+          if (result.failed()) {
+            handler.handle(Future.failedFuture(result.cause()));
+          } else {
+            Object javaValue = result.result().getResult();
+            if (javaValue == null && dbValue != null) {
+              Future<Void> future = Future.failedFuture(new TypeHandlerException(String.format(
+                  "Value conversion failed: original = %s, conversion = NULL", String.valueOf(dbValue))));
+              handler.handle(future);
+              return;
+            }
+            if (javaValue != null)
+              pAcc.writeData(mapper, javaValue);
+            handler.handle(Future.succeededFuture());
+          }
+          return;
+        });
+  }
 }

@@ -63,8 +63,7 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
   private void save(T entity, Handler<AsyncResult<IWriteResult>> resultHandler) {
     executePreSave(entity);
     MongoStoreObject storeObject = new MongoStoreObject(getMapper(), entity);
-    doSave(storeObject, resultHandler);
-    executePostSave(entity);
+    doSave(entity, storeObject, resultHandler);
   }
 
   /**
@@ -74,7 +73,7 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
    *          the entity to be handled
    */
   private void executePreSave(T entity) {
-    getMapper().executeLifecycle(AfterSave.class, entity);
+    getMapper().executeLifecycle(BeforeSave.class, entity);
   }
 
   /**
@@ -84,7 +83,7 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
    *          the entity to be handled
    */
   private void executePostSave(T entity) {
-    getMapper().executeLifecycle(BeforeSave.class, entity);
+    getMapper().executeLifecycle(AfterSave.class, entity);
   }
 
   /**
@@ -93,7 +92,7 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
    * @param storeObject
    * @param resultHandler
    */
-  private void doSave(MongoStoreObject storeObject, Handler<AsyncResult<IWriteResult>> resultHandler) {
+  private void doSave(T entity, MongoStoreObject storeObject, Handler<AsyncResult<IWriteResult>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
     IMapper mapper = getMapper();
     String column = mapper.getDataStoreName();
@@ -108,6 +107,7 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
         String id = result.result();
         if (id == null)
           id = currentId;
+        executePostSave(entity);
         Future<IWriteResult> future = Future.succeededFuture(new WriteResult(storeObject, id));
         resultHandler.handle(future);
       }

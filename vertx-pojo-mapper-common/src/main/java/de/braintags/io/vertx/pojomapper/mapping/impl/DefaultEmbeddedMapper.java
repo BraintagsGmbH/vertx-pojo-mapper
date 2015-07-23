@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
@@ -42,7 +44,7 @@ public class DefaultEmbeddedMapper implements IEmbeddedMapper {
    * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void intoStoreObject(Object mapper, IStoreObject storeObject, IField field) {
+  public void intoStoreObject(Object mapper, IStoreObject storeObject, IField field, Handler<AsyncResult<Void>> handler) {
     throw new UnsupportedOperationException();
   }
 
@@ -53,7 +55,7 @@ public class DefaultEmbeddedMapper implements IEmbeddedMapper {
    * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void fromStoreObject(Object mapper, IStoreObject storeObject, IField field) {
+  public void fromStoreObject(Object mapper, IStoreObject storeObject, IField field, Handler<AsyncResult<Void>> handler) {
     throw new UnsupportedOperationException();
   }
 

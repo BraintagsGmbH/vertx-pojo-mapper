@@ -56,7 +56,7 @@ public class MongoStoreObject extends JsonStoreObject {
     Object o = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
     for (String fieldName : getMapper().getFieldNames()) {
       IField field = getMapper().getField(fieldName);
-      field.getPropertyMapper().fromStoreObject(o, this, field);
+      field.getPropertyMapper().fromStoreObject(o, this, field, null);
     }
     entity = o;
   }
@@ -64,7 +64,7 @@ public class MongoStoreObject extends JsonStoreObject {
   private void initFromEntity(Object entity, IMapper mapper) {
     for (String fieldName : mapper.getFieldNames()) {
       IField field = mapper.getField(fieldName);
-      field.getPropertyMapper().intoStoreObject(entity, this, field);
+      field.getPropertyMapper().intoStoreObject(entity, this, field, null);
     }
   }
 
