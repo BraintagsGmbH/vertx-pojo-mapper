@@ -118,7 +118,7 @@ public class MongoQueryResult<T> extends AbstractCollectionAsync<T> implements I
 
   @Override
   public IteratorAsync<T> iterator() {
-    return null;
+    return new QueryResultIterator();
   }
 
   class QueryResultIterator implements IteratorAsync<T> {
