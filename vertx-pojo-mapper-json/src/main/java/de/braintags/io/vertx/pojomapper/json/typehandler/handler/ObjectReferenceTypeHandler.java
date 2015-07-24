@@ -73,7 +73,13 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
               resultHandler);
           return;
         }
-        success(result.result().iterator().next(), resultHandler);
+        result.result().iterator().next(iResult -> {
+          if (iResult.failed()) {
+            fail(iResult.cause(), resultHandler);
+          } else
+            success(iResult.result(), resultHandler);
+          return;
+        });
       }
       return;
     });

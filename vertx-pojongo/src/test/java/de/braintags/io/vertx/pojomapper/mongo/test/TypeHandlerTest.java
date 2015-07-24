@@ -77,9 +77,14 @@ public class TypeHandlerTest extends MongoBaseTest {
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
 
-    TypehandlerTestMapper foundSm = (TypehandlerTestMapper) resultContainer.queryResult.iterator().next();
-    assertTrue(sm.equals(foundSm));
-    logger.info("finished!");
+    resultContainer.queryResult.iterator().next(result -> {
+      if (result.failed()) {
+        result.cause().printStackTrace();
+      } else {
+        assertTrue(sm.equals(result.result()));
+        logger.info("finished!");
+      }
+    });
   }
 
   /* ****************************************************
@@ -120,8 +125,15 @@ public class TypeHandlerTest extends MongoBaseTest {
     IQueryResult<TypehandlerTestMapper> qr = qResult.result();
     assertNotNull(qr);
     assertTrue(qr.iterator().hasNext());
-    TypehandlerTestMapper mapper = qr.iterator().next();
-    assertNotNull(mapper);
+
+    qr.iterator().next(result -> {
+      if (result.failed()) {
+        result.cause().printStackTrace();
+      } else {
+        assertNotNull(result.result());
+      }
+    });
+
   }
 
   private ResultContainer saveRecord(TypehandlerTestMapper sm) {

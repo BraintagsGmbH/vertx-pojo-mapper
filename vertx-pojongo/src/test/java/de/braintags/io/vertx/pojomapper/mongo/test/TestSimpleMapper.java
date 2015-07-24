@@ -92,16 +92,31 @@ public class TestSimpleMapper extends MongoBaseTest {
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
 
-    SimpleMapper foundSm = (SimpleMapper) resultContainer.queryResult.iterator().next();
-    assertTrue(sm.equals(foundSm));
+    resultContainer.queryResult.iterator().next(result -> {
+      if (result.failed()) {
+        logger.error("", result.cause());
+        fail(result.cause().toString());
+      } else {
+        assertTrue(sm.equals(result.result()));
 
-    // search inside name field
-    query.field("name").is("testNameModified");
-    resultContainer = find(query, 1);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-    foundSm = (SimpleMapper) resultContainer.queryResult.iterator().next();
-    assertTrue(sm.equals(foundSm));
+        // search inside name field
+        query.field("name").is("testNameModified");
+        ResultContainer resultContainer2 = find(query, 1);
+        if (resultContainer2.assertionError != null)
+          throw resultContainer2.assertionError;
+
+        resultContainer2.queryResult.iterator().next(res2 -> {
+          if (res2.failed()) {
+            logger.error("", result.cause());
+            fail(result.cause().toString());
+          } else {
+            assertTrue(sm.equals(result.result()));
+          }
+
+        });
+
+      }
+    });
 
   }
 
@@ -269,12 +284,27 @@ public class TestSimpleMapper extends MongoBaseTest {
   }
 
   private void checkQueryResult(AsyncResult<IQueryResult<SimpleMapper>> qResult) {
+    CountDownLatch latch = new CountDownLatch(1);
     assertTrue(resultFine(qResult));
     IQueryResult<SimpleMapper> qr = qResult.result();
     assertNotNull(qr);
     assertTrue(qr.iterator().hasNext());
-    SimpleMapper mapper = qr.iterator().next();
-    assertNotNull(mapper);
+    qr.iterator().next(result -> {
+      try {
+        if (result.failed()) {
+          result.cause().printStackTrace();
+        } else {
+          assertNotNull(result.result());
+        }
+      } finally {
+        latch.countDown();
+      }
+    });
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
 
   private ResultContainer saveRecord(SimpleMapper sm) {
