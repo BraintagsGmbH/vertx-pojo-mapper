@@ -113,6 +113,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
    * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IRamblerSource#applyTo(de.braintags.io.vertx.pojomapper.
    * dataaccess.query.impl.IQueryRambler)
    */
+  @SuppressWarnings("unchecked")
   @Override
   public void applyTo(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     rambler.start(this);
@@ -121,6 +122,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
       if (filter instanceof IRamblerSource) {
         ((IRamblerSource) filter).applyTo(rambler, result -> {
           if (result.failed()) {
+            error.setThrowable(result.cause());
             resultHandler.handle(result);
           } else {
             // nothing to do here
@@ -137,6 +139,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
       }
     }
     rambler.stop(this);
+    resultHandler.handle(Future.succeededFuture());
   }
 
   /*

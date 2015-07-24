@@ -16,6 +16,9 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 
 import java.util.AbstractCollection;
@@ -80,10 +83,17 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
   }
 
   @SuppressWarnings("unchecked")
-  private void generatePojo(int i) {
+  private void generatePojo(int i, Handler<AsyncResult<Void>> handler) {
     JsonObject sourceObject = jsonResult.get(i);
     MongoStoreObject storeObject = new MongoStoreObject(sourceObject, getMapper());
-    pojoResult[i] = (T) storeObject.getEntity();
+    storeObject.initToEntity(result -> {
+      if (result.failed()) {
+        handler.handle(result);
+      } else {
+        pojoResult[i] = (T) storeObject.getEntity();
+        handler.handle(Future.succeededFuture());
+      }
+    });
   }
 
   class QueryResultIterator implements Iterator<T> {

@@ -50,7 +50,8 @@ public class MongoStoreObject extends JsonStoreObject {
 
   public Object getEntity() {
     if (entity == null) {
-      throw new NullPointerException("Call method initToEntity first ");
+      throw new NullPointerException(
+          "Internal Entity is not initialized; call method MongoStoreObject.initToEntity first ");
     }
     return entity;
   }
