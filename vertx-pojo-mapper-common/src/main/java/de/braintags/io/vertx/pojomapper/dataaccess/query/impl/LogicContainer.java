@@ -40,6 +40,7 @@ import de.braintags.io.vertx.util.ErrorObject;
 
 public class LogicContainer<T extends IQueryContainer> extends AbstractQueryContainer<IQueryContainer> implements
     ILogicContainer<T>, IRamblerSource {
+  @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(LogicContainer.class);
   private List<Object> filters = new ArrayList<Object>();
   // private T parent;
@@ -113,11 +114,10 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
    * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IRamblerSource#applyTo(de.braintags.io.vertx.pojomapper.
    * dataaccess.query.impl.IQueryRambler)
    */
-  @SuppressWarnings("unchecked")
   @Override
   public void applyTo(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     rambler.start(this);
-    ErrorObject error = new ErrorObject();
+    ErrorObject<Void> error = new ErrorObject<Void>();
     for (Object filter : filters) {
       if (filter instanceof IRamblerSource) {
         ((IRamblerSource) filter).applyTo(rambler, result -> {
@@ -129,7 +129,6 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
           }
         });
         if (error.isError()) {
-          resultHandler.handle((AsyncResult<Void>) error.toFuture());
           return;
         }
       } else {

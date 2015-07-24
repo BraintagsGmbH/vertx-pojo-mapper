@@ -16,20 +16,19 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
-import java.util.Collection;
-
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.util.CollectionAsync;
 
 /**
- * The result of an executed {@link IQuery}. Acts as an unmodifyable {@link Collection}, so that implementations can
- * decide to perform a lazy load of found results
+ * The result of an executed {@link IQuery}. Acts as an unmodifyable {@link CollectionAsync}, so that implementations
+ * can decide to perform a lazy load of found results
  * 
  * @author Michael Remme
  * 
  */
 
-public interface IQueryResult<T> extends Collection<T> {
+public interface IQueryResult<E> extends CollectionAsync<E> {
 
   /**
    * Get the {@link IDataStore} by which the current instance was created

@@ -61,21 +61,20 @@ public class MongoStoreObject extends JsonStoreObject {
    * 
    * @param handler
    */
-  @SuppressWarnings("unchecked")
   public void initToEntity(Handler<AsyncResult<Void>> handler) {
     Object o = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
-    ErrorObject error = new ErrorObject();
+    ErrorObject<Void> error = new ErrorObject<Void>();
     for (String fieldName : getMapper().getFieldNames()) {
       IField field = getMapper().getField(fieldName);
       field.getPropertyMapper().fromStoreObject(o, this, field, result -> {
         if (result.failed()) {
-          error.setError(result.cause());
+          error.setThrowable(result.cause());
+          handler.handle(result);
         } else {
 
         }
       });
       if (error.isError()) {
-        handler.handle((AsyncResult<Void>) error.toFuture());
         return;
       }
     }
@@ -88,21 +87,20 @@ public class MongoStoreObject extends JsonStoreObject {
    * 
    * @param handler
    */
-  @SuppressWarnings("unchecked")
   public void initFromEntity(Handler<AsyncResult<Void>> handler) {
-    ErrorObject error = new ErrorObject();
+    ErrorObject<Void> error = new ErrorObject<Void>();
     IMapper mapper = getMapper();
     for (String fieldName : mapper.getFieldNames()) {
       IField field = mapper.getField(fieldName);
       field.getPropertyMapper().intoStoreObject(entity, this, field, result -> {
         if (result.failed()) {
-          error.setError(result.cause());
+          error.setThrowable(result.cause());
+          handler.handle(result);
         } else {
 
         }
       });
       if (error.isError()) {
-        handler.handle((AsyncResult<Void>) error.toFuture());
         return;
       }
     }

@@ -81,7 +81,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   public void executeQueryRambler(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     rambler.start(this);
-    ErrorObject error = new ErrorObject();
+    ErrorObject<Void> error = new ErrorObject<Void>();
     for (Object filter : filters) {
       if (filter instanceof IRamblerSource) {
         ((IRamblerSource) filter).applyTo(rambler, result -> {
@@ -93,7 +93,6 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
           }
         });
         if (error.isError()) {
-          resultHandler.handle((AsyncResult<Void>) error.toFuture());
           return;
         }
 

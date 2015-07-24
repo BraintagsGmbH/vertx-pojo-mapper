@@ -21,8 +21,6 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 
-import java.util.AbstractCollection;
-import java.util.Iterator;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
@@ -30,6 +28,8 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
+import de.braintags.io.vertx.util.AbstractCollectionAsync;
+import de.braintags.io.vertx.util.IteratorAsync;
 
 /**
  * 
@@ -38,7 +38,7 @@ import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
  * 
  */
 
-public class MongoQueryResult<T> extends AbstractCollection<T> implements IQueryResult<T> {
+public class MongoQueryResult<T> extends AbstractCollectionAsync<T> implements IQueryResult<T> {
   private MongoDataStore store;
   private MongoMapper mapper;
   private JsonObject originalQuery;
@@ -65,17 +65,7 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
   /*
    * (non-Javadoc)
    * 
-   * @see java.util.AbstractCollection#iterator()
-   */
-  @Override
-  public Iterator<T> iterator() {
-    return new QueryResultIterator();
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.util.AbstractCollection#size()
+   * @see de.braintags.io.vertx.util.CollectionAsync#size()
    */
   @Override
   public int size() {
@@ -94,34 +84,6 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
         handler.handle(Future.succeededFuture());
       }
     });
-  }
-
-  class QueryResultIterator implements Iterator<T> {
-    private int currentIndex = 0;
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.util.Iterator#hasNext()
-     */
-    @Override
-    public boolean hasNext() {
-      return currentIndex < pojoResult.length;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.util.Iterator#next()
-     */
-    @Override
-    public T next() {
-      if (pojoResult[currentIndex] == null) {
-        generatePojo(currentIndex);
-      }
-      return pojoResult[currentIndex++];
-    }
-
   }
 
   /*
@@ -153,4 +115,35 @@ public class MongoQueryResult<T> extends AbstractCollection<T> implements IQuery
   public Object getOriginalQuery() {
     return originalQuery;
   }
+
+  @Override
+  public IteratorAsync<T> iterator() {
+    return null;
+  }
+
+  class QueryResultIterator implements IteratorAsync<T> {
+    private int currentIndex = 0;
+
+    @Override
+    public boolean hasNext() {
+      return currentIndex < pojoResult.length;
+    }
+
+    @Override
+    public void next(Handler<AsyncResult<T>> handler) {
+      if (pojoResult[currentIndex] == null) {
+        generatePojo(currentIndex, result -> {
+          if (result.failed()) {
+            handler.handle(Future.failedFuture(result.cause()));
+          } else {
+            handler.handle(Future.succeededFuture(pojoResult[currentIndex++]));
+          }
+        });
+      } else {
+        handler.handle(Future.succeededFuture(pojoResult[currentIndex++]));
+      }
+    }
+
+  }
+
 }

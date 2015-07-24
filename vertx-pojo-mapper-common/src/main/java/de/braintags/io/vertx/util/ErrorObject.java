@@ -16,7 +16,9 @@
 
 package de.braintags.io.vertx.util;
 
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * A simple instance to transfer error information in an event queue
@@ -25,8 +27,7 @@ import io.vertx.core.Future;
  * 
  */
 
-public class ErrorObject {
-  private boolean error = false;
+public class ErrorObject<E> {
   private Throwable throwable;
 
   /**
@@ -41,17 +42,7 @@ public class ErrorObject {
    * @return the error
    */
   public final boolean isError() {
-    return error;
-  }
-
-  /**
-   * did an error occur?
-   * 
-   * @param error
-   *          the error to set
-   */
-  public final void setError(boolean error) {
-    this.error = error;
+    return throwable != null;
   }
 
   /**
@@ -83,24 +74,27 @@ public class ErrorObject {
   }
 
   /**
-   * Set the error flag to true and add the Throwable
-   * 
-   * @param throwable
-   *          the Throwable
-   */
-  public void setError(Throwable throwable) {
-    this.error = true;
-    this.throwable = throwable;
-  }
-
-  /**
    * Creates a failed future with the contained Throwable
    * 
    * @return the {@link Future}
    */
-  public Future<?> toFuture() {
+  public Future<E> toFuture() {
     if (throwable == null)
       throw new NullPointerException("Throwable is null");
     return Future.failedFuture(throwable);
   }
+
+  /**
+   * If an error occured or a result exists, the handler will be called with a succeedded or error {@link Future}
+   * 
+   * @param handler
+   */
+  public boolean handleResult(Handler<AsyncResult<E>> handler) {
+    if (isError()) {
+      handler.handle(toFuture());
+      return true;
+    }
+    return false;
+  }
+
 }
