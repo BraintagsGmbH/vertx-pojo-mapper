@@ -14,42 +14,57 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper;
+package de.braintags.io.vertx.pojomapper.mongo.test;
 
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
 import java.util.Arrays;
 
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.LoggerQueryRamber;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.LogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
-import de.braintags.io.vertx.pojomapper.impl.DummyDataStore;
-import de.braintags.io.vertx.pojomapper.mapper.Person;
+import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoQueryRambler;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.Person;
 
-public class TestQuery {
-  private static Logger logger = LoggerFactory.getLogger(TestQuery.class);
-  private static IDataStore dataStore = new DummyDataStore();
+/**
+ * 
+ *
+ * @author Michael Remme
+ * 
+ */
 
-  @Before
-  public void setUp() throws Exception {
-    LoggerFactory.initialise();
+public class TestMongoQueryRambler extends MongoBaseTest {
+  private static Logger logger = LoggerFactory.getLogger(TestMongoQueryRambler.class);
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    System.setProperty("connection_string", "mongodb://localhost:27017");
+    System.setProperty("db_name", "PojongoTestDatabase");
+    MongoBaseTest.startMongo();
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    MongoBaseTest.stopMongo();
   }
 
   @Test
-  public void test() {
-    Query<Person> query = (Query<Person>) dataStore.createQuery(Person.class);
+  public void testRambler() {
+    IDataStore store = getDataStore();
+    Query<Person> query = (Query<Person>) store.createQuery(Person.class);
     IFieldParameter<Query<Person>> fp = query.field("name");
     query = fp.is("peter").field("secName").in(Arrays.asList("eins", "zwei"));
     IFieldParameter<LogicContainer<Query<Person>>> fplc = query.and("weight");
     LogicContainer<Query<Person>> lc = fplc.is(15);
     query = lc.parent();
     logger.info("--- start Rambler");
-    LoggerQueryRamber rambler = new LoggerQueryRamber();
+    MongoQueryRambler rambler = new MongoQueryRambler();
 
     final Query<Person> exQuery = query;
     exQuery.executeQueryRambler(rambler, result -> {
@@ -64,8 +79,11 @@ public class TestQuery {
             logger.info(fm.getValue());
           }
         }
+
+        logger.info(rambler.getJsonObject());
       }
     });
 
   }
+
 }

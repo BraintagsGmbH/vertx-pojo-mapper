@@ -16,35 +16,33 @@
 
 package de.braintags.io.vertx.pojomapper.exception;
 
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
-
 /**
- * Exception is thrown when an error in the use of {@link ITypeHandler} was detected
+ * 
  * 
  * @author Michael Remme
  * 
  */
 
 @SuppressWarnings("serial")
-public class TypeHandlerException extends RuntimeException {
+public class QueryParameterException extends RuntimeException {
 
   /**
    * 
    */
-  public TypeHandlerException() {
+  public QueryParameterException() {
   }
 
   /**
    * @param message
    */
-  public TypeHandlerException(String message) {
+  public QueryParameterException(String message) {
     super(message);
   }
 
   /**
    * @param cause
    */
-  public TypeHandlerException(Throwable cause) {
+  public QueryParameterException(Throwable cause) {
     super(cause);
   }
 
@@ -52,7 +50,7 @@ public class TypeHandlerException extends RuntimeException {
    * @param message
    * @param cause
    */
-  public TypeHandlerException(String message, Throwable cause) {
+  public QueryParameterException(String message, Throwable cause) {
     super(message, cause);
   }
 
@@ -62,7 +60,7 @@ public class TypeHandlerException extends RuntimeException {
    * @param enableSuppression
    * @param writableStackTrace
    */
-  public TypeHandlerException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+  public QueryParameterException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 

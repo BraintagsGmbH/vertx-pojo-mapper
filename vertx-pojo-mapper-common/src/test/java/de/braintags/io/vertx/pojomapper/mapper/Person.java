@@ -43,11 +43,13 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 @Entity(name = "PersonColumn")
 @Indexes(@Index(fields = { @IndexField(fieldName = "name"), @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
 public class Person extends AbstractPerson {
-  public static final int NUMBER_OF_PROPERTIES = 14;
+  public static final int NUMBER_OF_PROPERTIES = 15;
 
   @Id
   public String idField;
   private String name;
+
+  public String secName;
 
   @Referenced
   public Animal animal;

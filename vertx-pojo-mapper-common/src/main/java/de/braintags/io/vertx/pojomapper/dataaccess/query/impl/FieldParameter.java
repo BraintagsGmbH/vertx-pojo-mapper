@@ -42,6 +42,8 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   public FieldParameter(T container, IField field) {
     this.container = container;
     this.field = field;
+    if (field == null)
+      throw new NullPointerException("field is undefined");
   }
 
   @Override

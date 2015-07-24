@@ -24,12 +24,15 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
 
 import java.util.ArrayDeque;
+import java.util.Iterator;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler;
+import de.braintags.io.vertx.pojomapper.exception.QueryParameterException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.util.ErrorObject;
 
 /**
  * Implementation fills the contents into a {@link JsonObject} which then can be used as source for
@@ -116,6 +119,62 @@ public class MongoQueryRambler implements IQueryRambler {
    */
   @Override
   public void start(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
+
+    switch (fieldParameter.getOperator()) {
+    case IN:
+    case NOT_IN:
+      handleMultipleValues(fieldParameter, resultHandler);
+      break;
+
+    default:
+      handleSingleValue(fieldParameter, resultHandler);
+    }
+  }
+
+  /**
+   * Create the argument for query parts, which define one single argument
+   * 
+   * @param fieldParameter
+   * @param resultHandler
+   */
+  private void handleMultipleValues(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
+    IField field = fieldParameter.getField();
+    String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
+    Object valueIterable = fieldParameter.getValue();
+    if (!(valueIterable instanceof Iterable)) {
+      resultHandler.handle(Future.failedFuture(new QueryParameterException(
+          "multivalued argument but not an instance of Iterable")));
+      return;
+    }
+    Iterator<?> values = ((Iterable<?>) valueIterable).iterator();
+    ErrorObject<Void> errorObject = new ErrorObject<Void>();
+    JsonArray resultArray = new JsonArray();
+
+    while (values.hasNext()) {
+      Object value = values.next();
+      field.getTypeHandler().intoStore(value, field, result -> {
+        if (result.failed()) {
+          errorObject.setThrowable(result.cause());
+        } else {
+          resultArray.add(result.result().getResult());
+        }
+      });
+    }
+    if (errorObject.handleResult(resultHandler))
+      return;
+    JsonObject arg = new JsonObject().put(mongoOperator, resultArray);
+    add(field.getMappedFieldName(), arg);
+    resultHandler.handle(Future.succeededFuture());
+
+  }
+
+  /**
+   * Create the argument for query parts, which define one single argument
+   * 
+   * @param fieldParameter
+   * @param resultHandler
+   */
+  private void handleSingleValue(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
     IField field = fieldParameter.getField();
     String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
     Object value = fieldParameter.getValue();

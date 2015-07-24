@@ -275,7 +275,10 @@ public class Mapper implements IMapper {
    */
   @Override
   public IField getField(String name) {
-    return mappedFields.get(name);
+    IField field = mappedFields.get(name);
+    if (field == null)
+      throw new MappingException(String.format("Field '%s' does not exist in %s", name, getMapperClass().getName()));
+    return field;
   }
 
   /*

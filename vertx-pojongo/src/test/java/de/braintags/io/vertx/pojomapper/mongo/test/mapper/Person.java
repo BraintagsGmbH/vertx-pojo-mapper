@@ -19,11 +19,6 @@ package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 import java.util.Collection;
 import java.util.Map;
 
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.Index;
-import de.braintags.io.vertx.pojomapper.annotation.IndexField;
-import de.braintags.io.vertx.pojomapper.annotation.IndexOptions;
-import de.braintags.io.vertx.pojomapper.annotation.Indexes;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
@@ -37,12 +32,11 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
  * 
  */
 
-@Entity(name = "PersonColumn")
-@Indexes(@Index(fields = { @IndexField(fieldName = "name"), @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
 public class Person extends AbstractPerson {
   @Id
   public String idField;
   private String name;
+  public String secName;
 
   @Referenced
   public Animal animal;
