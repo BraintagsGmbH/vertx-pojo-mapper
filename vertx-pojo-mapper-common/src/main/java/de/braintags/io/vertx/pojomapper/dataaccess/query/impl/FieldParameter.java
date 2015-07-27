@@ -17,6 +17,7 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
@@ -151,6 +152,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
         resultHandler.handle(result);
       } else {
         rambler.stop(this);
+        resultHandler.handle(Future.succeededFuture());
       }
     });
   }

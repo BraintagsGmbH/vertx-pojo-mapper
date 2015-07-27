@@ -127,7 +127,10 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
             error.setThrowable(result.cause());
             resultHandler.handle(result);
           } else {
-            // nothing to do here
+            if (co.reduce()) { // last element in the list
+              rambler.stop(this);
+              resultHandler.handle(Future.succeededFuture());
+            }
           }
         });
         if (error.isError()) {
@@ -139,8 +142,6 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
         return;
       }
     }
-    rambler.stop(this);
-    resultHandler.handle(Future.succeededFuture());
   }
 
   /*

@@ -16,32 +16,33 @@
 
 package de.braintags.io.vertx.util;
 
+import java.util.Collection;
+
 /**
- * A helper to count loops inside an asynchron call
+ * Helper class to calculate size
  * 
  * @author Michael Remme
  * 
  */
 
-public class CounterObject extends Object {
-  private int count;
+public class Size {
 
   /**
+   * Get the size of an {@link Iterable}
    * 
+   * @param data
+   * @return
    */
-  public CounterObject(int count) {
-    this.count = count;
-    if (count == 0)
-      throw new UnsupportedOperationException("handle zero elements");
+  public static int size(Iterable<?> data) {
+    if (data instanceof Collection) {
+      return ((Collection<?>) data).size();
+    }
+
+    int counter = 0;
+    for (Object i : data) {
+      counter++;
+    }
+    return counter;
   }
 
-  /**
-   * Reduces the counter by 1 and returns true, if the counter reached 0
-   * 
-   * @return true, if zero
-   */
-  public boolean reduce() {
-    --count;
-    return count == 0;
-  }
 }

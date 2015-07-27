@@ -32,6 +32,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
@@ -81,12 +82,15 @@ public class TestSimpleMapper extends MongoBaseTest {
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
     IWriteEntry we = resultContainer.writeResult.iterator().next();
+    assertEquals(we.getAction(), WriteAction.INSERT);
     sm.id = (String) we.getId();
     sm.name = "testNameModified";
     sm.setSecondProperty("my modified property");
     resultContainer = saveRecord(sm);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
+    we = resultContainer.writeResult.iterator().next();
+    assertEquals(we.getAction(), WriteAction.UPDATE);
 
     // SimpleQuery for all records
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);

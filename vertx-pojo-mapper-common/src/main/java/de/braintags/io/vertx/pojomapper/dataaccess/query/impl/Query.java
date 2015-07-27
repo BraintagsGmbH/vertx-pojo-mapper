@@ -30,6 +30,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
+import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 
 /**
@@ -81,6 +82,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   public void executeQueryRambler(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     rambler.start(this);
+    CounterObject co = new CounterObject(filters.size());
     ErrorObject<Void> error = new ErrorObject<Void>();
     for (Object filter : filters) {
       if (filter instanceof IRamblerSource) {
@@ -89,7 +91,10 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
             error.setThrowable(result.cause());
             resultHandler.handle(result);
           } else {
-            // nothing to do here
+            if (co.reduce()) { // last element in the list
+              rambler.stop(this);
+              resultHandler.handle(Future.succeededFuture());
+            }
           }
         });
         if (error.isError()) {
@@ -102,8 +107,6 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
         return;
       }
     }
-    rambler.stop(this);
-    resultHandler.handle(Future.succeededFuture());
   }
 
   /*

@@ -73,6 +73,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
   @Override
   public void toArray(Handler<AsyncResult<Object[]>> handler) {
     List<Object> list = new ArrayList<Object>();
+    CounterObject co = new CounterObject(size());
     IteratorAsync<E> it = iterator();
     ResultObject<Object[]> ro = new ResultObject<Object[]>();
     while (it.hasNext()) {
@@ -81,6 +82,10 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
           ro.setThrowable(result.cause());
         } else {
           list.add(result.result());
+          if (co.reduce()) {
+            ro.setResult(list.toArray());
+            ro.handleResult(handler);
+          }
         }
       });
       if (ro.isError()) {
@@ -88,8 +93,6 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
         return;
       }
     }
-    ro.setResult(list.toArray());
-    ro.handleResult(handler);
   }
 
   /*

@@ -32,7 +32,9 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.exception.QueryParameterException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
+import de.braintags.io.vertx.util.Size;
 
 /**
  * Implementation fills the contents into a {@link JsonObject} which then can be used as source for
@@ -146,6 +148,7 @@ public class MongoQueryRambler implements IQueryRambler {
           "multivalued argument but not an instance of Iterable")));
       return;
     }
+    CounterObject co = new CounterObject(Size.size((Iterable<?>) valueIterable));
     Iterator<?> values = ((Iterable<?>) valueIterable).iterator();
     ErrorObject<Void> errorObject = new ErrorObject<Void>();
     JsonArray resultArray = new JsonArray();
@@ -157,14 +160,16 @@ public class MongoQueryRambler implements IQueryRambler {
           errorObject.setThrowable(result.cause());
         } else {
           resultArray.add(result.result().getResult());
+          if (co.reduce()) {
+            JsonObject arg = new JsonObject().put(mongoOperator, resultArray);
+            add(field.getMappedFieldName(), arg);
+            resultHandler.handle(Future.succeededFuture());
+          }
         }
       });
     }
     if (errorObject.handleError(resultHandler))
       return;
-    JsonObject arg = new JsonObject().put(mongoOperator, resultArray);
-    add(field.getMappedFieldName(), arg);
-    resultHandler.handle(Future.succeededFuture());
 
   }
 

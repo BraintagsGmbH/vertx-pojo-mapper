@@ -23,6 +23,7 @@ import io.vertx.core.json.JsonObject;
 import de.braintags.io.vertx.pojomapper.json.dataaccess.JsonStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 
 /**
@@ -64,6 +65,7 @@ public class MongoStoreObject extends JsonStoreObject {
   public void initToEntity(Handler<AsyncResult<Void>> handler) {
     Object o = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
     ErrorObject<Void> error = new ErrorObject<Void>();
+    CounterObject co = new CounterObject(getMapper().getFieldNames().size());
     for (String fieldName : getMapper().getFieldNames()) {
       IField field = getMapper().getField(fieldName);
       field.getPropertyMapper().fromStoreObject(o, this, field, result -> {
@@ -71,15 +73,16 @@ public class MongoStoreObject extends JsonStoreObject {
           error.setThrowable(result.cause());
           handler.handle(result);
         } else {
-
+          if (co.reduce()) {
+            entity = o;
+            handler.handle(Future.succeededFuture());
+          }
         }
       });
       if (error.isError()) {
         return;
       }
     }
-    entity = o;
-    handler.handle(Future.succeededFuture());
   }
 
   /**
@@ -90,6 +93,7 @@ public class MongoStoreObject extends JsonStoreObject {
   public void initFromEntity(Handler<AsyncResult<Void>> handler) {
     ErrorObject<Void> error = new ErrorObject<Void>();
     IMapper mapper = getMapper();
+    CounterObject co = new CounterObject(mapper.getFieldNames().size());
     for (String fieldName : mapper.getFieldNames()) {
       IField field = mapper.getField(fieldName);
       field.getPropertyMapper().intoStoreObject(entity, this, field, result -> {
@@ -97,14 +101,14 @@ public class MongoStoreObject extends JsonStoreObject {
           error.setThrowable(result.cause());
           handler.handle(result);
         } else {
-
+          if (co.reduce())
+            handler.handle(Future.succeededFuture());
         }
       });
       if (error.isError()) {
         return;
       }
     }
-    handler.handle(Future.succeededFuture());
   }
 
 }
