@@ -29,6 +29,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
+import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 
 /**
@@ -118,6 +119,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   public void applyTo(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     rambler.start(this);
     ErrorObject<Void> error = new ErrorObject<Void>();
+    CounterObject co = new CounterObject(filters.size());
     for (Object filter : filters) {
       if (filter instanceof IRamblerSource) {
         ((IRamblerSource) filter).applyTo(rambler, result -> {

@@ -66,8 +66,7 @@ public class ResultObject<E> extends ErrorObject<E> {
    * @param handler
    */
   public boolean handleResult(Handler<AsyncResult<E>> handler) {
-    if (isError()) {
-      handler.handle(super.toFuture());
+    if (super.handleError(handler)) {
       return true;
     } else if (isResultDefined()) {
       handler.handle(Future.succeededFuture(result));

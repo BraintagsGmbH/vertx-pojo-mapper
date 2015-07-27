@@ -14,22 +14,17 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mongo.test;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+package de.braintags.io.vertx.pojomapper.dataaccess.write;
 
 /**
- * 
+ * When an instance is written, the used action is stored inside {@link IWriteEntry} as info
  * 
  * @author Michael Remme
  * 
  */
 
-@RunWith(Suite.class)
-@SuiteClasses({ TestBaseTest.class, TestMongoMapper.class, TestSimpleInsert.class, TestSimpleMapper.class,
-    TypeHandlerTest.class })
-public class AllTestsPojongo {
-
+public enum WriteAction {
+  INSERT,
+  UPDATE,
+  UNKNOWN;
 }

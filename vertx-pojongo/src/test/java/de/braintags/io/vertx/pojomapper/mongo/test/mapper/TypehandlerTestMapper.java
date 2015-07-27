@@ -17,18 +17,6 @@
 package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
@@ -45,39 +33,39 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 public class TypehandlerTestMapper {
   @Id
   public String id;
-  public String stringField = "myString";
-  public int myInt = 5;
-  public Integer myInteger = new Integer(14);
-  public float myFloat = 5.88f;
-  public Float myFloatOb = new Float(12.5);
-  public boolean myBo = true;
-  public Boolean myBoolean = new Boolean(false);
-  public Date javaDate = new Date(System.currentTimeMillis());
-  public java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
-  public Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-  public Calendar calendar = Calendar.getInstance();
-  public Time time = new Time(System.currentTimeMillis());
-  public short shortvalue = 3;
-  public Short shortObject = new Short((short) 5);
-  public long longvalue = 6666666666666666l;
-  public Long longObject = new Long(88888888888888l);
-  public double doubleValue = 333.5555;
-  public Double doubleObject = new Double(44.9999);
-  public BigDecimal bigDecimal = new BigDecimal(23.44);
-  public BigInteger bigInteger = new BigInteger("99999999");
-  public StringBuffer buffer = new StringBuffer("test string buffer content");
-
-  public char charValue = 'a';
-  public Character character = new Character('c');
-  public byte byteValue = 123;
-  public Byte byteObject = 88;
-  public URI uri;
-  public URL url;
-
-  // complexer objects
-
-  public List arrayList = Arrays.asList("Eins", "Zwei", "drei"); // no subtype defined
-  public List mixedList = Arrays.asList("Eins", "Zwei", 5, "vier", new Long(99994444)); // no subtype defined
+  // public String stringField = "myString";
+  // public int myInt = 5;
+  // public Integer myInteger = new Integer(14);
+  // public float myFloat = 5.88f;
+  // public Float myFloatOb = new Float(12.5);
+  // public boolean myBo = true;
+  // public Boolean myBoolean = new Boolean(false);
+  // public Date javaDate = new Date(System.currentTimeMillis());
+  // public java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+  // public Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+  // public Calendar calendar = Calendar.getInstance();
+  // public Time time = new Time(System.currentTimeMillis());
+  // public short shortvalue = 3;
+  // public Short shortObject = new Short((short) 5);
+  // public long longvalue = 6666666666666666l;
+  // public Long longObject = new Long(88888888888888l);
+  // public double doubleValue = 333.5555;
+  // public Double doubleObject = new Double(44.9999);
+  // public BigDecimal bigDecimal = new BigDecimal(23.44);
+  // public BigInteger bigInteger = new BigInteger("99999999");
+  // public StringBuffer buffer = new StringBuffer("test string buffer content");
+  //
+  // public char charValue = 'a';
+  // public Character character = new Character('c');
+  // public byte byteValue = 123;
+  // public Byte byteObject = 88;
+  // public URI uri;
+  // public URL url;
+  //
+  // // complexer objects
+  //
+  // public List arrayList = Arrays.asList("Eins", "Zwei", "drei"); // no subtype defined
+  // public List mixedList = Arrays.asList("Eins", "Zwei", 5, "vier", new Long(99994444)); // no subtype defined
 
   @Referenced
   public SimpleMapper simpleMapper;
@@ -86,12 +74,12 @@ public class TypehandlerTestMapper {
    * 
    */
   public TypehandlerTestMapper() {
-    try {
-      uri = new URI("https://www.braintags.de/impressum");
-      url = new URL("https://www.braintag.de/rebutton");
-    } catch (URISyntaxException | MalformedURLException e) {
-      throw new MappingException(e);
-    }
+    // try {
+    // uri = new URI("https://www.braintags.de/impressum");
+    // url = new URL("https://www.braintag.de/rebutton");
+    // } catch (URISyntaxException | MalformedURLException e) {
+    // throw new MappingException(e);
+    // }
   }
 
   @Override

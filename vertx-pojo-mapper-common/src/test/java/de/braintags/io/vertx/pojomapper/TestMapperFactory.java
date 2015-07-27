@@ -17,8 +17,11 @@
 package de.braintags.io.vertx.pojomapper;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -161,7 +164,7 @@ public class TestMapperFactory {
     con = mapperField.getConstructor(long.class);
     Assert.assertNotNull(con);
     con = mapperField.getConstructor(Long.class);
-    Assert.assertNull(con);
+    assertNull(con);
 
     mapperField = mapperDef.getField("name");
     con = mapperField.getConstructor();
@@ -178,6 +181,12 @@ public class TestMapperFactory {
     Id ann = (Id) mapperDef.getField("idField").getAnnotation(Id.class);
     if (ann == null)
       Assert.fail("Annotation Id must not be null");
+
+    IField field = mapperDef.getIdField();
+    assertNotNull(field);
+    IField field2 = mapperDef.getField(field.getName());
+    Assert.assertSame(field, field2);
+
   }
 
   @Test
@@ -192,16 +201,16 @@ public class TestMapperFactory {
   public void testGetAnnotatedFields() {
     IField[] fields = mapperDef.getAnnotatedFields(Referenced.class);
     if (fields == null || fields.length != 1)
-      Assert.fail("WrongNumber of annotated fields with Referenced");
+      fail("WrongNumber of annotated fields with Referenced");
   }
 
   @Test
   public void testParametrizedField() {
     IField field = mapperDef.getField("stories");
-    Assert.assertFalse("this should not be a single value", field.isSingleValue());
+    assertFalse("this should not be a single value", field.isSingleValue());
     Assert.assertFalse("this should not be an array", field.isArray());
-    Assert.assertTrue("this should be a Collection", field.isCollection());
-    Assert.assertEquals(1, field.getTypeParameters().size());
+    assertTrue("this should be a Collection", field.isCollection());
+    assertEquals(1, field.getTypeParameters().size());
 
     field = mapperDef.getField("myMap");
     boolean parametrizedField = false;

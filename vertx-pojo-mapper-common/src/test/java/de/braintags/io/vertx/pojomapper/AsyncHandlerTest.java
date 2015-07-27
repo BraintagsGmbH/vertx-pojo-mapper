@@ -27,6 +27,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.braintags.io.vertx.util.CounterObject;
+
 public class AsyncHandlerTest {
   List<String> stringList = new ArrayList<String>();
 
@@ -41,6 +43,7 @@ public class AsyncHandlerTest {
   @Test
   public void test() {
     List<String> secondList = new ArrayList<String>();
+    CounterObject co = new CounterObject(stringList.size());
     int counter = 0;
     for (String string : stringList) {
       handleOneString(counter++, string, result -> {
@@ -48,12 +51,13 @@ public class AsyncHandlerTest {
           result.cause().printStackTrace();
         } else {
           secondList.add(result.result());
+          if (co.reduce())
+            Assert.assertEquals(stringList, secondList);
         }
       });
 
     }
 
-    Assert.assertEquals(stringList, secondList);
   }
 
   void handleOneString(int counter, String string, Handler<AsyncResult<String>> resultHandler) {

@@ -29,9 +29,12 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
+import de.braintags.io.vertx.util.CounterObject;
+import de.braintags.io.vertx.util.ErrorObject;
 
 /**
  * @author Michael Remme
@@ -55,19 +58,37 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
 
   @Override
   public void save(Handler<AsyncResult<IWriteResult>> resultHandler) {
+    ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>();
+    WriteResult rr = new WriteResult();
+    CounterObject counter = new CounterObject(objectsToSave.size());
     for (T entity : objectsToSave) {
-      save(entity, resultHandler);
+      save(entity, rr, result -> {
+        if (result.failed()) {
+          ro.setThrowable(result.cause());
+        } else {
+          if (counter.reduce())
+            resultHandler.handle(Future.succeededFuture(rr));
+        }
+      });
+      if (ro.handleError(resultHandler))
+        return;
     }
   }
 
-  private void save(T entity, Handler<AsyncResult<IWriteResult>> resultHandler) {
+  private void save(T entity, IWriteResult writeResult, Handler<AsyncResult<Void>> resultHandler) {
     executePreSave(entity);
     MongoStoreObject storeObject = new MongoStoreObject(getMapper(), entity);
-    storeObject.initFromEntity(result -> {
-      if (result.failed()) {
-        resultHandler.handle(Future.failedFuture(result.cause()));
+    storeObject.initFromEntity(initResult -> {
+      if (initResult.failed()) {
+        resultHandler.handle(Future.failedFuture(initResult.cause()));
       } else {
-        doSave(entity, storeObject, resultHandler);
+        doSave(entity, storeObject, writeResult, sResult -> {
+          if (sResult.failed()) {
+            resultHandler.handle(Future.failedFuture(sResult.cause()));
+          } else {
+            resultHandler.handle(Future.succeededFuture());
+          }
+        });
       }
     });
   }
@@ -93,12 +114,13 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
   }
 
   /**
-   * execute the action to store the instance in mongo
+   * execute the action to store ONE instance in mongo
    * 
    * @param storeObject
    * @param resultHandler
    */
-  private void doSave(T entity, MongoStoreObject storeObject, Handler<AsyncResult<IWriteResult>> resultHandler) {
+  private void doSave(T entity, MongoStoreObject storeObject, IWriteResult writeResult,
+      Handler<AsyncResult<Void>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
     IMapper mapper = getMapper();
     String column = mapper.getDataStoreName();
@@ -106,15 +128,20 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
 
     mongoClient.save(column, storeObject.getContainer(), result -> {
       if (result.failed()) {
-        Future<IWriteResult> future = Future.failedFuture(result.cause());
+        Future<Void> future = Future.failedFuture(result.cause());
         resultHandler.handle(future);
         return;
       } else {
+        WriteAction action = WriteAction.UNKNOWN;
         String id = result.result();
-        if (id == null)
+        if (id == null) {
           id = currentId;
+          action = WriteAction.UPDATE;
+        } else
+          action = WriteAction.INSERT;
         executePostSave(entity);
-        Future<IWriteResult> future = Future.succeededFuture(new WriteResult(storeObject, id));
+        writeResult.addEntry(storeObject, id, action);
+        Future<Void> future = Future.succeededFuture();
         resultHandler.handle(future);
       }
     });

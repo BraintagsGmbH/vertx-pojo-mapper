@@ -89,7 +89,7 @@ public class ErrorObject<E> {
    * 
    * @param handler
    */
-  public boolean handleResult(Handler<AsyncResult<E>> handler) {
+  public boolean handleError(Handler<AsyncResult<E>> handler) {
     if (isError()) {
       handler.handle(toFuture());
       return true;

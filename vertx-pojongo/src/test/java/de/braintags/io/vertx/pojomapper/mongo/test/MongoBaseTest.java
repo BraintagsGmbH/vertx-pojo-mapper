@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.flapdoodle.embed.mongo.MongodExecutable;
@@ -265,8 +266,10 @@ public abstract class MongoBaseTest extends VertxTestBase {
   public void checkWriteResult(AsyncResult<IWriteResult> result) {
     assertTrue(resultFine(result));
     assertNotNull(result.result());
-    assertNotNull(result.result().getStoreObject());
-    assertNotNull(result.result().getId());
+    IWriteEntry entry = result.result().iterator().next();
+    assertNotNull(entry);
+    assertNotNull(entry.getStoreObject());
+    assertNotNull(entry.getId());
   }
 
   public boolean resultFine(AsyncResult<?> result) {

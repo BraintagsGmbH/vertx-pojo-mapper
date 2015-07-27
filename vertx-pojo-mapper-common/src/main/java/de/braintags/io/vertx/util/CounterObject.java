@@ -14,22 +14,32 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mongo.test;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+package de.braintags.io.vertx.util;
 
 /**
- * 
+ * A helper to count loops inside an asynchron call
  * 
  * @author Michael Remme
  * 
  */
 
-@RunWith(Suite.class)
-@SuiteClasses({ TestBaseTest.class, TestMongoMapper.class, TestSimpleInsert.class, TestSimpleMapper.class,
-    TypeHandlerTest.class })
-public class AllTestsPojongo {
+public class CounterObject extends Object {
+  private int count;
 
+  /**
+   * 
+   */
+  public CounterObject(int count) {
+    this.count = count;
+  }
+
+  /**
+   * Reduces the counter by 1 and returns true, if the counter reached 0
+   * 
+   * @return true, if zero
+   */
+  public boolean reduce() {
+    --count;
+    return count == 0;
+  }
 }

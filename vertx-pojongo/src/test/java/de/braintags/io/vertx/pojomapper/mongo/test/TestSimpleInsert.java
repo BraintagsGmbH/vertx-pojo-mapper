@@ -45,11 +45,13 @@ public class TestSimpleInsert extends MongoBaseTest {
   }
 
   @Test
-  public void test() {
+  public void testInsert() {
     MiniMapper sm = new MiniMapper();
     ResultContainer resultContainer = saveRecord(sm);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
+
+    throw new UnsupportedOperationException("insert 100 ");
   }
 
   private ResultContainer saveRecord(MiniMapper sm) {
@@ -80,7 +82,7 @@ public class TestSimpleInsert extends MongoBaseTest {
 
   class MiniMapper {
     @Id
-    public String id;
+    public String id = null;
     public String name = "testName";
   }
 }

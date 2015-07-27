@@ -16,34 +16,60 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.write.impl;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 
 /**
- * 
+ * Default implementation of {@link IWriteResult}
  * 
  * @author Michael Remme
  * 
  */
 
 public class WriteResult implements IWriteResult {
+  private List<IWriteEntry> resultList = new ArrayList<IWriteEntry>();
 
-  private IStoreObject<?> sto;
-  private String id;
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult#getResult()
+   */
+  @Override
+  public Iterator<IWriteEntry> iterator() {
+    return resultList.iterator();
+  }
 
-  public WriteResult(IStoreObject<?> sto, String id) {
-    this.sto = sto;
-    this.id = id;
+  /**
+   * Add a new entry
+   * 
+   * @param entry
+   *          the entry to be added
+   */
+  private void addEntry(IWriteEntry entry) {
+    resultList.add(entry);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult#addEntry(de.braintags.io.vertx.pojomapper.mapping
+   * .IStoreObject, java.lang.String, de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction)
+   */
+  @Override
+  public void addEntry(IStoreObject<?> sto, String id, WriteAction action) {
+    addEntry(new WriteEntry(sto, id, action));
   }
 
   @Override
-  public IStoreObject<?> getStoreObject() {
-    return sto;
-  }
-
-  @Override
-  public Object getId() {
-    return id;
+  public int size() {
+    return resultList.size();
   }
 
 }

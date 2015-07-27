@@ -160,7 +160,7 @@ public class MongoQueryRambler implements IQueryRambler {
         }
       });
     }
-    if (errorObject.handleResult(resultHandler))
+    if (errorObject.handleError(resultHandler))
       return;
     JsonObject arg = new JsonObject().put(mongoOperator, resultArray);
     add(field.getMappedFieldName(), arg);

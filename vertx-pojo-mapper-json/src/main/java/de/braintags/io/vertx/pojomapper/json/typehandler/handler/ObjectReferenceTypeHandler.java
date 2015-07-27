@@ -21,6 +21,7 @@ import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -62,15 +63,15 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
     IMapperFactory mf = field.getMapper().getMapperFactory();
     IMapper subMapper = mf.getMapper(mapperClass);
     IDataStore store = mf.getDataStore();
-    IQuery<?> query = (IQuery<?>) store.createQuery(mapperClass).field(subMapper.getIdField().getMappedFieldName())
-        .is(source);
+    IQuery<?> query = (IQuery<?>) store.createQuery(mapperClass).field(subMapper.getIdField().getName()).is(source);
     query.execute(result -> {
       if (result.failed()) {
         fail(result.cause(), resultHandler);
       } else {
         if (result.result().size() != 1) {
-          fail(new PropertyAccessException("expected to find 1 record, but found " + result.result().size()),
-              resultHandler);
+          String formated = String.format("expected to find 1 record, but found %d in column %s with query '%s'",
+              result.result().size(), subMapper.getDataStoreName(), result.result().getOriginalQuery());
+          fail(new PropertyAccessException(formated), resultHandler);
           return;
         }
         result.result().iterator().next(iResult -> {
@@ -105,8 +106,9 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
       if (result.failed()) {
         fail(result.cause(), resultHandler);
       } else {
+        IWriteEntry we = result.result().iterator().next();
         IField idField = subMapper.getIdField();
-        Object id = result.result().getId();
+        Object id = we.getId();
         if (id == null)
           id = idField.getPropertyAccessor().readData(obToReference);
         if (id == null) {

@@ -16,42 +16,36 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.write;
 
-import java.util.Iterator;
-
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 
 /**
- * This object is created by a save action and contains the information about the action itself and the objects saved
- * 
+ * For each entity, which was saved by {@link IWrite#save(io.vertx.core.Handler)}, one instance of {@link IWriteEntry}
+ * is created and stored inside {@link IWriteResult}
  * 
  * @author Michael Remme
- *
+ * 
  */
-public interface IWriteResult {
+
+public interface IWriteEntry {
 
   /**
-   * The resulting list of {@link IWriteEntry}
+   * Get the instance of {@link IStoreObject}, which was created during the save action
    * 
-   * @return
+   * @return the {@link IStoreObject} which was written
    */
-  Iterator<IWriteEntry> iterator();
+  public IStoreObject<?> getStoreObject();
 
   /**
-   * Add a new {@link IWriteEntry} from the given information
+   * Get the id of the saved object
    * 
-   * @param sto
-   *          the {@link IStoreObject} which was handled
-   * @param id
-   *          the id, which was generated or existing already
-   * @param action
-   *          the {@link WriteAction} used
+   * @return the id of the instance
    */
-  void addEntry(IStoreObject<?> sto, String id, WriteAction action);
+  public Object getId();
 
   /**
-   * Get the number of {@link IWriteEntry}
+   * Get the action, which was used when writing the given instance
    * 
-   * @return the size
+   * @return the {@link WriteAction} used
    */
-  int size();
+  public WriteAction getAction();
 }
