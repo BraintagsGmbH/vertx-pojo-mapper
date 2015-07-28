@@ -319,6 +319,34 @@ public abstract class MongoBaseTest extends VertxTestBase {
     }
   }
 
+  public ResultContainer saveRecords(List<?> records) {
+    ResultContainer resultContainer = new ResultContainer();
+    CountDownLatch latch = new CountDownLatch(1);
+    IWrite<Object> write = (IWrite<Object>) getDataStore().createWrite(records.get(0).getClass());
+    for (Object record : records) {
+      write.add(record);
+    }
+    write.save(result -> {
+      try {
+        resultContainer.writeResult = result.result();
+        checkWriteResult(result);
+      } catch (AssertionError e) {
+        resultContainer.assertionError = e;
+      } catch (Throwable e) {
+        resultContainer.assertionError = new AssertionError(e);
+      } finally {
+        latch.countDown();
+      }
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    return resultContainer;
+  }
+
   public ResultContainer saveRecord(Object sm) {
     ResultContainer resultContainer = new ResultContainer();
     CountDownLatch latch = new CountDownLatch(1);

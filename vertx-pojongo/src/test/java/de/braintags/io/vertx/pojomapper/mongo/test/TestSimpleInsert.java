@@ -19,19 +19,22 @@ package de.braintags.io.vertx.pojomapper.mongo.test;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
-import java.util.concurrent.CountDownLatch;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
-import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 
 public class TestSimpleInsert extends MongoBaseTest {
 
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(TestSimpleInsert.class);
+
+  private static final int LOOP = 100;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -52,38 +55,32 @@ public class TestSimpleInsert extends MongoBaseTest {
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
 
-    throw new UnsupportedOperationException("insert 100 ");
-  }
-
-  private ResultContainer saveRecord(MiniMapper sm) {
-    ResultContainer resultContainer = new ResultContainer();
-    CountDownLatch latch = new CountDownLatch(1);
-    IWrite<MiniMapper> write = getDataStore().createWrite(MiniMapper.class);
-    write.add(sm);
-    write.save(result -> {
-      try {
-        resultContainer.writeResult = result.result();
-        checkWriteResult(result);
-      } catch (AssertionError e) {
-        resultContainer.assertionError = e;
-      } catch (Throwable e) {
-        resultContainer.assertionError = new AssertionError(e);
-      } finally {
-        latch.countDown();
-      }
-    });
-
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+    List<MiniMapper> mapperList = new ArrayList<MiniMapper>();
+    for (int i = 0; i < LOOP; i++) {
+      mapperList.add(new MiniMapper("looper"));
     }
-    return resultContainer;
+    resultContainer = saveRecords(mapperList);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+    assertEquals(LOOP, resultContainer.writeResult.size());
+
+    IQuery<MiniMapper> query = getDataStore().createQuery(MiniMapper.class);
+    query.field("name").is("looper");
+    find(query, LOOP);
   }
 
   class MiniMapper {
     @Id
     public String id = null;
     public String name = "testName";
+
+    MiniMapper() {
+
+    }
+
+    MiniMapper(String name) {
+      this.name = name;
+    }
+
   }
 }

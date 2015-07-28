@@ -38,4 +38,12 @@ public class ObjectReferenceMapper {
   public ObjectReferenceMapper() {
   }
 
+  @Override
+  public boolean equals(Object o) {
+    ObjectReferenceMapper om = (ObjectReferenceMapper) o;
+    boolean equal = om.id.equals(id);
+    boolean equal2 = om.simpleMapper.equals(simpleMapper);
+    return equal && equal2;
+  }
+
 }

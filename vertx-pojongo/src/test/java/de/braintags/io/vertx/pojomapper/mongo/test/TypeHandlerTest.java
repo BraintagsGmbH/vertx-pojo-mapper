@@ -77,16 +77,18 @@ public class TypeHandlerTest extends MongoBaseTest {
   @Test
   public void testSaveAndRead_ObjectReferenceMapper() {
     SimpleMapper sc = new SimpleMapper();
+    sc.name = "name";
+    sc.setSecondProperty("2. property");
 
-    ObjectReferenceMapper sm = new ObjectReferenceMapper();
-    sm.simpleMapper = sc;
+    ObjectReferenceMapper om = new ObjectReferenceMapper();
+    om.simpleMapper = sc;
 
-    ResultContainer resultContainer = saveRecord(sm);
+    ResultContainer resultContainer = saveRecord(om);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
 
     // SimpleQuery for all records
-    IQuery<TypehandlerTestMapper> query = getDataStore().createQuery(TypehandlerTestMapper.class);
+    IQuery<ObjectReferenceMapper> query = getDataStore().createQuery(ObjectReferenceMapper.class);
     resultContainer = find(query, 1);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
@@ -95,7 +97,11 @@ public class TypeHandlerTest extends MongoBaseTest {
       if (result.failed()) {
         result.cause().printStackTrace();
       } else {
-        assertTrue(sm.equals(result.result()));
+        ObjectReferenceMapper oom = (ObjectReferenceMapper) result.result();
+        assertNotNull(oom.simpleMapper);
+        assertTrue(oom.simpleMapper.id != null && !oom.simpleMapper.id.isEmpty());
+        assertEquals(om.simpleMapper.name, oom.simpleMapper.name);
+        assertEquals(om.simpleMapper.getSecondProperty(), oom.simpleMapper.getSecondProperty());
         logger.info("finished!");
       }
     });
