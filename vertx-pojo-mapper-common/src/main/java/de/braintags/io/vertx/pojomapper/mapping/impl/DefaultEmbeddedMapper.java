@@ -18,6 +18,9 @@ package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+
+import java.util.Map;
+
 import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
@@ -29,7 +32,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
  * 
  */
 
-public class DefaultEmbeddedMapper implements IEmbeddedMapper {
+public class DefaultEmbeddedMapper extends AbstractSubobjectMapper implements IEmbeddedMapper {
 
   /**
    * 
@@ -37,30 +40,38 @@ public class DefaultEmbeddedMapper implements IEmbeddedMapper {
   public DefaultEmbeddedMapper() {
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper#intoStoreObject(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField,
-   * io.vertx.core.Handler)
-   */
   @Override
-  public void intoStoreObject(Object entity, IStoreObject<?> storeObject, IField field,
-      Handler<AsyncResult<Void>> handler) {
-    throw new UnsupportedOperationException();
+  public void writeMap(Map<?, ?> javaValue, IStoreObject<?> storeObject, IField field) {
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper#fromStoreObject(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField,
-   * io.vertx.core.Handler)
-   */
   @Override
-  public void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field,
-      Handler<AsyncResult<Void>> handler) {
-    throw new UnsupportedOperationException();
+  public void writeArray(Object[] javaValue, IStoreObject<?> storeObject, IField field) {
+  }
+
+  @Override
+  public void writeCollection(Iterable<?> javaValue, IStoreObject<?> storeObject, IField field) {
+  }
+
+  @Override
+  public void writeSingleValue(Object referencedObject, IStoreObject<?> storeObject, IField field,
+      Handler<AsyncResult<Object>> handler) {
+  }
+
+  @Override
+  public void readMap(IStoreObject<?> storeObject, IField field) {
+  }
+
+  @Override
+  public void readArray(IStoreObject<?> storeObject, IField field) {
+  }
+
+  @Override
+  public void readCollection(IStoreObject<?> storeObject, IField field) {
+  }
+
+  @Override
+  public void readSingleValue(Object entity, IStoreObject<?> storeObject, IField field,
+      Handler<AsyncResult<Object>> handler) {
   }
 
 }
