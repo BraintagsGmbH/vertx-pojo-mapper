@@ -53,4 +53,13 @@ public class CounterObject extends Object {
   public boolean isZero() {
     return count == 0;
   }
+
+  /**
+   * Get the current counter
+   * 
+   * @return the counter
+   */
+  public int getCount() {
+    return count;
+  }
 }

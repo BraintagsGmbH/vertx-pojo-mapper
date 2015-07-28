@@ -99,7 +99,7 @@ public class ClassUtil {
     final Map<Type, Type> resolvedTypes = new HashMap<Type, Type>();
     Type type = clazz;
     // start walking up the inheritance hierarchy until we hit the end
-    while (type != null && !getClass(type).equals(Object.class)) {
+    while (type != null && !toClass(type).equals(Object.class)) {
       if (type instanceof Class) {
         // there is no useful information for us in raw types, so just
         // keep going.
@@ -112,7 +112,7 @@ public class ClassUtil {
         final TypeVariable<?>[] typeParameters = rawType.getTypeParameters();
         for (int i = 0; i < actualTypeArguments.length; i++) {
           if (typeParameters[i].equals(tv)) {
-            final Class<?> cls = getClass(actualTypeArguments[i]);
+            final Class<?> cls = toClass(actualTypeArguments[i]);
             if (cls != null) {
               return cls;
             }
@@ -120,7 +120,7 @@ public class ClassUtil {
             // passed through multiple levels of the hierarchy. Walk back until we run out.
             Type typeToTest = resolvedTypes.get(actualTypeArguments[i]);
             while (typeToTest != null) {
-              final Class<?> classToTest = getClass(typeToTest);
+              final Class<?> classToTest = toClass(typeToTest);
               if (classToTest != null) {
                 return classToTest;
               }
@@ -137,37 +137,6 @@ public class ClassUtil {
     }
 
     return null;
-  }
-
-  /**
-   * Get the underlying class for a type, or null if the type is a variable type.
-   *
-   * @param type
-   *          the type
-   * @return the underlying class
-   */
-  public static Class<?> getClass(final Type type) {
-    if (type instanceof Class) {
-      return (Class<?>) type;
-    } else if (type instanceof ParameterizedType) {
-      return getClass(((ParameterizedType) type).getRawType());
-    } else if (type instanceof WildcardType) {
-      return (Class<?>) ((WildcardType) type).getUpperBounds()[0];
-    } else if (type instanceof GenericArrayType) {
-      final Type componentType = ((GenericArrayType) type).getGenericComponentType();
-      final Class<?> componentClass = getClass(componentType);
-      if (componentClass != null) {
-        return Array.newInstance(componentClass, 0).getClass();
-      } else {
-        log.debug("************ ClassUtil.getClass 1st else");
-        log.debug("************ type = " + type);
-        return null;
-      }
-    } else {
-      log.debug("************ ClassUtil.getClass final else");
-      log.debug("************ type = " + type);
-      return null;
-    }
   }
 
   /**
@@ -192,16 +161,6 @@ public class ClassUtil {
       returnClass = (Class<?>) ((WildcardType) t).getUpperBounds()[0];
     } else
       throw new RuntimeException("Generic TypeVariable not supported!");
-
-    // TODO remove this check
-    log.info("********* remove the check in ClassUtil by the time");
-    Class<?> returnClass2 = getClass(t);
-    if (returnClass == null && returnClass2 != null)
-      throw new IllegalArgumentException("result not equal");
-    if (returnClass2 == null && returnClass != null)
-      throw new IllegalArgumentException("result not equal");
-    if (returnClass != null && returnClass2 != null && !returnClass.equals(returnClass2))
-      throw new IllegalArgumentException("result not equal");
 
     return returnClass;
   }

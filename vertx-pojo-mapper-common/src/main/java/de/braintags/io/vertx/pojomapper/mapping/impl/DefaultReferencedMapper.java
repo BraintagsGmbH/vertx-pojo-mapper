@@ -72,17 +72,14 @@ public class DefaultReferencedMapper extends AbstractSubobjectMapper implements 
   }
 
   @Override
-  public void readSingleValue(Object entity, final IStoreObject<?> storeObject, final IField field,
+  public void readSingleValue(Object dbValue, final IField field, Class<?> mapperClass,
       Handler<AsyncResult<Object>> handler) {
     ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
         .getTypeHandler(ObjectReference.class);
-
-    Object dbValue = storeObject.get(field);
-
     th.fromStore(
         dbValue,
         field,
-        null,
+        mapperClass,
         result -> {
           if (result.failed()) {
             Future<Object> future = Future.failedFuture(result.cause());

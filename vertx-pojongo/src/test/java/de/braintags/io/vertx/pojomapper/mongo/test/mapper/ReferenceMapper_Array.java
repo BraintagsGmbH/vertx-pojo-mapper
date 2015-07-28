@@ -26,24 +26,20 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
  * 
  */
 
-public class ObjectReferenceMapper {
+public class ReferenceMapper_Array {
   @Id
   public String id;
   @Referenced
-  public SimpleMapper simpleMapper;
+  public SimpleMapper[] simpleMapper;
 
   /**
    * 
    */
-  public ObjectReferenceMapper() {
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    ObjectReferenceMapper om = (ObjectReferenceMapper) o;
-    boolean equal = om.id.equals(id);
-    boolean equal2 = om.simpleMapper.equals(simpleMapper);
-    return equal && equal2;
+  public ReferenceMapper_Array() {
+    simpleMapper = new SimpleMapper[5];
+    for (int i = 0; i < simpleMapper.length; i++) {
+      simpleMapper[i] = new SimpleMapper("name " + i, "sec prop " + i);
+    }
   }
 
 }

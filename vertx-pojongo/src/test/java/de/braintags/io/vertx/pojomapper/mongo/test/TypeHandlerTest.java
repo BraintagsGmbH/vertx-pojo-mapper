@@ -24,7 +24,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ObjectReferenceMapper;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ReferenceMapper_Array;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ReferenceMapper_List;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ReferenceMapper_Map;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ReferenceMapper_Single;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.SimpleMapper;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.TypehandlerTestMapper;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -75,12 +78,12 @@ public class TypeHandlerTest extends MongoBaseTest {
   }
 
   @Test
-  public void testSaveAndRead_ObjectReferenceMapper() {
+  public void testSaveAndRead_ReferenceMapperSingle() {
     SimpleMapper sc = new SimpleMapper();
     sc.name = "name";
     sc.setSecondProperty("2. property");
 
-    ObjectReferenceMapper om = new ObjectReferenceMapper();
+    ReferenceMapper_Single om = new ReferenceMapper_Single();
     om.simpleMapper = sc;
 
     ResultContainer resultContainer = saveRecord(om);
@@ -88,7 +91,7 @@ public class TypeHandlerTest extends MongoBaseTest {
       throw resultContainer.assertionError;
 
     // SimpleQuery for all records
-    IQuery<ObjectReferenceMapper> query = getDataStore().createQuery(ObjectReferenceMapper.class);
+    IQuery<ReferenceMapper_Single> query = getDataStore().createQuery(ReferenceMapper_Single.class);
     resultContainer = find(query, 1);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
@@ -97,7 +100,7 @@ public class TypeHandlerTest extends MongoBaseTest {
       if (result.failed()) {
         result.cause().printStackTrace();
       } else {
-        ObjectReferenceMapper oom = (ObjectReferenceMapper) result.result();
+        ReferenceMapper_Single oom = (ReferenceMapper_Single) result.result();
         assertNotNull(oom.simpleMapper);
         assertTrue(oom.simpleMapper.id != null && !oom.simpleMapper.id.isEmpty());
         assertEquals(om.simpleMapper.name, oom.simpleMapper.name);
@@ -107,8 +110,106 @@ public class TypeHandlerTest extends MongoBaseTest {
     });
   }
 
-  /* ****************************************************
-   * Helper Part
-   */
+  @Test
+  public void testSaveAndRead_ReferenceMapperArray() {
+
+    ReferenceMapper_Array om = new ReferenceMapper_Array();
+
+    ResultContainer resultContainer = saveRecord(om);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    // SimpleQuery for all records
+    IQuery<ReferenceMapper_Array> query = getDataStore().createQuery(ReferenceMapper_Array.class);
+    resultContainer = find(query, 1);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    resultContainer.queryResult.iterator().next(result -> {
+      if (result.failed()) {
+        result.cause().printStackTrace();
+      } else {
+        ReferenceMapper_Array oom = (ReferenceMapper_Array) result.result();
+        assertNotNull(oom.simpleMapper);
+        for (int i = 0; i < om.simpleMapper.length; i++) {
+          SimpleMapper omSm = om.simpleMapper[i];
+          SimpleMapper oomSm = oom.simpleMapper[i];
+
+          assertTrue(oomSm.id != null && !oomSm.id.isEmpty());
+          assertEquals(omSm.name, oomSm.name);
+          assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
+        }
+        logger.info("finished!");
+      }
+    });
+  }
+
+  @Test
+  public void testSaveAndRead_ReferenceMapperList() {
+
+    ReferenceMapper_List om = new ReferenceMapper_List();
+
+    ResultContainer resultContainer = saveRecord(om);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    // SimpleQuery for all records
+    IQuery<ReferenceMapper_List> query = getDataStore().createQuery(ReferenceMapper_List.class);
+    resultContainer = find(query, 1);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    resultContainer.queryResult.iterator().next(result -> {
+      if (result.failed()) {
+        result.cause().printStackTrace();
+      } else {
+        ReferenceMapper_List oom = (ReferenceMapper_List) result.result();
+        assertNotNull(oom.simpleMapper);
+        for (int i = 0; i < om.simpleMapper.size(); i++) {
+          SimpleMapper omSm = om.simpleMapper.get(i);
+          SimpleMapper oomSm = oom.simpleMapper.get(i);
+
+          assertTrue(oomSm.id != null && !oomSm.id.isEmpty());
+          assertEquals(omSm.name, oomSm.name);
+          assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
+        }
+        logger.info("finished!");
+      }
+    });
+  }
+
+  @Test
+  public void testSaveAndRead_ReferenceMapperMap() {
+
+    ReferenceMapper_Map om = new ReferenceMapper_Map();
+
+    ResultContainer resultContainer = saveRecord(om);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    // SimpleQuery for all records
+    IQuery<ReferenceMapper_Map> query = getDataStore().createQuery(ReferenceMapper_Map.class);
+    resultContainer = find(query, 1);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    resultContainer.queryResult.iterator().next(result -> {
+      if (result.failed()) {
+        result.cause().printStackTrace();
+      } else {
+        ReferenceMapper_Map oom = (ReferenceMapper_Map) result.result();
+        assertNotNull(oom.simpleMapper);
+        for (int i = 0; i < om.simpleMapper.size(); i++) {
+          SimpleMapper omSm = om.simpleMapper.get(i);
+          SimpleMapper oomSm = oom.simpleMapper.get(i);
+
+          assertTrue(oomSm.id != null && !oomSm.id.isEmpty());
+          assertEquals(omSm.name, oomSm.name);
+          assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
+        }
+        logger.info("finished!");
+      }
+    });
+  }
 
 }

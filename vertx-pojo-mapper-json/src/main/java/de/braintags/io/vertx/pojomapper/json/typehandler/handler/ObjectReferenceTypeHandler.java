@@ -57,9 +57,12 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    Class<?> mapperClass = field.getType();
-    if (mapperClass == null)
-      mapperClass = cls;
+    Class<?> mapperClass = (cls != null ? cls : field.getType());
+    if (mapperClass == null) {
+      fail(new NullPointerException("undefined mapper class"), resultHandler);
+      return;
+    }
+
     IMapperFactory mf = field.getMapper().getMapperFactory();
     IMapper subMapper = mf.getMapper(mapperClass);
     IDataStore store = mf.getDataStore();

@@ -18,9 +18,6 @@ package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-
-import java.util.Map;
-
 import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
@@ -41,37 +38,12 @@ public class DefaultEmbeddedMapper extends AbstractSubobjectMapper implements IE
   }
 
   @Override
-  public void writeMap(Map<?, ?> javaValue, IStoreObject<?> storeObject, IField field) {
-  }
-
-  @Override
-  public void writeArray(Object[] javaValue, IStoreObject<?> storeObject, IField field) {
-  }
-
-  @Override
-  public void writeCollection(Iterable<?> javaValue, IStoreObject<?> storeObject, IField field) {
-  }
-
-  @Override
   public void writeSingleValue(Object referencedObject, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Object>> handler) {
   }
 
   @Override
-  public void readMap(IStoreObject<?> storeObject, IField field) {
-  }
-
-  @Override
-  public void readArray(IStoreObject<?> storeObject, IField field) {
-  }
-
-  @Override
-  public void readCollection(IStoreObject<?> storeObject, IField field) {
-  }
-
-  @Override
-  public void readSingleValue(Object entity, IStoreObject<?> storeObject, IField field,
-      Handler<AsyncResult<Object>> handler) {
+  public void readSingleValue(Object dbValue, IField field, Class<?> mapperClass, Handler<AsyncResult<Object>> handler) {
   }
 
 }

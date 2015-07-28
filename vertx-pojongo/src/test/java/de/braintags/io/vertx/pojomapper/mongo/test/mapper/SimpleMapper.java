@@ -39,6 +39,14 @@ public class SimpleMapper {
   }
 
   /**
+   * 
+   */
+  public SimpleMapper(String name, String secondProperty) {
+    this.name = name;
+    this.secondProperty = secondProperty;
+  }
+
+  /**
    * @return the secondProperty
    */
   public final String getSecondProperty() {
@@ -61,4 +69,8 @@ public class SimpleMapper {
         && compare.secondProperty.equals(secondProperty);
   }
 
+  @Override
+  public String toString() {
+    return String.valueOf(name);
+  }
 }
