@@ -16,19 +16,15 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.test;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-
-import java.util.concurrent.CountDownLatch;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
-import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ObjectReferenceMapper;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.SimpleMapper;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.TypehandlerTestMapper;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -56,15 +52,33 @@ public class TypeHandlerTest extends MongoBaseTest {
   }
 
   @Test
-  public void testSaveAndRead() {
+  public void testSaveAndRead_TypehandlerTestMapper() {
+    TypehandlerTestMapper sm = new TypehandlerTestMapper();
+    ResultContainer resultContainer = saveRecord(sm);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    // SimpleQuery for all records
+    IQuery<TypehandlerTestMapper> query = getDataStore().createQuery(TypehandlerTestMapper.class);
+    resultContainer = find(query, 1);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+    resultContainer.queryResult.iterator().next(result -> {
+      if (result.failed()) {
+        result.cause().printStackTrace();
+      } else {
+        assertTrue(sm.equals(result.result()));
+        logger.info("finished!");
+      }
+    });
+  }
+
+  @Test
+  public void testSaveAndRead_ObjectReferenceMapper() {
     SimpleMapper sc = new SimpleMapper();
 
-    // ResultContainer resultContainer = saveRecord(sc);
-    // if (resultContainer.assertionError != null)
-    // throw resultContainer.assertionError;
-    // sc.id = (String) resultContainer.writeResult.getId();
-
-    TypehandlerTestMapper sm = new TypehandlerTestMapper();
+    ObjectReferenceMapper sm = new ObjectReferenceMapper();
     sm.simpleMapper = sc;
 
     ResultContainer resultContainer = saveRecord(sm);
@@ -90,102 +104,5 @@ public class TypeHandlerTest extends MongoBaseTest {
   /* ****************************************************
    * Helper Part
    */
-
-  private ResultContainer find(IQuery<TypehandlerTestMapper> query, int expectedResult) {
-    ResultContainer resultContainer = new ResultContainer();
-    CountDownLatch latch = new CountDownLatch(1);
-    query.execute(result -> {
-      try {
-        resultContainer.queryResult = result.result();
-        checkQueryResult(result);
-
-        assertEquals(expectedResult, resultContainer.queryResult.size());
-        logger.info(resultContainer.queryResult.getOriginalQuery());
-
-      } catch (AssertionError e) {
-        resultContainer.assertionError = e;
-      } catch (Throwable e) {
-        resultContainer.assertionError = new AssertionError(e);
-      } finally {
-        latch.countDown();
-      }
-    });
-
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-
-    return resultContainer;
-  }
-
-  private void checkQueryResult(AsyncResult<IQueryResult<TypehandlerTestMapper>> qResult) {
-    assertTrue(resultFine(qResult));
-    IQueryResult<TypehandlerTestMapper> qr = qResult.result();
-    assertNotNull(qr);
-    assertTrue(qr.iterator().hasNext());
-
-    qr.iterator().next(result -> {
-      if (result.failed()) {
-        result.cause().printStackTrace();
-      } else {
-        assertNotNull(result.result());
-      }
-    });
-
-  }
-
-  private ResultContainer saveRecord(TypehandlerTestMapper sm) {
-    ResultContainer resultContainer = new ResultContainer();
-    CountDownLatch latch = new CountDownLatch(1);
-    IWrite<TypehandlerTestMapper> write = getDataStore().createWrite(TypehandlerTestMapper.class);
-    write.add(sm);
-    write.save(result -> {
-      try {
-        resultContainer.writeResult = result.result();
-        checkWriteResult(result);
-      } catch (AssertionError e) {
-        resultContainer.assertionError = e;
-      } catch (Throwable e) {
-        resultContainer.assertionError = new AssertionError(e);
-      } finally {
-        latch.countDown();
-      }
-    });
-
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    return resultContainer;
-  }
-
-  private ResultContainer saveRecord(SimpleMapper sm) {
-    ResultContainer resultContainer = new ResultContainer();
-    CountDownLatch latch = new CountDownLatch(1);
-    IWrite<SimpleMapper> write = getDataStore().createWrite(SimpleMapper.class);
-    write.add(sm);
-    write.save(result -> {
-      try {
-        resultContainer.writeResult = result.result();
-        checkWriteResult(result);
-      } catch (AssertionError e) {
-        resultContainer.assertionError = e;
-      } catch (Throwable e) {
-        resultContainer.assertionError = new AssertionError(e);
-      } finally {
-        latch.countDown();
-      }
-    });
-
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    return resultContainer;
-  }
 
 }

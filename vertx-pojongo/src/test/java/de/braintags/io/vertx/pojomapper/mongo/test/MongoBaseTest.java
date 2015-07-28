@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
@@ -45,7 +48,7 @@ import de.flapdoodle.embed.process.runtime.Network;
  */
 
 public abstract class MongoBaseTest extends VertxTestBase {
-  private static final Logger log = LoggerFactory.getLogger(MongoBaseTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(MongoBaseTest.class);
 
   private static MongodExecutable exe;
   private static MongoClient mongoClient;
@@ -76,7 +79,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
    */
   @Override
   public final void setUp() throws Exception {
-    log.info("-->> setup");
+    logger.info("-->> setup");
     super.setUp();
     getMongoClient();
     dropCollections();
@@ -89,7 +92,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
    */
   @Override
   protected void tearDown() throws Exception {
-    log.info("tearDown");
+    logger.info("tearDown");
     super.tearDown();
     mongoClient.close();
     mongoClient = null;
@@ -114,7 +117,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
   }
 
   public static void startMongo() {
-    log.info("STARTING MONGO");
+    logger.info("STARTING MONGO");
     if (getConnectionString() == null) {
       try {
         IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
@@ -128,7 +131,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
   }
 
   public static void stopMongo() {
-    log.info("STOPPING MONGO");
+    logger.info("STOPPING MONGO");
     if (mongoClient != null)
       mongoClient.close();
     if (exe != null) {
@@ -152,14 +155,14 @@ public abstract class MongoBaseTest extends VertxTestBase {
 
   private void initMongoClient() {
     JsonObject config = getConfig();
-    log.info("init MongoClient with " + config);
+    logger.info("init MongoClient with " + config);
     mongoClient = MongoClient.createShared(vertx, config);
     CountDownLatch latch = new CountDownLatch(1);
     mongoClient.getCollections(resultHandler -> {
       if (resultHandler.failed()) {
-        log.error("", resultHandler.cause());
+        logger.error("", resultHandler.cause());
       } else {
-        log.info(String.format("found %d collections", resultHandler.result().size()));
+        logger.info(String.format("found %d collections", resultHandler.result().size()));
       }
       latch.countDown();
     });
@@ -173,7 +176,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
   @SuppressWarnings("unused")
   private void initMongoService() {
     JsonObject config = getConfig();
-    log.info("init MongoService with " + config);
+    logger.info("init MongoService with " + config);
     DeploymentOptions options = new DeploymentOptions().setConfig(config);
     CountDownLatch latch = new CountDownLatch(1);
     vertx.deployVerticle("service:io.vertx.mongo-service", options, onSuccess(id -> {
@@ -223,25 +226,25 @@ public abstract class MongoBaseTest extends VertxTestBase {
    *          the latch to be used
    */
   protected void dropCollections() {
-    log.info("DROPPING COLLECTIONS");
+    logger.info("DROPPING COLLECTIONS");
     // Drop all the collections in the db
     CountDownLatch externalLatch = new CountDownLatch(1);
     mongoClient.getCollections(colls -> {
-      log.info("handling collections result");
+      logger.info("handling collections result");
       if (colls.failed()) {
-        log.error(colls.cause());
+        logger.error(colls.cause());
       } else {
         List<String> collections = colls.result();
         CountDownLatch internalLatch = new CountDownLatch(collections.size());
         for (String collection : collections) {
           if (collection.startsWith("system.")) {
-            log.info("NOT Dropping: " + collection);
+            logger.info("NOT Dropping: " + collection);
             internalLatch.countDown();
           } else {
             mongoClient.dropCollection(collection, dropResult -> {
-              log.info("DROPPING: " + collection);
+              logger.info("DROPPING: " + collection);
               if (dropResult.failed()) {
-                log.error("", dropResult.cause());
+                logger.error("", dropResult.cause());
               }
               internalLatch.countDown();
             });
@@ -263,6 +266,85 @@ public abstract class MongoBaseTest extends VertxTestBase {
     }
   }
 
+  public ResultContainer find(IQuery<?> query, int expectedResult) {
+    ResultContainer resultContainer = new ResultContainer();
+    CountDownLatch latch = new CountDownLatch(1);
+    query.execute(result -> {
+      try {
+        resultContainer.queryResult = result.result();
+        checkQueryResult(result);
+
+        assertEquals(expectedResult, resultContainer.queryResult.size());
+        logger.info(resultContainer.queryResult.getOriginalQuery());
+
+      } catch (AssertionError e) {
+        resultContainer.assertionError = e;
+      } catch (Throwable e) {
+        resultContainer.assertionError = new AssertionError(e);
+      } finally {
+        latch.countDown();
+      }
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    return resultContainer;
+  }
+
+  public void checkQueryResult(AsyncResult<? extends IQueryResult<?>> qResult) {
+    CountDownLatch latch = new CountDownLatch(1);
+    assertTrue(resultFine(qResult));
+    IQueryResult<?> qr = qResult.result();
+    assertNotNull(qr);
+    assertTrue(qr.iterator().hasNext());
+    qr.iterator().next(result -> {
+      try {
+        if (result.failed()) {
+          result.cause().printStackTrace();
+        } else {
+          assertNotNull(result.result());
+        }
+      } finally {
+        latch.countDown();
+      }
+    });
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public ResultContainer saveRecord(Object sm) {
+    ResultContainer resultContainer = new ResultContainer();
+    CountDownLatch latch = new CountDownLatch(1);
+    IWrite<Object> write = (IWrite<Object>) getDataStore().createWrite(sm.getClass());
+    write.add(sm);
+    write.save(result -> {
+      try {
+        resultContainer.writeResult = result.result();
+        checkWriteResult(result);
+      } catch (AssertionError e) {
+        resultContainer.assertionError = e;
+      } catch (Throwable e) {
+        resultContainer.assertionError = new AssertionError(e);
+      } finally {
+        latch.countDown();
+      }
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    return resultContainer;
+  }
+
   public void checkWriteResult(AsyncResult<IWriteResult> result) {
     assertTrue(resultFine(result));
     assertNotNull(result.result());
@@ -274,7 +356,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
 
   public boolean resultFine(AsyncResult<?> result) {
     if (result.failed()) {
-      log.error("", result.cause());
+      logger.error("", result.cause());
       return false;
     }
     return true;

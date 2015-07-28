@@ -104,6 +104,7 @@ public class DefaultReferencedMapper implements IReferencedMapper {
         return;
       } else {
         storeObject.put(field, result.result().getResult());
+        handler.handle(Future.succeededFuture());
       }
 
     });

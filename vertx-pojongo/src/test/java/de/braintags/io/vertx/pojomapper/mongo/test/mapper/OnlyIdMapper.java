@@ -14,22 +14,25 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mongo.test;
+package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 
 /**
- * 
- * 
+ * Mapper to test extremes. ID field is required by mapping, thus a complete empty Mapper is not possible
+ *
  * @author Michael Remme
  * 
  */
 
-@RunWith(Suite.class)
-@SuiteClasses({ TestBaseTest.class, TestMongoMapper.class, TestSimpleInsert.class, TestSimpleMapper.class,
-    TestOnlyIdMapper.class, TypeHandlerTest.class })
-public class AllTestsPojongo {
+public class OnlyIdMapper {
+  @Id
+  public String id;
+
+  /**
+   * 
+   */
+  public OnlyIdMapper() {
+  }
 
 }

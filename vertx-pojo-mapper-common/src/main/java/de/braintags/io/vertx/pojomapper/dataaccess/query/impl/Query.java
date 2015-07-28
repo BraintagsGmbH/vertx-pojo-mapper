@@ -82,6 +82,10 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   public void executeQueryRambler(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     rambler.start(this);
+    if (filters.isEmpty()) {
+      finishCounter(rambler, resultHandler);
+      return;
+    }
     CounterObject co = new CounterObject(filters.size());
     ErrorObject<Void> error = new ErrorObject<Void>();
     for (Object filter : filters) {
@@ -92,8 +96,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
             resultHandler.handle(result);
           } else {
             if (co.reduce()) { // last element in the list
-              rambler.stop(this);
-              resultHandler.handle(Future.succeededFuture());
+              finishCounter(rambler, resultHandler);
             }
           }
         });
@@ -107,6 +110,11 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
         return;
       }
     }
+  }
+
+  private void finishCounter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
+    rambler.stop(this);
+    resultHandler.handle(Future.succeededFuture());
   }
 
   /*

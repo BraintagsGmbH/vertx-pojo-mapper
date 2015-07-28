@@ -16,21 +16,17 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.test;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
-import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -258,85 +254,6 @@ public class TestSimpleMapper extends MongoBaseTest {
         throw resultContainer.assertionError;
     }
 
-  }
-
-  private ResultContainer find(IQuery<SimpleMapper> query, int expectedResult) {
-    ResultContainer resultContainer = new ResultContainer();
-    CountDownLatch latch = new CountDownLatch(1);
-    query.execute(result -> {
-      try {
-        resultContainer.queryResult = result.result();
-        checkQueryResult(result);
-
-        assertEquals(expectedResult, resultContainer.queryResult.size());
-        logger.info(resultContainer.queryResult.getOriginalQuery());
-
-      } catch (AssertionError e) {
-        resultContainer.assertionError = e;
-      } catch (Throwable e) {
-        resultContainer.assertionError = new AssertionError(e);
-      } finally {
-        latch.countDown();
-      }
-    });
-
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-
-    return resultContainer;
-  }
-
-  private void checkQueryResult(AsyncResult<IQueryResult<SimpleMapper>> qResult) {
-    CountDownLatch latch = new CountDownLatch(1);
-    assertTrue(resultFine(qResult));
-    IQueryResult<SimpleMapper> qr = qResult.result();
-    assertNotNull(qr);
-    assertTrue(qr.iterator().hasNext());
-    qr.iterator().next(result -> {
-      try {
-        if (result.failed()) {
-          result.cause().printStackTrace();
-        } else {
-          assertNotNull(result.result());
-        }
-      } finally {
-        latch.countDown();
-      }
-    });
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private ResultContainer saveRecord(SimpleMapper sm) {
-    ResultContainer resultContainer = new ResultContainer();
-    CountDownLatch latch = new CountDownLatch(1);
-    IWrite<SimpleMapper> write = getDataStore().createWrite(SimpleMapper.class);
-    write.add(sm);
-    write.save(result -> {
-      try {
-        resultContainer.writeResult = result.result();
-        checkWriteResult(result);
-      } catch (AssertionError e) {
-        resultContainer.assertionError = e;
-      } catch (Throwable e) {
-        resultContainer.assertionError = new AssertionError(e);
-      } finally {
-        latch.countDown();
-      }
-    });
-
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    return resultContainer;
   }
 
 }

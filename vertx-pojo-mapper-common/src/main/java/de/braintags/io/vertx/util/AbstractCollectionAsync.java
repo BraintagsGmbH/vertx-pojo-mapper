@@ -18,6 +18,7 @@ package de.braintags.io.vertx.util;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.groovy.core.Future;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,6 +74,10 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
   @Override
   public void toArray(Handler<AsyncResult<Object[]>> handler) {
     List<Object> list = new ArrayList<Object>();
+    if (isEmpty()) {
+      handler.handle((AsyncResult<Object[]>) Future.succeededFuture(list.toArray()));
+      return;
+    }
     CounterObject co = new CounterObject(size());
     IteratorAsync<E> it = iterator();
     ResultObject<Object[]> ro = new ResultObject<Object[]>();

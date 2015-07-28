@@ -14,22 +14,28 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mongo.test;
+package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 
 /**
- * 
- * 
+ * Mapper to test {@link Referenced} annotation
+ *
  * @author Michael Remme
  * 
  */
 
-@RunWith(Suite.class)
-@SuiteClasses({ TestBaseTest.class, TestMongoMapper.class, TestSimpleInsert.class, TestSimpleMapper.class,
-    TestOnlyIdMapper.class, TypeHandlerTest.class })
-public class AllTestsPojongo {
+public class ObjectReferenceMapper {
+  @Id
+  public String id;
+  @Referenced
+  public SimpleMapper simpleMapper;
+
+  /**
+   * 
+   */
+  public ObjectReferenceMapper() {
+  }
 
 }

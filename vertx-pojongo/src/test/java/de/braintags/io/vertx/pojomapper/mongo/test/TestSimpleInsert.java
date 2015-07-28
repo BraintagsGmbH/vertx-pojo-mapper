@@ -30,6 +30,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 
 public class TestSimpleInsert extends MongoBaseTest {
 
+  @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(TestSimpleInsert.class);
 
   @BeforeClass

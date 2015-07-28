@@ -118,6 +118,10 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   @Override
   public void applyTo(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     rambler.start(this);
+    if (filters.isEmpty()) {
+      finishCounter(rambler, resultHandler);
+      return;
+    }
     ErrorObject<Void> error = new ErrorObject<Void>();
     CounterObject co = new CounterObject(filters.size());
     for (Object filter : filters) {
@@ -128,8 +132,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
             resultHandler.handle(result);
           } else {
             if (co.reduce()) { // last element in the list
-              rambler.stop(this);
-              resultHandler.handle(Future.succeededFuture());
+              finishCounter(rambler, resultHandler);
             }
           }
         });
@@ -142,6 +145,11 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
         return;
       }
     }
+  }
+
+  private void finishCounter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
+    rambler.stop(this);
+    resultHandler.handle(Future.succeededFuture());
   }
 
   /*

@@ -44,4 +44,13 @@ public class CounterObject extends Object {
     --count;
     return count == 0;
   }
+
+  /**
+   * Returns true, if the internal counter is 0 ( zero )
+   * 
+   * @return wether the internal counter is zero
+   */
+  public boolean isZero() {
+    return count == 0;
+  }
 }

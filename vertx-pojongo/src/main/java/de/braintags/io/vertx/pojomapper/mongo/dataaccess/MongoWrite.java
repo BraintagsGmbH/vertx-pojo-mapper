@@ -58,8 +58,12 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
 
   @Override
   public void save(Handler<AsyncResult<IWriteResult>> resultHandler) {
-    ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>();
     WriteResult rr = new WriteResult();
+    if (objectsToSave.isEmpty()) {
+      resultHandler.handle(Future.succeededFuture(rr));
+      return;
+    }
+    ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>();
     CounterObject counter = new CounterObject(objectsToSave.size());
     for (T entity : objectsToSave) {
       save(entity, rr, result -> {

@@ -148,7 +148,13 @@ public class MongoQueryRambler implements IQueryRambler {
           "multivalued argument but not an instance of Iterable")));
       return;
     }
-    CounterObject co = new CounterObject(Size.size((Iterable<?>) valueIterable));
+    int count = Size.size((Iterable<?>) valueIterable);
+    if (count == 0) {
+      resultHandler.handle(Future
+          .failedFuture(new QueryParameterException("multivalued argument but no values defined")));
+      return;
+    }
+    CounterObject co = new CounterObject(count);
     Iterator<?> values = ((Iterable<?>) valueIterable).iterator();
     ErrorObject<Void> errorObject = new ErrorObject<Void>();
     JsonArray resultArray = new JsonArray();
