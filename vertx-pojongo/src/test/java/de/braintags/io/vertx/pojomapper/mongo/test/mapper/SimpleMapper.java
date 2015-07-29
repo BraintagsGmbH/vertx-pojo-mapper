@@ -17,6 +17,9 @@
 package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 
 /**
  * A simple mapper with some beans properties
@@ -31,6 +34,9 @@ public class SimpleMapper {
   public String name;
   private String secondProperty;
   public int intValue;
+  public String beforeSave;
+  public String afterSave;
+  public String afterLoad;
 
   /**
    * 
@@ -73,4 +79,20 @@ public class SimpleMapper {
   public String toString() {
     return String.valueOf(name);
   }
+
+  @BeforeSave
+  public void BeforeSave() {
+    beforeSave = "succeeded";
+  }
+
+  @AfterSave
+  public void afterSaveMethod() {
+    afterSave = "succeeded";
+  }
+
+  @AfterLoad
+  public void afterLoadMethod() {
+    afterLoad = "succeeded";
+  }
+
 }

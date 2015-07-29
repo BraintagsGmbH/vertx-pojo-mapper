@@ -112,7 +112,11 @@ public class TestSimpleMapper extends MongoBaseTest {
             logger.error("", result.cause());
             fail(result.cause().toString());
           } else {
-            assertTrue(sm.equals(result.result()));
+            SimpleMapper rsm = (SimpleMapper) result.result();
+            assertTrue(sm.equals(rsm));
+            assertEquals("succeeded", rsm.afterSave);
+            assertEquals("succeeded", rsm.beforeSave);
+            assertEquals("succeeded", rsm.afterLoad);
           }
 
         });

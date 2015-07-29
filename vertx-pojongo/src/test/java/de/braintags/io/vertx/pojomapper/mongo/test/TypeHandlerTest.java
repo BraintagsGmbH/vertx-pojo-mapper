@@ -109,6 +109,7 @@ public class TypeHandlerTest extends MongoBaseTest {
         assertTrue(oom.simpleMapper.id != null && !oom.simpleMapper.id.isEmpty());
         assertEquals(om.simpleMapper.name, oom.simpleMapper.name);
         assertEquals(om.simpleMapper.getSecondProperty(), oom.simpleMapper.getSecondProperty());
+        checkAnnotations(oom.simpleMapper);
         logger.info("finished!");
       }
     });
@@ -244,9 +245,15 @@ public class TypeHandlerTest extends MongoBaseTest {
         assertTrue(oom.simpleMapper.id == null);
         assertEquals(om.simpleMapper.name, oom.simpleMapper.name);
         assertEquals(om.simpleMapper.getSecondProperty(), oom.simpleMapper.getSecondProperty());
+        checkAnnotations(oom.simpleMapper);
         logger.info("finished!");
       }
     });
+  }
+
+  private void checkAnnotations(SimpleMapper rsm) {
+    assertEquals("succeeded", rsm.afterLoad);
+    assertEquals("succeeded", rsm.beforeSave);
   }
 
   @Test

@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
@@ -80,8 +79,6 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
   }
 
   private void save(T entity, IWriteResult writeResult, Handler<AsyncResult<Void>> resultHandler) {
-    executePreSave(entity);
-
     getDataStore().getStoreObjectFactory().createStoreObject(getMapper(), entity, result -> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
@@ -95,16 +92,6 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
         });
       }
     });
-  }
-
-  /**
-   * execute the methods marked with {@link BeforeSave}
-   * 
-   * @param entity
-   *          the entity to be handled
-   */
-  private void executePreSave(T entity) {
-    getMapper().executeLifecycle(BeforeSave.class, entity);
   }
 
   /**

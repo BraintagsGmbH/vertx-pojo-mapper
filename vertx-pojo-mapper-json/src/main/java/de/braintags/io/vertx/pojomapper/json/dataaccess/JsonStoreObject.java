@@ -20,6 +20,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
@@ -119,6 +120,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
         } else {
           if (co.reduce()) {
             entity = o;
+            getMapper().executeLifecycle(AfterLoad.class, entity);
             handler.handle(Future.succeededFuture());
           }
         }

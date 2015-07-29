@@ -20,6 +20,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
@@ -42,6 +43,7 @@ public class MongoStoreObjectFactory implements IStoreObjectFactory {
 
   @Override
   public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler) {
+    mapper.executeLifecycle(BeforeSave.class, entity);
     MongoStoreObject storeObject = new MongoStoreObject(mapper, entity);
     storeObject.initFromEntity(initResult -> {
       if (initResult.failed()) {
