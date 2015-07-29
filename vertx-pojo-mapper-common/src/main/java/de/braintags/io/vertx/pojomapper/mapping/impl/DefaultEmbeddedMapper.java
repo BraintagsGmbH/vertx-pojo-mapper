@@ -17,6 +17,7 @@
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -40,10 +41,12 @@ public class DefaultEmbeddedMapper extends AbstractSubobjectMapper implements IE
   @Override
   public void writeSingleValue(Object referencedObject, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Object>> handler) {
+    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
   }
 
   @Override
   public void readSingleValue(Object dbValue, IField field, Class<?> mapperClass, Handler<AsyncResult<Object>> handler) {
+    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
   }
 
 }
