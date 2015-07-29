@@ -19,12 +19,16 @@ package de.braintags.io.vertx.pojomapper.json.mapping;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 
 /**
- * 
+ * Implementation of {@link IEmbeddedMapper} which is used to store subobjects embedded in the field of their parent
+ * instance
  * 
  * @author Michael Remme
  * 
@@ -39,14 +43,36 @@ public class JsonEmbeddedMapper extends AbstractSubobjectMapper implements IEmbe
   }
 
   @Override
-  public void writeSingleValue(Object referencedObject, IStoreObject<?> storeObject, IField field,
+  public void writeSingleValue(Object embeddedObject, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Object>> handler) {
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    IDataStore store = field.getMapper().getMapperFactory().getDataStore();
+    IMapper mapper = store.getMapperFactory().getMapper(embeddedObject.getClass());
+
+    store.getStoreObjectFactory().createStoreObject(mapper, embeddedObject, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        JsonObject jo = (JsonObject) result.result().getContainer();
+        handler.handle(Future.succeededFuture(jo));
+      }
+    });
+
   }
 
   @Override
   public void readSingleValue(Object dbValue, IField field, Class<?> mapperClass, Handler<AsyncResult<Object>> handler) {
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    IDataStore store = field.getMapper().getMapperFactory().getDataStore();
+    mapperClass = mapperClass != null ? mapperClass : field.getType();
+    IMapper mapper = store.getMapperFactory().getMapper(mapperClass);
+
+    store.getStoreObjectFactory().createStoreObject(dbValue, mapper, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        Object jo = result.result().getEntity();
+        handler.handle(Future.succeededFuture(jo));
+      }
+    });
   }
 
 }

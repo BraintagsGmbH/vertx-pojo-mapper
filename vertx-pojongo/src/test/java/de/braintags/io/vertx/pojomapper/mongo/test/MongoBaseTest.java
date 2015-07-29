@@ -301,17 +301,20 @@ public abstract class MongoBaseTest extends VertxTestBase {
     IQueryResult<?> qr = qResult.result();
     assertNotNull(qr);
     assertTrue(qr.iterator().hasNext());
-    qr.iterator().next(result -> {
-      try {
-        if (result.failed()) {
-          result.cause().printStackTrace();
-        } else {
-          assertNotNull(result.result());
-        }
-      } finally {
-        latch.countDown();
-      }
-    });
+    qr.iterator().next(
+        result -> {
+          try {
+            if (result.failed()) {
+              result.cause().printStackTrace();
+              throw result.cause() instanceof RuntimeException ? (RuntimeException) result.cause()
+                  : new RuntimeException(result.cause());
+            } else {
+              assertNotNull(result.result());
+            }
+          } finally {
+            latch.countDown();
+          }
+        });
     try {
       latch.await();
     } catch (InterruptedException e) {
