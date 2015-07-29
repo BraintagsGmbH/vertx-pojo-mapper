@@ -34,7 +34,7 @@ public class TestSimpleInsert extends MongoBaseTest {
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(TestSimpleInsert.class);
 
-  private static final int LOOP = 100;
+  private static final int LOOP = 5000;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -62,7 +62,14 @@ public class TestSimpleInsert extends MongoBaseTest {
     resultContainer = saveRecords(mapperList);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
-    assertEquals(LOOP, resultContainer.writeResult.size());
+
+    if (LOOP != resultContainer.writeResult.size()) {
+      // check wether records weren't written or "only" IWriteResult is incomplete
+      IQuery<MiniMapper> query = getDataStore().createQuery(MiniMapper.class);
+      query.field("name").is("looper");
+      find(query, LOOP);
+      assertEquals(LOOP, resultContainer.writeResult.size());
+    }
 
     IQuery<MiniMapper> query = getDataStore().createQuery(MiniMapper.class);
     query.field("name").is("looper");

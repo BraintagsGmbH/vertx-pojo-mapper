@@ -19,6 +19,8 @@ package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.MongoClient;
 
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ import de.braintags.io.vertx.util.ErrorObject;
  */
 
 public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite<T> {
+  private static Logger logger = LoggerFactory.getLogger(MongoWrite.class);
   private List<T> objectsToSave = new ArrayList<T>();
 
   /**
@@ -69,6 +72,7 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
         if (result.failed()) {
           ro.setThrowable(result.cause());
         } else {
+          // logger.info("saving " + counter.getCount());
           if (counter.reduce())
             resultHandler.handle(Future.succeededFuture(rr));
         }
@@ -116,13 +120,15 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
     IMapper mapper = getMapper();
     String column = mapper.getDataStoreName();
     final String currentId = (String) storeObject.get(mapper.getIdField());
-
+    logger.info("now saving");
     mongoClient.save(column, storeObject.getContainer(), result -> {
       if (result.failed()) {
+        logger.info("failed", result.cause());
         Future<Void> future = Future.failedFuture(result.cause());
         resultHandler.handle(future);
         return;
       } else {
+        logger.info("saved");
         WriteAction action = WriteAction.UNKNOWN;
         String id = result.result();
         if (id == null) {
@@ -132,8 +138,7 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
           action = WriteAction.INSERT;
         executePostSave(entity);
         writeResult.addEntry(storeObject, id, action);
-        Future<Void> future = Future.succeededFuture();
-        resultHandler.handle(future);
+        resultHandler.handle(Future.succeededFuture());
       }
     });
 

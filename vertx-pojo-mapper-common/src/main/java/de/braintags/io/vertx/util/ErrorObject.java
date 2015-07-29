@@ -19,6 +19,8 @@ package de.braintags.io.vertx.util;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * A simple instance to transfer error information in an event queue
@@ -28,6 +30,7 @@ import io.vertx.core.Handler;
  */
 
 public class ErrorObject<E> {
+  private static Logger logger = LoggerFactory.getLogger(ErrorObject.class);
   private Throwable throwable;
 
   /**
@@ -71,6 +74,7 @@ public class ErrorObject<E> {
    */
   public final void setThrowable(Throwable throwable) {
     this.throwable = throwable;
+    logger.info("", throwable);
   }
 
   /**

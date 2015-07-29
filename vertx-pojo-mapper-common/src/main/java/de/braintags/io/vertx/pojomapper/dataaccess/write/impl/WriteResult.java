@@ -16,6 +16,9 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.write.impl;
 
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +36,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
  */
 
 public class WriteResult implements IWriteResult {
+  private static final Logger logger = LoggerFactory.getLogger(WriteResult.class);
   private List<IWriteEntry> resultList = new ArrayList<IWriteEntry>();
 
   /*
@@ -53,6 +57,7 @@ public class WriteResult implements IWriteResult {
    */
   private void addEntry(IWriteEntry entry) {
     resultList.add(entry);
+    logger.info(resultList.size());
   }
 
   /*
