@@ -69,6 +69,7 @@ public class MappedField implements IField {
   private Mapper mapper;
   private ITypeHandler typeHandler;
   private ITypeHandler subTypeHandler;
+  private ITypeHandler mapKeyTypeHandler;
   private IPropertyMapper propertyMapper;
   private final List<IField> typeParameters = new ArrayList<IField>();
   /**

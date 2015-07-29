@@ -245,6 +245,9 @@ public class TestMapperFactory {
     IField field = mapperDef.getField("myMap");
     Assert.assertTrue(field.isMap());
     Assert.assertEquals(2, field.getTypeParameters().size());
+
+    assertEquals(Integer.class, field.getMapKeyClass());
+    assertEquals(Double.class, field.getSubClass());
   }
 
   @Test

@@ -17,6 +17,7 @@
 package de.braintags.io.vertx.pojomapper.mapping;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * IObjectFactory is used to create new instances for a mapper.
@@ -43,6 +44,15 @@ public interface IObjectFactory {
    * @return a new {@link Collection}
    */
   Collection<?> createCollection(IField field);
+
+  /**
+   * Create a new instance of {@link Map}
+   * 
+   * @param field
+   *          the field to create a map for
+   * @return the new instance
+   */
+  Map<?, ?> createMap(IField field);
 
   /**
    * Set the Mapper, where the IObjectFactory is contained

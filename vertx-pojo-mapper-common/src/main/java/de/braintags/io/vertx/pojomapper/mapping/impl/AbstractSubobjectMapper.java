@@ -23,18 +23,21 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
-import java.util.ArrayList;
+import java.lang.reflect.Array;
 import java.util.Collection;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
-import de.braintags.io.vertx.util.ReflectionUtil;
+import de.braintags.io.vertx.util.Size;
 
 /**
  * An abstract implementation of IPropertyMapper, which is checking the field, wether it is a single value field, an
@@ -94,7 +97,13 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
   public void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
     if (field.isMap()) {
-      readMap(storeObject, field, handler);
+      readMap(entity, storeObject, field, result -> {
+        if (result.failed()) {
+          handler.handle(Future.failedFuture(result.cause()));
+        } else {
+          handler.handle(Future.succeededFuture());
+        }
+      });
     } else if (field.isArray()) {
       readArray(entity, storeObject, field, result -> {
         if (result.failed()) {
@@ -104,7 +113,17 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
         }
       });
     } else if (!field.isSingleValue()) {
-      readCollection(storeObject, field, handler);
+      try {
+        readCollection(entity, storeObject, field, result -> {
+          if (result.failed()) {
+            handler.handle(Future.failedFuture(result.cause()));
+          } else {
+            handler.handle(Future.succeededFuture());
+          }
+        });
+      } catch (Throwable e) {
+        handler.handle(Future.failedFuture(e));
+      }
     } else {
       Object dbValue = storeObject.get(field);
       readSingleValue(dbValue, field, null, result -> {
@@ -121,25 +140,35 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
     }
   }
 
-  public void writeArray(Object[] javaValues, IStoreObject<?> storeObject, IField field,
+  /**
+   * Write action for those fields, where an Array is marked as {@link Referenced}
+   * 
+   * @param javaValues
+   *          the array to be stored
+   * @param storeObject
+   *          the storeobject
+   * @param field
+   *          the field
+   * @param handler
+   *          the handler to be called
+   */
+  protected void writeArray(Object[] javaValues, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
     if (javaValues == null || javaValues.length == 0)
       handler.handle(Future.succeededFuture());
-    logger.info("writing array");
     ErrorObject<Void> errorObject = new ErrorObject<Void>();
     CounterObject co = new CounterObject(javaValues.length);
     Object[] resultArray = new Object[javaValues.length];
     for (int i = 0; i < javaValues.length; i++) {
       // trying to write the array in the order like it is
-      logger.info("writing array entry " + co.getCount());
       CurrentCounter cc = new CurrentCounter(i, javaValues[i]);
-      writeSingleValue(cc.javaValue, storeObject, field, result -> {
+      writeSingleValue(cc.value, storeObject, field, result -> {
         if (result.failed()) {
-          logger.info("failed");
+          logger.info("failed", result.cause());
           errorObject.setThrowable(result.cause());
         } else {
           resultArray[cc.i] = result.result();
-          logger.info("success write: " + cc.javaValue.toString() + " into " + cc.i);
+          logger.info("success write: " + cc.value.toString() + " into " + cc.i);
           if (co.reduce()) {
             JsonArray arr = new JsonArray();
             for (int k = 0; k < resultArray.length; k++) {
@@ -153,42 +182,42 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
       if (errorObject.handleError(handler))
         return;
     }
-
   }
 
-  class CurrentCounter {
-    int i;
-    Object javaValue;
-
-    CurrentCounter(int i, Object javaValue) {
-      this.i = i;
-      this.javaValue = javaValue;
-    }
-  }
-
-  public void readArray(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler) {
-    logger.info("reading array");
+  /**
+   * Read action for those fields, where an Array is marked as {@link Referenced}
+   * 
+   * @param entity
+   *          the entity to be filled
+   * @param storeObject
+   *          the storeobject from the datastore
+   * @param field
+   *          the field
+   * @param handler
+   *          the handler to be called
+   */
+  protected void readArray(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler) {
     JsonArray jsonArray = (JsonArray) storeObject.get(field);
     if (jsonArray == null || jsonArray.isEmpty())
       handler.handle(Future.succeededFuture());
     ErrorObject<Void> errorObject = new ErrorObject<Void>();
     CounterObject co = new CounterObject(jsonArray.size());
-    List<Object> resultList = new ArrayList<Object>();
+    final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
+    int counter = 0;
     for (Object jo : jsonArray) {
-      logger.info("reading array entry " + co.getCount());
-      readSingleValue(jo, field, field.getSubClass(), result -> {
+      CurrentCounter cc = new CurrentCounter(counter++, jo);
+      readSingleValue(cc.value, field, field.getSubClass(), result -> {
         if (result.failed()) {
-          logger.info("failed");
+          logger.info("failed", result.cause());
           errorObject.setThrowable(result.cause());
         } else {
           Object javaValue = result.result();
-          logger.info("success read: " + javaValue.toString());
+          logger.info("success read: " + javaValue.toString() + " into " + cc.i);
           if (javaValue != null)
-            resultList.add(javaValue);
+            Array.set(resultArray, cc.i, javaValue);
           if (co.reduce()) {
-            Object o = ReflectionUtil.convertToArray(field.getSubClass(), resultList);
             IPropertyAccessor pAcc = field.getPropertyAccessor();
-            pAcc.writeData(entity, o);
+            pAcc.writeData(entity, resultArray);
             handler.handle(Future.succeededFuture());
           }
         }
@@ -199,14 +228,232 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
 
   }
 
-  public void writeMap(Map<?, ?> javaValue, IStoreObject<?> storeObject, IField field,
-      Handler<AsyncResult<Void>> handler) {
-    throw new UnsupportedOperationException();
+  /**
+   * Read action for those fields, where a {@link Map} is marked as {@link Referenced}
+   * 
+   * @param entity
+   *          the entity to be filled
+   * @param storeObject
+   *          the storeobject from the datastore
+   * @param field
+   *          the field
+   * @param handler
+   *          the handler to be called
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected void readMap(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler) {
+    JsonArray jsonArray = (JsonArray) storeObject.get(field);
+    if (jsonArray == null || jsonArray.isEmpty())
+      handler.handle(Future.succeededFuture());
+    ErrorObject<Void> errorObject = new ErrorObject<Void>();
+    CounterObject co = new CounterObject(jsonArray.size());
+    final MapEntry[] resultArray = new MapEntry[jsonArray.size()];
+    int counter = 0;
+    for (Object jo : jsonArray) {
+      CurrentCounter cc = new CurrentCounter(counter++, jo);
+      Object keyIn = ((JsonArray) cc.value).getValue(0);
+      ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
+          .getTypeHandler(field.getMapKeyClass());
+      th.fromStore(keyIn, field, field.getMapKeyClass(), keyResult -> {
+        if (keyResult.failed()) {
+          logger.info("failed", keyResult.cause());
+          errorObject.setThrowable(keyResult.cause());
+        } else {
+          Object valueIn = ((JsonArray) cc.value).getValue(1);
+          readSingleValue(valueIn, field, field.getSubClass(), valueResult -> {
+            if (valueResult.failed()) {
+              logger.info("failed", valueResult.cause());
+              errorObject.setThrowable(valueResult.cause());
+            } else {
+              Object javaValue = valueResult.result();
+              logger.info("success read: " + javaValue.toString() + " into " + cc.i);
+              if (javaValue != null) {
+                resultArray[cc.i] = new MapEntry(keyResult.result().getResult(), valueResult.result());
+              }
+
+              if (co.reduce()) {
+                Map map = field.getMapper().getObjectFactory().createMap(field);
+                for (int i = 0; i < resultArray.length; i++) {
+                  map.put(resultArray[i].key, resultArray[i].value);
+                }
+                IPropertyAccessor pAcc = field.getPropertyAccessor();
+                pAcc.writeData(entity, map);
+                handler.handle(Future.succeededFuture());
+              }
+            }
+          });
+        }
+      });
+
+      if (errorObject.handleError(handler))
+        return;
+    }
   }
 
-  public void writeCollection(Iterable<?> javaValue, IStoreObject<?> storeObject, IField field,
+  class MapEntry {
+    Object key;
+    Object value;
+
+    MapEntry(Object key, Object value) {
+      this.key = key;
+      this.value = value;
+    }
+  }
+
+  /**
+   * Write action for those fields, where a {@link Map} is marked as {@link Referenced} The key of each entry in the map
+   * is written by using a suitable {@link ITypeHandler}, the value is resolved to its reference
+   * 
+   * @param javaValues
+   *          the array to be stored
+   * @param storeObject
+   *          the storeobject
+   * @param field
+   *          the field
+   * @param handler
+   *          the handler to be called
+   */
+  @SuppressWarnings("rawtypes")
+  protected void writeMap(Map<?, ?> map, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler) {
+    int size = map == null ? 0 : map.size();
+    if (size == 0)
+      handler.handle(Future.succeededFuture());
+    ErrorObject<Void> errorObject = new ErrorObject<Void>();
+    CounterObject co = new CounterObject(size);
+    JsonArray[] resultArray = new JsonArray[size];
+    Iterator<?> it = map.entrySet().iterator();
+    int counter = 0;
+    while (it.hasNext()) {
+      // trying to write the array in the order like it is
+      Entry entry = (Entry) it.next();
+      CurrentCounter cc = new CurrentCounter(counter++, entry);
+      ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
+          .getTypeHandler(field.getMapKeyClass());
+
+      th.intoStore(((Entry) cc.value).getKey(), field, keyResult -> {
+        if (keyResult.failed()) {
+          logger.info("failed", keyResult.cause());
+          errorObject.setThrowable(keyResult.cause());
+        } else {
+          writeSingleValue(((Entry) cc.value).getValue(), storeObject, field, valueResult -> {
+            if (valueResult.failed()) {
+              logger.info("failed", valueResult.cause());
+              errorObject.setThrowable(keyResult.cause());
+            } else {
+              resultArray[cc.i] = new JsonArray().add(keyResult.result().getResult()).add(valueResult.result());
+              logger.info("success write: " + cc.value.toString() + " into " + cc.i);
+              if (co.reduce()) {
+                JsonArray arr = new JsonArray();
+                for (int k = 0; k < resultArray.length; k++) {
+                  arr.add(resultArray[k]);
+                }
+                storeObject.put(field, arr);
+                handler.handle(Future.succeededFuture());
+              }
+            }
+          });
+        }
+      });
+      if (errorObject.handleError(handler))
+        return;
+    }
+  }
+
+  /**
+   * Write action for those fields, where an {@link Iterable} is marked as {@link Referenced}
+   * 
+   * @param javaValues
+   *          the array to be stored
+   * @param storeObject
+   *          the storeobject
+   * @param field
+   *          the field
+   * @param handler
+   *          the handler to be called
+   */
+  protected void writeCollection(Iterable<?> iterable, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
-    throw new UnsupportedOperationException();
+    int size = Size.size(iterable);
+    if (size == 0)
+      handler.handle(Future.succeededFuture());
+    ErrorObject<Void> errorObject = new ErrorObject<Void>();
+    CounterObject co = new CounterObject(size);
+    Object[] resultArray = new Object[size];
+    Iterator<?> it = iterable.iterator();
+    int counter = 0;
+    while (it.hasNext()) {
+      // trying to write the array in the order like it is
+      Object javaValue = it.next();
+      CurrentCounter cc = new CurrentCounter(counter++, javaValue);
+      writeSingleValue(cc.value, storeObject, field, result -> {
+        if (result.failed()) {
+          logger.info("failed", result.cause());
+          errorObject.setThrowable(result.cause());
+        } else {
+          resultArray[cc.i] = result.result();
+          logger.info("success write: " + cc.value.toString() + " into " + cc.i);
+          if (co.reduce()) {
+            JsonArray arr = new JsonArray();
+            for (int k = 0; k < resultArray.length; k++) {
+              arr.add(resultArray[k]);
+            }
+            storeObject.put(field, arr);
+            handler.handle(Future.succeededFuture());
+          }
+        }
+      });
+      if (errorObject.handleError(handler))
+        return;
+    }
+  }
+
+  /**
+   * Read action for those fields, where an {@link Iterable} is marked as {@link Referenced}
+   * 
+   * @param entity
+   *          the entity to be filled
+   * @param storeObject
+   *          the storeobject from the datastore
+   * @param field
+   *          the field
+   * @param handler
+   *          the handler to be called
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected void readCollection(Object entity, IStoreObject<?> storeObject, IField field,
+      Handler<AsyncResult<Void>> handler) {
+    JsonArray jsonArray = (JsonArray) storeObject.get(field);
+    if (jsonArray == null || jsonArray.isEmpty())
+      handler.handle(Future.succeededFuture());
+    ErrorObject<Void> errorObject = new ErrorObject<Void>();
+    CounterObject co = new CounterObject(jsonArray.size());
+    final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
+    int counter = 0;
+    for (Object jo : jsonArray) {
+      CurrentCounter cc = new CurrentCounter(counter++, jo);
+      readSingleValue(cc.value, field, field.getSubClass(), result -> {
+        if (result.failed()) {
+          logger.info("failed", result.cause());
+          errorObject.setThrowable(result.cause());
+        } else {
+          Object javaValue = result.result();
+          logger.info("success read: " + javaValue.toString() + " into " + cc.i);
+          if (javaValue != null)
+            Array.set(resultArray, cc.i, javaValue);
+          if (co.reduce()) {
+            Collection coll = field.getMapper().getObjectFactory().createCollection(field);
+            for (int i = 0; i < Array.getLength(resultArray); i++) {
+              coll.add(Array.get(resultArray, i));
+            }
+            IPropertyAccessor pAcc = field.getPropertyAccessor();
+            pAcc.writeData(entity, coll);
+            handler.handle(Future.succeededFuture());
+          }
+        }
+      });
+      if (errorObject.handleError(handler))
+        return;
+    }
   }
 
   /**
@@ -222,16 +469,8 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
    * @param handler
    *          the handler to be called
    */
-  public abstract void writeSingleValue(final Object referencedObject, final IStoreObject<?> storeObject,
+  protected abstract void writeSingleValue(final Object referencedObject, final IStoreObject<?> storeObject,
       final IField field, Handler<AsyncResult<Object>> handler);
-
-  public void readMap(IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler) {
-    throw new UnsupportedOperationException();
-  }
-
-  public void readCollection(IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler) {
-    throw new UnsupportedOperationException();
-  }
 
   /**
    * Generate a java value from the given dbValue
@@ -245,6 +484,17 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
    * @param handler
    *          the handler to be recalled
    */
-  public abstract void readSingleValue(Object dbValue, final IField field, Class<?> mapperClass,
+  protected abstract void readSingleValue(Object dbValue, final IField field, Class<?> mapperClass,
       Handler<AsyncResult<Object>> handler);
+
+  class CurrentCounter {
+    int i;
+    Object value;
+
+    CurrentCounter(int i, Object value) {
+      this.i = i;
+      this.value = value;
+    }
+  }
+
 }

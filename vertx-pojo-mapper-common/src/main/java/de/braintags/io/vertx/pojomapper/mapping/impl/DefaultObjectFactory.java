@@ -19,8 +19,10 @@ package de.braintags.io.vertx.pojomapper.mapping.impl;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
@@ -39,6 +41,7 @@ public class DefaultObjectFactory implements IObjectFactory {
   private IMapper mapper;
   private Class<?> DEFAULT_LIST_CLASS = ArrayList.class;
   private Class<?> DEFAULT_SET_CLASS = HashSet.class;
+  private Class<?> DEFAULT_MAP_CLASS = HashMap.class;
 
   /**
    * 
@@ -112,6 +115,11 @@ public class DefaultObjectFactory implements IObjectFactory {
       }
     }
     return createInstance(fallbackType);
+  }
+
+  @Override
+  public Map<?, ?> createMap(IField field) {
+    return (Map<?, ?>) newInstance(field.getConstructor(), DEFAULT_MAP_CLASS);
   }
 
 }

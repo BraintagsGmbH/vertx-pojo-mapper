@@ -61,7 +61,7 @@ public class Person extends AbstractPerson {
 
   public Animal rabbit;
 
-  public Map<String, Object> myMap;
+  public Map<Integer, Double> myMap;
 
   public Class<? extends Double> myClass;
 
