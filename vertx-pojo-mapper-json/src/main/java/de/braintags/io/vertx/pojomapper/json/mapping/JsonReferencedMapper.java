@@ -35,12 +35,12 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  * 
  */
 
-public class DefaultReferencedMapper extends AbstractSubobjectMapper implements IReferencedMapper {
+public class JsonReferencedMapper extends AbstractSubobjectMapper implements IReferencedMapper {
 
   /**
    * 
    */
-  public DefaultReferencedMapper() {
+  public JsonReferencedMapper() {
   }
 
   /**

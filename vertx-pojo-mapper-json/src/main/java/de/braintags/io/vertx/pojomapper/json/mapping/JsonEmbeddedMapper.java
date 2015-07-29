@@ -30,12 +30,12 @@ import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
  * 
  */
 
-public class DefaultEmbeddedMapper extends AbstractSubobjectMapper implements IEmbeddedMapper {
+public class JsonEmbeddedMapper extends AbstractSubobjectMapper implements IEmbeddedMapper {
 
   /**
    * 
    */
-  public DefaultEmbeddedMapper() {
+  public JsonEmbeddedMapper() {
   }
 
   @Override

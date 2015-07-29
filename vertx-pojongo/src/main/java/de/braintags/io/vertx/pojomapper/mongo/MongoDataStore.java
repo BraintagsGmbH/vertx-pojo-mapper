@@ -21,7 +21,7 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
-import de.braintags.io.vertx.pojomapper.json.mapping.DefaultPropertyMapperFactory;
+import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
@@ -42,7 +42,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 public class MongoDataStore implements IDataStore {
   private MongoClient client;
   private MapperFactory mapperFactory = new MongoMapperFactory(this);
-  private IPropertyMapperFactory propertyMapperFactory = new DefaultPropertyMapperFactory();
+  private IPropertyMapperFactory propertyMapperFactory = new JsonPropertyMapperFactory();
   private ITypeHandlerFactory thf = new JsonTypeHandlerFactory();
   public MongoStoreObjectFactory msf = new MongoStoreObjectFactory();
 

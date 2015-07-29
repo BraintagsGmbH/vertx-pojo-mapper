@@ -30,12 +30,12 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultPropertyMapper;
  * 
  */
 
-public class DefaultPropertyMapperFactory implements IPropertyMapperFactory {
+public class JsonPropertyMapperFactory implements IPropertyMapperFactory {
 
   /**
    * 
    */
-  public DefaultPropertyMapperFactory() {
+  public JsonPropertyMapperFactory() {
   }
 
   /*
@@ -48,9 +48,9 @@ public class DefaultPropertyMapperFactory implements IPropertyMapperFactory {
     if (cls == null)
       throw new NullPointerException("parameter must be specified: cls");
     if (cls.equals(IEmbeddedMapper.class) || IEmbeddedMapper.class.isInstance(cls)) {
-      return new DefaultEmbeddedMapper();
+      return new JsonEmbeddedMapper();
     } else if (cls.equals(IReferencedMapper.class) || IReferencedMapper.class.isInstance(cls)) {
-      return new DefaultReferencedMapper();
+      return new JsonReferencedMapper();
     } else if (cls.equals(IPropertyMapper.class) || IPropertyMapper.class.isInstance(cls)) {
       return new DefaultPropertyMapper();
     }
