@@ -24,10 +24,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.EmbeddedMapper_Array;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.EmbeddedMapper_List;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.EmbeddedMapper_Map;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.EmbeddedMapper_Single;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ReferenceMapper_Array;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ReferenceMapper_List;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ReferenceMapper_Map;
@@ -216,139 +212,139 @@ public class TypeHandlerTest extends MongoBaseTest {
     });
   }
 
-  @Test
-  public void testSaveAndRead_EmbeddedMapperSingle() {
-    SimpleMapper sc = new SimpleMapper();
-    sc.name = "name";
-    sc.setSecondProperty("2. property");
-
-    EmbeddedMapper_Single om = new EmbeddedMapper_Single();
-    om.simpleMapper = sc;
-
-    ResultContainer resultContainer = saveRecord(om);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
-    // SimpleQuery for all records
-    IQuery<EmbeddedMapper_Single> query = getDataStore().createQuery(EmbeddedMapper_Single.class);
-    resultContainer = find(query, 1);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
-    resultContainer.queryResult.iterator().next(result -> {
-      if (result.failed()) {
-        result.cause().printStackTrace();
-      } else {
-        EmbeddedMapper_Single oom = (EmbeddedMapper_Single) result.result();
-        assertNotNull(oom.simpleMapper);
-        assertTrue(oom.simpleMapper.id != null && !oom.simpleMapper.id.isEmpty());
-        assertEquals(om.simpleMapper.name, oom.simpleMapper.name);
-        assertEquals(om.simpleMapper.getSecondProperty(), oom.simpleMapper.getSecondProperty());
-        logger.info("finished!");
-      }
-    });
-  }
-
-  @Test
-  public void testSaveAndRead_EmbeddedMapperArray() {
-
-    EmbeddedMapper_Array om = new EmbeddedMapper_Array();
-
-    ResultContainer resultContainer = saveRecord(om);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
-    // SimpleQuery for all records
-    IQuery<EmbeddedMapper_Array> query = getDataStore().createQuery(EmbeddedMapper_Array.class);
-    resultContainer = find(query, 1);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
-    resultContainer.queryResult.iterator().next(result -> {
-      if (result.failed()) {
-        result.cause().printStackTrace();
-      } else {
-        EmbeddedMapper_Array oom = (EmbeddedMapper_Array) result.result();
-        assertNotNull(oom.simpleMapper);
-        for (int i = 0; i < om.simpleMapper.length; i++) {
-          SimpleMapper omSm = om.simpleMapper[i];
-          SimpleMapper oomSm = oom.simpleMapper[i];
-
-          assertTrue(oomSm.id != null && !oomSm.id.isEmpty());
-          assertEquals(omSm.name, oomSm.name);
-          assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
-        }
-        logger.info("finished!");
-      }
-    });
-  }
-
-  @Test
-  public void testSaveAndRead_EmbeddedMapperList() {
-
-    EmbeddedMapper_List om = new EmbeddedMapper_List();
-
-    ResultContainer resultContainer = saveRecord(om);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
-    // SimpleQuery for all records
-    IQuery<EmbeddedMapper_List> query = getDataStore().createQuery(EmbeddedMapper_List.class);
-    resultContainer = find(query, 1);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
-    resultContainer.queryResult.iterator().next(result -> {
-      if (result.failed()) {
-        result.cause().printStackTrace();
-      } else {
-        EmbeddedMapper_List oom = (EmbeddedMapper_List) result.result();
-        assertNotNull(oom.simpleMapper);
-        for (int i = 0; i < om.simpleMapper.size(); i++) {
-          SimpleMapper omSm = om.simpleMapper.get(i);
-          SimpleMapper oomSm = oom.simpleMapper.get(i);
-
-          assertTrue(oomSm.id != null && !oomSm.id.isEmpty());
-          assertEquals(omSm.name, oomSm.name);
-          assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
-        }
-        logger.info("finished!");
-      }
-    });
-  }
-
-  @Test
-  public void testSaveAndRead_EmbeddedMapperMap() {
-
-    EmbeddedMapper_Map om = new EmbeddedMapper_Map();
-
-    ResultContainer resultContainer = saveRecord(om);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
-    // SimpleQuery for all records
-    IQuery<EmbeddedMapper_Map> query = getDataStore().createQuery(EmbeddedMapper_Map.class);
-    resultContainer = find(query, 1);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
-    resultContainer.queryResult.iterator().next(result -> {
-      if (result.failed()) {
-        result.cause().printStackTrace();
-      } else {
-        EmbeddedMapper_Map oom = (EmbeddedMapper_Map) result.result();
-        assertNotNull(oom.simpleMapper);
-        for (int i = 0; i < om.simpleMapper.size(); i++) {
-          SimpleMapper omSm = om.simpleMapper.get(i);
-          SimpleMapper oomSm = oom.simpleMapper.get(i);
-
-          assertTrue(oomSm.id != null && !oomSm.id.isEmpty());
-          assertEquals(omSm.name, oomSm.name);
-          assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
-        }
-        logger.info("finished!");
-      }
-    });
-  }
+  // @Test
+  // public void testSaveAndRead_EmbeddedMapperSingle() {
+  // SimpleMapper sc = new SimpleMapper();
+  // sc.name = "name";
+  // sc.setSecondProperty("2. property");
+  //
+  // EmbeddedMapper_Single om = new EmbeddedMapper_Single();
+  // om.simpleMapper = sc;
+  //
+  // ResultContainer resultContainer = saveRecord(om);
+  // if (resultContainer.assertionError != null)
+  // throw resultContainer.assertionError;
+  //
+  // // SimpleQuery for all records
+  // IQuery<EmbeddedMapper_Single> query = getDataStore().createQuery(EmbeddedMapper_Single.class);
+  // resultContainer = find(query, 1);
+  // if (resultContainer.assertionError != null)
+  // throw resultContainer.assertionError;
+  //
+  // resultContainer.queryResult.iterator().next(result -> {
+  // if (result.failed()) {
+  // result.cause().printStackTrace();
+  // } else {
+  // EmbeddedMapper_Single oom = (EmbeddedMapper_Single) result.result();
+  // assertNotNull(oom.simpleMapper);
+  // assertTrue(oom.simpleMapper.id != null && !oom.simpleMapper.id.isEmpty());
+  // assertEquals(om.simpleMapper.name, oom.simpleMapper.name);
+  // assertEquals(om.simpleMapper.getSecondProperty(), oom.simpleMapper.getSecondProperty());
+  // logger.info("finished!");
+  // }
+  // });
+  // }
+  //
+  // @Test
+  // public void testSaveAndRead_EmbeddedMapperArray() {
+  //
+  // EmbeddedMapper_Array om = new EmbeddedMapper_Array();
+  //
+  // ResultContainer resultContainer = saveRecord(om);
+  // if (resultContainer.assertionError != null)
+  // throw resultContainer.assertionError;
+  //
+  // // SimpleQuery for all records
+  // IQuery<EmbeddedMapper_Array> query = getDataStore().createQuery(EmbeddedMapper_Array.class);
+  // resultContainer = find(query, 1);
+  // if (resultContainer.assertionError != null)
+  // throw resultContainer.assertionError;
+  //
+  // resultContainer.queryResult.iterator().next(result -> {
+  // if (result.failed()) {
+  // result.cause().printStackTrace();
+  // } else {
+  // EmbeddedMapper_Array oom = (EmbeddedMapper_Array) result.result();
+  // assertNotNull(oom.simpleMapper);
+  // for (int i = 0; i < om.simpleMapper.length; i++) {
+  // SimpleMapper omSm = om.simpleMapper[i];
+  // SimpleMapper oomSm = oom.simpleMapper[i];
+  //
+  // assertTrue(oomSm.id != null && !oomSm.id.isEmpty());
+  // assertEquals(omSm.name, oomSm.name);
+  // assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
+  // }
+  // logger.info("finished!");
+  // }
+  // });
+  // }
+  //
+  // @Test
+  // public void testSaveAndRead_EmbeddedMapperList() {
+  //
+  // EmbeddedMapper_List om = new EmbeddedMapper_List();
+  //
+  // ResultContainer resultContainer = saveRecord(om);
+  // if (resultContainer.assertionError != null)
+  // throw resultContainer.assertionError;
+  //
+  // // SimpleQuery for all records
+  // IQuery<EmbeddedMapper_List> query = getDataStore().createQuery(EmbeddedMapper_List.class);
+  // resultContainer = find(query, 1);
+  // if (resultContainer.assertionError != null)
+  // throw resultContainer.assertionError;
+  //
+  // resultContainer.queryResult.iterator().next(result -> {
+  // if (result.failed()) {
+  // result.cause().printStackTrace();
+  // } else {
+  // EmbeddedMapper_List oom = (EmbeddedMapper_List) result.result();
+  // assertNotNull(oom.simpleMapper);
+  // for (int i = 0; i < om.simpleMapper.size(); i++) {
+  // SimpleMapper omSm = om.simpleMapper.get(i);
+  // SimpleMapper oomSm = oom.simpleMapper.get(i);
+  //
+  // assertTrue(oomSm.id != null && !oomSm.id.isEmpty());
+  // assertEquals(omSm.name, oomSm.name);
+  // assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
+  // }
+  // logger.info("finished!");
+  // }
+  // });
+  // }
+  //
+  // @Test
+  // public void testSaveAndRead_EmbeddedMapperMap() {
+  //
+  // EmbeddedMapper_Map om = new EmbeddedMapper_Map();
+  //
+  // ResultContainer resultContainer = saveRecord(om);
+  // if (resultContainer.assertionError != null)
+  // throw resultContainer.assertionError;
+  //
+  // // SimpleQuery for all records
+  // IQuery<EmbeddedMapper_Map> query = getDataStore().createQuery(EmbeddedMapper_Map.class);
+  // resultContainer = find(query, 1);
+  // if (resultContainer.assertionError != null)
+  // throw resultContainer.assertionError;
+  //
+  // resultContainer.queryResult.iterator().next(result -> {
+  // if (result.failed()) {
+  // result.cause().printStackTrace();
+  // } else {
+  // EmbeddedMapper_Map oom = (EmbeddedMapper_Map) result.result();
+  // assertNotNull(oom.simpleMapper);
+  // for (int i = 0; i < om.simpleMapper.size(); i++) {
+  // SimpleMapper omSm = om.simpleMapper.get(i);
+  // SimpleMapper oomSm = oom.simpleMapper.get(i);
+  //
+  // assertTrue(oomSm.id != null && !oomSm.id.isEmpty());
+  // assertEquals(omSm.name, oomSm.name);
+  // assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
+  // }
+  // logger.info("finished!");
+  // }
+  // });
+  // }
 
 }

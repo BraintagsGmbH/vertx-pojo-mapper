@@ -243,7 +243,6 @@ public class TestMapperFactory {
   @Test
   public void testMap() {
     IField field = mapperDef.getField("myMap");
-    Assert.assertTrue(field instanceof ParametrizedMappedField);
 
     Assert.assertTrue(field.isMap());
     Assert.assertEquals(2, field.getTypeParameters().size());

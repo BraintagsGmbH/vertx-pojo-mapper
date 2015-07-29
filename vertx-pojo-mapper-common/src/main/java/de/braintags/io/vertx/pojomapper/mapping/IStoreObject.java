@@ -57,4 +57,11 @@ public interface IStoreObject<T> {
    * @return the container
    */
   public T getContainer();
+
+  /**
+   * Get the POJO entity, whihc was created from the stored information in the {@link IDataStore}
+   * 
+   * @return the entity
+   */
+  public Object getEntity();
 }

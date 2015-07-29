@@ -16,10 +16,15 @@
 
 package de.braintags.io.vertx.pojomapper.json.dataaccess;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import de.braintags.io.vertx.util.CounterObject;
+import de.braintags.io.vertx.util.ErrorObject;
 
 /**
  * An implementation of {@link IStoreObject}, which uses a JsonObject as internal container
@@ -30,22 +35,26 @@ import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 public class JsonStoreObject implements IStoreObject<JsonObject> {
   private JsonObject jsonObject;
   private IMapper mapper;
+  private Object entity = null;
 
   /**
    * 
    */
-  public JsonStoreObject(IMapper mapper) {
+  public JsonStoreObject(IMapper mapper, Object entity) {
     if (mapper == null)
       throw new NullPointerException("Mapper must not be null");
     this.mapper = mapper;
     this.jsonObject = new JsonObject();
+    this.entity = entity;
   }
 
   /**
    * 
    */
   public JsonStoreObject(JsonObject jsonObject, IMapper mapper) {
-    this(mapper);
+    if (mapper == null)
+      throw new NullPointerException("Mapper must not be null");
+    this.mapper = mapper;
     this.jsonObject = jsonObject;
   }
 
@@ -81,6 +90,69 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    */
   public IMapper getMapper() {
     return mapper;
+  }
+
+  @Override
+  public Object getEntity() {
+    if (entity == null) {
+      throw new NullPointerException(
+          "Internal Entity is not initialized; call method MongoStoreObject.initToEntity first ");
+    }
+    return entity;
+  }
+
+  /**
+   * Initialize the internal entity
+   * 
+   * @param handler
+   */
+  public void initToEntity(Handler<AsyncResult<Void>> handler) {
+    Object o = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
+    ErrorObject<Void> error = new ErrorObject<Void>();
+    CounterObject co = new CounterObject(getMapper().getFieldNames().size());
+    for (String fieldName : getMapper().getFieldNames()) {
+      IField field = getMapper().getField(fieldName);
+      field.getPropertyMapper().fromStoreObject(o, this, field, result -> {
+        if (result.failed()) {
+          error.setThrowable(result.cause());
+          handler.handle(result);
+        } else {
+          if (co.reduce()) {
+            entity = o;
+            handler.handle(Future.succeededFuture());
+          }
+        }
+      });
+      if (error.isError()) {
+        return;
+      }
+    }
+  }
+
+  /**
+   * Initialize the internal entity into the StoreObject
+   * 
+   * @param handler
+   */
+  public void initFromEntity(Handler<AsyncResult<Void>> handler) {
+    ErrorObject<Void> error = new ErrorObject<Void>();
+    IMapper mapper = getMapper();
+    CounterObject co = new CounterObject(mapper.getFieldNames().size());
+    for (String fieldName : mapper.getFieldNames()) {
+      IField field = mapper.getField(fieldName);
+      field.getPropertyMapper().intoStoreObject(entity, this, field, result -> {
+        if (result.failed()) {
+          error.setThrowable(result.cause());
+          handler.handle(result);
+        } else {
+          if (co.reduce())
+            handler.handle(Future.succeededFuture());
+        }
+      });
+      if (error.isError()) {
+        return;
+      }
+    }
   }
 
 }

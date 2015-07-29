@@ -75,12 +75,11 @@ public class MongoQueryResult<T> extends AbstractCollectionAsync<T> implements I
   @SuppressWarnings("unchecked")
   private void generatePojo(int i, Handler<AsyncResult<Void>> handler) {
     JsonObject sourceObject = jsonResult.get(i);
-    MongoStoreObject storeObject = new MongoStoreObject(sourceObject, getMapper());
-    storeObject.initToEntity(result -> {
+    getDataStore().getStoreObjectFactory().createStoreObject(sourceObject, getMapper(), result -> {
       if (result.failed()) {
-        handler.handle(result);
+        handler.handle(Future.failedFuture(result.cause()));
       } else {
-        pojoResult[i] = (T) storeObject.getEntity();
+        pojoResult[i] = (T) result.result().getEntity();
         handler.handle(Future.succeededFuture());
       }
     });

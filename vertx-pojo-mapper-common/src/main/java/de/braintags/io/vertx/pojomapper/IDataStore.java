@@ -22,6 +22,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 /**
@@ -80,5 +81,12 @@ public interface IDataStore {
    * @return the {@link IPropertyMapperFactory} to retrieve new instances of {@link IPropertyMapper}
    */
   public IPropertyMapperFactory getPropertyMapperFactory();
+
+  /**
+   * Get the {@link IStoreObjectFactory} suitable for the current datastore
+   * 
+   * @return the instance of {@link IStoreObjectFactory}
+   */
+  public IStoreObjectFactory getStoreObjectFactory();
 
 }
