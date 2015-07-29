@@ -14,13 +14,14 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.mapping.impl;
+package de.braintags.io.vertx.pojomapper.json.mapping;
 
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
+import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultPropertyMapper;
 
 /**
  * default implementation of {@link IPropertyMapperFactory}

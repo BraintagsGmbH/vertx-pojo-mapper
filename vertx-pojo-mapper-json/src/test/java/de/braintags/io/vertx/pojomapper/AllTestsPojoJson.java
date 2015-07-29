@@ -22,6 +22,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ AsyncHandlerTest.class, TestMapperFactory.class, TestQuery.class, TestReflection.class })
-public class AllTestsPojoCommon {
+public class AllTestsPojoJson {
 
 }
