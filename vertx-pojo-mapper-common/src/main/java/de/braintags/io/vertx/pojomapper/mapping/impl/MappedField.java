@@ -126,7 +126,7 @@ public class MappedField implements IField {
     computeType();
     // computeConstructor();
     computeMultivalued();
-
+    computeSubTypeHandler();
   }
 
   private void computeSubTypeHandler() {

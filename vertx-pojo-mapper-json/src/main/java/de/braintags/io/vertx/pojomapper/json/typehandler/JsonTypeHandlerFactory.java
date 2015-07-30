@@ -31,9 +31,11 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.EnumTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.FloatTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.LocaleTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectReferenceTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ShortTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.StringTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.URITypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.URLTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandlerFactory;
@@ -67,10 +69,8 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     definedTypeHandlers.add(new ClassTypeHandler());
     definedTypeHandlers.add(new LocaleTypeHandler());
     definedTypeHandlers.add(new EnumTypeHandler());
-
-    // definedTypeHandlers.add(new ());
-
-    // definedTypeHandlers.add(new ());
+    definedTypeHandlers.add(new MapTypeHandler());
+    definedTypeHandlers.add(new StringTypeHandler());
 
     // definedTypeHandlers.add(new ());
 

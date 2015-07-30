@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
@@ -90,6 +91,9 @@ public class TypehandlerTestMapper {
   public Enum<WriteAction> enumEnum = WriteAction.INSERT;
 
   public Map<String, Integer> map = new HashMap<String, Integer>();
+  public Properties properties = new Properties();
+
+  // public String[] stringArray = { "eins", "zwei", "drei" };
 
   /**
    * 
@@ -104,6 +108,9 @@ public class TypehandlerTestMapper {
       map.put("Eins", 1);
       map.put("Zwei", 2);
       map.put("Drei", 3);
+      properties.put("Eins", 1);
+      properties.put("Zwei", 2);
+      properties.put("Drei", 3);
     } catch (URISyntaxException | MalformedURLException e) {
       throw new MappingException(e);
     }

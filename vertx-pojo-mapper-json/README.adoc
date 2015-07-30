@@ -11,13 +11,7 @@ mainly stuff for the serialization of POJO to Json and back
     
     
     	
-    
-    registerTypeHandler(new PropertiesHandler()); -> Hashtable
-    registerTypeHandler(new MapHandler());
-    registerTypeHandler(new MapEntryHandler());
     registerTypeHandler(new NullObjectHandler());
-
-
 
 
     registerTypeHandler(new ZipHandler());
