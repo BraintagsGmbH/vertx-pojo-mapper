@@ -16,8 +16,6 @@ mainly stuff for the serialization of POJO to Json and back
     registerTypeHandler(new CollectionHandler()); 
     	List<String>
     	List<Person>
-    	@Referenced
-    	List<Person>  =>> List als Liste, Inhalte referenziert
     	
     
     registerTypeHandler(new LocaleHandler());
@@ -35,12 +33,8 @@ mainly stuff for the serialization of POJO to Json and back
     registerTypeHandler(new PeriodHandler());
 
     
-    Trigger testen Speichern von Hauptobjekt und Subobjekten
     
-    Embedded
-    
-    Referenced
-    
+   
     Generics
     
     

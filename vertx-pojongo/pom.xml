@@ -35,12 +35,12 @@
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mongo-client</artifactId>
-  			<version>3.1.0-SNAPSHOT</version>
+  			<version>${MONGO_VERSION}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mongo-service</artifactId>
-  			<version>3.1.0-SNAPSHOT</version>
+  			<version>${MONGO_VERSION}</version>
 		</dependency>
 		
 		<dependency>
@@ -54,10 +54,13 @@
 			<artifactId>vertx-mongo-service</artifactId>
 			<scope>test</scope>
 			<classifier>tests</classifier>
-  			<version>3.1.0-SNAPSHOT</version>
+  			<version>${MONGO_VERSION}</version>
 		</dependency>
 		
 		
 	</dependencies>
 	
+	<properties>
+		<MONGO_VERSION>3.0.0-SNAPSHOT</MONGO_VERSION>
+	</properties>
 </project>
