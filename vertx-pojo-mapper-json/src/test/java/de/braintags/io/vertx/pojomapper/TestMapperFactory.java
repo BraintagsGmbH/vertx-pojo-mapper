@@ -43,6 +43,8 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.impl.DummyDataStore;
 import de.braintags.io.vertx.pojomapper.impl.DummyObjectFactory;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.StringTypeHandler;
 import de.braintags.io.vertx.pojomapper.mapper.Animal;
 import de.braintags.io.vertx.pojomapper.mapper.Person;
 import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
@@ -53,7 +55,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ParametrizedMappedField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
-import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ObjectTypeHandler;
 
 /**
  * 
@@ -136,9 +137,9 @@ public class TestMapperFactory {
   @Test
   public void testTypeHandler() {
     ITypeHandler th = mapperDef.getField("name").getTypeHandler();
-    assertTrue("Not an instance of CharacterTypeHandler", th instanceof ObjectTypeHandler);
+    assertEquals(StringTypeHandler.class, th.getClass());
     th = mapperDef.getField("rabbit").getTypeHandler();
-    assertTrue("Not an instance of ObjectTypeHandler", th instanceof ObjectTypeHandler);
+    assertEquals(ObjectTypeHandler.class, th.getClass());
 
     th = mapperDef.getField("chicken").getTypeHandler();
     assertNull("@Embedded must be null", th);
@@ -202,7 +203,7 @@ public class TestMapperFactory {
   public void testArray() {
     IField field = mapperDef.getField("stringArray");
     assertTrue(field.isArray());
-    assertEquals(ArrayTypeHandler.class, field.getTypeHandler());
+    assertEquals(ArrayTypeHandler.class, field.getTypeHandler().getClass());
   }
 
   @Test

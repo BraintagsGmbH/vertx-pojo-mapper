@@ -151,6 +151,15 @@ public class TypehandlerTestMapper {
       value = value.toString();
       compareValue = compareValue.toString();
     }
+
+    if (value.getClass().isArray()) {
+      if (!compareValue.getClass().isArray())
+        throw new MappingException("Contents are not equal: " + fieldName);
+      if (!Arrays.equals((Object[]) value, (Object[]) compareValue))
+        throw new MappingException("Contents are not equal: " + fieldName);
+      return true;
+    }
+
     if (!value.equals(compareValue))
       throw new MappingException("Contents are not equal: " + fieldName);
     return true;
