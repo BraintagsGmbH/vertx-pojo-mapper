@@ -25,12 +25,12 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
+import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
-import de.braintags.io.vertx.pojomapper.typehandler.stringbased.StringTypeHandlerFactory;
 
 /**
  * 
@@ -41,7 +41,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.stringbased.StringTypeHandle
 
 public class DummyDataStore implements IDataStore {
   IMapperFactory mf = new MapperFactory(this);
-  ITypeHandlerFactory tf = new StringTypeHandlerFactory();
+  ITypeHandlerFactory tf = new JsonTypeHandlerFactory();
   IPropertyMapperFactory pmf = new JsonPropertyMapperFactory();
 
   /*

@@ -42,6 +42,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.impl.DummyDataStore;
 import de.braintags.io.vertx.pojomapper.impl.DummyObjectFactory;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler;
 import de.braintags.io.vertx.pojomapper.mapper.Animal;
 import de.braintags.io.vertx.pojomapper.mapper.Person;
 import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
@@ -195,6 +196,13 @@ public class TestMapperFactory {
     Referenced ann = (Referenced) field.getAnnotation(Referenced.class);
     if (ann == null)
       Assert.fail("Annotation Referenced must not be null");
+  }
+
+  @Test
+  public void testArray() {
+    IField field = mapperDef.getField("stringArray");
+    assertTrue(field.isArray());
+    assertEquals(ArrayTypeHandler.class, field.getTypeHandler());
   }
 
   @Test

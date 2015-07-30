@@ -93,7 +93,7 @@ public class TypehandlerTestMapper {
   public Map<String, Integer> map = new HashMap<String, Integer>();
   public Properties properties = new Properties();
 
-  // public String[] stringArray = { "eins", "zwei", "drei" };
+  public String[] stringArray = { "eins", "zwei", "drei" };
 
   /**
    * 

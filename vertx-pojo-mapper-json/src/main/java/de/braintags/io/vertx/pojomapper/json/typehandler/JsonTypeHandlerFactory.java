@@ -19,6 +19,7 @@ package de.braintags.io.vertx.pojomapper.json.typehandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.BigDecimalTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.BigIntegerTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ByteTypeHandler;
@@ -71,9 +72,13 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     definedTypeHandlers.add(new EnumTypeHandler());
     definedTypeHandlers.add(new MapTypeHandler());
     definedTypeHandlers.add(new StringTypeHandler());
+    definedTypeHandlers.add(new ArrayTypeHandler());
 
     // definedTypeHandlers.add(new ());
+    // definedTypeHandlers.add(new ());
+    // definedTypeHandlers.add(new ());
 
+    // definedTypeHandlers.add(new ());
   }
 
   /**

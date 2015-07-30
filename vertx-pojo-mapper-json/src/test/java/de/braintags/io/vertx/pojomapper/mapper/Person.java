@@ -43,7 +43,7 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 @Entity(name = "PersonColumn")
 @Indexes(@Index(fields = { @IndexField(fieldName = "name"), @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
 public class Person extends AbstractPerson {
-  public static final int NUMBER_OF_PROPERTIES = 15;
+  public static final int NUMBER_OF_PROPERTIES = 16;
 
   @Id
   public String idField;
@@ -80,6 +80,7 @@ public class Person extends AbstractPerson {
 
   private String hiddenString;
   public transient String transientString;
+  public String[] stringArray = { "eins", "zwei", "drei" };
 
   /**
    * @return the name
