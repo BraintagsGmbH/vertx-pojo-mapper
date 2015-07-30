@@ -156,7 +156,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
   private void initMongoClient() {
     JsonObject config = getConfig();
     logger.info("init MongoClient with " + config);
-    mongoClient = MongoClient.createShared(vertx, config);
+    mongoClient = MongoClient.createNonShared(vertx, config);
     CountDownLatch latch = new CountDownLatch(1);
     mongoClient.getCollections(resultHandler -> {
       if (resultHandler.failed()) {
