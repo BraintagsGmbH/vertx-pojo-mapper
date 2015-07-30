@@ -69,6 +69,7 @@ public class MongoBulkTest extends MongoBaseTest {
   public MongoBulkTest() {
   }
 
+  @SuppressWarnings("rawtypes")
   @Test
   public void BulkTest() {
     CountDownLatch latch = new CountDownLatch(1);

@@ -1,0 +1,80 @@
+/*
+ * Copyright 2014 Red Hat, Inc.
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * 
+ * The Eclipse Public License is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * 
+ * You may elect to redistribute this code under either of these licenses.
+ */
+
+package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
+
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
+import java.util.List;
+
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+
+/**
+ * 
+ * 
+ * @author Michael Remme
+ * 
+ */
+
+public class EnumTypeHandler extends AbstractTypeHandler {
+
+  /**
+   * @param classesToDeal
+   */
+  public EnumTypeHandler() {
+    super(Enum.class);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
+   */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @Override
+  public void fromStore(Object source, IField field, Class<?> cls,
+      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    List<IField> tp = field.getTypeParameters();
+    if (!tp.isEmpty()) {
+      Class enumClass = tp.get(0).getType();
+      success(source == null ? source : Enum.valueOf(enumClass, source.toString()), resultHandler);
+    } else {
+      fail(
+          new UnsupportedOperationException("Enum without generic are not supported in entity " + field.getFullName()),
+          resultHandler);
+    }
+
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
+   */
+  @Override
+  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    success(source == null ? source : getName((Enum) source), resultHandler);
+  }
+
+  private <T extends Enum> String getName(final T value) {
+    return value.name();
+  }
+}

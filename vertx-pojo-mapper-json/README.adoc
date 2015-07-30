@@ -10,15 +10,8 @@ mainly stuff for the serialization of POJO to Json and back
 		byte[]
     
     
-    registerTypeHandler(new ByteHandler());
-    registerTypeHandler(new ClassHandler());
-    registerTypeHandler(new EnumHandler());
-    registerTypeHandler(new CollectionHandler()); 
-    	List<String>
-    	List<Person>
     	
     
-    registerTypeHandler(new LocaleHandler());
     registerTypeHandler(new PropertiesHandler()); -> Hashtable
     registerTypeHandler(new MapHandler());
     registerTypeHandler(new MapEntryHandler());
@@ -30,7 +23,6 @@ mainly stuff for the serialization of POJO to Json and back
     registerTypeHandler(new ZipHandler());
 
     registerTypeHandler(new BinaryDocumentHandler());
-    registerTypeHandler(new PeriodHandler());
 
     
     

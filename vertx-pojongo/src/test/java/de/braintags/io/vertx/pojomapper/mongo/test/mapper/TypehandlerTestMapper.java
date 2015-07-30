@@ -25,12 +25,17 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
@@ -78,6 +83,14 @@ public class TypehandlerTestMapper {
   public List arrayList = Arrays.asList("Eins", "Zwei", "drei"); // no subtype defined
   public List mixedList = Arrays.asList("Eins", "Zwei", 5, "vier", new Long(99994444)); // no subtype defined
 
+  public Class<?> clsProperty = String.class;
+  public Locale locale = Locale.FRANCE;
+
+  public List<String> stringList = new ArrayList<String>();
+  public Enum<WriteAction> enumEnum = WriteAction.INSERT;
+
+  public Map<String, Integer> map = new HashMap<String, Integer>();
+
   /**
    * 
    */
@@ -85,6 +98,12 @@ public class TypehandlerTestMapper {
     try {
       uri = new URI("https://www.braintags.de/impressum");
       url = new URL("https://www.braintag.de/rebutton");
+      stringList.add("s1");
+      stringList.add("s2");
+      stringList.add("s3");
+      map.put("Eins", 1);
+      map.put("Zwei", 2);
+      map.put("Drei", 3);
     } catch (URISyntaxException | MalformedURLException e) {
       throw new MappingException(e);
     }
