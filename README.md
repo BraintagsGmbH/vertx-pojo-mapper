@@ -5,6 +5,7 @@ map POJO to datastores and back
 Simple example to write and read a pojo ( as JUnit test )
 Run it inside the subproject vertx-pojongo
 
+----
 
   private static final Logger logger = LoggerFactory.getLogger(Examples.class);
 
@@ -108,3 +109,5 @@ Run it inside the subproject vertx-pojongo
     public String subname;
 
   }
+----
+  
