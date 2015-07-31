@@ -23,6 +23,7 @@ import io.vertx.test.core.VertxTestBase;
 
 import org.junit.Test;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
@@ -31,7 +32,9 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
+import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoStoreObject;
 
 /**
  * Simple example to write and read Pojos
@@ -44,7 +47,7 @@ public class Examples extends VertxTestBase {
   private static final Logger logger = LoggerFactory.getLogger(Examples.class);
 
   private static MongoClient mongoClient;
-  private MongoDataStore mongoDataStore;
+  private IDataStore mongoDataStore;
 
   @Test
   public void Demo() {
@@ -56,8 +59,11 @@ public class Examples extends VertxTestBase {
       config.put("connection_string", "mongodb://localhost:27017");
       config.put("db_name", "PojongoTestDatabase");
       mongoClient = MongoClient.createNonShared(vertx, config);
+
+      // Create a datastore
       mongoDataStore = new MongoDataStore(mongoClient);
 
+      // Create the object wo be saved into the datastore
       DemoMapper dm = new DemoMapper();
       dm.setName("demoMapper");
       DemoSubMapper dmsr = new DemoSubMapper();
@@ -67,6 +73,11 @@ public class Examples extends VertxTestBase {
       DemoSubMapper dmse = new DemoSubMapper();
       dmse.subname = "referenced submapper";
       dm.subMapperEmbedded = dmse;
+
+      IMapper mapper = mongoDataStore.getMapperFactory().getMapper(DemoMapper.class);
+      @SuppressWarnings("unused")
+      MongoStoreObject storeObject = new MongoStoreObject(mapper, dm);
+      throw new UnsupportedOperationException("Check result did not save");
 
       IWrite<DemoMapper> write = mongoDataStore.createWrite(DemoMapper.class);
       write.add(dm);
