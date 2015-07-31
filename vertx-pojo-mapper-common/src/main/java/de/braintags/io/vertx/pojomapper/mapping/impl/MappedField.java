@@ -122,7 +122,7 @@ public class MappedField implements IField {
     computeAnnotations();
     mappedFieldName = computePropertyName();
     propertyMapper = computePropertyMapper();
-    typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
+    // typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
     computeType();
     // computeConstructor();
     computeMultivalued();
@@ -299,6 +299,8 @@ public class MappedField implements IField {
    */
   @Override
   public ITypeHandler getTypeHandler() {
+    if (typeHandler == null)
+      typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
     return typeHandler;
   }
 

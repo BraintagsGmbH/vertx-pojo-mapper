@@ -16,6 +16,7 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -94,6 +95,7 @@ public class TypehandlerTestMapper {
   public Properties properties = new Properties();
 
   public String[] stringArray = { "eins", "zwei", "drei" };
+  public char[] chars = { 'a', 'd', 'f' };
 
   /**
    * 
@@ -151,6 +153,17 @@ public class TypehandlerTestMapper {
       value = value.toString();
       compareValue = compareValue.toString();
     }
+
+    if (value.getClass().isArray()) {
+      if (!compareValue.getClass().isArray())
+        throw new MappingException("Contents are not equal: " + fieldName);
+      for (int i = 0; i < Array.getLength(value); i++) {
+        if (!Array.get(value, i).equals(Array.get(compareValue, i)))
+          throw new MappingException("Contents are not equal: " + fieldName);
+      }
+      return true;
+    }
+
     if (!value.equals(compareValue))
       throw new MappingException("Contents are not equal: " + fieldName);
     return true;
