@@ -37,7 +37,7 @@ import de.braintags.io.vertx.pojomapper.mongo.test.mapper.TypehandlerTestMapper;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
- * Test the {@link ITypeHandler} used for mongo
+ * Test the {@link ITypeHandler} used for mongo with a mapper which contains all datatypes to be checked
  * 
  * @author Michael Remme
  * 

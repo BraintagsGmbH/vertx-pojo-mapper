@@ -27,7 +27,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.OnlyIdMapper;
 
 /**
- * 
+ * Just to test that a mapper with only the id field is working
  *
  * @author Michael Remme
  * 

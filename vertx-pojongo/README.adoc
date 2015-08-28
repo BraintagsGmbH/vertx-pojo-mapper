@@ -3,7 +3,6 @@
 implementation of vertx-pojo-mapper for mongo-db
 
 
-
 == Map POJO to datastores and back
 
 Simple example to write and read a pojo ( as JUnit test ). See the class 
