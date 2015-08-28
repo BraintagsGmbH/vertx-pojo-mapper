@@ -3,5 +3,5 @@
 vertx-pojo-mapper is a framework for nonblocking pojo for different datasources
 
 * Web-site docs
-* link:vertx.pojo-mapper/README.adoc[implementation for mongo]
+* link:vertx-pojo-mapper/README.adoc[implementation for mongo]
 
