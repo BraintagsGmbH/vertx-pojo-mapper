@@ -6,5 +6,6 @@ implementation of vertx-pojo-mapper for mongo-db
 
 == Map POJO to datastores and back
 
-Simple example to write and read a pojo ( as JUnit test ). See the class link:src/main/java/examples/Examples.java [implementation for mongo]
+Simple example to write and read a pojo ( as JUnit test ). See the class 
+link:src/main/java/examples/Examples.java[Example to use pojong]
 
