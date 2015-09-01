@@ -73,6 +73,8 @@ public class TestSimpleInsert extends MongoBaseTest {
     if (reCo.assertionError != null)
       throw resultContainer.assertionError;
 
+    assertEquals(LOOP, reCo.queryResult.size());
+    ;
   }
 
   class MiniMapper {
