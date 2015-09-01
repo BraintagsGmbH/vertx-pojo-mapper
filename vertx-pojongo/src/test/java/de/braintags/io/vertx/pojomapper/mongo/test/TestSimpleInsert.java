@@ -69,7 +69,10 @@ public class TestSimpleInsert extends MongoBaseTest {
 
     IQuery<MiniMapper> query = getDataStore().createQuery(MiniMapper.class);
     query.field("name").is("looper");
-    find(query, LOOP);
+    ResultContainer reCo = find(query, LOOP);
+    if (reCo.assertionError != null)
+      throw resultContainer.assertionError;
+
   }
 
   class MiniMapper {
