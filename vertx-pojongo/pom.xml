@@ -56,11 +56,14 @@
 			<classifier>tests</classifier>
   			<version>${MONGO_VERSION}</version>
 		</dependency>
-		
-		
 	</dependencies>
 	
 	<properties>
 		<MONGO_VERSION>3.0.0</MONGO_VERSION>
-	</properties>
+    	<maven.test.skip>false</maven.test.skip>
+    	<doc.skip>false</doc.skip>
+    	<source.skip>false</source.skip>
+  </properties>
+	
+	
 </project>
