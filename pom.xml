@@ -14,128 +14,25 @@
 
 	<packaging>pom</packaging>
 
+	<artifactId>vertx-pojo-mapper</artifactId>
+	<name>Vert.x Pojo Mapper</name>
+	<version>${braintags.vertx.version}</version>
+	
+	<parent>
+	  <groupId>de.braintags</groupId>
+	  <artifactId>btVertxBasePOM</artifactId>
+	  <version>3</version>
+	</parent>
+	
 	<modules>
 		<module>vertx-pojo-mapper-common</module>
 		<module>vertx-pojongo</module>
 		<module>vertx-pojo-mapper-json</module>
 	</modules>
 
-	<parent>
-		<groupId>io.vertx</groupId>
-		<artifactId>vertx-ext-parent</artifactId>
-		<version>14</version>
-	</parent>
-
-	<groupId>de.braintags</groupId>
-	<artifactId>vertx-pojo-mapper</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-
-	<name>Vert.x Pojo Mapper</name>
-
-	<properties>
-		<stack.version>3.0.0-SNAPSHOT</stack.version>
-		<doc.skip>true</doc.skip>
-	</properties>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>io.vertx</groupId>
-				<artifactId>vertx-dependencies</artifactId>
-				<version>${stack.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
-	<dependencies>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-codegen</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-docgen</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-codetrans</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-lang-groovy</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-lang-js</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-lang-ruby</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-rx-java</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-core</artifactId>
-			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-			<version>4.11</version>
-		</dependency>
-	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>1.8</version>
-				<configuration>
-					<licenseName>epl_only_v1</licenseName>
-					<licenseResolver>${project.baseUri}/../license</licenseResolver>
-					<organizationName>Braintags GmbH</organizationName>
-					<inceptionYear>2015</inceptionYear>
-					<canUpdateDescription>false</canUpdateDescription>
-					<canUpdateDescription>false</canUpdateDescription>
-					<addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
-
-				</configuration>
-				<executions>
-					<execution>
-						<id>updateLicense</id>
-						<phase>clean</phase>
-						<goals>
-							<goal>update-file-header</goal>
-						</goals>
-						<inherited>true</inherited>
-						<configuration>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-		</plugins>
-	</build>
-
+  <properties>
+    <doc.skip>true</doc.skip>
+    <maven.test.skip>true</maven.test.skip>
+  </properties>
 
 </project>
