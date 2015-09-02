@@ -23,6 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
@@ -50,82 +51,10 @@ public class Examples extends VertxTestBase {
 
   @Test
   public void Demo() {
-    saveDemoMapper();
+    handleDemoMapper();
   }
 
-  private void saveSimpleMapper() {
-    try {
-      /*
-       * Init a MongoClient onto a locally running Mongo
-       */
-      JsonObject config = new JsonObject();
-      config.put("connection_string", "mongodb://localhost:27017");
-      config.put("db_name", "PojongoTestDatabase");
-      mongoClient = MongoClient.createNonShared(vertx, config);
-
-      // Create a datastore
-      mongoDataStore = new MongoDataStore(mongoClient);
-
-      // Create the object wo be saved into the datastore
-      SimpleMapper dm = new SimpleMapper();
-      dm.setName("demoMapper2");
-
-      IMapper mapper = mongoDataStore.getMapperFactory().getMapper(DemoMapper.class);
-      IWrite<SimpleMapper> write = mongoDataStore.createWrite(SimpleMapper.class);
-      write.add(dm);
-      CountDownLatch latch = new CountDownLatch(1);
-      write.save(result -> {
-        if (result.failed()) {
-          logger.error(result.cause());
-          fail(result.cause().getMessage());
-          latch.countDown();
-        } else {
-          IWriteResult wr = result.result();
-          IWriteEntry entry = wr.iterator().next();
-          logger.info("written with id " + entry.getId());
-          logger.info("written action: " + entry.getAction());
-          logger.info("written as " + entry.getStoreObject());
-
-          IQuery<SimpleMapper> query = mongoDataStore.createQuery(SimpleMapper.class);
-          query.field("name").is("demoMapper");
-          query.execute(rResult -> {
-            if (rResult.failed()) {
-              logger.error(rResult.cause());
-              fail(rResult.cause().getMessage());
-              latch.countDown();
-            } else {
-              IQueryResult<SimpleMapper> qr = rResult.result();
-              qr.iterator().next(itResult -> {
-                if (itResult.failed()) {
-                  logger.error(itResult.cause());
-                  fail(itResult.cause().getMessage());
-                  latch.countDown();
-                } else {
-                  SimpleMapper readMapper = itResult.result();
-                  logger.info("Query found id " + readMapper.id);
-                  latch.countDown();
-                }
-              });
-            }
-          });
-
-        }
-      });
-
-      try {
-        latch.await();
-      } catch (InterruptedException e) {
-        logger.error("", e);
-      }
-
-    } finally {
-      if (mongoClient != null)
-        mongoClient.close();
-    }
-
-  }
-
-  private void saveDemoMapper() {
+  private void handleDemoMapper() {
     try {
       /*
        * Init a MongoClient onto a locally running Mongo
@@ -182,8 +111,92 @@ public class Examples extends VertxTestBase {
                 } else {
                   DemoMapper readMapper = itResult.result();
                   logger.info("Query found id " + readMapper.id);
-                  latch.countDown();
 
+                  IDelete<DemoMapper> delete = mongoDataStore.createDelete(DemoMapper.class);
+                  delete.add(readMapper);
+                  delete.delete(deleteResult -> {
+                    if (deleteResult.failed()) {
+                      logger.error("", deleteResult.cause());
+                      fail(deleteResult.cause().getMessage());
+                      latch.countDown();
+                    } else {
+                      logger.info(deleteResult.result().getOriginalCommand());
+                      latch.countDown();
+                    }
+                  });
+
+                }
+              });
+            }
+          });
+
+        }
+      });
+
+      try {
+        latch.await();
+      } catch (InterruptedException e) {
+        logger.error("", e);
+      }
+
+    } finally {
+      if (mongoClient != null)
+        mongoClient.close();
+    }
+
+  }
+
+  private void saveSimpleMapper() {
+    try {
+      /*
+       * Init a MongoClient onto a locally running Mongo
+       */
+      JsonObject config = new JsonObject();
+      config.put("connection_string", "mongodb://localhost:27017");
+      config.put("db_name", "PojongoTestDatabase");
+      mongoClient = MongoClient.createNonShared(vertx, config);
+
+      // Create a datastore
+      mongoDataStore = new MongoDataStore(mongoClient);
+
+      // Create the object wo be saved into the datastore
+      SimpleMapper dm = new SimpleMapper();
+      dm.setName("demoMapper2");
+
+      IMapper mapper = mongoDataStore.getMapperFactory().getMapper(DemoMapper.class);
+      IWrite<SimpleMapper> write = mongoDataStore.createWrite(SimpleMapper.class);
+      write.add(dm);
+      CountDownLatch latch = new CountDownLatch(1);
+      write.save(result -> {
+        if (result.failed()) {
+          logger.error(result.cause());
+          fail(result.cause().getMessage());
+          latch.countDown();
+        } else {
+          IWriteResult wr = result.result();
+          IWriteEntry entry = wr.iterator().next();
+          logger.info("written with id " + entry.getId());
+          logger.info("written action: " + entry.getAction());
+          logger.info("written as " + entry.getStoreObject());
+
+          IQuery<SimpleMapper> query = mongoDataStore.createQuery(SimpleMapper.class);
+          query.field("name").is("demoMapper");
+          query.execute(rResult -> {
+            if (rResult.failed()) {
+              logger.error(rResult.cause());
+              fail(rResult.cause().getMessage());
+              latch.countDown();
+            } else {
+              IQueryResult<SimpleMapper> qr = rResult.result();
+              qr.iterator().next(itResult -> {
+                if (itResult.failed()) {
+                  logger.error(itResult.cause());
+                  fail(itResult.cause().getMessage());
+                  latch.countDown();
+                } else {
+                  SimpleMapper readMapper = itResult.result();
+                  logger.info("Query found id " + readMapper.id);
+                  latch.countDown();
                 }
               });
             }

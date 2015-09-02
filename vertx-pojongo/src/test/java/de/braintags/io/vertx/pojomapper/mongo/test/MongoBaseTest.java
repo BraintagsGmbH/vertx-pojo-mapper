@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
+import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
@@ -262,13 +264,22 @@ public abstract class MongoBaseTest extends VertxTestBase {
     }
   }
 
+  /**
+   * Executes a query and checks for the expected result
+   * 
+   * @param query
+   *          the query to be executed
+   * @param expectedResult
+   *          the expected number of records
+   * @return ResultContainer with certain informations
+   */
   public ResultContainer find(IQuery<?> query, int expectedResult) {
     ResultContainer resultContainer = new ResultContainer();
     CountDownLatch latch = new CountDownLatch(1);
     query.execute(result -> {
       try {
         resultContainer.queryResult = result.result();
-        checkQueryResult(result);
+        checkQueryResult(result, expectedResult);
 
         assertEquals(expectedResult, resultContainer.queryResult.size());
         logger.info(resultContainer.queryResult.getOriginalQuery());
@@ -291,26 +302,83 @@ public abstract class MongoBaseTest extends VertxTestBase {
     return resultContainer;
   }
 
-  public void checkQueryResult(AsyncResult<? extends IQueryResult<?>> qResult) {
+  /**
+   * Performs the delete action and processes the checkQuery to improve the correct result
+   * 
+   * @param delete
+   *          the {@link IDelete} to be executed
+   * @param checkQuery
+   *          the query to improve the correct result
+   * @param expectedResult
+   *          the expected result of checkQuery
+   * @return {@link ResultContainer} with deleteResult and queryResult
+   */
+  public ResultContainer delete(IDelete<?> delete, IQuery<?> checkQuery, int expectedResult) {
+    ResultContainer resultContainer = new ResultContainer();
+    CountDownLatch latch = new CountDownLatch(1);
+    delete.delete(result -> {
+      try {
+        resultContainer.deleteResult = result.result();
+        checkDeleteResult(result);
+
+        ResultContainer queryResult = find(checkQuery, expectedResult);
+        resultContainer.assertionError = queryResult.assertionError;
+        resultContainer.queryResult = queryResult.queryResult;
+      } catch (AssertionError e) {
+        resultContainer.assertionError = e;
+      } catch (Throwable e) {
+        resultContainer.assertionError = new AssertionError(e);
+      } finally {
+        latch.countDown();
+      }
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    return resultContainer;
+  }
+
+  public void checkDeleteResult(AsyncResult<? extends IDeleteResult> dResult) {
+    assertTrue(resultFine(dResult));
+    IDeleteResult dr = dResult.result();
+    assertNotNull(dr);
+    assertNotNull(dr.getOriginalCommand());
+    logger.info(dr.getOriginalCommand());
+  }
+
+  public void checkQueryResult(AsyncResult<? extends IQueryResult<?>> qResult, int expectedResult) {
     CountDownLatch latch = new CountDownLatch(1);
     assertTrue(resultFine(qResult));
     IQueryResult<?> qr = qResult.result();
     assertNotNull(qr);
-    assertTrue(qr.iterator().hasNext());
-    qr.iterator().next(
-        result -> {
-          try {
-            if (result.failed()) {
-              result.cause().printStackTrace();
-              throw result.cause() instanceof RuntimeException ? (RuntimeException) result.cause()
-                  : new RuntimeException(result.cause());
-            } else {
-              assertNotNull(result.result());
+    if (expectedResult == 0) {
+      try {
+        assertFalse(qr.iterator().hasNext());
+      } finally {
+        latch.countDown();
+      }
+    } else {
+      assertTrue(qr.iterator().hasNext());
+      qr.iterator().next(
+          result -> {
+            try {
+              if (result.failed()) {
+                result.cause().printStackTrace();
+                throw result.cause() instanceof RuntimeException ? (RuntimeException) result.cause()
+                    : new RuntimeException(result.cause());
+              } else {
+                assertNotNull(result.result());
+              }
+            } finally {
+              latch.countDown();
             }
-          } finally {
-            latch.countDown();
-          }
-        });
+          });
+    }
+
     try {
       latch.await();
     } catch (InterruptedException e) {

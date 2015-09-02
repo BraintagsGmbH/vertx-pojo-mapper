@@ -17,15 +17,18 @@ import io.vertx.core.logging.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.MiniMapper;
 
 public class TestSimpleInsert extends MongoBaseTest {
+  private static Logger logger = LoggerFactory.getLogger(TestSimpleInsert.class);
 
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(TestSimpleInsert.class);
@@ -71,23 +74,45 @@ public class TestSimpleInsert extends MongoBaseTest {
     query.field("name").is("looper");
     ResultContainer reCo = find(query, LOOP);
     if (reCo.assertionError != null)
-      throw resultContainer.assertionError;
+      throw reCo.assertionError;
 
-    assertEquals(LOOP, reCo.queryResult.size());
-    ;
-  }
+    CountDownLatch latch = new CountDownLatch(1);
 
-  class MiniMapper {
-    @Id
-    public String id = null;
-    public String name = "testName";
+    IDelete<MiniMapper> delete = getDataStore().createDelete(MiniMapper.class);
+    reCo.queryResult.toArray(toArray -> {
+      if (toArray.failed()) {
+        logger.error("", toArray.cause());
+        fail(toArray.cause().toString());
+        latch.countDown();
+      } else {
+        Object[] obs = toArray.result();
+        try {
+          assertEquals(LOOP, obs.length);
+        } catch (AssertionError e) {
+          latch.countDown();
+          logger.error("", e);
+          throw e;
+        }
+        for (Object ob : obs) {
+          delete.add((MiniMapper) ob);
+        }
+        ResultContainer reCod = delete(delete, query, 0);
+        if (reCod.assertionError != null) {
+          logger.error("", reCod.assertionError);
+          fail(reCod.assertionError.toString());
+          latch.countDown();
+        } else {
+          logger.info(reCod.deleteResult.getOriginalCommand());
+          latch.countDown();
+        }
 
-    MiniMapper() {
+      }
+    });
 
-    }
-
-    MiniMapper(String name) {
-      this.name = name;
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
 
   }

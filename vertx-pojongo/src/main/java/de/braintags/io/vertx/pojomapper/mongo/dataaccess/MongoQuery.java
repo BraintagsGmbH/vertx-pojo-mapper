@@ -66,6 +66,7 @@ public class MongoQuery<T> extends Query<T> {
    */
   @Override
   public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -92,7 +93,14 @@ public class MongoQuery<T> extends Query<T> {
     return new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(), (MongoMapper) getMapper(), query);
   }
 
-  private void createQueryDefinition(Handler<AsyncResult<JsonObject>> resultHandler) {
+  /**
+   * Create the {@link JsonObject} which then contains the definition for the query, which will be executed by
+   * {@link MongoClient}
+   * 
+   * @param resultHandler
+   *          the resulthandler which will receive notification
+   */
+  void createQueryDefinition(Handler<AsyncResult<JsonObject>> resultHandler) {
     MongoQueryRambler rambler = new MongoQueryRambler();
     executeQueryRambler(rambler, result -> {
       if (result.failed()) {
