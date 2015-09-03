@@ -45,7 +45,7 @@ public class TestBaseTest extends MongoBaseTest {
   @Override
   protected VertxOptions getOptions() {
     VertxOptions options = new VertxOptions();
-    options.setBlockedThreadCheckPeriod(10000);
+    options.setBlockedThreadCheckInterval(10000);
     options.setWarningExceptionTime(10000);
     return options;
   }

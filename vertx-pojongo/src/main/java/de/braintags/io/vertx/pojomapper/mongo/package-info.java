@@ -10,6 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
+
 /**
  * == Implementation of pojo mapper for Mongo
  *
@@ -31,4 +32,10 @@
  * 
  */
 
+@Document(fileName = "index.adoc")
+@GenModule(name = "vertx-pojongo", groupPackageName = "de.braintags")
 package de.braintags.io.vertx.pojomapper.mongo;
+
+import io.vertx.codegen.annotations.GenModule;
+import io.vertx.docgen.Document;
+

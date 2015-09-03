@@ -11,12 +11,16 @@
  * #L%
  */
 /**
- * == Pojo Mapper
- *
+ * == vertx pojo mapper common
  * 
- *
+ * This module contains common interfaces and default implementations for pojo mapper.
  *
  * @author Michael Remme
  */
+@Document(fileName = "index.adoc")
+@GenModule(name = "vertx-pojo-mapper-common", groupPackageName = "de.braintags")
 package de.braintags.io.vertx.pojomapper;
+
+import io.vertx.codegen.annotations.GenModule;
+import io.vertx.docgen.Document;
 
