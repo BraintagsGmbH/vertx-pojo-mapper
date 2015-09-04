@@ -25,6 +25,7 @@ public class SimpleMapper {
   @Id
   public String id;
   private String name;
+  public int number;
 
   /**
    * 

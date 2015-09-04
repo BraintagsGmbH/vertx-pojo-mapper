@@ -16,6 +16,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.docgen.Source;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
@@ -23,8 +24,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
-import examples.mapper.DemoMapper;
-import examples.mapper.DemoSubMapper;
+import examples.mapper.SimpleMapper;
 
 /**
  * Simple example to write and read Pojos
@@ -33,6 +33,7 @@ import examples.mapper.DemoSubMapper;
  * 
  */
 
+@Source(translate = false)
 public class Examples {
   private static final Logger logger = LoggerFactory.getLogger(Examples.class);
 
@@ -53,15 +54,9 @@ public class Examples {
    * Create the object to be saved into the datastore
    */
   public void example2() {
-    DemoMapper dm = new DemoMapper();
-    dm.setName("demoMapper");
-    DemoSubMapper dmsr = new DemoSubMapper();
-    dmsr.subname = "referenced submapper";
-    dm.subMapperReferenced = dmsr;
-
-    DemoSubMapper dmse = new DemoSubMapper();
-    dmse.subname = "embedded submapper";
-    dm.subMapperEmbedded = dmse;
+    SimpleMapper dm = new SimpleMapper();
+    dm.setName("SimpleMapper");
+    dm.number = 20;
   }
 
   /**
@@ -70,8 +65,8 @@ public class Examples {
    * @param mongoDataStore
    * @param dm
    */
-  public void example3(IDataStore mongoDataStore, DemoMapper dm) {
-    IWrite<DemoMapper> write = mongoDataStore.createWrite(DemoMapper.class);
+  public void example3(IDataStore mongoDataStore, SimpleMapper dm) {
+    IWrite<SimpleMapper> write = mongoDataStore.createWrite(SimpleMapper.class);
     write.add(dm);
     write.save(result -> {
       if (result.failed()) {
@@ -92,18 +87,18 @@ public class Examples {
    * @param mongoDataStore
    */
   public void example4(IDataStore mongoDataStore) {
-    IQuery<DemoMapper> query = mongoDataStore.createQuery(DemoMapper.class);
-    query.field("name").is("demoMapper");
+    IQuery<SimpleMapper> query = mongoDataStore.createQuery(SimpleMapper.class);
+    query.field("name").is("SimpleMapper");
     query.execute(rResult -> {
       if (rResult.failed()) {
         logger.error(rResult.cause());
       } else {
-        IQueryResult<DemoMapper> qr = rResult.result();
+        IQueryResult<SimpleMapper> qr = rResult.result();
         qr.iterator().next(itResult -> {
           if (itResult.failed()) {
             logger.error(itResult.cause());
           } else {
-            DemoMapper readMapper = itResult.result();
+            SimpleMapper readMapper = itResult.result();
             logger.info("Query found id " + readMapper.id);
           }
         });
@@ -117,8 +112,8 @@ public class Examples {
    * @param mongoDataStore
    * @param mapper
    */
-  public void example5(IDataStore mongoDataStore, DemoMapper mapper) {
-    IDelete<DemoMapper> delete = mongoDataStore.createDelete(DemoMapper.class);
+  public void example5(IDataStore mongoDataStore, SimpleMapper mapper) {
+    IDelete<SimpleMapper> delete = mongoDataStore.createDelete(SimpleMapper.class);
     delete.add(mapper);
     delete.delete(deleteResult -> {
       if (deleteResult.failed()) {

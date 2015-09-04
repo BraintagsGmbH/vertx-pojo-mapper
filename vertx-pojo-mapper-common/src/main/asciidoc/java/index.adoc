@@ -22,12 +22,100 @@ To use this project, add the following dependency to the _dependencies_ section 
 compile {maven-groupId}:{maven-artifactId}:{maven-version}
 ----
 
+== Quick-Start
+Although this library will deal with completely different types of datastores lioke SQL, NoSQL etc. we are using some idioms inside the 
+further description, which are more or less database depending. Thus a "table" will refer to a table inside a MySQL for instance and to a
+collection inside a MongoDB - just to avoid stringy text constructions.
+
+=== Initializing an IDataStore 
+The initialization of the `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` is the only action, where you
+are directly referring to a concrete implementation. 
+See https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojongo/src/main/asciidoc/java/index.adoc[vertx-pojongo] 
+to initialize an `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` which works with MongoDB.
+
+=== Create a mapper
+See the mapper examples.mapper.SimpleMapper inside the current module. 
+The only required information in a Mapper is the annotation de.braintags.io.vertx.pojomapper.annotation.field.Id,
+which flags one field as the primary key field of a mapper. All other annotations which are described later are optional.
+
+=== Creating an instance
+Create and fill a typical Java object like always
+
+[source,java]
+----
+SimpleMapper dm = new SimpleMapper();
+dm.setName("SimpleMapper");
+dm.number = 20;
+----
+
+=== Saving data
+
+[source,java]
+----
+IWrite<SimpleMapper> write = mongoDataStore.createWrite(SimpleMapper.class);
+write.add(dm);
+write.save(result -> {
+  if (result.failed()) {
+    logger.error(result.cause());
+  } else {
+    IWriteResult wr = result.result();
+    IWriteEntry entry = wr.iterator().next();
+    logger.info("written with id " + entry.getId());
+    logger.info("written action: " + entry.getAction());
+    logger.info("written as " + entry.getStoreObject());
+  }
+});
+----
+
+To save one or more instances inside the datastore, we first create an `link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/write/IWrite.html[IWrite]`. 
+By creating the IWrite the system will automatically perform the mapping process, if not done already.
+After adding the instance into the IWrite, we are able to execute the action, which will return an `link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/write/IWriteResult.html[IWriteResult]`,
+by which we are getting further information about the action, like the generated id of the record and wether it was inserted
+or updated, for instance.
+
+=== Searching data
+
+[source,java]
+----
+IQuery<SimpleMapper> query = mongoDataStore.createQuery(SimpleMapper.class);
+query.field("name").is("SimpleMapper");
+query.execute(rResult -> {
+  if (rResult.failed()) {
+    logger.error(rResult.cause());
+  } else {
+    IQueryResult<SimpleMapper> qr = rResult.result();
+    qr.iterator().next(itResult -> {
+      if (itResult.failed()) {
+        logger.error(itResult.cause());
+      } else {
+        SimpleMapper readMapper = itResult.result();
+        logger.info("Query found id " + readMapper.id);
+      }
+    });
+  }
+});
+----
+
+To search in the datastore, we are creating first an instance of `link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/query/IQuery.html[IQuery]`
+and define the query arguments. In the current example we are only searching for the name, but cause IQuery supports a fluent api
+we could simply and quickly add further arguments.
+Again - with the creation of the IQuery - the system checks wether the class was mapped already and performs the mapping if not.
+The query is processed by calling the execute method, which in turn will deliver an `link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/query/IQueryResult.html[IQueryResult]`,
+which contains several information like the native query and a reference to found records.
+The found records can be requested step by step by an Iterator or once as Array by requesting the method toArray. Both methods
+are requiring a Handler, since only during this request the Java object is created if not done already. For complexer objects this can
+mean, that further informations must be loaded from the IDataStore.
+
+
+=== Deleting data
+
+
+
 == Basic concepts
 
 tbd
 Describe `link:../../apidocs/de/braintags/io/vertx/pojomapper/typehandler/ITypeHandler.html[ITypeHandler]`, `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IMapper.html[IMapper]`, `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IField.html[IField]`,
 and the general mapping process
-There is no need to start a mapping of a Java class, the mapping is automatically performed at the moment, when it is needed. 
 
 == Working with vertx-pojo-mapper
 
@@ -37,32 +125,49 @@ moment, when it is needed.
 During the mapping process the class is inspected for several information. The persistent fields of a mapper are generated by inspecting
 public fields and BeanProperties. The rest of the configuration of a mapper is done by using annotations.
 
-[source,java]
-----
-include::{$sourcedirectory}/../../../java/examples/mapper/SimpleMapper.java[]
-----
+You will find some mapper definitions in the example package, for instance:
+
+ * `link:../../apidocs/examples/mapper/SimpleMapper.html[SimpleMapper]` as a very simple mapper
+ * `link:../../apidocs/examples/mapper/DemoMapper.html[DemoMapper]` as an example for referenced and embedded usage
+
+==== @Entity ( name = "tableName" )
+By annotating a class with de.braintags.io.vertx.pojomapper.annotation.Entity you are able to set the name of the table
+which is used to store the information in the `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`. By default the system will use the short classname of the mapper.
+
+==== @Id
+One field of the mapper must be annotated by de.braintags.io.vertx.pojomapper.annotation.field.Id, which will mark the annotated field
+as primary key
+
+==== @Property 
+Properties of a mapper are stored inside the `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` by using the fieldname by default. 
+By annotating a field with de.braintags.io.vertx.pojomapper.annotation.field.Property you are able to modify the name of the column 
+in the table.
+
+==== @Referenced
+
+==== @Embedded
+
+==== @ConcreteClass
+not yet supported
+
+==== @ConstructorArguments
+to be tested
+
+==== @Indexes
+
+==== @ObjectFactory
+
+==== @AfterLoad
+
+==== @BeforeSave
+
+==== @AfterSave
+
+==== @BeforeDelete
+
+==== @AfterDelete
 
 
-
-=== Initializing an IDataStore 
-The initialization of the `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` is the only action, where you
-are directly referring to a concrete implementation. 
-See https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojongo/src/main/asciidoc/java/index.adoc[vertx-pojongo] 
-to initialize an `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` which works with MongoDB.
-
-
-[source,java]
-----
-JsonObject config = new JsonObject();
-config.put("connection_string", "mongodb://localhost:27017");
-config.put("db_name", "PojongoTestDatabase");
-----
-
-=== Saving data
-
-=== Searching data
-
-=== Deleting data
 
 == Creating a new implementation 
 tbd
