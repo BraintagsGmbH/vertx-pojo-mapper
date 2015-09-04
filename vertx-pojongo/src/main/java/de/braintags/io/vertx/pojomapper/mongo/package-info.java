@@ -28,7 +28,7 @@
  * {@link examples.Examples#example1(io.vertx.core.Vertx )}
  * ----
  * 
- * The rest of the usage is the same than described in the documentation of link:../vertx-pojo-mapper-common[vertx-pojo-mapper-common]
+ * The rest of the usage is the same than described in the documentation of link:/BraintagsGmbH/vertx-pojo-mapper-common[vertx-pojo-mapper-common]
  * 
  * @author Michael Remme
  * 

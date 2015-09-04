@@ -2,7 +2,8 @@
 
 vertx-pojo-mapper is a framework for nonblocking pojo mapping for different datasources
 
-Key features:
+Key features
+
 * nonblocking as far as possible
 * map your Java entities to different datasources like MongoDB, MySql etc. and back
 * transparent and flexible markup for POJOs
@@ -11,9 +12,11 @@ Key features:
 * very fast initialization
 
 *List of supported datasources*
+
 * link:vertx-pojongo/README.adoc[implementation for mongo]
 
 *Documentation*
+
 * How to use it based on link:vertx-pojongo/src/main/asciidoc/java/index.adoc[vertx-pojongo]
 * General information about the api link:vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[vertx-pojo-mapper-common]
 

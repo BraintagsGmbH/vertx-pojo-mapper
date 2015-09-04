@@ -1,10 +1,6 @@
 = vertx-pojongo
 
-implementation of vertx-pojo-mapper for mongo-db
+implementation of vertx-pojo-mapper for MongoDB
 
-
-== Map POJO to datastores and back
-
-Simple example to write and read a pojo ( as JUnit test ). See the class 
-link:src/main/java/examples/Examples.java[Example to use pojong]
+See the documentation under link:src/main/asciidoc/java/index.adoc[Example to use pojongo]
 
