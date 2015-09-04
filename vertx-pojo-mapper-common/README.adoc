@@ -1,5 +1,11 @@
 # vertx-pojo-mapper-common
 
 This module contains common interfaces and default implementations for vertx-pojo-mapper.
-Particular implementations are stored in other submodules of 
-link:../[vertx-pojo-mapper]
+Particular implementations are stored in other submodules of the main project.
+
+See the documentation under
+
+* link:src/main/asciidoc/java/index.adoc[ java ]
+* link:src/main/asciidoc/js/index.adoc[ java-script ]
+* link:src/main/asciidoc/ruby/index.adoc[ ruby ]
+* link:src/main/asciidoc/groovy/index.adoc[ groovy ]
