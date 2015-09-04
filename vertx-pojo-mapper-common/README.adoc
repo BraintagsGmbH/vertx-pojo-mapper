@@ -1,3 +1,3 @@
 # vertx-pojo-mapper-common
 
-defines the api of the pojo mapper system
+This module contains common interfaces and default implementations for vertx-pojo-mapper

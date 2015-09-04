@@ -1,10 +1,6 @@
 # vertx-pojo-mapper-json
 
-mainly stuff for the serialization of POJO to Json and back
-
-
-    
+This module contains common implementations of interfaces of pojo mapper for all implementations which are using JSon as
+format to persist Java objects into the IDataStore
    
-    Generics
-    
     

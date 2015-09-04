@@ -17,8 +17,6 @@
  *
  * @author Michael Remme
  */
-@Document(fileName = "index.adoc")
-@GenModule(name = "vertx-pojo-mapper-common", groupPackageName = "de.braintags")
 package de.braintags.io.vertx.pojomapper;
 
 import io.vertx.codegen.annotations.GenModule;

@@ -1,1 +1,3 @@
-== Pojo Mapper
+== vertx pojo mapper common
+
+This module contains common interfaces and default implementations for pojo mapper.
