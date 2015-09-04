@@ -1,3 +1,5 @@
 # vertx-pojo-mapper-common
 
-This module contains common interfaces and default implementations for vertx-pojo-mapper
+This module contains common interfaces and default implementations for vertx-pojo-mapper.
+Particular implementations are stored in other submodules of 
+link:../[vertx-pojo-mapper]

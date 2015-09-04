@@ -19,8 +19,8 @@
 
 	<modules>
 		<module>vertx-pojo-mapper-common</module>
-		<module>vertx-pojongo</module>
 		<module>vertx-pojo-mapper-json</module>
+		<module>vertx-pojongo</module>
 	</modules>
 
 	<properties>
