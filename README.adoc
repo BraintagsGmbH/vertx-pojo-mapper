@@ -23,14 +23,14 @@ Key features
 
 *Modules inside this project*
 
-*link:vertx-pojo-mapper-common/README.adoc[vertx-pojo-mapper-common]
+* link:vertx-pojo-mapper-common/README.adoc[vertx-pojo-mapper-common]
 defines the common interfaces and default implementations for all particular implementations
 
-*link:vertx-pojo-mapper-json/README.adoc[vertx-pojo-mapper-json]
+* link:vertx-pojo-mapper-json/README.adoc[vertx-pojo-mapper-json]
 Contains common implementations of vertx-pojo-mapper-common for all those particular solutions, which are using JSON as 
 a format to serialize Java objects
 
-*link:vertx-pojongo/README.adoc[vertx-pojongo]
+* link:vertx-pojongo/README.adoc[vertx-pojongo]
 This is the concrete implementation of vertx-pojo-mapper, which is using MongoDB as datastore
 
 
