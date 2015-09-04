@@ -17,16 +17,18 @@
  * We provide an implementation of {@link de.braintags.io.vertx.pojomapper.IDataStore} which uses the Vert.x {@link io.vertx.ext.mongo.MongoClient}
  * to perform mapping of POJOs into the datastore
  *
- * To create an instance you first need an instance of {@link io.vertx.ext.mongo.MongoClient}. To learn how to create one
- * of those please consult the documentation for the MongoClient.
+ * To create an instance you first need an instance of {@link io.vertx.ext.mongo.MongoClient}. 
+ * To learn how to create one, please consult the documentation for the MongoClient.
  *
- * Once you've got one of those you can create a {@link io.vertx.ext.auth.mongo.MongoAuth} instance as follows:
+ * Once you've got one, you can create an instance of {@link de.braintags.io.vertx.pojomapper.IDataStore}, which deals with MongoDB,
+ * as follows:
  *
  * [source,java]
  * ----
  * {@link examples.Examples#example1(io.vertx.core.Vertx )}
  * ----
  * 
+ * The rest of the usage is the same than described in the documentation of link:../vertx-pojo-mapper-common[vertx-pojo-mapper-common]
  * 
  * @author Michael Remme
  * 

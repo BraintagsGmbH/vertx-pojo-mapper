@@ -40,6 +40,7 @@
  * 
  * 
  * == Working with a vertx-pojo-mapper
+ * 
  * === Making a Java class mappable
  * 
  * === Initializing 
