@@ -22,4 +22,5 @@ mongoDataStore = Java::DeBraintagsIoVertxPojomapperMongo::MongoDataStore.new(mon
 
 ----
 
-The rest of the usage is the same than described in the documentation of link:/BraintagsGmbH/vertx-pojo-mapper-common[vertx-pojo-mapper-common]
+The rest of the usage is the same than described in the documentation of 
+https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojo-mapper-common

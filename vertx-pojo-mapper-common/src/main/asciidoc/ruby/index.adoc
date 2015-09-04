@@ -30,7 +30,9 @@ tbd
 
 === Making a Java class mappable
 
-=== Initializing 
+=== Initializing an `link:unavailable[IDataStore]`
+https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojongo
+
 
 [source,java]
 ----

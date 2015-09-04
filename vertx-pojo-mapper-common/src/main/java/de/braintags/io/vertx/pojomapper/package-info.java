@@ -43,7 +43,9 @@
  * 
  * === Making a Java class mappable
  * 
- * === Initializing 
+ * === Initializing an {@link de.braintags.io.vertx.pojomapper.IDataStore}
+ * https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojongo
+ * 
  * 
  * [source,java]
  * ----
