@@ -24,7 +24,7 @@
  * <dependency>
  *   <groupId>de.braintags</groupId>
  *   <artifactId>vertx-pojo-mapper</artifactId>
- *   <version>{maven-version}</version>
+ *   <version>1.0.0-SNAPSHOT</version>
  * </dependency>
  * ----
  *
