@@ -27,10 +27,7 @@
  * {@link examples.Examples#example1(io.vertx.core.Vertx )}
  * ----
  * 
- * The rest of the usage is the same than described in the documentation of 
- * https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojo-mapper-common 
- * 
- * https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[vertx-pojo-mapper-common]
+ * The rest of the usage is the same than described in the documentation of https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[vertx-pojo-mapper-common]
  * 
  * @author Michael Remme
  * 

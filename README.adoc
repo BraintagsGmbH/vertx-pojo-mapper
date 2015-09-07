@@ -11,14 +11,14 @@ Key features
 * fluent api
 * very fast initialization
 
-*List of supported datasources*
-
-* link:vertx-pojongo/README.adoc[implementation for mongo]
-
 *Documentation*
 
 * Quick-Start and general information about the api link:vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[ here ]
 * How to use it based on link:vertx-pojongo/src/main/asciidoc/java/index.adoc[vertx-pojongo]
+
+*List of supported datasources*
+
+* link:vertx-pojongo/README.adoc[implementation for mongo]
 
 
 *Modules inside this project*
