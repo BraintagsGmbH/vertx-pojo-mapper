@@ -17,8 +17,8 @@ Key features
 
 *Documentation*
 
+* Quick-Start and general information about the api link:vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[ here ]
 * How to use it based on link:vertx-pojongo/src/main/asciidoc/java/index.adoc[vertx-pojongo]
-* General information about the api link:vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[vertx-pojo-mapper-common]
 
 
 *Modules inside this project*
