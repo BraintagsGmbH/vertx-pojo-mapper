@@ -28,6 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
@@ -303,6 +304,41 @@ public abstract class MongoBaseTest extends VertxTestBase {
   }
 
   /**
+   * Executes a query and checks for the expected result
+   * 
+   * @param query
+   *          the query to be executed
+   * @param expectedResult
+   *          the expected number of records
+   * @return ResultContainer with certain informations
+   */
+  public ResultContainer findCount(IQuery<?> query, int expectedResult) {
+    ResultContainer resultContainer = new ResultContainer();
+    CountDownLatch latch = new CountDownLatch(1);
+    query.executeCount(result -> {
+      try {
+        resultContainer.queryResultCount = result.result();
+        checkQueryResultCount(result, expectedResult);
+        logger.info(resultContainer.queryResultCount.getOriginalQuery());
+      } catch (AssertionError e) {
+        resultContainer.assertionError = e;
+      } catch (Throwable e) {
+        resultContainer.assertionError = new AssertionError(e);
+      } finally {
+        latch.countDown();
+      }
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    return resultContainer;
+  }
+
+  /**
    * Performs the delete action and processes the checkQuery to improve the correct result
    * 
    * @param delete
@@ -348,6 +384,14 @@ public abstract class MongoBaseTest extends VertxTestBase {
     assertNotNull(dr);
     assertNotNull(dr.getOriginalCommand());
     logger.info(dr.getOriginalCommand());
+  }
+
+  public void checkQueryResultCount(AsyncResult<? extends IQueryCountResult> qResult, int expectedResult) {
+    CountDownLatch latch = new CountDownLatch(1);
+    assertTrue(resultFine(qResult));
+    IQueryCountResult qr = qResult.result();
+    assertNotNull(qr);
+    assertEquals(expectedResult, qr.getCount());
   }
 
   public void checkQueryResult(AsyncResult<? extends IQueryResult<?>> qResult, int expectedResult) {

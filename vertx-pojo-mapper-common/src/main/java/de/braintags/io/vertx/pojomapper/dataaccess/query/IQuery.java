@@ -38,9 +38,9 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * Execute the query by counting the fitting objects
    * 
    * @param resultHandler
-   *          contains the {@link IQueryResult}
+   *          contains the {@link IQueryCountResult}
    */
-  public void executeCount(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
+  public void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler);
 
   /**
    * Execute the query with the option explain and sends back the suitable information

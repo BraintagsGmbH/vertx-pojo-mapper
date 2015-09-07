@@ -17,6 +17,7 @@ import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
@@ -126,7 +127,7 @@ public class DummyDataStore implements IDataStore {
      * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
      */
     @Override
-    public void executeCount(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    public void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
       throw new UnsupportedOperationException();
     }
 

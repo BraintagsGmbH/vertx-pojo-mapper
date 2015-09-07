@@ -38,7 +38,7 @@ public class Examples {
   private static final Logger logger = LoggerFactory.getLogger(Examples.class);
 
   /**
-   * Init a MongoClient onto a locally running Mongo and the {@link MongoDataStore}
+   * Init a MongoClient onto a locally running Mongo and the {@link dataStore}
    * 
    * @param vertx
    */
@@ -47,7 +47,7 @@ public class Examples {
     config.put("connection_string", "mongodb://localhost:27017");
     config.put("db_name", "PojongoTestDatabase");
     // MongoClient mongoClient = MongoClient.createNonShared(vertx, config);
-    // MongoDataStore mongoDataStore = new MongoDataStore(mongoClient);
+    // dataStore dataStore = new dataStore(mongoClient);
   }
 
   /**
@@ -62,11 +62,11 @@ public class Examples {
   /**
    * Saving an instance intp the Datastore
    * 
-   * @param mongoDataStore
+   * @param dataStore
    * @param dm
    */
-  public void example3(IDataStore mongoDataStore, SimpleMapper dm) {
-    IWrite<SimpleMapper> write = mongoDataStore.createWrite(SimpleMapper.class);
+  public void example3(IDataStore dataStore, SimpleMapper dm) {
+    IWrite<SimpleMapper> write = dataStore.createWrite(SimpleMapper.class);
     write.add(dm);
     write.save(result -> {
       if (result.failed()) {
@@ -84,10 +84,10 @@ public class Examples {
   /**
    * Searching for objects
    * 
-   * @param mongoDataStore
+   * @param dataStore
    */
-  public void example4(IDataStore mongoDataStore) {
-    IQuery<SimpleMapper> query = mongoDataStore.createQuery(SimpleMapper.class);
+  public void example4(IDataStore dataStore) {
+    IQuery<SimpleMapper> query = dataStore.createQuery(SimpleMapper.class);
     query.field("name").is("SimpleMapper");
     query.execute(rResult -> {
       if (rResult.failed()) {
@@ -109,11 +109,11 @@ public class Examples {
   /**
    * Delete an instance from the Datastore
    * 
-   * @param mongoDataStore
+   * @param dataStore
    * @param mapper
    */
-  public void example5(IDataStore mongoDataStore, SimpleMapper mapper) {
-    IDelete<SimpleMapper> delete = mongoDataStore.createDelete(SimpleMapper.class);
+  public void example5(IDataStore dataStore, SimpleMapper mapper) {
+    IDelete<SimpleMapper> delete = dataStore.createDelete(SimpleMapper.class);
     delete.add(mapper);
     delete.delete(deleteResult -> {
       if (deleteResult.failed()) {
@@ -122,6 +122,21 @@ public class Examples {
         logger.info(deleteResult.result().getOriginalCommand());
       }
     });
+  }
+
+  public void example6(IDataStore dataStore) {
+    IQuery<SimpleMapper> query = dataStore.createQuery(SimpleMapper.class);
+    query.field("name").is("test");
+    IDelete<SimpleMapper> delete = dataStore.createDelete(SimpleMapper.class);
+    delete.setQuery(query);
+    delete.delete(deleteResult -> {
+      if (deleteResult.failed()) {
+        logger.error("", deleteResult.cause());
+      } else {
+        logger.info(deleteResult.result().getOriginalCommand());
+      }
+    });
+
   }
 
 }

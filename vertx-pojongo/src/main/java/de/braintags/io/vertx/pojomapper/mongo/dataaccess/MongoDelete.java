@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.DeleteResult;
@@ -54,7 +56,7 @@ public class MongoDelete<T> extends Delete<T> {
   @Override
   public void delete(Handler<AsyncResult<IDeleteResult>> resultHandler) {
     if (getQuery() != null) {
-      deleteQuery(resultHandler, (MongoQuery<T>) getQuery());
+      deleteQuery((MongoQuery<T>) getQuery(), resultHandler);
     } else if (!getRecordList().isEmpty()) {
       deleteRecords(resultHandler);
     } else
@@ -66,13 +68,19 @@ public class MongoDelete<T> extends Delete<T> {
     IField idField = getMapper().getIdField();
     List<Object> values = new ArrayList<Object>();
     for (T record : getRecordList()) {
+      getMapper().executeLifecycle(BeforeDelete.class, record);
       values.add(idField.getPropertyAccessor().readData(record));
     }
     query.field(idField.getName()).in(values);
-    deleteQuery(resultHandler, query);
+    deleteQuery(query, dr -> {
+      for (T record : getRecordList()) {
+        getMapper().executeLifecycle(AfterDelete.class, record);
+      }
+      resultHandler.handle(dr);
+    });
   }
 
-  private void deleteQuery(Handler<AsyncResult<IDeleteResult>> resultHandler, MongoQuery<T> query) {
+  private void deleteQuery(MongoQuery<T> query, Handler<AsyncResult<IDeleteResult>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
     String collection = getMapper().getDataStoreName();
     query.createQueryDefinition(qDefResult -> {

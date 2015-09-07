@@ -151,6 +151,17 @@ public class TestSimpleMapper extends MongoBaseTest {
   }
 
   @Test
+  public void testSimpleAndCount() {
+    createDemoRecords();
+
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    query.and("name").is("Dublette").field("secondProperty").is("erste");
+    ResultContainer resultContainer = findCount(query, 1);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
+  @Test
   public void testQueryMultipleFields() {
     createDemoRecords();
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);

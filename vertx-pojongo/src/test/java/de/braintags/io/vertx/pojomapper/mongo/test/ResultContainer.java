@@ -13,6 +13,7 @@
 package de.braintags.io.vertx.pojomapper.mongo.test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 
@@ -20,6 +21,7 @@ public class ResultContainer {
   public AssertionError assertionError;
   public IWriteResult writeResult;
   public IQueryResult<?> queryResult;
+  public IQueryCountResult queryResultCount;
   public IDeleteResult deleteResult;
 
   public ResultContainer() {

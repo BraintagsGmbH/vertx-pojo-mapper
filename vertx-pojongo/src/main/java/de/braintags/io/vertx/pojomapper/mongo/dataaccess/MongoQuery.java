@@ -21,8 +21,10 @@ import io.vertx.ext.mongo.MongoClient;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.QueryCountResult;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
 
@@ -66,12 +68,38 @@ public class MongoQuery<T> extends Query<T> {
    */
   @Override
   public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   @Override
-  public void executeCount(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    throw new UnsupportedOperationException();
+  public void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+    try {
+      createQueryDefinition(result -> {
+        if (result.failed()) {
+          resultHandler.handle(Future.failedFuture(result.cause()));
+        } else {
+          doFindCount(result.result(), resultHandler);
+        }
+      });
+    } catch (Throwable e) {
+      Future<IQueryCountResult> future = Future.failedFuture(e);
+      resultHandler.handle(future);
+    }
+  }
+
+  private void doFindCount(JsonObject query, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+    MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
+    String column = getMapper().getDataStoreName();
+    mongoClient.count(column, query, qResult -> {
+      if (qResult.failed()) {
+        Future<IQueryCountResult> future = Future.failedFuture(qResult.cause());
+        resultHandler.handle(future);
+      } else {
+        QueryCountResult qcr = new QueryCountResult(getMapper(), getDataStore(), qResult.result(), query);
+        Future<IQueryCountResult> future = Future.succeededFuture(qcr);
+        resultHandler.handle(future);
+      }
+    });
   }
 
   private void doFind(JsonObject query, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
