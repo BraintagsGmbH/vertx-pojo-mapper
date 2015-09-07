@@ -104,7 +104,7 @@
  * returns the native arguments which were used to perform the delete action
  * 
  * ----
- * {@link examples.Examples#example6(de.braintags.io.vertx.pojomapper.IDataStore, examples.mapper.SimpleMapper )}
+ * {@link examples.Examples#example6(de.braintags.io.vertx.pojomapper.IDataStore )}
  * ----
  * 
  * This example shows how to perform a delete action by using an {@link de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery}. All records, which are fitting the arguments of the query are deleted.
@@ -154,23 +154,18 @@
  * 
  * ==== @AfterLoad
  * All methods, which are annotated by this annotation are executed after an instance was loaded from the {@link de.braintags.io.vertx.pojomapper.IDataStore}
- * implemented Testcase missing
  * 
  * ==== @BeforeSave
  * All methods, which are annotated by this annotation are executed before an instance is saved into the {@link de.braintags.io.vertx.pojomapper.IDataStore}
- * implemented Testcase missing
  * 
  * ==== @AfterSave
  * All methods, which are annotated by this annotation are executed after an instance was saved into the {@link de.braintags.io.vertx.pojomapper.IDataStore}
- * implemented Testcase missing
  * 
  * ==== @BeforeDelete
  * All methods, which are annotated by this annotation are executed before an instance is deleted from the {@link de.braintags.io.vertx.pojomapper.IDataStore}
- * implemented Testcase missing
  * 
  * ==== @AfterDelete
  * All methods, which are annotated by this annotation are executed after an instance was deleted from the {@link de.braintags.io.vertx.pojomapper.IDataStore}
- * implemented Testcase missing
  * 
  * 
  * ==== @ConcreteClass

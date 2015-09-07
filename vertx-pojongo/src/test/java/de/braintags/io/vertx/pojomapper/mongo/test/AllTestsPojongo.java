@@ -25,7 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ TestBaseTest.class, TestMongoMapper.class, TestSimpleInsert.class, TestSimpleMapper.class,
-    TestOnlyIdMapper.class, TypeHandlerTest.class })
+    TestOnlyIdMapper.class, TypeHandlerTest.class, TestLifecycle.class })
 public class AllTestsPojongo {
 
 }

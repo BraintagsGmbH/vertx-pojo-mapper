@@ -23,4 +23,6 @@ var mongoDataStore = new (Java.type("de.braintags.io.vertx.pojomapper.mongo.Mong
 ----
 
 The rest of the usage is the same than described in the documentation of 
-https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojo-mapper-common
+https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojo-mapper-common 
+
+https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[vertx-pojo-mapper-common]

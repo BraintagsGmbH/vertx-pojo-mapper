@@ -379,7 +379,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
   }
 
   public void checkDeleteResult(AsyncResult<? extends IDeleteResult> dResult) {
-    assertTrue(resultFine(dResult));
+    resultFine(dResult);
     IDeleteResult dr = dResult.result();
     assertNotNull(dr);
     assertNotNull(dr.getOriginalCommand());
@@ -387,8 +387,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
   }
 
   public void checkQueryResultCount(AsyncResult<? extends IQueryCountResult> qResult, int expectedResult) {
-    CountDownLatch latch = new CountDownLatch(1);
-    assertTrue(resultFine(qResult));
+    resultFine(qResult);
     IQueryCountResult qr = qResult.result();
     assertNotNull(qr);
     assertEquals(expectedResult, qr.getCount());
@@ -396,7 +395,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
 
   public void checkQueryResult(AsyncResult<? extends IQueryResult<?>> qResult, int expectedResult) {
     CountDownLatch latch = new CountDownLatch(1);
-    assertTrue(resultFine(qResult));
+    resultFine(qResult);
     IQueryResult<?> qr = qResult.result();
     assertNotNull(qr);
     if (expectedResult == 0) {
@@ -485,7 +484,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
   }
 
   public void checkWriteResult(AsyncResult<IWriteResult> result) {
-    assertTrue(resultFine(result));
+    resultFine(result);
     assertNotNull(result.result());
     IWriteEntry entry = result.result().iterator().next();
     assertNotNull(entry);
@@ -493,12 +492,11 @@ public abstract class MongoBaseTest extends VertxTestBase {
     assertNotNull(entry.getId());
   }
 
-  public boolean resultFine(AsyncResult<?> result) {
+  public void resultFine(AsyncResult<?> result) {
     if (result.failed()) {
       logger.error("", result.cause());
-      return false;
+      throw new AssertionError("result failed", result.cause());
     }
-    return true;
   }
 
 }
