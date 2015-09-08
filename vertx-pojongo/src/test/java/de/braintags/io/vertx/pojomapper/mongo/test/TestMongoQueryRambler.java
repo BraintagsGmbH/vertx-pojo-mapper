@@ -26,9 +26,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.LogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoQueryRambler;
-import de.braintags.io.vertx.pojomapper.test.MongoBaseTest;
-import de.braintags.io.vertx.pojomapper.test.TestMongoQueryRambler;
-import de.braintags.io.vertx.pojomapper.test.mapper.Person;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.Person;
 
 /**
  * 

@@ -31,10 +31,7 @@ import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMappedField;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapperFactory;
-import de.braintags.io.vertx.pojomapper.test.MongoBaseTest;
-import de.braintags.io.vertx.pojomapper.test.ResultContainer;
-import de.braintags.io.vertx.pojomapper.test.TestSimpleMapper;
-import de.braintags.io.vertx.pojomapper.test.mapper.SimpleMapper;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.SimpleMapper;
 
 /**
  * Test the base actions by using a very simple mapper

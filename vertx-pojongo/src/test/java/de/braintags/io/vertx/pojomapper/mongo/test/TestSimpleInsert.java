@@ -25,10 +25,7 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.test.MongoBaseTest;
-import de.braintags.io.vertx.pojomapper.test.ResultContainer;
-import de.braintags.io.vertx.pojomapper.test.TestSimpleInsert;
-import de.braintags.io.vertx.pojomapper.test.mapper.MiniMapper;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.MiniMapper;
 
 public class TestSimpleInsert extends MongoBaseTest {
   private static Logger logger = LoggerFactory.getLogger(TestSimpleInsert.class);

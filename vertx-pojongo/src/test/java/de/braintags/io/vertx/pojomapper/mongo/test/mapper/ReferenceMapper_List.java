@@ -17,7 +17,6 @@ import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
-import de.braintags.io.vertx.pojomapper.test.mapper.SimpleMapper;
 
 /**
  * Mapper to test {@link Referenced} annotation

@@ -20,10 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.test.MongoBaseTest;
-import de.braintags.io.vertx.pojomapper.test.ResultContainer;
-import de.braintags.io.vertx.pojomapper.test.TestOnlyIdMapper;
-import de.braintags.io.vertx.pojomapper.test.mapper.OnlyIdMapper;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.OnlyIdMapper;
 
 /**
  * Just to test that a mapper with only the id field is working

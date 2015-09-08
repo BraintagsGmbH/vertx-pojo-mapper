@@ -24,9 +24,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.test.MongoBaseTest;
-import de.braintags.io.vertx.pojomapper.test.TestMongoMapper;
-import de.braintags.io.vertx.pojomapper.test.mapper.Person;
+import de.braintags.io.vertx.pojomapper.mongo.test.mapper.Person;
 
 /**
  * 

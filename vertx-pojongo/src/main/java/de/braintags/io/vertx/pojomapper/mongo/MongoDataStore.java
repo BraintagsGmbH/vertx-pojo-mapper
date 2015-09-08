@@ -17,13 +17,17 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
-import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
+import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoDelete;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoQuery;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoWrite;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapperFactory;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 /**
  * An {@link IDataStore} which is dealing with {@link MongoClient}
@@ -32,18 +36,18 @@ import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapperFactory;
  * 
  */
 
-public class MongoDataStore extends AbstractDataStore {
+public class MongoDataStore implements IDataStore {
   private MongoClient client;
+  private MapperFactory mapperFactory = new MongoMapperFactory(this);
+  private IPropertyMapperFactory propertyMapperFactory = new JsonPropertyMapperFactory();
+  private ITypeHandlerFactory thf = new JsonTypeHandlerFactory();
+  public MongoStoreObjectFactory msf = new MongoStoreObjectFactory();
 
   /**
    * 
    */
   public MongoDataStore(MongoClient client) {
     this.client = client;
-    setMapperFactory(new MongoMapperFactory(this));
-    setPropertyMapperFactory(new JsonPropertyMapperFactory());
-    setTypeHandlerFactory(new JsonTypeHandlerFactory());
-    setStoreObjectFactory(new MongoStoreObjectFactory());
   }
 
   /*
@@ -76,6 +80,36 @@ public class MongoDataStore extends AbstractDataStore {
     return new MongoDelete<>(mapper, this);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getMapperFactory()
+   */
+  @Override
+  public IMapperFactory getMapperFactory() {
+    return mapperFactory;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getTypeHandlerFactory()
+   */
+  @Override
+  public ITypeHandlerFactory getTypeHandlerFactory() {
+    return thf;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getPropertyMapperFactory()
+   */
+  @Override
+  public IPropertyMapperFactory getPropertyMapperFactory() {
+    return propertyMapperFactory;
+  }
+
   /**
    * Get the underlaying instance of {@link MongoClient}
    * 
@@ -83,6 +117,11 @@ public class MongoDataStore extends AbstractDataStore {
    */
   public MongoClient getMongoClient() {
     return client;
+  }
+
+  @Override
+  public IStoreObjectFactory getStoreObjectFactory() {
+    return msf;
   }
 
 }
