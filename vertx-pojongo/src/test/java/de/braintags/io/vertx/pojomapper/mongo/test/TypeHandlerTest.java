@@ -20,16 +20,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.EmbeddedMapper_Array;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.EmbeddedMapper_List;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.EmbeddedMapper_Map;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.EmbeddedMapper_Single;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ReferenceMapper_Array;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ReferenceMapper_List;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ReferenceMapper_Map;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ReferenceMapper_Single;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.SimpleMapper;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.TypehandlerTestMapper;
+import de.braintags.io.vertx.pojomapper.test.MongoBaseTest;
+import de.braintags.io.vertx.pojomapper.test.ResultContainer;
+import de.braintags.io.vertx.pojomapper.test.TypeHandlerTest;
+import de.braintags.io.vertx.pojomapper.test.mapper.EmbeddedMapper_Array;
+import de.braintags.io.vertx.pojomapper.test.mapper.EmbeddedMapper_List;
+import de.braintags.io.vertx.pojomapper.test.mapper.EmbeddedMapper_Map;
+import de.braintags.io.vertx.pojomapper.test.mapper.EmbeddedMapper_Single;
+import de.braintags.io.vertx.pojomapper.test.mapper.ReferenceMapper_Array;
+import de.braintags.io.vertx.pojomapper.test.mapper.ReferenceMapper_List;
+import de.braintags.io.vertx.pojomapper.test.mapper.ReferenceMapper_Map;
+import de.braintags.io.vertx.pojomapper.test.mapper.ReferenceMapper_Single;
+import de.braintags.io.vertx.pojomapper.test.mapper.SimpleMapper;
+import de.braintags.io.vertx.pojomapper.test.mapper.TypehandlerTestMapper;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**

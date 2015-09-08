@@ -23,7 +23,10 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.LifecycleMapper;
+import de.braintags.io.vertx.pojomapper.test.MongoBaseTest;
+import de.braintags.io.vertx.pojomapper.test.ResultContainer;
+import de.braintags.io.vertx.pojomapper.test.TestLifecycle;
+import de.braintags.io.vertx.pojomapper.test.mapper.LifecycleMapper;
 
 /**
  * Test the base actions by using a very simple mapper

@@ -20,6 +20,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.braintags.io.vertx.pojomapper.test.MongoBaseTest;
+import de.braintags.io.vertx.pojomapper.test.TestBaseTest;
+
 /**
  * 
  * 

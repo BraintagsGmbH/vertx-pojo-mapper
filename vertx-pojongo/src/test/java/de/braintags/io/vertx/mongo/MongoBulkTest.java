@@ -31,7 +31,7 @@ import org.junit.Test;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
-import de.braintags.io.vertx.pojomapper.mongo.test.MongoBaseTest;
+import de.braintags.io.vertx.pojomapper.test.MongoBaseTest;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 

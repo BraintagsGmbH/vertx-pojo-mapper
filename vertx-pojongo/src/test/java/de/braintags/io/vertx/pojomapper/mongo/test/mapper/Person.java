@@ -20,6 +20,8 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
+import de.braintags.io.vertx.pojomapper.test.mapper.AbstractPerson;
+import de.braintags.io.vertx.pojomapper.test.mapper.Animal;
 
 /**
  * Person is used as mapper class

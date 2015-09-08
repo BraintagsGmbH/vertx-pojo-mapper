@@ -16,6 +16,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
+import de.braintags.io.vertx.pojomapper.test.mapper.SimpleMapper;
 
 /**
  * A simple mapper with some beans properties

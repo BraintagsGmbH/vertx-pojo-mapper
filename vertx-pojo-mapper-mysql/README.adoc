@@ -1,0 +1,6 @@
+= vertx-pojo-mapper-mysql
+
+implementation of vertx-pojo-mapper for MySql
+
+See the documentation under link:src/main/asciidoc/java/index.adoc[Example to use vertx-pojo-mapper-mysql]
+

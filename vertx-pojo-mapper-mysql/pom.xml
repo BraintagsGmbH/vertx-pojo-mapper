@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	  <parent>
+	    <artifactId>vertx-pojo-mapper</artifactId>
+  		<groupId>de.braintags</groupId>
+	    <version>1.0.0-SNAPSHOT</version>
+	  </parent>
+	  <modelVersion>4.0.0</modelVersion>
+
+	  <artifactId>vertx-pojo-mapper-mysql</artifactId>
+
+	<dependencies>
+		
+		<dependency>
+  			<groupId>io.vertx</groupId>
+			<artifactId>vertx-mysql-postgresql-client</artifactId>
+	    	<version>${mysql_version}</version>
+		</dependency>
+		
+		<dependency>
+  			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-json</artifactId>
+	    	<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		
+
+	</dependencies>
+	
+	<properties>
+		<mysql_version>3.0.0-SNAPSHOT</mysql_version>
+    	<maven.test.skip>false</maven.test.skip>
+    	<doc.skip>false</doc.skip>
+    	<source.skip>false</source.skip>
+  </properties>
+	
+	
+</project>
