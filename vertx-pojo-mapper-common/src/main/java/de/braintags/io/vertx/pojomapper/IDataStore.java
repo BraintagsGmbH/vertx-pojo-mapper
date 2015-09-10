@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
+import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
@@ -84,5 +85,12 @@ public interface IDataStore {
    * @return the instance of {@link IStoreObjectFactory}
    */
   public IStoreObjectFactory getStoreObjectFactory();
+
+  /**
+   * Get the instance of {@link IDataStoreSynchronizer} suitable for the current datastore
+   * 
+   * @return the instance of {@link IDataStoreSynchronizer} for the current datastore or null, if no synchronizer needed
+   */
+  public IDataStoreSynchronizer getDataStoreSynchronizer();
 
 }

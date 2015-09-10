@@ -46,7 +46,7 @@ public abstract class AbstractDataStore implements IDataStore {
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getMapperFactory()
    */
   @Override
-  public IMapperFactory getMapperFactory() {
+  public final IMapperFactory getMapperFactory() {
     return mapperFactory;
   }
 
@@ -64,7 +64,7 @@ public abstract class AbstractDataStore implements IDataStore {
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getPropertyMapperFactory()
    */
   @Override
-  public IPropertyMapperFactory getPropertyMapperFactory() {
+  public final IPropertyMapperFactory getPropertyMapperFactory() {
     return propertyMapperFactory;
   }
 
@@ -82,7 +82,7 @@ public abstract class AbstractDataStore implements IDataStore {
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getTypeHandlerFactory()
    */
   @Override
-  public ITypeHandlerFactory getTypeHandlerFactory() {
+  public final ITypeHandlerFactory getTypeHandlerFactory() {
     return typeHandlerFactory;
   }
 
@@ -95,7 +95,7 @@ public abstract class AbstractDataStore implements IDataStore {
   }
 
   @Override
-  public IStoreObjectFactory getStoreObjectFactory() {
+  public final IStoreObjectFactory getStoreObjectFactory() {
     return storeObjectFactory;
   }
 

@@ -18,13 +18,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.MongoClient;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
-import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject;
-import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
+import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
@@ -38,9 +33,8 @@ import de.braintags.io.vertx.util.ErrorObject;
  * @param <T>
  */
 
-public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite<T> {
+public class MongoWrite<T> extends AbstractWrite<T> {
   private static Logger logger = LoggerFactory.getLogger(MongoWrite.class);
-  private List<T> objectsToSave = new ArrayList<T>();
 
   /**
    * 
@@ -50,20 +44,15 @@ public class MongoWrite<T> extends AbstractDataAccessObject<T> implements IWrite
   }
 
   @Override
-  public void add(T mapper) {
-    objectsToSave.add(mapper);
-  }
-
-  @Override
   public void save(Handler<AsyncResult<IWriteResult>> resultHandler) {
     WriteResult rr = new WriteResult();
-    if (objectsToSave.isEmpty()) {
+    if (getObjectsToSave().isEmpty()) {
       resultHandler.handle(Future.succeededFuture(rr));
       return;
     }
     ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>();
-    CounterObject counter = new CounterObject(objectsToSave.size());
-    for (T entity : objectsToSave) {
+    CounterObject counter = new CounterObject(getObjectsToSave().size());
+    for (T entity : getObjectsToSave()) {
       save(entity, rr, result -> {
         if (result.failed()) {
           ro.setThrowable(result.cause());

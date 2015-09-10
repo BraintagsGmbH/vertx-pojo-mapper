@@ -67,6 +67,7 @@ public class Mapper implements IMapper {
   private Entity entity;
   private Map<Class<? extends Annotation>, IField[]> fieldCache = new HashMap<Class<? extends Annotation>, IField[]>();
   private String dataStoreName;
+  private boolean syncNeeded = true;
 
   /**
    * all annotations which shall be examined for the mapper class itself
@@ -401,5 +402,25 @@ public class Mapper implements IMapper {
   @Override
   public IField getIdField() {
     return idField;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#isSyncNeeded()
+   */
+  @Override
+  public final boolean isSyncNeeded() {
+    return syncNeeded;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#setSyncNeeded(boolean)
+   */
+  @Override
+  public final void setSyncNeeded(boolean syncNeeded) {
+    this.syncNeeded = syncNeeded;
   }
 }

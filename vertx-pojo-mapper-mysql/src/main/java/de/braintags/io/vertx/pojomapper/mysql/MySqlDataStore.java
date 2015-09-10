@@ -21,6 +21,8 @@ import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
+import de.braintags.io.vertx.pojomapper.mysql.dataaccess.MySqlWrite;
+import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObjectFactory;
 
 /**
  * 
@@ -39,7 +41,7 @@ public class MySqlDataStore extends AbstractDataStore {
     setMapperFactory(new MapperFactory(this));
     setPropertyMapperFactory(new JsonPropertyMapperFactory());
     setTypeHandlerFactory(new JsonTypeHandlerFactory());
-    // setStoreObjectFactory(new MongoStoreObjectFactory());
+    setStoreObjectFactory(new SqlStoreObjectFactory());
   }
 
   /*
@@ -49,7 +51,7 @@ public class MySqlDataStore extends AbstractDataStore {
    */
   @Override
   public <T> IQuery<T> createQuery(Class<T> mapper) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   /*
@@ -59,7 +61,7 @@ public class MySqlDataStore extends AbstractDataStore {
    */
   @Override
   public <T> IWrite<T> createWrite(Class<T> mapper) {
-    return null;
+    return new MySqlWrite<T>(mapper, this);
   }
 
   /*
@@ -69,7 +71,7 @@ public class MySqlDataStore extends AbstractDataStore {
    */
   @Override
   public <T> IDelete<T> createDelete(Class<T> mapper) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   /**

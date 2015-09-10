@@ -134,4 +134,18 @@ public interface IMapper {
    */
   public IMapperFactory getMapperFactory();
 
+  /**
+   * If true, then the mapper should be synchronized with the underlaying {@link IDataStore}
+   * 
+   * @return the syncNeeded
+   */
+  public boolean isSyncNeeded();
+
+  /**
+   * If true, then the mapper should be synchronized with the underlaying {@link IDataStore}
+   * 
+   * @param syncNeeded
+   *          the syncNeeded to set
+   */
+  public void setSyncNeeded(boolean syncNeeded);
 }

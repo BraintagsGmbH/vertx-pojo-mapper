@@ -14,6 +14,7 @@ package de.braintags.io.vertx.pojomapper.dataaccess.impl;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject;
+import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 
 /**
@@ -68,4 +69,10 @@ public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T
     return mapper;
   }
 
+  protected void sync(){
+    IDataStoreSynchronizer syncer = getDataStore().getDataStoreSynchronizer();
+    if( syncer != null ){
+      syncer.
+    }
+  }
 }
