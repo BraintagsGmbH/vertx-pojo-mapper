@@ -14,17 +14,18 @@
 	<parent>
 		<groupId>de.braintags</groupId>
 		<artifactId>btVertxBasePOM</artifactId>
-		<version>5</version>
+		<version>7-SNAPSHOT</version>
 	</parent>
 
 	<modules>
 		<module>vertx-pojo-mapper-common</module>
 		<module>vertx-pojo-mapper-json</module>
 		<module>vertx-pojongo</module>
-		<module>vertx-pojo-mapper-mysql</module>
+<!-- 		<module>vertx-pojo-mapper-mysql</module> -->
 	</modules>
 
 	<properties>
+		<testjar.skip>true</testjar.skip>
 		<doc.skip>true</doc.skip>
 		<maven.test.skip>true</maven.test.skip>
 		<source.skip>true</source.skip>

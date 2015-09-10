@@ -1,16 +1,18 @@
 /*
- * #%L
- * vertx-pojongo
- * %%
- * Copyright (C) 2015 Braintags GmbH
- * %%
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * and Apache License v2.0 which accompanies this distribution.
+ * 
+ * The Eclipse Public License is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * #L%
+ * 
+ * The Apache License v2.0 is available at
+ * http://www.opensource.org/licenses/apache2.0.php
+ * 
+ * You may elect to redistribute this code under either of these licenses.
  */
-package de.braintags.io.vertx.pojomapper.mongo.test;
+
+package de.braintags.io.vertx.pojomapper.test;
 
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -19,33 +21,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.mongo.test.mapper.MiniMapper;
+import de.braintags.io.vertx.pojomapper.test.mapper.MiniMapper;
 
-public class TestSimpleInsert extends MongoBaseTest {
+/**
+ * 
+ * 
+ * @author Michael Remme
+ * 
+ */
+
+public class TestSimpleInsert extends DatastoreBaseTest {
   private static Logger logger = LoggerFactory.getLogger(TestSimpleInsert.class);
-
   private static final int LOOP = 100;
 
-  @BeforeClass
-  public static void beforeClass() throws Exception {
-    System.setProperty("connection_string", "mongodb://localhost:27017");
-    System.setProperty("db_name", "PojongoTestDatabase");
-    MongoBaseTest.startMongo();
-  }
-
-  @AfterClass
-  public static void afterClass() {
-    MongoBaseTest.stopMongo();
+  /**
+   * 
+   */
+  public TestSimpleInsert() {
   }
 
   @Test
-  public void testInsert() {
+  public void testRoundtrip() {
     MiniMapper sm = new MiniMapper();
     ResultContainer resultContainer = saveRecord(sm);
     if (resultContainer.assertionError != null)

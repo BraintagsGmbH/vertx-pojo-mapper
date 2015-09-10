@@ -44,7 +44,7 @@ import de.braintags.io.vertx.util.ErrorObject;
 
 public class MongoBulkTest extends MongoBaseTest {
   private static Logger logger = LoggerFactory.getLogger(MongoBulkTest.class);
-  private static final long LOOP = 10000;
+  private static final long LOOP = 100;
   private static final String COLUMN = "BulkTest";
 
   @BeforeClass

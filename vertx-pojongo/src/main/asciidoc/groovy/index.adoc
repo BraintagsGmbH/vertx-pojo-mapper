@@ -21,7 +21,4 @@ def mongoDataStore = new de.braintags.io.vertx.pojomapper.mongo.MongoDataStore(m
 
 ----
 
-The rest of the usage is the same than described in the documentation of 
-https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojo-mapper-common 
-
-https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[vertx-pojo-mapper-common]
+The rest of the usage is the same than described in the documentation of https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[vertx-pojo-mapper-common]

@@ -13,6 +13,10 @@
 
 package de.braintags.io.vertx.pojomapper.mysql;
 
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.asyncsql.AsyncSQLClient;
+import io.vertx.ext.asyncsql.MySQLClient;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.test.IDatastoreContainer;
 
@@ -24,11 +28,19 @@ import de.braintags.io.vertx.pojomapper.test.IDatastoreContainer;
 
 public class MySqlDataStoreContainer implements IDatastoreContainer {
   private MySqlDataStore datastore;
+  private AsyncSQLClient mySQLClient;
 
   /**
    * 
    */
   public MySqlDataStoreContainer() {
+  }
+
+  @Override
+  public void startup(Vertx vertx) {
+    JsonObject mySQLClientConfig = new JsonObject().put("host", "localhost");
+    mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
+    datastore = new MySqlDataStore(mySQLClient);
   }
 
   /*
@@ -39,6 +51,11 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   @Override
   public IDataStore getDataStore() {
     return datastore;
+  }
+
+  @Override
+  public void shutdown() {
+    mySQLClient.close();
   }
 
 }

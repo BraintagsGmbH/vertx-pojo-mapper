@@ -2,14 +2,23 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	  <parent>
-	    <artifactId>vertx-pojo-mapper</artifactId>
-  		<groupId>de.braintags</groupId>
-	    <version>1.0.0-SNAPSHOT</version>
-	  </parent>
-	  <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>vertx-pojo-mapper</artifactId>
+		<groupId>de.braintags</groupId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
 
-	  <artifactId>vertx-pojongo</artifactId>
+	<artifactId>vertx-pojongo</artifactId>
+
+	<properties>
+		<MONGO_VERSION>3.0.0</MONGO_VERSION>
+		<maven.test.skip>false</maven.test.skip>
+		<doc.skip>false</doc.skip>
+		<source.skip>false</source.skip>
+		<testjar.skip>false</testjar.skip>
+		<maven.test.skip>false</maven.test.skip>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -20,35 +29,28 @@
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mongo-client</artifactId>
-  			<version>${MONGO_VERSION}</version>
+			<version>${MONGO_VERSION}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mongo-service</artifactId>
-  			<version>${MONGO_VERSION}</version>
+			<version>${MONGO_VERSION}</version>
 		</dependency>
-		
+
 		<dependency>
-  			<groupId>de.braintags</groupId>
+			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-json</artifactId>
-	    	<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mongo-service</artifactId>
 			<scope>test</scope>
 			<classifier>tests</classifier>
-  			<version>${MONGO_VERSION}</version>
+			<version>${MONGO_VERSION}</version>
 		</dependency>
 	</dependencies>
-	
-	<properties>
-		<MONGO_VERSION>3.0.0</MONGO_VERSION>
-    	<maven.test.skip>false</maven.test.skip>
-    	<doc.skip>false</doc.skip>
-    	<source.skip>false</source.skip>
-  </properties>
-	
-	
+
+
 </project>

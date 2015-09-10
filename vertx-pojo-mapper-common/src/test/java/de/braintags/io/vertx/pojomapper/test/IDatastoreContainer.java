@@ -13,6 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper.test;
 
+import io.vertx.core.Vertx;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 
 /**
@@ -23,5 +24,11 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
  */
 
 public interface IDatastoreContainer {
+  public static final String PROPERTY = "IDatastoreContainer";
+
   public IDataStore getDataStore();
+
+  public void startup(Vertx vertx);
+
+  public void shutdown();
 }

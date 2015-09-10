@@ -18,6 +18,14 @@
     <maven.test.skip>true</maven.test.skip>
     <source.skip>false</source.skip>
     <maven.javadoc.skip>false</maven.javadoc.skip>
+	<!-- We skip sources jar generation as we do it with the assembly plugin 
+		to have greater control over the content -->
+	<skipAssembly>false</skipAssembly>
+	<!-- skip maven-compiler-plugin? -->
+	<maven.compiler.plugin>false</maven.compiler.plugin>
+	<testjar.skip>true</testjar.skip>
+	<maven.test.skip>true</maven.test.skip>
+    
   </properties>
 
 </project>
