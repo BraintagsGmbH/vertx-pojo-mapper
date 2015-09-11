@@ -52,4 +52,12 @@ public interface IColumnHandler {
    */
   public short matches(IField field);
 
+  /**
+   * This method generates the command, which is used to create a column in the connected datastore
+   * 
+   * @param field
+   *          the field which shall be generated in the datastore
+   * @return the creation object, like a column creation string
+   */
+  public Object generate(IField field);
 }

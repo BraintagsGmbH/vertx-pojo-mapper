@@ -36,12 +36,13 @@ public abstract class AbstractDataStore implements IDataStore {
   private IStoreObjectFactory storeObjectFactory;
   private ITableGenerator tableGenerator;
   private IDataStoreSynchronizer dataStoreSynchronizer;
+  private String database;
 
   /**
    * 
    */
-  public AbstractDataStore() {
-
+  public AbstractDataStore(String database) {
+    this.database = database;
   }
 
   /*
@@ -141,6 +142,14 @@ public abstract class AbstractDataStore implements IDataStore {
    */
   public final void setDataStoreSynchronizer(IDataStoreSynchronizer dataStoreSynchronizer) {
     this.dataStoreSynchronizer = dataStoreSynchronizer;
+  }
+
+  /**
+   * @return the database
+   */
+  @Override
+  public final String getDatabase() {
+    return database;
   }
 
 }

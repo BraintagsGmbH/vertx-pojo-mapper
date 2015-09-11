@@ -77,7 +77,7 @@ public class TestMapperFactory {
   public void testColumnHandler() {
     IColumnInfo ci = mapperDef.getTableInfo().getColumnInfo("weight");
     assertNotNull(ci);
-    assertNotNull(ci.getColumnHandler());
+    assertNull(ci.getColumnHandler());
   }
 
   @Test

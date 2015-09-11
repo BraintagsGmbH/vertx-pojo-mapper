@@ -38,7 +38,8 @@ public class MySqlDataStore extends AbstractDataStore {
   /**
    * 
    */
-  public MySqlDataStore(AsyncSQLClient sqlClient) {
+  public MySqlDataStore(AsyncSQLClient sqlClient, String database) {
+    super(database);
     this.sqlClient = sqlClient;
     setMapperFactory(new MapperFactory(this));
     setPropertyMapperFactory(new JsonPropertyMapperFactory());

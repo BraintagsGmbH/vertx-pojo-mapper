@@ -43,6 +43,10 @@ public class DummyDataStore implements IDataStore {
   ITypeHandlerFactory tf = new JsonTypeHandlerFactory();
   IPropertyMapperFactory pmf = new JsonPropertyMapperFactory();
   ITableGenerator tg = new DummyTableGenerator();
+  String database;
+
+  public DummyDataStore() {
+  }
 
   /*
    * (non-Javadoc)
@@ -169,5 +173,15 @@ public class DummyDataStore implements IDataStore {
   @Override
   public ITableGenerator getTableGenerator() {
     return tg;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDatabase()
+   */
+  @Override
+  public String getDatabase() {
+    return database;
   }
 }

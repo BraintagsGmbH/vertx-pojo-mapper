@@ -1,15 +1,14 @@
 /*
+ * #%L
+ * vertx-pojo-mapper-common
+ * %%
+ * Copyright (C) 2015 Braintags GmbH
+ * %%
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
- * 
- * The Eclipse Public License is available at
+ * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * The Apache License v2.0 is available at
- * http://www.opensource.org/licenses/apache2.0.php
- * 
- * You may elect to redistribute this code under either of these licenses.
+ * #L%
  */
 
 package de.braintags.io.vertx.pojomapper.mapping.datastore.impl;
@@ -39,8 +38,7 @@ public class DefaultTableGenerator implements ITableGenerator {
    * key
    */
   private final Map<Class<?>, IColumnHandler> cachedColumnHandler = new HashMap<Class<?>, IColumnHandler>();
-  private static final List<IColumnHandler> definedColumnHandlers = new ArrayList<IColumnHandler>();
-  private IColumnHandler defaultColumnHandler = new DefaultColumnHandler();
+  protected static final List<IColumnHandler> definedColumnHandlers = new ArrayList<IColumnHandler>();
 
   /**
    * 
@@ -106,12 +104,12 @@ public class DefaultTableGenerator implements ITableGenerator {
   }
 
   /**
-   * Get the default handler to be used
+   * This implementation returns null
    * 
    * @return the defined default handler or null, if none defined
    */
   public IColumnHandler getDefaultColumnHandler() {
-    return defaultColumnHandler;
+    return null;
   }
 
   /**

@@ -193,7 +193,7 @@ public abstract class MongoBaseTest extends VertxTestBase {
 
   public MongoDataStore getDataStore() {
     if (mongoDataStore == null) {
-      mongoDataStore = new MongoDataStore(getMongoClient());
+      mongoDataStore = new MongoDataStore(getMongoClient(), getDatabaseName());
     }
     return mongoDataStore;
   }

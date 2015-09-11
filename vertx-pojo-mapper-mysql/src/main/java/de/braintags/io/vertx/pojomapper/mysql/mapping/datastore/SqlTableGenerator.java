@@ -13,7 +13,9 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore;
 
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableGenerator;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.StringColumnHandler;
 
 /**
  * 
@@ -23,10 +25,24 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableGener
 
 public class SqlTableGenerator extends DefaultTableGenerator {
 
+  static {
+    definedColumnHandlers.add(new StringColumnHandler());
+  }
+
   /**
    * 
    */
   public SqlTableGenerator() {
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableGenerator#getDefaultColumnHandler()
+   */
+  @Override
+  public IColumnHandler getDefaultColumnHandler() {
+    return super.getDefaultColumnHandler();
   }
 
 }

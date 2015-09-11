@@ -101,4 +101,11 @@ public interface IDataStore {
    */
   public ITableGenerator getTableGenerator();
 
+  /**
+   * Get the name of the database, the current instance is using
+   * 
+   * @return the name of the schema or database
+   */
+  public String getDatabase();
+
 }

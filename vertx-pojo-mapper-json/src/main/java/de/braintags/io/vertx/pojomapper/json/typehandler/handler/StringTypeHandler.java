@@ -26,13 +26,12 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
  */
 
 public class StringTypeHandler extends AbstractTypeHandler {
-  private static final Class<?>[] handleClass = { String.class };
 
   /**
    * 
    */
   public StringTypeHandler() {
-    super(handleClass);
+    super(String.class);
   }
 
   /*
