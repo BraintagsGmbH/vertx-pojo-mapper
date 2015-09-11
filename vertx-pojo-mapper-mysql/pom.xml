@@ -21,7 +21,6 @@
 	</properties>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mysql-postgresql-client</artifactId>

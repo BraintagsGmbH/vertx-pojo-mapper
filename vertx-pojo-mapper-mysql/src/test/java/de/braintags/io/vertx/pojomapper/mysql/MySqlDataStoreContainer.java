@@ -38,7 +38,8 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
 
   @Override
   public void startup(Vertx vertx) {
-    JsonObject mySQLClientConfig = new JsonObject().put("host", "localhost");
+    JsonObject mySQLClientConfig = new JsonObject().put("host", "localhost").put("username", "mremme")
+        .put("password", "xxxxxx").put("database", "test").put("port", 3306);
     mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
     datastore = new MySqlDataStore(mySQLClient);
   }
