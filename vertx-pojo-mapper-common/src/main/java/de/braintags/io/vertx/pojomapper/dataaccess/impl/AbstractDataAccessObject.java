@@ -12,6 +12,9 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.impl;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
@@ -69,10 +72,18 @@ public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T
     return mapper;
   }
 
-  protected void sync(){
+  /**
+   * If a Synchronizer is defined, then it is executed
+   * 
+   * @param resultHandler
+   *          resultHandler receives the ISyncResult or null, if no synchronizer is defined
+   */
+  protected void sync(Handler<AsyncResult<Void>> resultHandler) {
     IDataStoreSynchronizer syncer = getDataStore().getDataStoreSynchronizer();
-    if( syncer != null ){
-      syncer.
+    if (syncer != null) {
+      syncer.synchronize(getMapper(), resultHandler);
+    } else {
+      resultHandler.handle(Future.succeededFuture());
     }
   }
 }

@@ -14,6 +14,7 @@
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
@@ -37,6 +38,14 @@ public class MySqlWrite<T> extends AbstractWrite<T> {
 
   @Override
   public void save(Handler<AsyncResult<IWriteResult>> resultHandler) {
+    sync(syncResult -> {
+      if (syncResult.failed()) {
+        resultHandler.handle(Future.failedFuture(syncResult.cause()));
+      } else {
+        throw new UnsupportedOperationException();
+
+      }
+    });
   }
 
   /*

@@ -33,6 +33,6 @@ public interface IDataStoreSynchronizer {
    * @param mapper
    * @param resultHandler
    */
-  public void synchronize(IMapper mapper, Handler<AsyncResult<ISyncResult>> resultHandler);
+  public void synchronize(IMapper mapper, Handler<AsyncResult<Void>> resultHandler);
 
 }
