@@ -82,7 +82,7 @@ public class MongoDelete<T> extends Delete<T> {
 
   private void deleteQuery(MongoQuery<T> query, Handler<AsyncResult<IDeleteResult>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
-    String collection = getMapper().getDataStoreName();
+    String collection = getMapper().getTableInfo().getName();
     query.createQueryDefinition(qDefResult -> {
       if (qDefResult.failed()) {
         resultHandler.handle(Future.failedFuture(qDefResult.cause()));

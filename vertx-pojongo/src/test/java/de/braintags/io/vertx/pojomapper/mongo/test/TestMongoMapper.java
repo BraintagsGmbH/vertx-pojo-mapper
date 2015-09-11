@@ -24,6 +24,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.Person;
 
 /**
@@ -77,11 +78,13 @@ public class TestMongoMapper extends MongoBaseTest {
     Assert.assertSame(field, field2);
 
     String javaName = field.getName();
-    String dbName = field.getMappedFieldName();
+    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field.getName());
+    assertNotNull(ci);
+    String dbName = ci.getName();
     Assert.assertNotEquals(javaName, dbName);
 
     try {
-      field = mapperDef.getField(field.getMappedFieldName());
+      field = mapperDef.getField(ci.getName());
       fail("this should throw an exception here");
     } catch (MappingException e) {
       // this is the expected result

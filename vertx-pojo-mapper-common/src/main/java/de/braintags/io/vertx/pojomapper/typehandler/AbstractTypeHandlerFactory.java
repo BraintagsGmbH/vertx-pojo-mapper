@@ -112,9 +112,6 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
     ITypeHandler returnHandler = null;
     List<ITypeHandler> ths = getDefinedTypehandlers();
     for (ITypeHandler th : ths) {
-      if (th.getClass().getName().equals("de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler")) {
-        String test = "test";
-      }
       short matchResult = th.matches(field);
       switch (matchResult) {
       case ITypeHandler.MATCH_MAJOR:

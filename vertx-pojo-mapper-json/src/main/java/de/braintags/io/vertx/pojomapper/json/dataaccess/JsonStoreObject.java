@@ -17,9 +17,11 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
+import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 
@@ -62,7 +64,8 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    */
   @Override
   public Object get(IField field) {
-    return jsonObject.getValue(field.getMappedFieldName());
+    String colName = mapper.getTableInfo().getColumnInfo(field.getName()).getName();
+    return jsonObject.getValue(colName);
   }
 
   /*
@@ -73,7 +76,11 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    */
   @Override
   public IStoreObject<JsonObject> put(IField field, Object value) {
-    jsonObject.put(field.getMappedFieldName(), value);
+    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field.getName());
+    if (ci == null) {
+      throw new MappingException("Can't find columninfo for field " + field.getFullName());
+    }
+    jsonObject.put(ci.getName(), value);
     return this;
   }
 

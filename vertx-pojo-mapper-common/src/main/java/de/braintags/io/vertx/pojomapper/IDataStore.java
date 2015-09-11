@@ -20,6 +20,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 /**
@@ -92,5 +93,12 @@ public interface IDataStore {
    * @return the instance of {@link IDataStoreSynchronizer} for the current datastore or null, if no synchronizer needed
    */
   public IDataStoreSynchronizer getDataStoreSynchronizer();
+
+  /**
+   * Get the instance of {@link ITableGenerator} suitable for the given datastore
+   * 
+   * @return
+   */
+  public ITableGenerator getTableGenerator();
 
 }

@@ -89,7 +89,7 @@ public class MongoQuery<T> extends Query<T> {
 
   private void doFindCount(JsonObject query, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
-    String column = getMapper().getDataStoreName();
+    String column = getMapper().getTableInfo().getName();
     mongoClient.count(column, query, qResult -> {
       if (qResult.failed()) {
         Future<IQueryCountResult> future = Future.failedFuture(qResult.cause());
@@ -104,7 +104,7 @@ public class MongoQuery<T> extends Query<T> {
 
   private void doFind(JsonObject query, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
-    String column = getMapper().getDataStoreName();
+    String column = getMapper().getTableInfo().getName();
     mongoClient.find(column, query, qResult -> {
       if (qResult.failed()) {
         Future<IQueryResult<T>> future = Future.failedFuture(qResult.cause());

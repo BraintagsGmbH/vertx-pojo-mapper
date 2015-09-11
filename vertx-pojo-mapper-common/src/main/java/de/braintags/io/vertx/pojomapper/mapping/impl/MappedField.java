@@ -88,7 +88,6 @@ public class MappedField implements IField {
 
   private Type mapKeyType;
   private Type subType;
-  private String mappedFieldName;
   private HashMap<String, Constructor<?>> constructors = new HashMap<String, Constructor<?>>();
 
   /**
@@ -116,7 +115,6 @@ public class MappedField implements IField {
 
   protected void init() {
     computeAnnotations();
-    mappedFieldName = computePropertyName();
     propertyMapper = computePropertyMapper();
     // typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
     computeType();
@@ -139,14 +137,6 @@ public class MappedField implements IField {
     } else {
       return store.getPropertyMapperFactory().getPropertyMapper(IPropertyMapper.class);
     }
-  }
-
-  protected String computePropertyName() {
-    if (field.isAnnotationPresent(Property.class)) {
-      Property prop = field.getAnnotation(Property.class);
-      return prop.value();
-    }
-    return getField().getName();
   }
 
   // TODO Yet needed?
@@ -505,11 +495,6 @@ public class MappedField implements IField {
   @Override
   public String getName() {
     return field.getName();
-  }
-
-  @Override
-  public String getMappedFieldName() {
-    return mappedFieldName;
   }
 
   @Override

@@ -59,7 +59,7 @@ public class LoggerQueryRamber implements IQueryRambler {
 
   @Override
   public void start(IQuery<?> query) {
-    log("start query in: " + query.getMapper().getDataStoreName());
+    log("start query in: " + query.getMapper().getTableInfo().getName());
   }
 
   @Override

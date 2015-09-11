@@ -47,6 +47,9 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.util.ClassUtil;
 
 /**
@@ -66,7 +69,7 @@ public class Mapper implements IMapper {
   private Class<?> mapperClass;
   private Entity entity;
   private Map<Class<? extends Annotation>, IField[]> fieldCache = new HashMap<Class<? extends Annotation>, IField[]>();
-  private String dataStoreName;
+  private ITableInfo tableInfo;
   private boolean syncNeeded = true;
 
   /**
@@ -118,7 +121,18 @@ public class Mapper implements IMapper {
     computeClassAnnotations();
     computeEntity();
     computeObjectFactory();
+    generateTableInfo();
     validate();
+  }
+
+  private void generateTableInfo() {
+    ITableGenerator tg = mapperFactory.getDataStore().getTableGenerator();
+    this.tableInfo = tg.createTableInfo(this);
+    for (String fn : getFieldNames()) {
+      IField field = getField(fn);
+      IColumnHandler ch = tg.getColumnHandler(field);
+      this.tableInfo.createColumnInfo(field, ch);
+    }
   }
 
   /**
@@ -132,9 +146,7 @@ public class Mapper implements IMapper {
   private void computeEntity() {
     if (mapperClass.isAnnotationPresent(Entity.class)) {
       entity = mapperClass.getAnnotation(Entity.class);
-      dataStoreName = entity.name();
-    } else
-      dataStoreName = mapperClass.getSimpleName();
+    }
   }
 
   private void computeObjectFactory() {
@@ -395,8 +407,8 @@ public class Mapper implements IMapper {
   }
 
   @Override
-  public String getDataStoreName() {
-    return dataStoreName;
+  public ITableInfo getTableInfo() {
+    return tableInfo;
   }
 
   @Override

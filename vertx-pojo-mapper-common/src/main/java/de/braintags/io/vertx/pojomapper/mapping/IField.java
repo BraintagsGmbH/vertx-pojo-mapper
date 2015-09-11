@@ -21,11 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
- * Describes a field of an {@link IMapper}
+ * Describes a java field of an {@link IMapper}
  * 
  * @author Michael Remme
  * 
@@ -46,13 +45,6 @@ public interface IField {
    * @return the classname.fieldname
    */
   public String getFullName();
-
-  /**
-   * Get the name of the field in the {@link IDataStore}
-   * 
-   * @return
-   */
-  public String getMappedFieldName();
 
   /**
    * Get the fitting {@link IPropertyAccessor} for the current field

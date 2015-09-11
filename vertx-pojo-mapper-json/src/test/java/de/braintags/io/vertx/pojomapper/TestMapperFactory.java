@@ -49,6 +49,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ParametrizedMappedField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
@@ -70,6 +71,13 @@ public class TestMapperFactory {
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
     mapperDef = dataStore.getMapperFactory().getMapper(Person.class);
+  }
+
+  @Test
+  public void testColumnHandler() {
+    IColumnInfo ci = mapperDef.getTableInfo().getColumnInfo("weight");
+    assertNotNull(ci);
+    assertNotNull(ci.getColumnHandler());
   }
 
   @Test

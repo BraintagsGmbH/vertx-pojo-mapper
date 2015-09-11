@@ -15,7 +15,6 @@ package de.braintags.io.vertx.pojomapper.mongo.mapper;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MappedField;
 import de.braintags.io.vertx.pojomapper.mapping.impl.Mapper;
@@ -28,7 +27,6 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.Mapper;
  */
 
 public class MongoMappedField extends MappedField {
-  private static final String ID_FIELD_NAME = "_id";
 
   /**
    * @param field
@@ -45,19 +43,6 @@ public class MongoMappedField extends MappedField {
    */
   public MongoMappedField(Type type, Mapper mapper) {
     super(type, mapper);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.impl.MappedField#computePropertyName()
-   */
-  @Override
-  protected String computePropertyName() {
-    if (hasAnnotation(Id.class)) {
-      return ID_FIELD_NAME;
-    }
-    return super.computePropertyName();
   }
 
 }

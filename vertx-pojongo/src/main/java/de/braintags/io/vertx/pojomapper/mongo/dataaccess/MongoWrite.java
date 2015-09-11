@@ -103,7 +103,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
       Handler<AsyncResult<Void>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
     IMapper mapper = getMapper();
-    String column = mapper.getDataStoreName();
+    String column = mapper.getTableInfo().getName();
     final String currentId = (String) storeObject.get(mapper.getIdField());
     logger.info("now saving");
     mongoClient.save(column, storeObject.getContainer(), result -> {

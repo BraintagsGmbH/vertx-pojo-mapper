@@ -69,7 +69,7 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
       } else {
         if (result.result().size() != 1) {
           String formated = String.format("expected to find 1 record, but found %d in column %s with query '%s'",
-              result.result().size(), subMapper.getDataStoreName(), result.result().getOriginalQuery());
+              result.result().size(), subMapper.getTableInfo().getName(), result.result().getOriginalQuery());
           fail(new PropertyAccessException(formated), resultHandler);
           return;
         }

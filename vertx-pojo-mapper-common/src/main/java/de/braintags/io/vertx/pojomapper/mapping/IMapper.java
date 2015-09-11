@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeDelete;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultObjectFactory;
 
 /**
@@ -37,11 +38,11 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultObjectFactory;
 public interface IMapper {
 
   /**
-   * Get the name of the entity inside the {@link IDataStore} ( table etc. )
+   * Get information about the table / collection inside the connected datastore
    * 
    * @return the name
    */
-  public String getDataStoreName();
+  public ITableInfo getTableInfo();
 
   /**
    * Get the underlaying class which defines the mapper

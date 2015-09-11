@@ -26,8 +26,10 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler;
+import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.exception.QueryParameterException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.Size;
@@ -137,6 +139,13 @@ public class MongoQueryRambler implements IQueryRambler {
    */
   private void handleMultipleValues(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
     IField field = fieldParameter.getField();
+    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field.getName());
+    if (ci == null) {
+      resultHandler.handle(Future.failedFuture(new MappingException("Can't find columninfo for field "
+          + field.getFullName())));
+      return;
+    }
+
     String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
     Object valueIterable = fieldParameter.getValue();
     if (!(valueIterable instanceof Iterable)) {
@@ -155,6 +164,7 @@ public class MongoQueryRambler implements IQueryRambler {
     ErrorObject<Void> errorObject = new ErrorObject<Void>();
     JsonArray resultArray = new JsonArray();
 
+    // TODO check the loop handling here!! see below
     while (values.hasNext()) {
       Object value = values.next();
       field.getTypeHandler().intoStore(value, field, result -> {
@@ -163,15 +173,18 @@ public class MongoQueryRambler implements IQueryRambler {
         } else {
           resultArray.add(result.result().getResult());
           if (co.reduce()) {
-            JsonObject arg = new JsonObject().put(mongoOperator, resultArray);
-            add(field.getMappedFieldName(), arg);
-            resultHandler.handle(Future.succeededFuture());
+            if (errorObject.handleError(resultHandler)) {
+              return;
+            } else {
+              JsonObject arg = new JsonObject().put(mongoOperator, resultArray);
+              String colName = ci.getName();
+              add(colName, arg);
+              resultHandler.handle(Future.succeededFuture());
+            }
           }
         }
       });
     }
-    if (errorObject.handleError(resultHandler))
-      return;
 
   }
 
@@ -183,6 +196,12 @@ public class MongoQueryRambler implements IQueryRambler {
    */
   private void handleSingleValue(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
     IField field = fieldParameter.getField();
+    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field.getName());
+    if (ci == null) {
+      resultHandler.handle(Future.failedFuture(new MappingException("Can't find columninfo for field "
+          + field.getFullName())));
+      return;
+    }
     String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
     Object value = fieldParameter.getValue();
 
@@ -192,7 +211,7 @@ public class MongoQueryRambler implements IQueryRambler {
       } else {
         Object storeObject = result.result().getResult();
         JsonObject arg = new JsonObject().put(mongoOperator, storeObject);
-        add(field.getMappedFieldName(), arg);
+        add(ci.getName(), arg);
         resultHandler.handle(Future.succeededFuture());
       }
     });
