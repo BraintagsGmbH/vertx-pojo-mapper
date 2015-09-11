@@ -23,6 +23,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
@@ -156,5 +157,10 @@ public class DummyDataStore implements IDataStore {
   @Override
   public IStoreObjectFactory getStoreObjectFactory() {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public IDataStoreSynchronizer getDataStoreSynchronizer() {
+    return null;
   }
 }

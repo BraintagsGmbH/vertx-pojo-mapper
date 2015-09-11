@@ -26,13 +26,13 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
  * 
  */
 
-public class MySqlWrite<T> extends AbstractWrite<T> {
+public class SqlWrite<T> extends AbstractWrite<T> {
 
   /**
    * @param mapperClass
    * @param datastore
    */
-  public MySqlWrite(Class mapperClass, IDataStore datastore) {
+  public SqlWrite(Class<T> mapperClass, IDataStore datastore) {
     super(mapperClass, datastore);
   }
 

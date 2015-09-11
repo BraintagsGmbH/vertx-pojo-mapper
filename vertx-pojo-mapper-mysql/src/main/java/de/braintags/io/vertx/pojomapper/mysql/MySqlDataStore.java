@@ -20,9 +20,11 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
-import de.braintags.io.vertx.pojomapper.mysql.dataaccess.MySqlWrite;
+import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlWrite;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObjectFactory;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlDataStoreSynchronizer;
 
 /**
  * 
@@ -61,7 +63,7 @@ public class MySqlDataStore extends AbstractDataStore {
    */
   @Override
   public <T> IWrite<T> createWrite(Class<T> mapper) {
-    return new MySqlWrite<T>(mapper, this);
+    return new SqlWrite<T>(mapper, this);
   }
 
   /*
@@ -81,6 +83,11 @@ public class MySqlDataStore extends AbstractDataStore {
    */
   public final AsyncSQLClient getSqlClient() {
     return sqlClient;
+  }
+
+  @Override
+  public IDataStoreSynchronizer getDataStoreSynchronizer() {
+    return new SqlDataStoreSynchronizer(this);
   }
 
 }
