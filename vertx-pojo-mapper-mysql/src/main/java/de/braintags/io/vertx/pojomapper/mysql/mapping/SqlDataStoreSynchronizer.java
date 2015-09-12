@@ -13,15 +13,6 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.asyncsql.AsyncSQLClient;
-import io.vertx.ext.sql.ResultSet;
-import io.vertx.ext.sql.SQLConnection;
-
 import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
@@ -31,6 +22,14 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.asyncsql.AsyncSQLClient;
+import io.vertx.ext.sql.ResultSet;
+import io.vertx.ext.sql.SQLConnection;
 
 /**
  * 
@@ -56,9 +55,8 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer#synchronize(de.braintags.io.vertx.pojomapper.mapping
-   * .IMapper, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer#synchronize(de.braintags.io.vertx.pojomapper.
+   * mapping .IMapper, io.vertx.core.Handler)
    */
   @Override
   public void synchronize(IMapper mapper, Handler<AsyncResult<Void>> resultHandler) {

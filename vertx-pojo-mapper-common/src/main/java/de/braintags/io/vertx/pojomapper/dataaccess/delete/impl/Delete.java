@@ -29,9 +29,10 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
  * 
  */
 
-public abstract class Delete<T> extends AbstractDataAccessObject<T> implements IDelete<T> {
+public abstract class Delete<T> extends AbstractDataAccessObject<T>implements IDelete<T> {
+  private static final String ERROR_MESSAGE = "You can only use ONE source for deletion, either an IQuery or a list of instances";
   private IQuery<T> query;
-  private ArrayList<T> recordList = new ArrayList<T>();
+  private List<T> recordList = new ArrayList<T>();
 
   /**
    * @param mapperClass
@@ -51,8 +52,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   @Override
   public void setQuery(IQuery<T> query) {
     if (!recordList.isEmpty())
-      throw new UnsupportedOperationException(
-          "You can only use ONE source for deletion, or an IQuery or a list of instances");
+      throw new UnsupportedOperationException(ERROR_MESSAGE);
     this.query = query;
   }
 
@@ -64,8 +64,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   @Override
   public void add(T record) {
     if (query != null)
-      throw new UnsupportedOperationException(
-          "You can only use ONE source for deletion, or an IQuery or a list of instances");
+      throw new UnsupportedOperationException(ERROR_MESSAGE);
     recordList.add(record);
   }
 
@@ -78,8 +77,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   @Override
   public void add(T... records) {
     if (query != null)
-      throw new UnsupportedOperationException(
-          "You can only use ONE source for deletion, or an IQuery or a list of instances");
+      throw new UnsupportedOperationException(ERROR_MESSAGE);
     recordList.addAll(Arrays.asList(records));
   }
 

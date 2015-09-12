@@ -13,8 +13,6 @@
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import static java.lang.String.format;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -49,6 +47,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.util.ClassUtil;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * Represents a field, which shall be mapped into an {@link IDataStore}
@@ -179,9 +179,9 @@ public class MappedField implements IField {
           constructor = type.getDeclaredConstructor();
           constructor.setAccessible(true);
         } catch (NoSuchMethodException e) {
-          // never mind.
+          log.warn("unaccessible constructor", e);
         } catch (SecurityException e) {
-          // never mind.
+          log.warn("unaccessible constructor", e);
         }
       }
     }
@@ -206,8 +206,8 @@ public class MappedField implements IField {
       }
 
       // get the subtype T, T[]/List<T>/Map<?,T>; subtype of Long[], List<Long> is Long
-      subType = (realType.isArray()) ? realType.getComponentType() : ClassUtil.getParameterizedType(field, isMap ? 1
-          : 0);
+      subType = (realType.isArray()) ? realType.getComponentType()
+          : ClassUtil.getParameterizedType(field, isMap ? 1 : 0);
 
       if (isMap) {
         mapKeyType = ClassUtil.getParameterizedType(field, 0);
@@ -518,6 +518,7 @@ public class MappedField implements IField {
       constructor = clz.getDeclaredConstructor(parameters);
       constructors.put(code, constructor);
     } catch (NoSuchMethodException | SecurityException e) {
+      log.warn("unaccessible constructor", e);
       constructors.put(code, constructor);
     }
     return constructor;

@@ -18,7 +18,7 @@ config = {
 config['connection_string'] = "mongodb://localhost:27017"
 config['db_name'] = "PojongoTestDatabase"
 mongoClient = VertxMongo::MongoClient.create_non_shared(vertx, config)
-mongoDataStore = Java::DeBraintagsIoVertxPojomapperMongo::MongoDataStore.new(mongoClient)
+mongoDataStore = Java::DeBraintagsIoVertxPojomapperMongo::MongoDataStore.new(mongoClient, "PojongoTestDatabase")
 
 ----
 

@@ -12,12 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.mongo.MongoClient;
-
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
@@ -27,6 +21,11 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.QueryCountResult;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.MongoClient;
 
 /**
  * 
@@ -55,7 +54,7 @@ public class MongoQuery<T> extends Query<T> {
           doFind(result.result(), resultHandler);
         }
       });
-    } catch (Throwable e) {
+    } catch (Exception e) {
       Future<IQueryResult<T>> future = Future.failedFuture(e);
       resultHandler.handle(future);
     }
@@ -81,7 +80,7 @@ public class MongoQuery<T> extends Query<T> {
           doFindCount(result.result(), resultHandler);
         }
       });
-    } catch (Throwable e) {
+    } catch (Exception e) {
       Future<IQueryCountResult> future = Future.failedFuture(e);
       resultHandler.handle(future);
     }

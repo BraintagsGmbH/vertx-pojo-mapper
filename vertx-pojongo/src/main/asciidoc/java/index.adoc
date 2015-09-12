@@ -16,7 +16,7 @@ JsonObject config = new JsonObject();
 config.put("connection_string", "mongodb://localhost:27017");
 config.put("db_name", "PojongoTestDatabase");
 MongoClient mongoClient = MongoClient.createNonShared(vertx, config);
-MongoDataStore mongoDataStore = new MongoDataStore(mongoClient);
+MongoDataStore mongoDataStore = new MongoDataStore(mongoClient, "PojongoTestDatabase");
 ----
 
 The rest of the usage is the same than described in the documentation of https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[vertx-pojo-mapper-common]

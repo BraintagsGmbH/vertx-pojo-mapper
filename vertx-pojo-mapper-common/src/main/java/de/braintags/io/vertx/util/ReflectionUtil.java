@@ -15,6 +15,9 @@ package de.braintags.io.vertx.util;
 import java.lang.reflect.Array;
 import java.util.List;
 
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+
 /**
  * 
  * 
@@ -23,6 +26,7 @@ import java.util.List;
  */
 
 public class ReflectionUtil {
+  private static final Logger logger = LoggerFactory.getLogger(ReflectionUtil.class);
 
   /**
    * Convert the given list members into an array with the specified type
@@ -38,6 +42,7 @@ public class ReflectionUtil {
     try {
       return values.toArray((Object[]) exampleArray);
     } catch (ClassCastException e) {
+      logger.warn("ClassCastException for toArray - taking the long road");
       for (int i = 0; i < values.size(); i++) {
         Array.set(exampleArray, i, values.get(i));
       }

@@ -18,7 +18,7 @@ var config = {
 config.connection_string = "mongodb://localhost:27017";
 config.db_name = "PojongoTestDatabase";
 var mongoClient = MongoClient.createNonShared(vertx, config);
-var mongoDataStore = new (Java.type("de.braintags.io.vertx.pojomapper.mongo.MongoDataStore"))(mongoClient);
+var mongoDataStore = new (Java.type("de.braintags.io.vertx.pojomapper.mongo.MongoDataStore"))(mongoClient, "PojongoTestDatabase");
 
 ----
 

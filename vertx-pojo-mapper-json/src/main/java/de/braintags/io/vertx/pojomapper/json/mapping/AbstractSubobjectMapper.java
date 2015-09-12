@@ -12,13 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.json.mapping;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
@@ -34,6 +27,12 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.Size;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * An abstract implementation of IPropertyMapper, which is checking the field, wether it is a single value field, an
@@ -117,7 +116,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
             handler.handle(Future.succeededFuture());
           }
         });
-      } catch (Throwable e) {
+      } catch (Exception e) {
         handler.handle(Future.failedFuture(e));
       }
     } else {
@@ -192,7 +191,8 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
    * @param handler
    *          the handler to be called
    */
-  protected void readArray(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler) {
+  protected void readArray(Object entity, IStoreObject<?> storeObject, IField field,
+      Handler<AsyncResult<Void>> handler) {
     JsonArray jsonArray = (JsonArray) storeObject.get(field);
     if (jsonArray == null || jsonArray.isEmpty())
       handler.handle(Future.succeededFuture());
@@ -310,7 +310,8 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
    *          the handler to be called
    */
   @SuppressWarnings("rawtypes")
-  protected void writeMap(Map<?, ?> map, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler) {
+  protected void writeMap(Map<?, ?> map, IStoreObject<?> storeObject, IField field,
+      Handler<AsyncResult<Void>> handler) {
     int size = map == null ? 0 : map.size();
     if (size == 0)
       handler.handle(Future.succeededFuture());

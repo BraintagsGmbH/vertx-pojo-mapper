@@ -17,7 +17,7 @@ def config = [:]
 config.connection_string = "mongodb://localhost:27017"
 config.db_name = "PojongoTestDatabase"
 def mongoClient = MongoClient.createNonShared(vertx, config)
-def mongoDataStore = new de.braintags.io.vertx.pojomapper.mongo.MongoDataStore(mongoClient)
+def mongoDataStore = new de.braintags.io.vertx.pojomapper.mongo.MongoDataStore(mongoClient, "PojongoTestDatabase")
 
 ----
 
