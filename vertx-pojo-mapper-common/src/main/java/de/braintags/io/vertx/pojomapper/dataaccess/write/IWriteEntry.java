@@ -29,7 +29,8 @@ public interface IWriteEntry {
    * 
    * @return the {@link IStoreObject} which was written
    */
-  public IStoreObject<?> getStoreObject();
+  @SuppressWarnings("rawtypes")
+  public IStoreObject getStoreObject();
 
   /**
    * Get the id of the saved object

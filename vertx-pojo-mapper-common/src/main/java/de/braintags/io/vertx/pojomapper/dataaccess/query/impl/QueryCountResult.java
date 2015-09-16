@@ -44,6 +44,7 @@ public class QueryCountResult implements IQueryCountResult {
    * @param originalQuery
    */
   public QueryCountResult(IMapper mapper, IDataStore dataStore, long count, Object originalQuery) {
+    this.mapper = mapper;
     this.dataStore = dataStore;
     this.count = count;
     this.originalQuery = originalQuery;

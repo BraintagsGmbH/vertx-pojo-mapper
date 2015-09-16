@@ -11,7 +11,7 @@
  * #L%
  */
 
-package de.braintags.io.vertx.pojomapper.test;
+package de.braintags.io.vertx.pojomapper.datastoretest;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.logging.Logger;

@@ -26,7 +26,11 @@ import io.vertx.core.logging.LoggerFactory;
  */
 
 public class ReflectionUtil {
-  private static final Logger logger = LoggerFactory.getLogger(ReflectionUtil.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtil.class);
+
+  private ReflectionUtil() {
+
+  }
 
   /**
    * Convert the given list members into an array with the specified type
@@ -42,7 +46,7 @@ public class ReflectionUtil {
     try {
       return values.toArray((Object[]) exampleArray);
     } catch (ClassCastException e) {
-      logger.warn("ClassCastException for toArray - taking the long road " + e);
+      LOGGER.warn("ClassCastException for toArray - taking the long road " + e);
       for (int i = 0; i < values.size(); i++) {
         Array.set(exampleArray, i, values.get(i));
       }

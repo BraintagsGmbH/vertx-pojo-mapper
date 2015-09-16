@@ -76,4 +76,12 @@ public class ParametrizedMappedField extends MappedField {
     return false;
   }
 
+  /**
+   * Get the parent
+   * 
+   * @return the parent instance of {@link MappedField}
+   */
+  public MappedField getParent() {
+    return parent;
+  }
 }

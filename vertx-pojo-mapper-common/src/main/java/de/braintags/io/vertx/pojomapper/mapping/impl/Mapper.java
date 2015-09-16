@@ -362,8 +362,6 @@ public class Mapper implements IMapper {
     }
 
     IField[] result = fieldCache.get(annotationClass);
-    if (result.length == 0)
-      return null;
     return result;
   }
 
@@ -375,22 +373,23 @@ public class Mapper implements IMapper {
   @Override
   public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity) {
     List<Method> methods = getLifecycleMethods(annotationClass);
-    if (methods != null) {
-      for (Method method : methods) {
-        method.setAccessible(true);
-        Object[] args = null;
-        if (method.getParameterCount() > 0) {
-          args = createMethodArgs(method, entity);
-        }
+    if (methods == null)
+      return;
 
-        try {
-          Object result = method.invoke(entity, args);
-          if (result != null)
-            throw new UnsupportedOperationException("Not yet supported, return value of annotated lifecyle methods: "
-                + result.getClass().getName());
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-          throw new MethodAccessException(e);
-        }
+    for (Method method : methods) {
+      method.setAccessible(true);
+      Object[] args = null;
+      if (method.getParameterCount() > 0) {
+        args = createMethodArgs(method, entity);
+      }
+
+      try {
+        Object result = method.invoke(entity, args);
+        if (result != null)
+          throw new UnsupportedOperationException(
+              "Not yet supported, return value of annotated lifecyle methods: " + result.getClass().getName());
+      } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        throw new MethodAccessException(e);
       }
     }
   }

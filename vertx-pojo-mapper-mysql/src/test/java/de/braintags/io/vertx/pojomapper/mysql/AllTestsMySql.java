@@ -17,8 +17,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import de.braintags.io.vertx.pojomapper.test.TestBaseTest;
-import de.braintags.io.vertx.pojomapper.test.TestSimpleInsert;
+import de.braintags.io.vertx.pojomapper.datastoretest.TestBaseTest;
+import de.braintags.io.vertx.pojomapper.datastoretest.TestSimpleInsert;
 
 /**
  * 

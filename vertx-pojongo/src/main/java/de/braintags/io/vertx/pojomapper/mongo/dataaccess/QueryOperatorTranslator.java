@@ -26,7 +26,7 @@ public class QueryOperatorTranslator {
   /**
    * 
    */
-  public QueryOperatorTranslator() {
+  private QueryOperatorTranslator() {
   }
 
   public static String translate(QueryOperator op) {

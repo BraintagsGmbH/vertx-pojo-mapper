@@ -69,12 +69,6 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     definedTypeHandlers.add(new MapTypeHandler());
     definedTypeHandlers.add(new StringTypeHandler());
     definedTypeHandlers.add(new ArrayTypeHandler());
-
-    // definedTypeHandlers.add(new ());
-    // definedTypeHandlers.add(new ());
-    // definedTypeHandlers.add(new ());
-
-    // definedTypeHandlers.add(new ());
   }
 
   /**

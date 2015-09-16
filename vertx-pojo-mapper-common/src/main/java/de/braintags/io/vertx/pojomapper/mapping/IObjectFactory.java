@@ -39,7 +39,8 @@ public interface IObjectFactory {
    *          the {@link IField} definition
    * @return a new {@link Collection}
    */
-  Collection<?> createCollection(IField field);
+  @SuppressWarnings("rawtypes")
+  Collection createCollection(IField field);
 
   /**
    * Create a new instance of {@link Map}
@@ -48,7 +49,8 @@ public interface IObjectFactory {
    *          the field to create a map for
    * @return the new instance
    */
-  Map<?, ?> createMap(IField field);
+  @SuppressWarnings("rawtypes")
+  Map createMap(IField field);
 
   /**
    * Set the Mapper, where the IObjectFactory is contained

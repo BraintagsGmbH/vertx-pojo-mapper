@@ -42,6 +42,10 @@ import io.vertx.core.logging.LoggerFactory;
 public class ClassUtil {
   private static final Logger log = LoggerFactory.getLogger(ClassUtil.class);
 
+  private ClassUtil() {
+
+  }
+
   /**
    * Get a defined {@link Constructor} of the given class with the arguments
    * 
@@ -51,7 +55,8 @@ public class ClassUtil {
    *          the arguments of the contructor
    * @return a fitting constructor
    */
-  public static Constructor<?> getConstructor(Class<?> cls, Class<?>... arguments) {
+  @SuppressWarnings("rawtypes")
+  public static Constructor getConstructor(Class<?> cls, Class<?>... arguments) {
     try {
       return cls.getDeclaredConstructor(arguments);
     } catch (NoSuchMethodException | SecurityException e) {
@@ -186,17 +191,7 @@ public class ClassUtil {
     } else if (t instanceof WildcardType) {
       returnClass = (Class<?>) ((WildcardType) t).getUpperBounds()[0];
     } else
-      throw new RuntimeException("Generic TypeVariable not supported!");
-
-    // // TODO remove this check
-    // log.info("********* remove the check in ClassUtil by the time");
-    // Class<?> returnClass2 = getClass(t);
-    // if (returnClass == null && returnClass2 != null)
-    // throw new IllegalArgumentException("result not equal");
-    // if (returnClass2 == null && returnClass != null)
-    // throw new IllegalArgumentException("result not equal");
-    // if (returnClass != null && returnClass2 != null && !returnClass.equals(returnClass2))
-    // throw new IllegalArgumentException("result not equal");
+      throw new UnsupportedOperationException("Generic TypeVariable not supported!");
 
     return returnClass;
   }
@@ -210,7 +205,7 @@ public class ClassUtil {
         }
         final Type paramType = type.getActualTypeArguments()[index];
         if (paramType instanceof GenericArrayType) {
-          return paramType; // ((GenericArrayType) paramType).getGenericComponentType();
+          return paramType;
         } else {
           if (paramType instanceof ParameterizedType) {
             return paramType;
@@ -219,8 +214,6 @@ public class ClassUtil {
               // TODO: Figure out what to do... Walk back up the to
               // the parent class and try to get the variable type
               // from the T/V/X
-              // throw new MappingException("Generic Typed Class not supported: <" + ((TypeVariable)
-              // paramType).getName() + "> = " + ((TypeVariable) paramType).getBounds()[0]);
               return paramType;
             } else if (paramType instanceof WildcardType) {
               return paramType;

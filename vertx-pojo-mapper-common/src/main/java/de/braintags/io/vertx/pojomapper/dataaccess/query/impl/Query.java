@@ -12,12 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +22,9 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * 
@@ -36,8 +33,7 @@ import de.braintags.io.vertx.util.ErrorObject;
  * 
  */
 
-public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQuery<T> {
-  private static final Logger logger = LoggerFactory.getLogger(Query.class);
+public abstract class Query<T> extends AbstractDataAccessObject<T>implements IQuery<T> {
   private List<Object> filters = new ArrayList<Object>();
 
   /**
@@ -82,30 +78,35 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
       finishCounter(rambler, resultHandler);
       return;
     }
-    CounterObject co = new CounterObject(filters.size());
     ErrorObject<Void> error = new ErrorObject<Void>();
+    CounterObject co = new CounterObject(filters.size());
     for (Object filter : filters) {
-      if (filter instanceof IRamblerSource) {
-        ((IRamblerSource) filter).applyTo(rambler, result -> {
-          if (result.failed()) {
-            error.setThrowable(result.cause());
-            resultHandler.handle(result);
-          } else {
-            if (co.reduce()) { // last element in the list
-              finishCounter(rambler, resultHandler);
-            }
-          }
-        });
-        if (error.isError()) {
-          return;
-        }
-
-      } else {
-        resultHandler.handle(Future.failedFuture(new UnsupportedOperationException(
-            "NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName())));
+      handleFilter(rambler, resultHandler, filter, error, co);
+      if (error.isError()) {
         return;
       }
     }
+  }
+
+  private void handleFilter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler, Object filter,
+      ErrorObject<Void> error, CounterObject co) {
+    if (!(filter instanceof IRamblerSource)) {
+      error.setThrowable(
+          new UnsupportedOperationException("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName()));
+      error.handleError(resultHandler);
+      return;
+    }
+
+    ((IRamblerSource) filter).applyTo(rambler, result -> {
+      if (result.failed()) {
+        error.setThrowable(result.cause());
+        error.handleError(resultHandler);
+        return;
+      }
+      if (co.reduce()) { // last element in the list
+        finishCounter(rambler, resultHandler);
+      }
+    });
   }
 
   private void finishCounter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {

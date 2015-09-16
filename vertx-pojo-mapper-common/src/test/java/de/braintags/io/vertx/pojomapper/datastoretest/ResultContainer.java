@@ -12,7 +12,7 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.test;
+package de.braintags.io.vertx.pojomapper.datastoretest;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;

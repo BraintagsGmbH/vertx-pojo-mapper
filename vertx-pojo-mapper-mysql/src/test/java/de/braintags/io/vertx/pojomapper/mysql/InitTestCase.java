@@ -17,7 +17,7 @@ import io.vertx.test.core.VertxTestBase;
 
 import org.junit.Test;
 
-import de.braintags.io.vertx.pojomapper.test.DatastoreBaseTest;
+import de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest;
 
 public class InitTestCase extends VertxTestBase {
 

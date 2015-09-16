@@ -12,10 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.typehandler;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +20,9 @@ import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 import de.braintags.io.vertx.util.ClassUtil;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * Abstract implementation of {@link ITypeHandler} which handles
@@ -78,7 +77,8 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
    *          the arguments for the constructor
    * @return a fitting {@link Constructor}
    */
-  public Constructor<?> getConstructor(IField field, Class<?> cls, Class<?>... arguments) {
+  @SuppressWarnings("rawtypes")
+  public Constructor getConstructor(IField field, Class<?> cls, Class<?>... arguments) {
     if (field != null) {
       Constructor<?> constr = field.getConstructor(String.class);
       if (constr == null)

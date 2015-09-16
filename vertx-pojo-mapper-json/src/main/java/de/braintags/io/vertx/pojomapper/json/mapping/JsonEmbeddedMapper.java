@@ -12,15 +12,15 @@
  */
 package de.braintags.io.vertx.pojomapper.json.mapping;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
 /**
  * Implementation of {@link IEmbeddedMapper} which is used to store subobjects embedded in the field of their parent
@@ -56,10 +56,11 @@ public class JsonEmbeddedMapper extends AbstractSubobjectMapper implements IEmbe
   }
 
   @Override
-  public void readSingleValue(Object dbValue, IField field, Class<?> mapperClass, Handler<AsyncResult<Object>> handler) {
+  public void readSingleValue(Object dbValue, IField field, Class<?> mapperClass,
+      Handler<AsyncResult<Object>> handler) {
     IDataStore store = field.getMapper().getMapperFactory().getDataStore();
-    mapperClass = mapperClass != null ? mapperClass : field.getType();
-    IMapper mapper = store.getMapperFactory().getMapper(mapperClass);
+    Class<?> internalMapperClass = mapperClass != null ? mapperClass : field.getType();
+    IMapper mapper = store.getMapperFactory().getMapper(internalMapperClass);
 
     store.getStoreObjectFactory().createStoreObject(dbValue, mapper, result -> {
       if (result.failed()) {

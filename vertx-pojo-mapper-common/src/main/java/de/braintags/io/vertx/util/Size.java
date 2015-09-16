@@ -15,13 +15,16 @@ package de.braintags.io.vertx.util;
 import java.util.Collection;
 
 /**
- * Helper class to calculate size
+ * Helper class to calculate sizes
  * 
  * @author Michael Remme
  * 
  */
 
 public class Size {
+
+  private Size() {
+  }
 
   /**
    * Get the size of an {@link Iterable}

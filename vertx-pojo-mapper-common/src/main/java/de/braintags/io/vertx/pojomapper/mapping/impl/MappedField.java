@@ -139,7 +139,8 @@ public class MappedField implements IField {
   }
 
   // TODO Yet needed?
-  private Constructor<?> computeConstructor() {
+  @SuppressWarnings("rawtypes")
+  private Constructor computeConstructor() {
     Constructor<?> constructor = null;
     Class<?> type = null;
     // get the first annotation with a concreteClass that isn't Object.class

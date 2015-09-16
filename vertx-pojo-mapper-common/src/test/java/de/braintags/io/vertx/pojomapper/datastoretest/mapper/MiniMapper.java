@@ -12,7 +12,7 @@
  * You may elect to redistribute this code under either of these licenses.
  */
 
-package de.braintags.io.vertx.pojomapper.test.mapper;
+package de.braintags.io.vertx.pojomapper.datastoretest.mapper;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 

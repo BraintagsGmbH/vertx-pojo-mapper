@@ -43,7 +43,7 @@ import io.vertx.core.logging.LoggerFactory;
  */
 
 public abstract class AbstractSubobjectMapper implements IPropertyMapper {
-  private static final Logger logger = LoggerFactory.getLogger(AbstractSubobjectMapper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSubobjectMapper.class);
 
   /**
    * 
@@ -157,26 +157,32 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
     for (int i = 0; i < javaValues.length; i++) {
       // trying to write the array in the order like it is
       CurrentCounter cc = new CurrentCounter(i, javaValues[i]);
-      writeSingleValue(cc.value, storeObject, field, result -> {
-        if (result.failed()) {
-          logger.info("failed", result.cause());
-          errorObject.setThrowable(result.cause());
-        } else {
-          resultArray[cc.i] = result.result();
-          logger.info("success write: " + cc.value.toString() + " into " + cc.i);
-          if (co.reduce()) {
-            JsonArray arr = new JsonArray();
-            for (int k = 0; k < resultArray.length; k++) {
-              arr.add(resultArray[k]);
-            }
-            storeObject.put(field, arr);
-            handler.handle(Future.succeededFuture());
-          }
-        }
-      });
+      writeSingleValue(cc.value, storeObject, field,
+          result -> doWriteSingleValue(result, errorObject, co, resultArray, cc, storeObject, field, handler));
       if (errorObject.handleError(handler))
         return;
     }
+  }
+
+  private void doWriteSingleValue(AsyncResult<Object> result, ErrorObject<Void> errorObject, CounterObject co,
+      Object[] resultArray, CurrentCounter cc, IStoreObject<?> storeObject, IField field,
+      Handler<AsyncResult<Void>> handler) {
+    if (result.failed()) {
+      LOGGER.info("failed", result.cause());
+      errorObject.setThrowable(result.cause());
+    } else {
+      resultArray[cc.i] = result.result();
+      LOGGER.info("success write: " + cc.value.toString() + " into " + cc.i);
+      if (co.reduce()) {
+        JsonArray arr = new JsonArray();
+        for (int k = 0; k < resultArray.length; k++) {
+          arr.add(resultArray[k]);
+        }
+        storeObject.put(field, arr);
+        handler.handle(Future.succeededFuture());
+      }
+    }
+
   }
 
   /**
@@ -193,35 +199,46 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
    */
   protected void readArray(Object entity, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
+    readInternal(storeObject, field, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        IPropertyAccessor pAcc = field.getPropertyAccessor();
+        pAcc.writeData(entity, result.result());
+        handler.handle(Future.succeededFuture());
+      }
+    });
+  }
+
+  private void readInternal(IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Object>> handler) {
     JsonArray jsonArray = (JsonArray) storeObject.get(field);
-    if (jsonArray == null || jsonArray.isEmpty())
-      handler.handle(Future.succeededFuture());
-    ErrorObject<Void> errorObject = new ErrorObject<Void>();
-    CounterObject co = new CounterObject(jsonArray.size());
     final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
+    if (jsonArray == null || jsonArray.isEmpty()) {
+      handler.handle(Future.succeededFuture(resultArray));
+      return;
+    }
+    ErrorObject<Object> errorObject = new ErrorObject<Object>();
+    CounterObject co = new CounterObject(jsonArray.size());
     int counter = 0;
     for (Object jo : jsonArray) {
       CurrentCounter cc = new CurrentCounter(counter++, jo);
       readSingleValue(cc.value, field, field.getSubClass(), result -> {
         if (result.failed()) {
-          logger.info("failed", result.cause());
+          LOGGER.info("failed", result.cause());
           errorObject.setThrowable(result.cause());
+          errorObject.handleError(handler);
+          return;
         } else {
           Object javaValue = result.result();
-          logger.info("success read: " + javaValue.toString() + " into " + cc.i);
+          LOGGER.info("success read: " + javaValue.toString() + " into " + cc.i);
           if (javaValue != null)
             Array.set(resultArray, cc.i, javaValue);
           if (co.reduce()) {
-            IPropertyAccessor pAcc = field.getPropertyAccessor();
-            pAcc.writeData(entity, resultArray);
-            handler.handle(Future.succeededFuture());
+            handler.handle(Future.succeededFuture(resultArray));
           }
         }
       });
-      if (errorObject.handleError(handler))
-        return;
     }
-
   }
 
   /**
@@ -245,24 +262,26 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
     CounterObject co = new CounterObject(jsonArray.size());
     final MapEntry[] resultArray = new MapEntry[jsonArray.size()];
     int counter = 0;
+
     for (Object jo : jsonArray) {
       CurrentCounter cc = new CurrentCounter(counter++, jo);
       Object keyIn = ((JsonArray) cc.value).getValue(0);
       ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
           .getTypeHandler(field.getMapKeyClass());
+
       th.fromStore(keyIn, field, field.getMapKeyClass(), keyResult -> {
         if (keyResult.failed()) {
-          logger.info("failed", keyResult.cause());
+          LOGGER.info("failed", keyResult.cause());
           errorObject.setThrowable(keyResult.cause());
         } else {
           Object valueIn = ((JsonArray) cc.value).getValue(1);
           readSingleValue(valueIn, field, field.getSubClass(), valueResult -> {
             if (valueResult.failed()) {
-              logger.info("failed", valueResult.cause());
+              LOGGER.info("failed", valueResult.cause());
               errorObject.setThrowable(valueResult.cause());
             } else {
               Object javaValue = valueResult.result();
-              logger.info("success read: " + javaValue.toString() + " into " + cc.i);
+              LOGGER.info("success read: " + javaValue.toString() + " into " + cc.i);
               if (javaValue != null) {
                 resultArray[cc.i] = new MapEntry(keyResult.result().getResult(), valueResult.result());
               }
@@ -329,16 +348,16 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
 
       th.intoStore(((Entry) cc.value).getKey(), field, keyResult -> {
         if (keyResult.failed()) {
-          logger.info("failed", keyResult.cause());
+          LOGGER.info("failed", keyResult.cause());
           errorObject.setThrowable(keyResult.cause());
         } else {
           writeSingleValue(((Entry) cc.value).getValue(), storeObject, field, valueResult -> {
             if (valueResult.failed()) {
-              logger.info("failed", valueResult.cause());
+              LOGGER.info("failed", valueResult.cause());
               errorObject.setThrowable(keyResult.cause());
             } else {
               resultArray[cc.i] = new JsonArray().add(keyResult.result().getResult()).add(valueResult.result());
-              logger.info("success write: " + cc.value.toString() + " into " + cc.i);
+              LOGGER.info("success write: " + cc.value.toString() + " into " + cc.i);
               if (co.reduce()) {
                 JsonArray arr = new JsonArray();
                 for (int k = 0; k < resultArray.length; k++) {
@@ -382,23 +401,8 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
       // trying to write the array in the order like it is
       Object javaValue = it.next();
       CurrentCounter cc = new CurrentCounter(counter++, javaValue);
-      writeSingleValue(cc.value, storeObject, field, result -> {
-        if (result.failed()) {
-          logger.info("failed", result.cause());
-          errorObject.setThrowable(result.cause());
-        } else {
-          resultArray[cc.i] = result.result();
-          logger.info("success write: " + cc.value.toString() + " into " + cc.i);
-          if (co.reduce()) {
-            JsonArray arr = new JsonArray();
-            for (int k = 0; k < resultArray.length; k++) {
-              arr.add(resultArray[k]);
-            }
-            storeObject.put(field, arr);
-            handler.handle(Future.succeededFuture());
-          }
-        }
-      });
+      writeSingleValue(cc.value, storeObject, field,
+          result -> doWriteSingleValue(result, errorObject, co, resultArray, cc, storeObject, field, handler));
       if (errorObject.handleError(handler))
         return;
     }
@@ -419,38 +423,20 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void readCollection(Object entity, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
-    JsonArray jsonArray = (JsonArray) storeObject.get(field);
-    if (jsonArray == null || jsonArray.isEmpty())
-      handler.handle(Future.succeededFuture());
-    ErrorObject<Void> errorObject = new ErrorObject<Void>();
-    CounterObject co = new CounterObject(jsonArray.size());
-    final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
-    int counter = 0;
-    for (Object jo : jsonArray) {
-      CurrentCounter cc = new CurrentCounter(counter++, jo);
-      readSingleValue(cc.value, field, field.getSubClass(), result -> {
-        if (result.failed()) {
-          logger.info("failed", result.cause());
-          errorObject.setThrowable(result.cause());
-        } else {
-          Object javaValue = result.result();
-          logger.info("success read: " + javaValue.toString() + " into " + cc.i);
-          if (javaValue != null)
-            Array.set(resultArray, cc.i, javaValue);
-          if (co.reduce()) {
-            Collection coll = field.getMapper().getObjectFactory().createCollection(field);
-            for (int i = 0; i < Array.getLength(resultArray); i++) {
-              coll.add(Array.get(resultArray, i));
-            }
-            IPropertyAccessor pAcc = field.getPropertyAccessor();
-            pAcc.writeData(entity, coll);
-            handler.handle(Future.succeededFuture());
-          }
+    readInternal(storeObject, field, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        Object resultArray = result.result();
+        Collection coll = field.getMapper().getObjectFactory().createCollection(field);
+        for (int i = 0; i < Array.getLength(resultArray); i++) {
+          coll.add(Array.get(resultArray, i));
         }
-      });
-      if (errorObject.handleError(handler))
-        return;
-    }
+        IPropertyAccessor pAcc = field.getPropertyAccessor();
+        pAcc.writeData(entity, coll);
+        handler.handle(Future.succeededFuture());
+      }
+    });
   }
 
   /**

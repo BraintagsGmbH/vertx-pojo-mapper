@@ -12,12 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.mongo.MongoClient;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
@@ -27,6 +21,12 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.mongo.MongoClient;
 
 /**
  * @author Michael Remme
@@ -57,7 +57,6 @@ public class MongoWrite<T> extends AbstractWrite<T> {
         if (result.failed()) {
           ro.setThrowable(result.cause());
         } else {
-          // logger.info("saving " + counter.getCount());
           if (counter.reduce())
             resultHandler.handle(Future.succeededFuture(rr));
         }

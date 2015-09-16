@@ -113,7 +113,7 @@ public interface IMapper {
    * 
    * @param annotationClass
    *          the annotation class where we are interested in
-   * @return found fields or null, if none is annotated with the given annotation class
+   * @return found fields or empty array, if none is annotated with the given annotation class
    */
   public IField[] getAnnotatedFields(Class<? extends Annotation> annotationClass);
 

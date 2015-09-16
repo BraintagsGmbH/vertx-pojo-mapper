@@ -18,8 +18,8 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
 import io.vertx.ext.asyncsql.MySQLClient;
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.datastoretest.IDatastoreContainer;
 import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
-import de.braintags.io.vertx.pojomapper.test.IDatastoreContainer;
 
 /**
  * 

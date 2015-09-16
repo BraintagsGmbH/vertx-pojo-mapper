@@ -90,12 +90,14 @@ public class DefaultObjectFactory implements IObjectFactory {
       throw new UnsupportedOperationException("this should not land here");
   }
 
-  private Set<?> createSet(IField field) {
-    return (Set<?>) newInstance(field.getConstructor(), DEFAULT_SET_CLASS);
+  @SuppressWarnings("rawtypes")
+  private Set createSet(IField field) {
+    return (Set) newInstance(field.getConstructor(), DEFAULT_SET_CLASS);
   }
 
-  private List<?> createList(IField field) {
-    return (List<?>) newInstance(field.getConstructor(), DEFAULT_LIST_CLASS);
+  @SuppressWarnings("rawtypes")
+  private List createList(IField field) {
+    return (List) newInstance(field.getConstructor(), DEFAULT_LIST_CLASS);
   }
 
   /**

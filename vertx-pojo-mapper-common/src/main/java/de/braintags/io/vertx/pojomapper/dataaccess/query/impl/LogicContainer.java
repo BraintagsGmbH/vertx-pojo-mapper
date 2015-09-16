@@ -115,26 +115,32 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
     ErrorObject<Void> error = new ErrorObject<Void>();
     CounterObject co = new CounterObject(filters.size());
     for (Object filter : filters) {
-      if (filter instanceof IRamblerSource) {
-        ((IRamblerSource) filter).applyTo(rambler, result -> {
-          if (result.failed()) {
-            error.setThrowable(result.cause());
-            resultHandler.handle(result);
-          } else {
-            if (co.reduce()) { // last element in the list
-              finishCounter(rambler, resultHandler);
-            }
-          }
-        });
-        if (error.isError()) {
-          return;
-        }
-      } else {
-        resultHandler.handle(Future.failedFuture(
-            new UnsupportedOperationException("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName())));
+      handleFilter(rambler, resultHandler, filter, error, co);
+      if (error.isError()) {
         return;
       }
     }
+  }
+
+  private void handleFilter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler, Object filter,
+      ErrorObject<Void> error, CounterObject co) {
+    if (!(filter instanceof IRamblerSource)) {
+      error.setThrowable(
+          new UnsupportedOperationException("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName()));
+      error.handleError(resultHandler);
+      return;
+    }
+
+    ((IRamblerSource) filter).applyTo(rambler, result -> {
+      if (result.failed()) {
+        error.setThrowable(result.cause());
+        error.handleError(resultHandler);
+        return;
+      }
+      if (co.reduce()) { // last element in the list
+        finishCounter(rambler, resultHandler);
+      }
+    });
   }
 
   private void finishCounter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {

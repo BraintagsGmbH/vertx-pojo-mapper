@@ -97,7 +97,8 @@ public interface IField {
    * 
    * @return a constructor with the arguments or null
    */
-  public Constructor<?> getConstructor(Class<?>... parameters);
+  @SuppressWarnings("rawtypes")
+  public Constructor getConstructor(Class<?>... parameters);
 
   /**
    * Get the underlaying {@link Field}

@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.test;
+package de.braintags.io.vertx.pojomapper.datastoretest;
 
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
