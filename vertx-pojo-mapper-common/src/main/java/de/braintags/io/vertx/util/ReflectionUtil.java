@@ -42,7 +42,7 @@ public class ReflectionUtil {
     try {
       return values.toArray((Object[]) exampleArray);
     } catch (ClassCastException e) {
-      logger.warn("ClassCastException for toArray - taking the long road");
+      logger.warn("ClassCastException for toArray - taking the long road " + e);
       for (int i = 0; i < values.size(); i++) {
         Array.set(exampleArray, i, values.get(i));
       }

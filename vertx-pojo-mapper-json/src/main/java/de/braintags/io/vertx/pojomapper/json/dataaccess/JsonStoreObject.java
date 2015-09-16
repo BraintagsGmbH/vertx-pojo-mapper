@@ -12,10 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.json.dataaccess;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -24,6 +20,10 @@ import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
 /**
  * An implementation of {@link IStoreObject}, which uses a JsonObject as internal container
@@ -141,7 +141,6 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    */
   public void initFromEntity(Handler<AsyncResult<Void>> handler) {
     ErrorObject<Void> error = new ErrorObject<Void>();
-    IMapper mapper = getMapper();
     CounterObject co = new CounterObject(mapper.getFieldNames().size());
     for (String fieldName : mapper.getFieldNames()) {
       IField field = mapper.getField(fieldName);

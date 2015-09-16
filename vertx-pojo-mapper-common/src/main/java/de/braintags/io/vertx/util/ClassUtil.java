@@ -12,9 +12,6 @@
  */
 package de.braintags.io.vertx.util;
 
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -32,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * Several utility methods for handling classes
@@ -78,8 +77,8 @@ public class ClassUtil {
     }
 
     final Class<?> parent = type.getSuperclass();
-    final List<Method> list = getDeclaredAndInheritedMethods(parent, methods == null ? new ArrayList<Method>()
-        : methods);
+    final List<Method> list = getDeclaredAndInheritedMethods(parent,
+        methods == null ? new ArrayList<Method>() : methods);
 
     for (final Method m : type.getDeclaredMethods()) {
       if (!Modifier.isStatic(m.getModifiers())) {
@@ -220,7 +219,7 @@ public class ClassUtil {
               // TODO: Figure out what to do... Walk back up the to
               // the parent class and try to get the variable type
               // from the T/V/X
-              // throw new MappingException("Generic Typed Class not supported:  <" + ((TypeVariable)
+              // throw new MappingException("Generic Typed Class not supported: <" + ((TypeVariable)
               // paramType).getName() + "> = " + ((TypeVariable) paramType).getBounds()[0]);
               return paramType;
             } else if (paramType instanceof WildcardType) {

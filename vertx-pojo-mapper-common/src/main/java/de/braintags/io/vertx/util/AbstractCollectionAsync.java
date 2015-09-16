@@ -12,13 +12,13 @@
  */
 package de.braintags.io.vertx.util;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.groovy.core.Future;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * The abstract implementation defines an unmodifyable list, cause all methods, which are changing the content are
@@ -43,23 +43,59 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
 
   @Override
   public void contains(Object o, Handler<AsyncResult<Boolean>> handler) {
-    IteratorAsync<E> it = iterator();
-    ResultObject<Boolean> ro = new ResultObject<Boolean>();
-    while (it.hasNext()) {
-      it.next(result -> {
-        if (result.failed()) {
-          ro.setThrowable(result.cause());
-        } else {
-          if (o == null && result.result() == null) {
-            ro.setResult(true);
-          } else if (o.equals(result.result())) {
-            ro.setResult(true);
-          }
-        }
-      });
-      if (ro.handleResult(handler))
-        return;
+    toArray(result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        handler.handle(Future.succeededFuture(contains(result.result(), o)));
+      }
+    });
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.util.CollectionAsync#containsAll(de.braintags.io.vertx.util.CollectionAsync,
+   * io.vertx.core.Handler)
+   */
+  @Override
+  public void containsAll(CollectionAsync<?> c, Handler<AsyncResult<Boolean>> handler) {
+    if (c.isEmpty() || isEmpty()) {
+      handler.handle(Future.succeededFuture(false));
+      return;
     }
+
+    toArray(sourceResult -> {
+      if (sourceResult.failed()) {
+        handler.handle(Future.failedFuture(sourceResult.cause()));
+      } else {
+        c.toArray(checkResult -> {
+          if (checkResult.failed()) {
+            handler.handle(Future.failedFuture(checkResult.cause()));
+          } else {
+            Object[] sourceArray = sourceResult.result();
+            Object[] checkArray = checkResult.result();
+            handler.handle(Future.succeededFuture(containsAll(sourceArray, checkArray)));
+          }
+        });
+      }
+    });
+  }
+
+  private boolean containsAll(Object[] objects, Object[] searchObjects) {
+    for (Object searchObject : searchObjects) {
+      if (!contains(objects, searchObject))
+        return false;
+    }
+    return true;
+  }
+
+  private boolean contains(Object[] objects, Object searchObject) {
+    for (Object sourceObject : objects) {
+      if (sourceObject.equals(searchObject))
+        return true;
+    }
+    return false;
   }
 
   /*
@@ -71,16 +107,17 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
   public void toArray(Handler<AsyncResult<Object[]>> handler) {
     List<Object> list = new ArrayList<Object>();
     if (isEmpty()) {
-      handler.handle((AsyncResult<Object[]>) Future.succeededFuture(list.toArray()));
+      handler.handle(Future.succeededFuture(list.toArray()));
       return;
     }
     CounterObject co = new CounterObject(size());
     IteratorAsync<E> it = iterator();
     ResultObject<Object[]> ro = new ResultObject<Object[]>();
-    while (it.hasNext()) {
+    while (it.hasNext() && !ro.isError()) {
       it.next(result -> {
         if (result.failed()) {
           ro.setThrowable(result.cause());
+          ro.handleError(handler);
         } else {
           list.add(result.result());
           if (co.reduce()) {
@@ -89,10 +126,6 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
           }
         }
       });
-      if (ro.isError()) {
-        ro.handleResult(handler);
-        return;
-      }
     }
   }
 
@@ -114,37 +147,6 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
   @Override
   public boolean remove(Object o) {
     throw new UnsupportedOperationException();
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.util.CollectionAsync#containsAll(de.braintags.io.vertx.util.CollectionAsync,
-   * io.vertx.core.Handler)
-   */
-  @Override
-  public void containsAll(CollectionAsync<?> c, Handler<AsyncResult<Boolean>> handler) {
-    IteratorAsync<?> it = c.iterator();
-    ResultObject<Boolean> ro = new ResultObject<Boolean>();
-    while (it.hasNext()) {
-      it.next(result -> {
-        if (result.failed()) {
-          ro.setThrowable(result.cause());
-        } else {
-          Object check = result.result();
-          contains(check, checkResult -> {
-            if (checkResult.failed()) {
-              ro.setThrowable(checkResult.cause());
-            } else {
-              if (!checkResult.result())
-                ro.setResult(false);
-            }
-          });
-        }
-      });
-      if (ro.handleResult(handler))
-        return;
-    }
   }
 
   /*

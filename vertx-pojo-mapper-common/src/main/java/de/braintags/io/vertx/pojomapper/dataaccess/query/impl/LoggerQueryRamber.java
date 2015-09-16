@@ -12,14 +12,14 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 
 /**
  * An implementation of IQueryRambler which is logging the elements
@@ -50,7 +50,7 @@ public class LoggerQueryRamber implements IQueryRambler {
   }
 
   public void setHirarchyString() {
-    StringBuffer prefixBuffer = new StringBuffer();
+    StringBuilder prefixBuffer = new StringBuilder();
     for (int i = 0; i < level; i++) {
       prefixBuffer.append(" ");
     }

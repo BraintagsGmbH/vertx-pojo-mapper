@@ -12,12 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +21,9 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * 
@@ -35,12 +32,9 @@ import de.braintags.io.vertx.util.ErrorObject;
  * 
  */
 
-public class LogicContainer<T extends IQueryContainer> extends AbstractQueryContainer<IQueryContainer> implements
-    ILogicContainer<T>, IRamblerSource {
-  @SuppressWarnings("unused")
-  private static final Logger logger = LoggerFactory.getLogger(LogicContainer.class);
+public class LogicContainer<T extends IQueryContainer> extends AbstractQueryContainer<IQueryContainer>
+    implements ILogicContainer<T>, IRamblerSource {
   private List<Object> filters = new ArrayList<Object>();
-  // private T parent;
   private QueryLogic logic;
 
   /**
@@ -58,8 +52,8 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
    */
   @Override
   public IFieldParameter<LogicContainer<T>> field(String fieldName) {
-    FieldParameter<LogicContainer<T>> param = new FieldParameter<LogicContainer<T>>(this, getQuery().getMapper()
-        .getField(fieldName));
+    FieldParameter<LogicContainer<T>> param = new FieldParameter<LogicContainer<T>>(this,
+        getQuery().getMapper().getField(fieldName));
     filters.add(param);
     return param;
   }
@@ -136,8 +130,8 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
           return;
         }
       } else {
-        resultHandler.handle(Future.failedFuture(new UnsupportedOperationException(
-            "NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName())));
+        resultHandler.handle(Future.failedFuture(
+            new UnsupportedOperationException("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName())));
         return;
       }
     }

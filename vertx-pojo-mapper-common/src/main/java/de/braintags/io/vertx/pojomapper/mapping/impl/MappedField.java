@@ -58,14 +58,13 @@ import io.vertx.core.logging.LoggerFactory;
  */
 
 public class MappedField implements IField {
-  private static final Logger log = LoggerFactory.getLogger(MappedField.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MappedField.class);
 
   private IPropertyAccessor accessor;
   private Field field;
   private Mapper mapper;
   private ITypeHandler typeHandler;
   private ITypeHandler subTypeHandler;
-  private ITypeHandler mapKeyTypeHandler;
   private IPropertyMapper propertyMapper;
   private final List<IField> typeParameters = new ArrayList<IField>();
   /**
@@ -88,7 +87,7 @@ public class MappedField implements IField {
 
   private Type mapKeyType;
   private Type subType;
-  private HashMap<String, Constructor<?>> constructors = new HashMap<String, Constructor<?>>();
+  private Map<String, Constructor<?>> constructors = new HashMap<String, Constructor<?>>();
 
   /**
    * 
@@ -179,9 +178,9 @@ public class MappedField implements IField {
           constructor = type.getDeclaredConstructor();
           constructor.setAccessible(true);
         } catch (NoSuchMethodException e) {
-          log.warn("unaccessible constructor", e);
+          LOGGER.warn("unaccessible constructor", e);
         } catch (SecurityException e) {
-          log.warn("unaccessible constructor", e);
+          LOGGER.warn("unaccessible constructor", e);
         }
       }
     }
@@ -251,7 +250,7 @@ public class MappedField implements IField {
     }
 
     if (Object.class.equals(realType) && (tv != null || pt != null)) {
-      log.warn("Parameterized types are treated as untyped Objects. See field '" + field.getName() + "' on "
+      LOGGER.warn("Parameterized types are treated as untyped Objects. See field '" + field.getName() + "' on "
           + field.getDeclaringClass());
     }
 
@@ -422,7 +421,7 @@ public class MappedField implements IField {
   @Override
   public boolean isSingleValue() {
     if (!isSingleValue && !isMap && !isSet && !isArray && !isCollection) {
-      throw new RuntimeException("Not single, but none of the types that are not-single.");
+      throw new IllegalArgumentException("Not single, but none of the types that are not-single.");
     }
     return isSingleValue;
   }
@@ -518,7 +517,7 @@ public class MappedField implements IField {
       constructor = clz.getDeclaredConstructor(parameters);
       constructors.put(code, constructor);
     } catch (NoSuchMethodException | SecurityException e) {
-      log.warn("unaccessible constructor", e);
+      LOGGER.debug("unaccessible constructor because of " + e);
       constructors.put(code, constructor);
     }
     return constructor;

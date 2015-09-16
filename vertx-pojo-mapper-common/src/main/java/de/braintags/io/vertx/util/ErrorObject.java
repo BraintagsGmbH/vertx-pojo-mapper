@@ -28,6 +28,7 @@ import io.vertx.core.logging.LoggerFactory;
 public class ErrorObject<E> {
   private static Logger logger = LoggerFactory.getLogger(ErrorObject.class);
   private Throwable throwable;
+  private boolean errorHandled = false;
 
   /**
    * 
@@ -91,10 +92,22 @@ public class ErrorObject<E> {
    */
   public boolean handleError(Handler<AsyncResult<E>> handler) {
     if (isError()) {
+      if (errorHandled)
+        return true;
       handler.handle(toFuture());
+      errorHandled = true;
       return true;
     }
     return false;
+  }
+
+  /**
+   * If the method {@link #handleError(Handler)} was called, this returns true
+   * 
+   * @return the errorHandled
+   */
+  public final boolean isErrorHandled() {
+    return errorHandled;
   }
 
 }

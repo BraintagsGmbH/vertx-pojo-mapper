@@ -25,6 +25,7 @@
 	</modules>
 
 	<properties>
+	    <sonar.language>java</sonar.language>
 		<testjar.skip>true</testjar.skip>
 		<doc.skip>true</doc.skip>
 		<maven.test.skip>true</maven.test.skip>
