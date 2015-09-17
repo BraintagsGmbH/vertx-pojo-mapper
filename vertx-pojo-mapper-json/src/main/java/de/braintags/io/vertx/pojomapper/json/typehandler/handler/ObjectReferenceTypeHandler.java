@@ -12,8 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
@@ -27,6 +25,8 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.ObjectReference;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * Handles instances of {@link ObjectReference}.
@@ -53,7 +53,7 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    Class<?> mapperClass = (cls != null ? cls : field.getType());
+    Class<?> mapperClass = cls != null ? cls : field.getType();
     if (mapperClass == null) {
       fail(new NullPointerException("undefined mapper class"), resultHandler);
       return;
@@ -107,13 +107,10 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
       } else {
         IWriteEntry we = result.result().iterator().next();
         IField idField = subMapper.getIdField();
-        Object id = we.getId();
-        if (id == null)
-          id = idField.getPropertyAccessor().readData(obToReference);
+        Object id = we.getId() == null ? idField.getPropertyAccessor().readData(obToReference) : we.getId();
         if (id == null) {
-          fail(
-              new MappingException(String.format("Error after saving instancde: @Id field of mapper %s is null.",
-                  obToReference.getClass().getName())), resultHandler);
+          fail(new MappingException(String.format("Error after saving instancde: @Id field of mapper %s is null.",
+              obToReference.getClass().getName())), resultHandler);
           return;
         }
         ITypeHandler th = mf.getDataStore().getTypeHandlerFactory().getTypeHandler(id.getClass());
@@ -124,10 +121,8 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
             Object dest = tmpResult.result().getResult();
             success(dest, resultHandler);
           }
-
         });
       }
-
     });
   }
 

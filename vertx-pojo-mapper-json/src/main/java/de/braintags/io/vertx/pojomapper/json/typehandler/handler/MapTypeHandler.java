@@ -12,11 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonArray;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,6 +22,10 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
 
 /**
  * 
@@ -57,44 +56,65 @@ public class MapTypeHandler extends AbstractTypeHandler {
     JsonArray jsonArray = (JsonArray) source;
     if (jsonArray == null || jsonArray.isEmpty())
       resultHandler.handle(Future.succeededFuture());
+
     ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>();
     CounterObject co = new CounterObject(jsonArray.size());
     final MapEntry[] resultArray = new MapEntry[jsonArray.size()];
     int counter = 0;
     for (Object jo : jsonArray) {
+      if (errorObject.isError())
+        return;
       CurrentCounter cc = new CurrentCounter(counter++, jo);
-      Object keyIn = ((JsonArray) cc.value).getValue(0);
-      ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
-          .getTypeHandler(field.getMapKeyClass());
-      th.fromStore(keyIn, field, field.getMapKeyClass(), keyResult -> {
-        if (keyResult.failed()) {
-          errorObject.setThrowable(keyResult.cause());
+      handleOneEntryFromStore(field, cc, resultArray, result -> {
+        if (result.failed()) {
+          errorObject.setThrowable(result.cause());
+          errorObject.handleError(resultHandler);
+          return;
         } else {
-          Object valueIn = ((JsonArray) cc.value).getValue(1);
-          convertValueFromStore(valueIn, field, valueResult -> {
-            if (valueResult.failed()) {
-              errorObject.setThrowable(valueResult.cause());
-            } else {
-              Object javaValue = valueResult.result();
-              if (javaValue != null) {
-                resultArray[cc.i] = new MapEntry(keyResult.result().getResult(), valueResult.result());
-              }
-
-              if (co.reduce()) {
-                Map map = field.getMapper().getObjectFactory().createMap(field);
-                for (int i = 0; i < resultArray.length; i++) {
-                  map.put(resultArray[i].key, resultArray[i].value);
-                }
-                success(map, resultHandler);
-              }
-            }
-          });
+          checkSuccessFromStore(field, co, resultArray, resultHandler);
         }
       });
-
-      if (errorObject.handleError(resultHandler))
-        return;
     }
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private void checkSuccessFromStore(IField field, CounterObject co, MapEntry[] resultArray,
+      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    if (co.reduce()) {
+      Map map = field.getMapper().getObjectFactory().createMap(field);
+      for (int i = 0; i < resultArray.length; i++) {
+        map.put(resultArray[i].key, resultArray[i].value);
+      }
+      success(map, resultHandler);
+    }
+  }
+
+  private void handleOneEntryFromStore(IField field, CurrentCounter cc, MapEntry[] resultArray,
+      Handler<AsyncResult<Void>> resultHandler) {
+    Object keyIn = ((JsonArray) cc.value).getValue(0);
+    ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
+        .getTypeHandler(field.getMapKeyClass());
+    th.fromStore(keyIn, field, field.getMapKeyClass(), keyResult -> {
+      if (keyResult.failed()) {
+        resultHandler.handle(Future.failedFuture(keyResult.cause()));
+        return;
+      } else {
+        Object valueIn = ((JsonArray) cc.value).getValue(1);
+        convertValueFromStore(valueIn, field, valueResult -> {
+          if (valueResult.failed()) {
+            resultHandler.handle(Future.failedFuture(valueResult.cause()));
+            return;
+          } else {
+            Object javaValue = valueResult.result();
+            if (javaValue != null) {
+              resultArray[cc.i] = new MapEntry(keyResult.result().getResult(), valueResult.result());
+            }
+            resultHandler.handle(Future.succeededFuture());
+          }
+        });
+      }
+    });
+
   }
 
   private void convertValueFromStore(Object valueIn, IField field, Handler<AsyncResult<Object>> resultHandler) {
@@ -130,43 +150,57 @@ public class MapTypeHandler extends AbstractTypeHandler {
     JsonArray[] resultArray = new JsonArray[size];
     Iterator<?> it = map.entrySet().iterator();
     int counter = 0;
-    while (it.hasNext()) {
+    while (it.hasNext() && !errorObject.isError()) {
       // trying to write the array in the order like it is
       Entry entry = (Entry) it.next();
       CurrentCounter cc = new CurrentCounter(counter++, entry);
-      ITypeHandler keyTh = getKeyTypeHandler(((Entry) cc.value).getKey(), field);
 
-      keyTh.intoStore(
-          ((Entry) cc.value).getKey(),
-          field,
-          keyResult -> {
-            if (keyResult.failed()) {
-              errorObject.setThrowable(keyResult.cause());
-            } else {
-              ITypeHandler valueTh = getValueTypeHandler(((Entry) cc.value).getValue(), field);
-              valueTh.intoStore(
-                  ((Entry) cc.value).getValue(),
-                  field,
-                  valueResult -> {
-                    if (valueResult.failed()) {
-                      errorObject.setThrowable(valueResult.cause());
-                    } else {
-                      resultArray[cc.i] = new JsonArray().add(keyResult.result().getResult()).add(
-                          valueResult.result().getResult());
-                      if (co.reduce()) {
-                        JsonArray arr = new JsonArray();
-                        for (int k = 0; k < resultArray.length; k++) {
-                          arr.add(resultArray[k]);
-                        }
-                        success(arr, resultHandler);
-                      }
-                    }
-                  });
-            }
-          });
-      if (errorObject.handleError(resultHandler))
-        return;
+      valueIntoStore(field, cc, resultArray, result -> {
+        if (result.failed()) {
+          errorObject.setThrowable(result.cause());
+          errorObject.handleError(resultHandler);
+          return;
+        } else {
+          checkSuccessIntoStore(co, resultArray, resultHandler);
+        }
+      });
     }
+  }
+
+  private void checkSuccessIntoStore(CounterObject co, JsonArray[] resultArray,
+      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    if (co.reduce()) {
+      JsonArray arr = new JsonArray();
+      for (int k = 0; k < resultArray.length; k++) {
+        arr.add(resultArray[k]);
+      }
+      success(arr, resultHandler);
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  private void valueIntoStore(IField field, CurrentCounter cc, JsonArray[] resultArray,
+      Handler<AsyncResult<Void>> resultHandler) {
+    ITypeHandler keyTh = getKeyTypeHandler(((Entry) cc.value).getKey(), field);
+
+    keyTh.intoStore(((Entry) cc.value).getKey(), field, keyResult -> {
+      if (keyResult.failed()) {
+        resultHandler.handle(Future.failedFuture(keyResult.cause()));
+        return;
+      } else {
+        ITypeHandler valueTh = getValueTypeHandler(((Entry) cc.value).getValue(), field);
+        valueTh.intoStore(((Entry) cc.value).getValue(), field, valueResult -> {
+          if (valueResult.failed()) {
+            resultHandler.handle(Future.failedFuture(valueResult.cause()));
+            return;
+          } else {
+            resultArray[cc.i] = new JsonArray().add(keyResult.result().getResult())
+                .add(valueResult.result().getResult());
+            resultHandler.handle(Future.succeededFuture());
+          }
+        });
+      }
+    });
   }
 
   @SuppressWarnings("rawtypes")
