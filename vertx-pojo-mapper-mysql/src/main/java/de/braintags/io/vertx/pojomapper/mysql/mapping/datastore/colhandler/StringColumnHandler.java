@@ -14,7 +14,6 @@
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.AbstractColumnHandler;
 
 /**
  * 
@@ -22,7 +21,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.AbstractColumnHan
  * 
  */
 
-public class StringColumnHandler extends AbstractColumnHandler {
+public class StringColumnHandler extends AbstractSqlColumnHandler {
 
   /**
    * 
@@ -32,7 +31,7 @@ public class StringColumnHandler extends AbstractColumnHandler {
   }
 
   @Override
-  public Object generate(IField field) {
+  protected String generateColumn(IField field) {
     throw new UnsupportedOperationException();
   }
 

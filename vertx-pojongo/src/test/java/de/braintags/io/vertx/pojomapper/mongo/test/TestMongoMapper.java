@@ -12,9 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.test;
 
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -26,6 +23,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.Person;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * 
@@ -78,7 +77,7 @@ public class TestMongoMapper extends MongoBaseTest {
     Assert.assertSame(field, field2);
 
     String javaName = field.getName();
-    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field.getName());
+    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     assertNotNull(ci);
     String dbName = ci.getName();
     Assert.assertNotEquals(javaName, dbName);

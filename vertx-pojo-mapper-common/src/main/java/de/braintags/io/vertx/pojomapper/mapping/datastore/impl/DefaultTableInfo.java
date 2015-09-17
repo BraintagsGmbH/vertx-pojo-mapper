@@ -77,8 +77,8 @@ public class DefaultTableInfo implements ITableInfo {
    * @see de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo#getColumnInfo(java.lang.String)
    */
   @Override
-  public IColumnInfo getColumnInfo(String javaFieldName) {
-    return cols.get(javaFieldName);
+  public IColumnInfo getColumnInfo(IField field) {
+    return cols.get(field.getName());
   }
 
 }

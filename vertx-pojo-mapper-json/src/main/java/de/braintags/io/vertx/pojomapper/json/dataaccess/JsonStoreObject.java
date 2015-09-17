@@ -64,7 +64,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    */
   @Override
   public Object get(IField field) {
-    String colName = mapper.getTableInfo().getColumnInfo(field.getName()).getName();
+    String colName = mapper.getTableInfo().getColumnInfo(field).getName();
     return jsonObject.getValue(colName);
   }
 
@@ -76,7 +76,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    */
   @Override
   public IStoreObject<JsonObject> put(IField field, Object value) {
-    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field.getName());
+    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     if (ci == null) {
       throw new MappingException("Can't find columninfo for field " + field.getFullName());
     }

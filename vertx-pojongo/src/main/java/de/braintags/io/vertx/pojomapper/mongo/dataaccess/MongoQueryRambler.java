@@ -12,14 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.mongo.MongoClient;
-
 import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Iterator;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
@@ -33,6 +27,12 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.Size;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.MongoClient;
 
 /**
  * Implementation fills the contents into a {@link JsonObject} which then can be used as source for
@@ -45,7 +45,7 @@ import de.braintags.io.vertx.util.Size;
 public class MongoQueryRambler implements IQueryRambler {
   private JsonObject qDef = new JsonObject();
   private Object currentObject = qDef;
-  private ArrayDeque<Object> deque = new ArrayDeque<>();
+  private Deque<Object> deque = new ArrayDeque<>();
 
   /**
    * 
@@ -63,31 +63,30 @@ public class MongoQueryRambler implements IQueryRambler {
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess
-   * .query.IQuery)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#start(de.braintags.io.vertx.pojomapper.
+   * dataaccess .query.IQuery)
    */
   @Override
   public void start(IQuery<?> query) {
+    // no use for Mongo
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess
-   * .query.IQuery)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.
+   * dataaccess .query.IQuery)
    */
   @Override
   public void stop(IQuery<?> query) {
+    // no use for Mongo
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess
-   * .query.ILogicContainer)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#start(de.braintags.io.vertx.pojomapper.
+   * dataaccess .query.ILogicContainer)
    */
   @Override
   public void start(ILogicContainer<?> container) {
@@ -101,9 +100,8 @@ public class MongoQueryRambler implements IQueryRambler {
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess
-   * .query.ILogicContainer)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.
+   * dataaccess .query.ILogicContainer)
    */
   @Override
   public void stop(ILogicContainer<?> container) {
@@ -113,9 +111,8 @@ public class MongoQueryRambler implements IQueryRambler {
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess
-   * .query.IFieldParameter)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#start(de.braintags.io.vertx.pojomapper.
+   * dataaccess .query.IFieldParameter)
    */
   @Override
   public void start(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
@@ -139,53 +136,51 @@ public class MongoQueryRambler implements IQueryRambler {
    */
   private void handleMultipleValues(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
     IField field = fieldParameter.getField();
-    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field.getName());
+    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     if (ci == null) {
-      resultHandler.handle(Future.failedFuture(new MappingException("Can't find columninfo for field "
-          + field.getFullName())));
+      resultHandler
+          .handle(Future.failedFuture(new MappingException("Can't find columninfo for field " + field.getFullName())));
       return;
     }
 
     String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
     Object valueIterable = fieldParameter.getValue();
     if (!(valueIterable instanceof Iterable)) {
-      resultHandler.handle(Future.failedFuture(new QueryParameterException(
-          "multivalued argument but not an instance of Iterable")));
+      resultHandler.handle(
+          Future.failedFuture(new QueryParameterException("multivalued argument but not an instance of Iterable")));
       return;
     }
     int count = Size.size((Iterable<?>) valueIterable);
     if (count == 0) {
-      resultHandler.handle(Future
-          .failedFuture(new QueryParameterException("multivalued argument but no values defined")));
+      resultHandler
+          .handle(Future.failedFuture(new QueryParameterException("multivalued argument but no values defined")));
       return;
     }
+
     CounterObject co = new CounterObject(count);
     Iterator<?> values = ((Iterable<?>) valueIterable).iterator();
     ErrorObject<Void> errorObject = new ErrorObject<Void>();
     JsonArray resultArray = new JsonArray();
 
     // TODO check the loop handling here!! see below
-    while (values.hasNext()) {
+    while (values.hasNext() && !errorObject.isError()) {
       Object value = values.next();
       field.getTypeHandler().intoStore(value, field, result -> {
         if (result.failed()) {
           errorObject.setThrowable(result.cause());
+          errorObject.handleError(resultHandler);
+          return;
         } else {
           resultArray.add(result.result().getResult());
           if (co.reduce()) {
-            if (errorObject.handleError(resultHandler)) {
-              return;
-            } else {
-              JsonObject arg = new JsonObject().put(mongoOperator, resultArray);
-              String colName = ci.getName();
-              add(colName, arg);
-              resultHandler.handle(Future.succeededFuture());
-            }
+            JsonObject arg = new JsonObject().put(mongoOperator, resultArray);
+            String colName = ci.getName();
+            add(colName, arg);
+            resultHandler.handle(Future.succeededFuture());
           }
         }
       });
     }
-
   }
 
   /**
@@ -196,10 +191,10 @@ public class MongoQueryRambler implements IQueryRambler {
    */
   private void handleSingleValue(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
     IField field = fieldParameter.getField();
-    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field.getName());
+    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     if (ci == null) {
-      resultHandler.handle(Future.failedFuture(new MappingException("Can't find columninfo for field "
-          + field.getFullName())));
+      resultHandler
+          .handle(Future.failedFuture(new MappingException("Can't find columninfo for field " + field.getFullName())));
       return;
     }
     String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
@@ -220,12 +215,12 @@ public class MongoQueryRambler implements IQueryRambler {
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess
-   * .query.IFieldParameter)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.
+   * dataaccess .query.IFieldParameter)
    */
   @Override
   public void stop(IFieldParameter<?> fieldParameter) {
+    // no use for Mongo
   }
 
   private void add(String key, Object objectToAdd) {

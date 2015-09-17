@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.mysql.mapping;
 
 import java.util.Set;
 
+import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
@@ -38,7 +39,7 @@ import io.vertx.ext.sql.SQLConnection;
  */
 
 public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
-  private static Logger logger = LoggerFactory.getLogger(SqlDataStoreSynchronizer.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(SqlDataStoreSynchronizer.class);
 
   private MySqlDataStore datastore;
 
@@ -71,7 +72,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
           } else {
             compareTables(mapper, dbTable);
           }
-        } catch (Throwable e) {
+        } catch (Exception e) {
           resultHandler.handle(Future.failedFuture(e));
         }
       }
@@ -80,6 +81,10 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
 
   /*
    * CREATE TABLE test.test2 (id INT NOT NULL AUTO_INCREMENT, name LONGTEXT, wahr BOOL, PRIMARY KEY (id))
+   * 
+   * CREATE TABLE test.TestTable ( id int(10) NOT NULL auto_increment, name varchar(25), PRIMARY KEY (id) )
+   * ENGINE=InnoDB DEFAULT CHARSET=utf8;
+   * 
    */
 
   private void generateNewTable(IMapper mapper, Handler<AsyncResult<Void>> resultHandler) {
@@ -96,7 +101,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
           if (exec.failed()) {
             resultHandler.handle(exec);
           } else {
-            // perhaps improve result by searching in INFORMATION_SCHEMA?
+            // TODO perhaps improve result by searching in INFORMATION_SCHEMA?
             return;
           }
         });
@@ -104,19 +109,37 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
     });
   }
 
+  /**
+   * Generates the part of the sequence, which is creating the columns
+   * 
+   * @param mapper
+   * @return
+   */
   private String generateColumnPart(IMapper mapper) {
-    StringBuffer buffer = new StringBuffer();
-    IField field = mapper.getIdField();
+    StringBuilder buffer = new StringBuilder();
+    IField idField = mapper.getIdField();
     ITableInfo ti = mapper.getTableInfo();
     Set<String> fieldNames = mapper.getFieldNames();
+    boolean appended = false;
     for (String fieldName : fieldNames) {
-      IColumnInfo ci = ti.getColumnInfo(fieldName);
-      IColumnHandler ch = ci.getColumnHandler();
-
+      if (!appended) {
+        buffer.append(", ");
+        appended = true;
+      }
+      if (buffer.hashCode() != 0)
+        buffer.append(generateColumn(mapper, ti, fieldName));
     }
+    return buffer.toString();
+  }
 
-    throw new UnsupportedOperationException();
-
+  private String generateColumn(IMapper mapper, ITableInfo ti, String fieldName) {
+    IField field = mapper.getField(fieldName);
+    IColumnInfo ci = ti.getColumnInfo(field);
+    IColumnHandler ch = ci.getColumnHandler();
+    if (ch == null)
+      throw new MappingException("Undefined column hanbdler for field " + field.getFullName());
+    String returnValue = (String) ch.generate(field);
+    return returnValue;
   }
 
   private void compareTables(IMapper mapper, ITableInfo currentDbTable) {
@@ -124,35 +147,53 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
   }
 
   private void readTableFromDatabase(IMapper mapper, Handler<AsyncResult<ITableInfo>> resultHandler) {
-    AsyncSQLClient client = datastore.getSqlClient();
+    String command = String.format(TABLE_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
+    executeCommand(command, result -> {
+      if (result.failed()) {
+        resultHandler.handle(Future.failedFuture(result.cause()));
+      } else {
+        ResultSet rs = result.result();
+        resultHandler.handle(Future.succeededFuture(createTableInfo(rs)));
+      }
+    });
 
+  }
+
+  private ITableInfo createTableInfo(ResultSet resultSet) {
+    if (resultSet.getNumRows() == 0)
+      return null;
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Executed the given command and returns the {@link ResultSet} to the {@link Handler}
+   * 
+   * @param command
+   * @param resultHandler
+   */
+  private void executeCommand(String command, Handler<AsyncResult<ResultSet>> resultHandler) {
+    AsyncSQLClient client = datastore.getSqlClient();
     client.getConnection(connectionResult -> {
       if (connectionResult.failed()) {
-        logger.error("", connectionResult.cause());
+        LOGGER.error("", connectionResult.cause());
         resultHandler.handle(Future.failedFuture(connectionResult.cause()));
       } else {
         SQLConnection connection = connectionResult.result();
-        String command = String.format(TABLE_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
         connection.query(command, qr -> {
           try {
             if (qr.failed()) {
               resultHandler.handle(Future.failedFuture(qr.cause()));
             } else {
               ResultSet res = qr.result();
-              if (res.getNumRows() < 1) {
-                resultHandler.handle(Future.succeededFuture());
-              } else {
-                resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
-
-              }
+              resultHandler.handle(Future.succeededFuture(res));
             }
           } finally {
-            logger.debug("closing connection - sync finished");
+            LOGGER.debug("closing connection - sync finished");
             connection.close();
           }
         });
       }
     });
-
   }
+
 }

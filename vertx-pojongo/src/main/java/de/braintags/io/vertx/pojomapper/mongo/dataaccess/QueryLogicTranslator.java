@@ -27,7 +27,7 @@ public class QueryLogicTranslator {
   /**
    * 
    */
-  public QueryLogicTranslator() {
+  private QueryLogicTranslator() {
   }
 
   /**

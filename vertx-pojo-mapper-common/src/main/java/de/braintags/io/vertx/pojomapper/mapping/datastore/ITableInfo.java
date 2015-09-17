@@ -17,7 +17,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 
 /**
- * ITable keeps information about the structure of the connected table for an {@link IMapper}
+ * ITableInfo keeps information about the structure of the connected table for an {@link IMapper}
  * 
  * @author Michael Remme
  * 
@@ -50,6 +50,6 @@ public interface ITableInfo {
    *          the name of the field to be searched
    * @return an instance of IColumnInfo or null, if none existing
    */
-  public IColumnInfo getColumnInfo(String javaFieldName);
+  public IColumnInfo getColumnInfo(IField field);
 
 }
