@@ -108,4 +108,11 @@ public interface IDataStore {
    */
   public String getDatabase();
 
+  /**
+   * Get the instance of {@link IDataStoreMetaData}.
+   * 
+   * @return
+   */
+  public IDataStoreMetaData getMetaData();
+
 }

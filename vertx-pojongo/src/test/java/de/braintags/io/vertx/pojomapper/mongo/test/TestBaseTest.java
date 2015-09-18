@@ -12,13 +12,15 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.test;
 
-import io.vertx.core.VertxOptions;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import io.vertx.core.VertxOptions;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * 
@@ -28,7 +30,7 @@ import org.junit.Test;
  */
 
 public class TestBaseTest extends MongoBaseTest {
-  private static final Logger log = LoggerFactory.getLogger(TestBaseTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TestBaseTest.class);
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -58,14 +60,40 @@ public class TestBaseTest extends MongoBaseTest {
 
   @Test
   public void simpleTest() {
-    log.info("-->>test");
+    LOGGER.info("-->>test");
     testComplete();
   }
 
   @Test
   public void simpleTest2() {
-    log.info("-->>test");
+    LOGGER.info("-->>test");
     testComplete();
+  }
+
+  @Test
+  public void testMetaData() {
+    CountDownLatch latch = new CountDownLatch(1);
+    assertNotNull(getDataStore().getMetaData());
+    getDataStore().getMetaData().getVersion(result -> {
+      if (result.failed()) {
+        LOGGER.error("Error in testMetaData", result.cause());
+        latch.countDown();
+      } else {
+        String version = result.result();
+        assertNotNull(version);
+        LOGGER.info(version);
+        latch.countDown();
+      }
+
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      LOGGER.error("", e);
+    } finally {
+      testComplete();
+    }
   }
 
 }

@@ -13,6 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.AbstractColumnHandler;
 
@@ -41,9 +42,25 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
     }
   }
 
+  /**
+   * Generates a sequence like "id int(10) NOT NULL auto_increment"
+   * 
+   * @param field
+   * @return
+   */
   protected String generateIdColumn(IField field) {
-    throw new UnsupportedOperationException();
+    String propName = field.getColumnInfo().getName();
+    Property prop = (Property) field.getAnnotation(Property.class);
+    int scale = prop.scale();
+    scale = scale == 0 ? 10 : scale;
+    return String.format("%s(%d) NOT NULL auto_increment", propName, scale);
   }
 
+  /**
+   * Generate the sequence to build a column inside the datastore
+   * 
+   * @param field
+   * @return
+   */
   protected abstract String generateColumn(IField field);
 }

@@ -12,9 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.IDataStoreMetaData;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
@@ -30,6 +29,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * 
@@ -183,5 +184,15 @@ public class DummyDataStore implements IDataStore {
   @Override
   public String getDatabase() {
     return database;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getMetaData()
+   */
+  @Override
+  public IDataStoreMetaData getMetaData() {
+    return null;
   }
 }

@@ -38,9 +38,11 @@ public class DefaultColumnInfo implements IColumnInfo {
   }
 
   protected String computePropertyName(IField field) {
-    if (field.getField().isAnnotationPresent(Property.class)) {
-      Property prop = field.getField().getAnnotation(Property.class);
-      return prop.value();
+    Property prop = (Property) field.getAnnotation(Property.class);
+    if (prop != null) {
+      String propName = prop.value();
+      if (!propName.equals(Property.UNDEFINED_COLUMN_NAME))
+        return propName;
     }
     return field.getName();
   }

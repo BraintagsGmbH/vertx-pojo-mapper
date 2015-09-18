@@ -45,6 +45,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.util.ClassUtil;
 import io.vertx.core.logging.Logger;
@@ -542,5 +543,15 @@ public class MappedField implements IField {
   @Override
   public ITypeHandler getSubTypeHandler() {
     return subTypeHandler;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getColumnInfo()
+   */
+  @Override
+  public IColumnInfo getColumnInfo() {
+    return getMapper().getTableInfo().getColumnInfo(this);
   }
 }

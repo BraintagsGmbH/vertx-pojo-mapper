@@ -11,26 +11,25 @@
  * #L%
  */
 
-package de.braintags.io.vertx.pojomapper.datastoretest;
+package de.braintags.io.vertx.pojomapper;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 
 /**
- * 
+ * The interface gives information about the datastore itself, like the version for instance
  * 
  * @author Michael Remme
  * 
  */
 
-public interface IDatastoreContainer {
-  public static final String PROPERTY = "IDatastoreContainer";
+public interface IDataStoreMetaData {
 
-  public IDataStore getDataStore();
-
-  public void startup(Vertx vertx, Handler<AsyncResult<Void>> handler);
-
-  public void shutdown(Handler<AsyncResult<Void>> handler);
+  /**
+   * Get the version of the datastore as complete string
+   * 
+   * @param handler
+   *          the handler, which will be called to receive the version number
+   */
+  public void getVersion(Handler<AsyncResult<String>> handler);
 }

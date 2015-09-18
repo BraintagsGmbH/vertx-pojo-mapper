@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
@@ -185,4 +186,10 @@ public interface IField {
    */
   public boolean isCollection();
 
+  /**
+   * Get the {@link IColumnInfo} which is connected to the current field
+   * 
+   * @return
+   */
+  public IColumnInfo getColumnInfo();
 }

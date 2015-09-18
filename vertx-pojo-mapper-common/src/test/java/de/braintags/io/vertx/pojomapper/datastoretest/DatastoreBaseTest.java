@@ -13,13 +13,9 @@
 
 package de.braintags.io.vertx.pojomapper.datastoretest;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.test.core.VertxTestBase;
-
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
@@ -31,6 +27,11 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
+import de.braintags.io.vertx.util.ErrorObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import io.vertx.test.core.VertxTestBase;
 
 /**
  * 
@@ -64,13 +65,22 @@ public class DatastoreBaseTest extends VertxTestBase {
     super.setUp();
     String property = System.getProperty(IDatastoreContainer.PROPERTY);
     if (property == null) {
-      throw new ParameterRequiredException(
-          "Need the parameter "
-              + IDatastoreContainer.PROPERTY
-              + ". Start the test with -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer for instance");
+      throw new ParameterRequiredException("Need the parameter " + IDatastoreContainer.PROPERTY
+          + ". Start the test with -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer for instance");
     }
     datastoreContainer = (IDatastoreContainer) Class.forName(property).newInstance();
-    datastoreContainer.startup(vertx);
+    CountDownLatch latch = new CountDownLatch(1);
+    ErrorObject<Void> err = new ErrorObject<Void>();
+    datastoreContainer.startup(vertx, result -> {
+      if (result.failed()) {
+        err.setThrowable(result.cause());
+      }
+      latch.countDown();
+    });
+
+    latch.await(5, TimeUnit.SECONDS);
+    if (err.isError())
+      throw err.getRuntimeException();
   }
 
   /*
@@ -82,7 +92,20 @@ public class DatastoreBaseTest extends VertxTestBase {
   protected void tearDown() throws Exception {
     logger.info("teardown");
     super.tearDown();
-    datastoreContainer.shutdown();
+
+    CountDownLatch latch = new CountDownLatch(1);
+    ErrorObject<Void> err = new ErrorObject<Void>();
+    datastoreContainer.shutdown(result -> {
+      if (result.failed()) {
+        err.setThrowable(result.cause());
+      }
+      latch.countDown();
+    });
+
+    latch.await(5, TimeUnit.SECONDS);
+    if (err.isError())
+      throw err.getRuntimeException();
+
   }
 
   public ResultContainer saveRecords(List<?> records) {
@@ -296,20 +319,19 @@ public class DatastoreBaseTest extends VertxTestBase {
       }
     } else {
       assertTrue(qr.iterator().hasNext());
-      qr.iterator().next(
-          result -> {
-            try {
-              if (result.failed()) {
-                result.cause().printStackTrace();
-                throw result.cause() instanceof RuntimeException ? (RuntimeException) result.cause()
-                    : new RuntimeException(result.cause());
-              } else {
-                assertNotNull(result.result());
-              }
-            } finally {
-              latch.countDown();
-            }
-          });
+      qr.iterator().next(result -> {
+        try {
+          if (result.failed()) {
+            result.cause().printStackTrace();
+            throw result.cause() instanceof RuntimeException ? (RuntimeException) result.cause()
+                : new RuntimeException(result.cause());
+          } else {
+            assertNotNull(result.result());
+          }
+        } finally {
+          latch.countDown();
+        }
+      });
     }
 
     try {

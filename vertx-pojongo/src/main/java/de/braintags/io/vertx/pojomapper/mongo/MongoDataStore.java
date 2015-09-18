@@ -12,8 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo;
 
-import io.vertx.ext.mongo.MongoClient;
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.IDataStoreMetaData;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoQuery;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoWrite;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapperFactory;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.datastore.MongoTableGenerator;
+import io.vertx.ext.mongo.MongoClient;
 
 /**
  * An {@link IDataStore} which is dealing with {@link MongoClient}
@@ -35,6 +36,7 @@ import de.braintags.io.vertx.pojomapper.mongo.mapper.datastore.MongoTableGenerat
 
 public class MongoDataStore extends AbstractDataStore implements IDataStore {
   private MongoClient client;
+  private MongoMetaData metaData;
 
   /**
    * 
@@ -42,6 +44,7 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
   public MongoDataStore(MongoClient client, String database) {
     super(database);
     this.client = client;
+    metaData = new MongoMetaData(client);
     setMapperFactory(new MongoMapperFactory(this));
     setPropertyMapperFactory(new JsonPropertyMapperFactory());
     setTypeHandlerFactory(new JsonTypeHandlerFactory());
@@ -86,6 +89,16 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
    */
   public MongoClient getMongoClient() {
     return client;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getMetaData()
+   */
+  @Override
+  public IDataStoreMetaData getMetaData() {
+    return metaData;
   }
 
 }

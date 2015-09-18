@@ -13,6 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 
 /**
@@ -32,6 +33,8 @@ public class StringColumnHandler extends AbstractSqlColumnHandler {
 
   @Override
   protected String generateColumn(IField field) {
+    Property prop = (Property) field.getAnnotation(Property.class);
+
     throw new UnsupportedOperationException();
   }
 

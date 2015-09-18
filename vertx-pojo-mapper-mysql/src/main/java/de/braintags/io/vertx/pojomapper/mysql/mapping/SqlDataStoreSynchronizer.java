@@ -110,7 +110,8 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
   }
 
   /**
-   * Generates the part of the sequence, which is creating the columns
+   * Generates the part of the sequence, which is creating the columns id int(10) NOT NULL auto_increment, name
+   * varchar(25), PRIMARY KEY (id)
    * 
    * @param mapper
    * @return
@@ -120,15 +121,11 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
     IField idField = mapper.getIdField();
     ITableInfo ti = mapper.getTableInfo();
     Set<String> fieldNames = mapper.getFieldNames();
-    boolean appended = false;
+
     for (String fieldName : fieldNames) {
-      if (!appended) {
-        buffer.append(", ");
-        appended = true;
-      }
-      if (buffer.hashCode() != 0)
-        buffer.append(generateColumn(mapper, ti, fieldName));
+      buffer.append(generateColumn(mapper, ti, fieldName)).append(", ");
     }
+    buffer.append(String.format("PRIMARY KEY ( %s )", idField.getColumnInfo().getName()));
     return buffer.toString();
   }
 
@@ -138,8 +135,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
     IColumnHandler ch = ci.getColumnHandler();
     if (ch == null)
       throw new MappingException("Undefined column hanbdler for field " + field.getFullName());
-    String returnValue = (String) ch.generate(field);
-    return returnValue;
+    return (String) ch.generate(field);
   }
 
   private void compareTables(IMapper mapper, ITableInfo currentDbTable) {

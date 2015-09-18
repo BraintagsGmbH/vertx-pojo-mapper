@@ -12,10 +12,13 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest;
 
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
+
+import io.vertx.core.VertxOptions;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * 
@@ -33,6 +36,14 @@ public class TestBaseTest extends DatastoreBaseTest {
   public TestBaseTest() {
   }
 
+  @Override
+  protected VertxOptions getOptions() {
+    VertxOptions options = new VertxOptions();
+    options.setBlockedThreadCheckInterval(10000);
+    options.setWarningExceptionTime(10000);
+    return options;
+  }
+
   @Test
   public void simpleTest() {
     log.info("-->>test");
@@ -41,10 +52,29 @@ public class TestBaseTest extends DatastoreBaseTest {
   }
 
   @Test
-  public void simpleTest2() {
-    log.info("-->>test");
-    assertNotNull(datastoreContainer);
-    testComplete();
+  public void testMetaData() {
+    CountDownLatch latch = new CountDownLatch(1);
+    assertNotNull(getDataStore().getMetaData());
+    getDataStore().getMetaData().getVersion(result -> {
+      if (result.failed()) {
+        log.error("Error in testMetaData", result.cause());
+        latch.countDown();
+      } else {
+        String version = result.result();
+        assertNotNull(version);
+        log.info(version);
+        latch.countDown();
+      }
+
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      log.error("", e);
+    } finally {
+      testComplete();
+    }
   }
 
 }

@@ -13,7 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper.mysql;
 
-import io.vertx.ext.asyncsql.AsyncSQLClient;
+import de.braintags.io.vertx.pojomapper.IDataStoreMetaData;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlWrite;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlTableGenerator;
+import io.vertx.ext.asyncsql.AsyncSQLClient;
 
 /**
  * 
@@ -34,6 +35,7 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlTableGenerato
 
 public class MySqlDataStore extends AbstractDataStore {
   private AsyncSQLClient sqlClient;
+  private MySqlMetaData metaData;
 
   /**
    * 
@@ -41,6 +43,7 @@ public class MySqlDataStore extends AbstractDataStore {
   public MySqlDataStore(AsyncSQLClient sqlClient, String database) {
     super(database);
     this.sqlClient = sqlClient;
+    metaData = new MySqlMetaData(sqlClient);
     setMapperFactory(new MapperFactory(this));
     setPropertyMapperFactory(new JsonPropertyMapperFactory());
     setTypeHandlerFactory(new JsonTypeHandlerFactory());
@@ -86,6 +89,11 @@ public class MySqlDataStore extends AbstractDataStore {
    */
   public final AsyncSQLClient getSqlClient() {
     return sqlClient;
+  }
+
+  @Override
+  public IDataStoreMetaData getMetaData() {
+    return metaData;
   }
 
 }
