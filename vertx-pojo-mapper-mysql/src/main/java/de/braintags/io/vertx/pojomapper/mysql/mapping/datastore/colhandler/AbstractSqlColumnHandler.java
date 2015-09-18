@@ -35,12 +35,30 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
 
   @Override
   public final Object generate(IField field) {
+    Property prop = (Property) field.getAnnotation(Property.class);
     if (field.getMapper().getIdField() == field) {
-      return generateIdColumn(field);
+      return generateIdColumn(field, prop);
+    } else if (prop != null && !prop.columnType().equals(Property.UNDEFINED_COLUMN_TYPE)) {
+      throw new UnsupportedOperationException("Not yet supported: Property.columnType");
     } else {
-      return generateColumn(field);
+      StringBuilder colString = generateColumn(field, prop);
+      addNotNull(colString, prop);
+      addUnique(colString, prop);
+      return colString.toString();
     }
   }
+
+  protected void addNotNull(StringBuilder colString, Property prop) {
+    if (prop != null && !prop.nullable())
+      colString.append(" NOT NULL");
+  }
+
+  protected void addUnique(StringBuilder colString, Property prop) {
+    if (prop != null && !prop.unique())
+      colString.append(" NOT NULL");
+  }
+
+  // LONGTEXT DEFAULT zzzzz NOT NULL
 
   /**
    * Generates a sequence like "id int(10) NOT NULL auto_increment"
@@ -48,10 +66,9 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
    * @param field
    * @return
    */
-  protected String generateIdColumn(IField field) {
+  protected String generateIdColumn(IField field, Property prop) {
     String propName = field.getColumnInfo().getName();
-    Property prop = (Property) field.getAnnotation(Property.class);
-    int scale = prop.scale();
+    int scale = prop == null ? 0 : prop.scale();
     scale = scale == 0 ? 10 : scale;
     return String.format("%s(%d) NOT NULL auto_increment", propName, scale);
   }
@@ -62,5 +79,5 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
    * @param field
    * @return
    */
-  protected abstract String generateColumn(IField field);
+  protected abstract StringBuilder generateColumn(IField field, Property prop);
 }

@@ -24,6 +24,9 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
 
 public class StringColumnHandler extends AbstractSqlColumnHandler {
 
+  private static final int CHAR_MAX = 50;
+  private int VARCHAR_MAX = 32000;
+
   /**
    * 
    */
@@ -32,10 +35,27 @@ public class StringColumnHandler extends AbstractSqlColumnHandler {
   }
 
   @Override
-  protected String generateColumn(IField field) {
-    Property prop = (Property) field.getAnnotation(Property.class);
-
-    throw new UnsupportedOperationException();
+  protected StringBuilder generateColumn(IField field, Property prop) {
+    StringBuilder result = new StringBuilder();
+    int length = prop == null ? 255 : prop.length();
+    if (length < CHAR_MAX)
+      generateChar(result, field, length);
+    else if (length < VARCHAR_MAX)
+      generateVarchar(result, field, length);
+    else
+      generateText(result, field, length);
+    return result;
   }
 
+  private void generateChar(StringBuilder result, IField field, int length) {
+    String.format("%s CHAR( %d ) ", field.getColumnInfo().getName(), length);
+  }
+
+  private void generateVarchar(StringBuilder result, IField field, int length) {
+    String.format("%s VARCHAR( %d ) ", field.getColumnInfo().getName(), length);
+  }
+
+  private void generateText(StringBuilder result, IField field, int length) {
+    String.format("%s LONGTEXT ", field.getColumnInfo().getName(), length);
+  }
 }
