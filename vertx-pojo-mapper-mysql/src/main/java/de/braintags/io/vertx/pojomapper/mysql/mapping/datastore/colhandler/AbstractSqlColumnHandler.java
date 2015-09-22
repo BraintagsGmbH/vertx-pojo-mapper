@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.AbstractColumnHandler;
 
 /**
@@ -25,6 +26,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.AbstractColumnHan
  */
 
 public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
+  private static final String ID_COLUMN_STRING = "%s INT(%d) NOT NULL auto_increment";
 
   /**
    * @param classesToDeal
@@ -35,27 +37,25 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
 
   @Override
   public final Object generate(IField field) {
-    Property prop = (Property) field.getAnnotation(Property.class);
+    IColumnInfo ci = field.getColumnInfo();
     if (field.getMapper().getIdField() == field) {
-      return generateIdColumn(field, prop);
-    } else if (prop != null && !prop.columnType().equals(Property.UNDEFINED_COLUMN_TYPE)) {
-      throw new UnsupportedOperationException("Not yet supported: Property.columnType");
+      return generateIdColumn(field, ci);
     } else {
-      StringBuilder colString = generateColumn(field, prop);
-      addNotNull(colString, prop);
-      addUnique(colString, prop);
+      StringBuilder colString = generateColumn(field, ci);
+      addNotNull(colString, ci);
+      addUnique(colString, ci);
       return colString.toString();
     }
   }
 
-  protected void addNotNull(StringBuilder colString, Property prop) {
-    if (prop != null && !prop.nullable())
+  protected void addNotNull(StringBuilder colString, IColumnInfo ci) {
+    if (!ci.isNullable())
       colString.append(" NOT NULL");
   }
 
-  protected void addUnique(StringBuilder colString, Property prop) {
-    if (prop != null && !prop.unique())
-      colString.append(" NOT NULL");
+  protected void addUnique(StringBuilder colString, IColumnInfo ci) {
+    if (ci.isUnique())
+      throw new UnsupportedOperationException("not yet supported: unique property");
   }
 
   // LONGTEXT DEFAULT zzzzz NOT NULL
@@ -66,12 +66,23 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
    * @param field
    * @return
    */
-  protected String generateIdColumn(IField field, Property prop) {
+  protected String generateIdColumn(IField field, IColumnInfo ci) {
+    String propName = ci.getName();
+    int scale = ci.getScale();
+    scale = scale == Property.UNDEFINED_INTEGER ? 10 : scale;
+    return String.format(ID_COLUMN_STRING, propName, scale);
+  }
 
-    String propName = field.getColumnInfo().getName();
-    int scale = prop == null ? 0 : prop.scale();
-    scale = scale == 0 ? 10 : scale;
-    return String.format("%s(INT %d) NOT NULL auto_increment", propName, scale);
+  /**
+   * Get the defined length of the {@link IColumnInfo}. If this value is undefined, then the given default value is
+   * returned
+   * 
+   * @param ci
+   * @param defaultValue
+   * @return
+   */
+  public int getLength(IColumnInfo ci, int defaultValue) {
+    return ci.getLength() == Property.UNDEFINED_INTEGER ? defaultValue : ci.getLength();
   }
 
   /**
@@ -80,5 +91,5 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
    * @param field
    * @return
    */
-  protected abstract StringBuilder generateColumn(IField field, Property prop);
+  protected abstract StringBuilder generateColumn(IField field, IColumnInfo ci);
 }

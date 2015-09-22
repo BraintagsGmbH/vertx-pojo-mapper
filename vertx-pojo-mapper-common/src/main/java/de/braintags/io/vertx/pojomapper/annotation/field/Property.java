@@ -20,6 +20,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 
 /**
  * With this annotation one can specify, how a field shall be stored inside the {@link IDataStore}
@@ -35,6 +36,7 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 public @interface Property {
   public static final String UNDEFINED_COLUMN_NAME = "";
   public static final String UNDEFINED_COLUMN_TYPE = "";
+  public static final int UNDEFINED_INTEGER = -1;
 
   /**
    * Specifies the name of the field in the {@link IDataStore}. If undefined, then the name of the field in the POJO
@@ -64,27 +66,30 @@ public @interface Property {
    * 
    * @return
    */
-  String columnType() default "";
+  String columnType() default UNDEFINED_COLUMN_TYPE;
 
   /**
-   * Defines the length of a column inside the datastore. Default = 255
+   * Defines the length of a column inside the datastore. Default = UNDEFINED_INTEGER. If the value is undefined, it
+   * will be defined by the {@link IColumnHandler}
    * 
    * @return the length
    */
-  int length() default 255;
+  int length() default UNDEFINED_INTEGER;
 
   /**
-   * Defines the decimal precision of numeric values. Default = 0,
+   * Defines the decimal precision of numeric values. Default = UNDEFINED_INTEGER, If the value is UNDEFINED_INTEGER,
+   * then the default value will be taken from the {@link IColumnHandler}
    * 
    * @return the precision
    */
-  int precision() default 0;
+  int precision() default UNDEFINED_INTEGER;
 
   /**
-   * Defines the scale of numeric values. Default = 0.
+   * Defines the scale of numeric values. Default = UNDEFINED_INTEGER. If the value is UNDEFINED_INTEGER, then the
+   * default value will be taken from the {@link IColumnHandler}
    * 
    * @return the scale
    */
-  int scale() default 0;
+  int scale() default UNDEFINED_INTEGER;
 
 }

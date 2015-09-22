@@ -113,7 +113,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
     String columnPart = generateColumnPart(mapper);
     String tableName = mapper.getTableInfo().getName();
     String database = datastore.getDatabase();
-    String sqlCommand = String.format(CREATE_TABLE, tableName, database, columnPart);
+    String sqlCommand = String.format(CREATE_TABLE, database, tableName, columnPart);
     return new DefaultSyncResult(sqlCommand);
   }
 

@@ -13,8 +13,8 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
-import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 
 /**
  * 
@@ -35,9 +35,9 @@ public class StringColumnHandler extends AbstractSqlColumnHandler {
   }
 
   @Override
-  protected StringBuilder generateColumn(IField field, Property prop) {
+  protected StringBuilder generateColumn(IField field, IColumnInfo ci) {
     StringBuilder result = new StringBuilder();
-    int length = prop == null ? 255 : prop.length();
+    int length = getLength(ci, 255);
     if (length < CHAR_MAX)
       generateChar(result, field, length);
     else if (length < VARCHAR_MAX)

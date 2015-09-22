@@ -29,12 +29,26 @@ public class DefaultColumnInfo implements IColumnInfo {
   private String colName;
   private IColumnHandler columnHandler;
 
+  private String type = Property.UNDEFINED_COLUMN_TYPE;
+  private int length = Property.UNDEFINED_INTEGER;
+  private int scale = Property.UNDEFINED_INTEGER;
+  private int precision = Property.UNDEFINED_INTEGER;
+
+  private boolean nullable = true;
+  private boolean unique = false;
+
   /**
+   * Initializes an instance by using a defined {@link Property} and adds the defined {@link IColumnHandler}
    * 
+   * @param field
+   *          the {@link IField} to be used for init
+   * @param columnHandler
+   *          the {@link IColumnHandler} to be used
    */
   public DefaultColumnInfo(IField field, IColumnHandler columnHandler) {
-    colName = computePropertyName(field);
     this.columnHandler = columnHandler;
+    colName = computePropertyName(field);
+    init(field, columnHandler);
   }
 
   protected String computePropertyName(IField field) {
@@ -45,6 +59,18 @@ public class DefaultColumnInfo implements IColumnInfo {
         return propName;
     }
     return field.getName();
+  }
+
+  private void init(IField field, IColumnHandler columnHandler) {
+    Property prop = (Property) field.getAnnotation(Property.class);
+    if (prop != null) {
+      type = prop.columnType();
+      length = prop.length();
+      scale = prop.scale();
+      precision = prop.precision();
+      nullable = prop.nullable();
+      unique = prop.unique();
+    }
   }
 
   /*
@@ -65,6 +91,66 @@ public class DefaultColumnInfo implements IColumnInfo {
   @Override
   public IColumnHandler getColumnHandler() {
     return columnHandler;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#getType()
+   */
+  @Override
+  public String getType() {
+    return type;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#getLength()
+   */
+  @Override
+  public int getLength() {
+    return length;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#getScale()
+   */
+  @Override
+  public int getScale() {
+    return scale;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#getPrecision()
+   */
+  @Override
+  public int getPrecision() {
+    return precision;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#isNullable()
+   */
+  @Override
+  public boolean isNullable() {
+    return nullable;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#isUnique()
+   */
+  @Override
+  public boolean isUnique() {
+    return unique;
   }
 
 }

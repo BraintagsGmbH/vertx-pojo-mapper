@@ -19,7 +19,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultColumnInfo;
 
 /**
- * An implementation of {@link IColumnInfo} for use with sql based datastores
+ * An implementation of {@link IColumnInfo} for use with sql based datastores.
  * 
  * @author Michael Remme
  * 
@@ -27,10 +27,6 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultColumnInfo
 
 public class SqlColumnInfo extends DefaultColumnInfo {
 
-  /**
-   * @param field
-   * @param columnHandler
-   */
   public SqlColumnInfo(IField field, IColumnHandler columnHandler) {
     super(field, columnHandler);
   }
