@@ -25,9 +25,11 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultSyncResult;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlTableInfo;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
@@ -46,6 +48,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
   private MySqlDataStore datastore;
 
   private static final String TABLE_QUERY = "SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='%s' AND TABLE_NAME='%s'";
+  private static final String COLUMN_QUERY = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA='%s' AND TABLE_NAME='%s'";
   private static final String CREATE_TABLE = "CREATE TABLE %s.%s ( %s )";
 
   /**
@@ -162,22 +165,44 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
   }
 
   private void readTableFromDatabase(IMapper mapper, Handler<AsyncResult<ITableInfo>> resultHandler) {
-    String command = String.format(TABLE_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
-    executeCommand(command, result -> {
+    String tableQuery = String.format(TABLE_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
+    executeCommand(tableQuery, result -> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
         ResultSet rs = result.result();
-        resultHandler.handle(Future.succeededFuture(createTableInfo(rs)));
+        ITableInfo tInfo = createTableInfo(mapper, rs);
+        String columnQuery = String.format(COLUMN_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
+        executeCommand(columnQuery, colResult -> readColumns(tInfo, colResult, resultHandler));
+
       }
     });
 
   }
 
-  private ITableInfo createTableInfo(ResultSet resultSet) {
+  // [TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE,
+  // CHARACTER_MAXIMUM_LENGTH, CHARACTER_OCTET_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, DATETIME_PRECISION,
+  // CHARACTER_SET_NAME,
+  // COLLATION_NAME, COLUMN_TYPE, COLUMN_KEY, EXTRA, PRIVILEGES, COLUMN_COMMENT]
+  private void readColumns(ITableInfo tInfo, AsyncResult<ResultSet> result,
+      Handler<AsyncResult<ITableInfo>> resultHandler) {
+    if (result.failed()) {
+      resultHandler.handle(Future.failedFuture(result.cause()));
+    } else {
+      ResultSet rs = result.result();
+      if (rs.getNumRows() == 0)
+        return;
+      JsonArray jo = rs.getResults().get(0);
+      resultHandler.handle(Future.failedFuture(new UnsupportedOperationException("read columns")));
+
+      resultHandler.handle(Future.succeededFuture(tInfo));
+    }
+  }
+
+  private ITableInfo createTableInfo(IMapper mapper, ResultSet resultSet) {
     if (resultSet.getNumRows() == 0)
       return null;
-    throw new UnsupportedOperationException();
+    return new SqlTableInfo(mapper);
   }
 
   /**
