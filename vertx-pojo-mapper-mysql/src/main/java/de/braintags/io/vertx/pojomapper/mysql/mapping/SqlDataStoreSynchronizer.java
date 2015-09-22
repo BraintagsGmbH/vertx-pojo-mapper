@@ -13,6 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping;
 
+import java.util.List;
 import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
@@ -29,7 +30,7 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlTableInfo;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
@@ -172,9 +173,12 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
       } else {
         ResultSet rs = result.result();
         ITableInfo tInfo = createTableInfo(mapper, rs);
+        if (tInfo == null) { // signal that table doesn't exist
+          resultHandler.handle(Future.succeededFuture(null));
+          return;
+        }
         String columnQuery = String.format(COLUMN_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
         executeCommand(columnQuery, colResult -> readColumns(tInfo, colResult, resultHandler));
-
       }
     });
 
@@ -190,13 +194,30 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
       resultHandler.handle(Future.failedFuture(result.cause()));
     } else {
       ResultSet rs = result.result();
-      if (rs.getNumRows() == 0)
-        return;
-      JsonArray jo = rs.getResults().get(0);
+      if (rs.getNumRows() == 0) {
+        String message = String.format("No column definitions found for '%s'", tInfo.getName());
+        resultHandler.handle(Future.failedFuture(new UnsupportedOperationException(message)));
+      }
+
+      logColumns(rs);
+
       resultHandler.handle(Future.failedFuture(new UnsupportedOperationException("read columns")));
 
-      resultHandler.handle(Future.succeededFuture(tInfo));
+      // resultHandler.handle(Future.succeededFuture(tInfo));
     }
+  }
+
+  private void logColumns(ResultSet rs) {
+    List<String> colNames = rs.getColumnNames();
+
+    List<JsonObject> rows = rs.getRows();
+    for (JsonObject row : rows) {
+      for (String colName : colNames) {
+        Object value = row.getValue(colName);
+        LOGGER.info(colName + ":" + value);
+      }
+    }
+
   }
 
   private ITableInfo createTableInfo(IMapper mapper, ResultSet resultSet) {
