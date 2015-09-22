@@ -71,6 +71,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
           ITableInfo dbTable = res.result();
           if (dbTable == null) {
             generateNewTable(mapper, resultHandler);
+            readTable(mapper, resultHandler);
           } else {
             compareTables(mapper, dbTable);
           }
@@ -79,6 +80,11 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
         }
       }
     });
+  }
+
+  private void readTable(IMapper mapper, Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
+    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+
   }
 
   /*

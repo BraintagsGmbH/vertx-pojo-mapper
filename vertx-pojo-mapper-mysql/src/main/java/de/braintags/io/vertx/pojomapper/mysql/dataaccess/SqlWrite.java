@@ -13,12 +13,12 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * 
@@ -42,7 +42,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
       } else {
-        throw new UnsupportedOperationException();
+        resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
 
       }
     });
