@@ -48,14 +48,14 @@ public class StringColumnHandler extends AbstractSqlColumnHandler {
   }
 
   private void generateChar(StringBuilder result, IField field, int length) {
-    String.format("%s CHAR( %d ) ", field.getColumnInfo().getName(), length);
+    result.append(String.format("%s CHAR( %d ) ", field.getColumnInfo().getName(), length));
   }
 
   private void generateVarchar(StringBuilder result, IField field, int length) {
-    String.format("%s VARCHAR( %d ) ", field.getColumnInfo().getName(), length);
+    result.append(String.format("%s VARCHAR( %d ) ", field.getColumnInfo().getName(), length));
   }
 
   private void generateText(StringBuilder result, IField field, int length) {
-    String.format("%s LONGTEXT ", field.getColumnInfo().getName(), length);
+    result.append(String.format("%s LONGTEXT ", field.getColumnInfo().getName(), length));
   }
 }

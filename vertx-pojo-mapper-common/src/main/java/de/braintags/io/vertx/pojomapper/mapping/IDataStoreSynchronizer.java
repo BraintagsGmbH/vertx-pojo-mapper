@@ -25,7 +25,7 @@ import io.vertx.core.Handler;
  * 
  */
 
-public interface IDataStoreSynchronizer {
+public interface IDataStoreSynchronizer<T> {
 
   /**
    * Check wether the underlaying table / column inside the database must be created or modified
@@ -33,6 +33,6 @@ public interface IDataStoreSynchronizer {
    * @param mapper
    * @param resultHandler
    */
-  public void synchronize(IMapper mapper, Handler<AsyncResult<Void>> resultHandler);
+  public void synchronize(IMapper mapper, Handler<AsyncResult<ISyncResult<T>>> resultHandler);
 
 }

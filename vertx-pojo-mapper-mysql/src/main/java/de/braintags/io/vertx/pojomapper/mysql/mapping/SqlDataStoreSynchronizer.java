@@ -19,9 +19,11 @@ import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.ISyncResult;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
+import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultSyncResult;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -38,7 +40,7 @@ import io.vertx.ext.sql.SQLConnection;
  * 
  */
 
-public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
+public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> {
   private static Logger LOGGER = LoggerFactory.getLogger(SqlDataStoreSynchronizer.class);
 
   private MySqlDataStore datastore;
@@ -60,7 +62,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
    * mapping .IMapper, io.vertx.core.Handler)
    */
   @Override
-  public void synchronize(IMapper mapper, Handler<AsyncResult<Void>> resultHandler) {
+  public void synchronize(IMapper mapper, Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
     readTableFromDatabase(mapper, res -> {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
@@ -87,26 +89,32 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
    * 
    */
 
-  private void generateNewTable(IMapper mapper, Handler<AsyncResult<Void>> resultHandler) {
-    String columnPart = generateColumnPart(mapper);
-    String tableName = mapper.getTableInfo().getName();
-    String database = datastore.getDatabase();
-    String sqlCommand = String.format(CREATE_TABLE, tableName, database, columnPart);
+  private void generateNewTable(IMapper mapper, Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
+    DefaultSyncResult syncResult = createSyncResult(mapper);
     datastore.getSqlClient().getConnection(cr -> {
       if (cr.failed()) {
         resultHandler.handle(Future.failedFuture(cr.cause()));
       } else {
         SQLConnection connection = cr.result();
-        connection.execute(sqlCommand, exec -> {
+        connection.execute(syncResult.getSyncCommand(), exec -> {
           if (exec.failed()) {
-            resultHandler.handle(exec);
+            LOGGER.error("error in executing command: " + syncResult.getSyncCommand());
+            resultHandler.handle(Future.failedFuture(exec.cause()));
           } else {
             // TODO perhaps improve result by searching in INFORMATION_SCHEMA?
-            return;
+            resultHandler.handle(Future.succeededFuture(syncResult));
           }
         });
       }
     });
+  }
+
+  private DefaultSyncResult createSyncResult(IMapper mapper) {
+    String columnPart = generateColumnPart(mapper);
+    String tableName = mapper.getTableInfo().getName();
+    String database = datastore.getDatabase();
+    String sqlCommand = String.format(CREATE_TABLE, tableName, database, columnPart);
+    return new DefaultSyncResult(sqlCommand);
   }
 
   /**
@@ -123,7 +131,8 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
     Set<String> fieldNames = mapper.getFieldNames();
 
     for (String fieldName : fieldNames) {
-      buffer.append(generateColumn(mapper, ti, fieldName)).append(", ");
+      String colString = generateColumn(mapper, ti, fieldName);
+      buffer.append(colString).append(", ");
     }
     buffer.append(String.format("PRIMARY KEY ( %s )", idField.getColumnInfo().getName()));
     return buffer.toString();
@@ -134,8 +143,12 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer {
     IColumnInfo ci = ti.getColumnInfo(field);
     IColumnHandler ch = ci.getColumnHandler();
     if (ch == null)
-      throw new MappingException("Undefined column hanbdler for field " + field.getFullName());
-    return (String) ch.generate(field);
+      throw new MappingException("Undefined column handler for field  " + field.getFullName());
+    String colString = (String) ch.generate(field);
+    if (colString == null || colString.isEmpty())
+      throw new UnsupportedOperationException(
+          String.format(" Did not generate column creation string for column '%s'", fieldName));
+    return colString;
   }
 
   private void compareTables(IMapper mapper, ITableInfo currentDbTable) {

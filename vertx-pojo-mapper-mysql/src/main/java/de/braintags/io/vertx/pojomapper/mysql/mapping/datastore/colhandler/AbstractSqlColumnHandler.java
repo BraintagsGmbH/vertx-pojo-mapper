@@ -67,10 +67,11 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
    * @return
    */
   protected String generateIdColumn(IField field, Property prop) {
+
     String propName = field.getColumnInfo().getName();
     int scale = prop == null ? 0 : prop.scale();
     scale = scale == 0 ? 10 : scale;
-    return String.format("%s(%d) NOT NULL auto_increment", propName, scale);
+    return String.format("%s(INT %d) NOT NULL auto_increment", propName, scale);
   }
 
   /**
