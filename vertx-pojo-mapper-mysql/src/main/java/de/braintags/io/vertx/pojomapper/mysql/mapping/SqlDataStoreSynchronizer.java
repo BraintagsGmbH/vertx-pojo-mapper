@@ -111,11 +111,26 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
     ITableInfo newTi = mapper.getTableInfo();
     List<String> deletedCols = checkDeletedCols(newTi, currentDbTable);
     List<String> newCols = checkNewCols(newTi, currentDbTable);
-    List<String> modifiedCols = new ArrayList<String>();
+    List<String> modifiedCols = checkModifiedCols(newTi, currentDbTable);
 
-    List<String> oldColnames = currentDbTable.getColumnNames();
+    if (!newCols.isEmpty() || !modifiedCols.isEmpty()) {
+      throw new UnsupportedOperationException();
+    } else {
+      resultHandler.handle(Future.succeededFuture(new DefaultSyncResult(SyncAction.NO_ACTION)));
+    }
 
-    throw new UnsupportedOperationException();
+  }
+
+  private List<String> checkModifiedCols(ITableInfo newTableInfo, ITableInfo currentDbTable) {
+    List<String> modCols = new ArrayList<String>();
+    List<String> newCols = newTableInfo.getColumnNames();
+    for (String colName : newCols) {
+      IColumnInfo newCol = newTableInfo.getColumnInfo(colName);
+      IColumnInfo currCol = currentDbTable.getColumnInfo(colName);
+      if (newCol.isModified(currCol))
+        modCols.add(colName);
+    }
+    return modCols;
   }
 
   private List<String> checkNewCols(ITableInfo newTableInfo, ITableInfo currentDbTable) {
@@ -172,8 +187,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
     String tableName = mapper.getTableInfo().getName();
     String database = datastore.getDatabase();
     String sqlCommand = String.format(CREATE_TABLE, database, tableName, columnPart);
-    DefaultSyncResult sr = new DefaultSyncResult(sqlCommand);
-    sr.setAction(action);
+    DefaultSyncResult sr = new DefaultSyncResult(action, sqlCommand);
     return sr;
   }
 

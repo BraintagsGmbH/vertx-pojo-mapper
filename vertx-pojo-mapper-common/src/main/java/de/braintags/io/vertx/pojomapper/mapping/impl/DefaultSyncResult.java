@@ -31,7 +31,8 @@ public class DefaultSyncResult implements ISyncResult<String> {
   /**
    * 
    */
-  public DefaultSyncResult() {
+  public DefaultSyncResult(SyncAction action) {
+    this.action = action;
   }
 
   /**
@@ -40,7 +41,8 @@ public class DefaultSyncResult implements ISyncResult<String> {
    * @param syncCommand
    *          the command to be set
    */
-  public DefaultSyncResult(String syncCommand) {
+  public DefaultSyncResult(SyncAction action, String syncCommand) {
+    this(action);
     this.syncCommand = syncCommand;
   }
 

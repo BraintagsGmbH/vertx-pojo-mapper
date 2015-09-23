@@ -183,4 +183,27 @@ public class DefaultColumnInfo implements IColumnInfo {
     this.nullable = nullable;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#isModified(de.braintags.io.vertx.pojomapper.mapping.
+   * datastore.IColumnInfo)
+   */
+  @Override
+  public boolean isModified(IColumnInfo compare) {
+    if (compare == null)
+      throw new NullPointerException();
+    if (compare.getPrecision() != getPrecision())
+      return true;
+    if (compare.getLength() != getLength())
+      return true;
+    if (compare.getScale() != getScale())
+      return true;
+    if (!compare.getType().equals(getType()))
+      return true;
+
+    return false;
+  }
+
 }
