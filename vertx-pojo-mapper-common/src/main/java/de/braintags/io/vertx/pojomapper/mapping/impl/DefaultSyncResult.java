@@ -15,6 +15,7 @@
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import de.braintags.io.vertx.pojomapper.mapping.ISyncResult;
+import de.braintags.io.vertx.pojomapper.mapping.SyncAction;
 
 /**
  * The default implementation for all datastores, where String is used as native format to synchronize a connected table
@@ -25,6 +26,7 @@ import de.braintags.io.vertx.pojomapper.mapping.ISyncResult;
 
 public class DefaultSyncResult implements ISyncResult<String> {
   private String syncCommand = null;
+  private SyncAction action;
 
   /**
    * 
@@ -50,6 +52,26 @@ public class DefaultSyncResult implements ISyncResult<String> {
   @Override
   public String getSyncCommand() {
     return syncCommand;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.ISyncResult#getAction()
+   */
+  @Override
+  public SyncAction getAction() {
+    return action;
+  }
+
+  /**
+   * Set the action, which was performed by a synchronization
+   * 
+   * @param action
+   *          the action
+   */
+  public void setAction(SyncAction action) {
+    this.action = action;
   }
 
 }

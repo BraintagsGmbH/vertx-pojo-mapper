@@ -13,6 +13,8 @@
 
 package de.braintags.io.vertx.pojomapper.mapping.datastore;
 
+import java.util.List;
+
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 
@@ -43,13 +45,28 @@ public interface ITableInfo {
   public void createColumnInfo(IField field, IColumnHandler columnHandler);
 
   /**
-   * Get the instance of IColumnInfo for the given field name. NOTE: the name given here is the name of the
-   * {@link IField}
+   * Get the instance of IColumnInfo for the given {@link IField}
    * 
-   * @param javaFieldName
-   *          the name of the field to be searched
+   * @param field
+   *          the field to get the {@link IColumnInfo} for
    * @return an instance of IColumnInfo or null, if none existing
    */
   public IColumnInfo getColumnInfo(IField field);
+
+  /**
+   * Get the instance of {@link IColumnInfo} by the name of the column inside the datastore
+   * 
+   * @param columnName
+   *          the name of the column in the datastore
+   * @return an instance of IColumnInfo or null, if none existing
+   */
+  public IColumnInfo getColumnInfo(String columnName);
+
+  /**
+   * Get a list of all defined column names
+   * 
+   * @return
+   */
+  public List<String> getColumnNames();
 
 }

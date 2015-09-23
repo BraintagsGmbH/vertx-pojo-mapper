@@ -13,7 +13,9 @@
 
 package de.braintags.io.vertx.pojomapper.mapping.datastore.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -31,7 +33,8 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 
 public class DefaultTableInfo implements ITableInfo {
   private String name;
-  private Map<String, IColumnInfo> cols = new HashMap<String, IColumnInfo>();
+  private Map<String, IColumnInfo> colsByJavaFieldName = new HashMap<String, IColumnInfo>();
+  private Map<String, IColumnInfo> colsByColumnName = new HashMap<String, IColumnInfo>();
 
   /**
    * 
@@ -49,7 +52,7 @@ public class DefaultTableInfo implements ITableInfo {
    * @see de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo#getName()
    */
   @Override
-  public String getName() {
+  public final String getName() {
     return name;
   }
 
@@ -61,14 +64,23 @@ public class DefaultTableInfo implements ITableInfo {
    * .IField, de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler)
    */
   @Override
-  public void createColumnInfo(IField field, IColumnHandler columnHandler) {
-    String fieldName = field.getName();
-    DefaultColumnInfo ci = new DefaultColumnInfo(field, columnHandler);
-    addColumnInfo(fieldName, ci);
+  public final void createColumnInfo(IField field, IColumnHandler columnHandler) {
+    IColumnInfo ci = generateColumnInfo(field, columnHandler);
+    colsByJavaFieldName.put(field.getName(), ci);
+    colsByColumnName.put(ci.getName(), ci);
   }
 
-  protected void addColumnInfo(String fieldName, IColumnInfo ci) {
-    cols.put(fieldName, ci);
+  /**
+   * Generate the instance of {@link IColumnInfo} which is used from this implementation of {@link ITableInfo}
+   * 
+   * @param field
+   *          the field to be mapped
+   * @param columnHandler
+   *          the instance of {@link IColumnHandler}
+   * @return the implementation of {@link IColumnInfo}
+   */
+  protected IColumnInfo generateColumnInfo(IField field, IColumnHandler columnHandler) {
+    return new DefaultColumnInfo(field, columnHandler);
   }
 
   /*
@@ -77,8 +89,29 @@ public class DefaultTableInfo implements ITableInfo {
    * @see de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo#getColumnInfo(java.lang.String)
    */
   @Override
-  public IColumnInfo getColumnInfo(IField field) {
-    return cols.get(field.getName());
+  public final IColumnInfo getColumnInfo(IField field) {
+    return colsByJavaFieldName.get(field.getName());
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo#getColumnInfo(java.lang.String)
+   */
+  @Override
+  public final IColumnInfo getColumnInfo(String columnName) {
+    return colsByColumnName.get(columnName);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo#getColumnNames()
+   */
+  @Override
+  public List<String> getColumnNames() {
+    String[] keys = (String[]) colsByColumnName.keySet().toArray();
+    return Arrays.asList(keys);
   }
 
 }

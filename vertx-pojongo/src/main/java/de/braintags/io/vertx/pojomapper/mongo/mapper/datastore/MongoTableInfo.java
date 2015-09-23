@@ -19,6 +19,7 @@ package de.braintags.io.vertx.pojomapper.mongo.mapper.datastore;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableInfo;
 
 /**
@@ -37,11 +38,16 @@ public class MongoTableInfo extends DefaultTableInfo {
     super(mapper);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableInfo#generateColumnInfo(de.braintags.io.vertx.
+   * pojomapper.mapping.IField, de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler)
+   */
   @Override
-  public void createColumnInfo(IField field, IColumnHandler columnHandler) {
-    String fieldName = field.getName();
-    MongoColumnInfo ci = new MongoColumnInfo(field, columnHandler);
-    addColumnInfo(fieldName, ci);
+  protected IColumnInfo generateColumnInfo(IField field, IColumnHandler columnHandler) {
+    return new MongoColumnInfo(field, columnHandler);
   }
 
 }

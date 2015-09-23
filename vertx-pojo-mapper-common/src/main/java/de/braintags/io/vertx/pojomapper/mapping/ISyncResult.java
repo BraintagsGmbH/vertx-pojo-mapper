@@ -35,4 +35,11 @@ public interface ISyncResult<T> {
    */
   public T getSyncCommand();
 
+  /**
+   * Get the {@link SyncAction} which was performed by a synchronization
+   * 
+   * @return
+   */
+  public SyncAction getAction();
+
 }

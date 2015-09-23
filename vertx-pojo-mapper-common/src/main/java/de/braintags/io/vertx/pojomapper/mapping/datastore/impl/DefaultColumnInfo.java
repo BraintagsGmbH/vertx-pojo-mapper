@@ -19,7 +19,9 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 
 /**
- * 
+ * Default implementation of IColumnInfo which contains the needed properties and above the interface getter methods for
+ * column properties either the getter methods for those implementations, which will reread information from some
+ * database meta data
  * 
  * @author Michael Remme
  * 
@@ -35,7 +37,6 @@ public class DefaultColumnInfo implements IColumnInfo {
   private int precision = Property.UNDEFINED_INTEGER;
 
   private boolean nullable = true;
-  private boolean unique = false;
 
   /**
    * Initializes an instance by using a defined {@link Property} and adds the defined {@link IColumnHandler}
@@ -69,7 +70,6 @@ public class DefaultColumnInfo implements IColumnInfo {
       scale = prop.scale();
       precision = prop.precision();
       nullable = prop.nullable();
-      unique = prop.unique();
     }
   }
 
@@ -143,14 +143,44 @@ public class DefaultColumnInfo implements IColumnInfo {
     return nullable;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#isUnique()
+  /**
+   * @param type
+   *          the type to set
    */
-  @Override
-  public boolean isUnique() {
-    return unique;
+  public final void setType(String type) {
+    this.type = type;
+  }
+
+  /**
+   * @param length
+   *          the length to set
+   */
+  public final void setLength(int length) {
+    this.length = length;
+  }
+
+  /**
+   * @param scale
+   *          the scale to set
+   */
+  public final void setScale(int scale) {
+    this.scale = scale;
+  }
+
+  /**
+   * @param precision
+   *          the precision to set
+   */
+  public final void setPrecision(int precision) {
+    this.precision = precision;
+  }
+
+  /**
+   * @param nullable
+   *          the nullable to set
+   */
+  public final void setNullable(boolean nullable) {
+    this.nullable = nullable;
   }
 
 }

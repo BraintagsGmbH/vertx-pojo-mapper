@@ -43,7 +43,6 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
     } else {
       StringBuilder colString = generateColumn(field, ci);
       addNotNull(colString, ci);
-      addUnique(colString, ci);
       return colString.toString();
     }
   }
@@ -51,11 +50,6 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
   protected void addNotNull(StringBuilder colString, IColumnInfo ci) {
     if (!ci.isNullable())
       colString.append(" NOT NULL");
-  }
-
-  protected void addUnique(StringBuilder colString, IColumnInfo ci) {
-    if (ci.isUnique())
-      throw new UnsupportedOperationException("not yet supported: unique property");
   }
 
   // LONGTEXT DEFAULT zzzzz NOT NULL

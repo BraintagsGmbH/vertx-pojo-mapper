@@ -76,11 +76,4 @@ public interface IColumnInfo {
    */
   public boolean isNullable();
 
-  /**
-   * DEfines, wether a column can have only unique values
-   * 
-   * @return true, if only unique values are allowed
-   */
-  public boolean isUnique();
-
 }

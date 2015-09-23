@@ -16,6 +16,7 @@ package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableInfo;
 
@@ -39,14 +40,12 @@ public class SqlTableInfo extends DefaultTableInfo {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableInfo#createColumnInfo(de.braintags.io.vertx.
+   * de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableInfo#generateColumnInfo(de.braintags.io.vertx.
    * pojomapper.mapping.IField, de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler)
    */
   @Override
-  public void createColumnInfo(IField field, IColumnHandler columnHandler) {
-    String fieldName = field.getName();
-    SqlColumnInfo ci = new SqlColumnInfo(field, columnHandler);
-    addColumnInfo(fieldName, ci);
+  protected IColumnInfo generateColumnInfo(IField field, IColumnHandler columnHandler) {
+    return new SqlColumnInfo(field, columnHandler);
   }
 
 }

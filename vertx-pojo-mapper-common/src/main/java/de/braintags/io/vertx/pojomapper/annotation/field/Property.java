@@ -47,13 +47,6 @@ public @interface Property {
   String value() default UNDEFINED_COLUMN_NAME;
 
   /**
-   * Defines a unique constraint on the property in the datastore. Default = false
-   * 
-   * @return true, if unique is required
-   */
-  boolean unique() default false;
-
-  /**
    * Set the column nullable ( allow null ). Default = true
    * 
    * @return true, if nullable
