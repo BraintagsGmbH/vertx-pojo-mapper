@@ -110,12 +110,23 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
       Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
     ITableInfo newTi = mapper.getTableInfo();
     List<String> deletedCols = checkDeletedCols(newTi, currentDbTable);
-    List<String> newCols = new ArrayList<String>();
+    List<String> newCols = checkNewCols(newTi, currentDbTable);
     List<String> modifiedCols = new ArrayList<String>();
 
     List<String> oldColnames = currentDbTable.getColumnNames();
 
     throw new UnsupportedOperationException();
+  }
+
+  private List<String> checkNewCols(ITableInfo newTableInfo, ITableInfo currentDbTable) {
+    List<String> planedCols = newTableInfo.getColumnNames();
+    List<String> existingCols = currentDbTable.getColumnNames();
+    for (String planedCol : planedCols) {
+      if (existingCols.contains(planedCol))
+        planedCols.remove(planedCol);
+
+    }
+    return planedCols;
   }
 
   private List<String> checkDeletedCols(ITableInfo newTableInfo, ITableInfo currentDbTable) {
