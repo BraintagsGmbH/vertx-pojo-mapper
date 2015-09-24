@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import de.braintags.io.vertx.pojomapper.AllTestsPojoJson;
 import de.braintags.io.vertx.pojomapper.datastoretest.TestBaseTest;
 import de.braintags.io.vertx.pojomapper.datastoretest.TestSimpleInsert;
 
@@ -27,7 +28,7 @@ import de.braintags.io.vertx.pojomapper.datastoretest.TestSimpleInsert;
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ TestBaseTest.class, TestSimpleInsert.class })
+@SuiteClasses({ AllTestsPojoJson.class, TestTableInfo.class, TestBaseTest.class, TestSimpleInsert.class })
 public class AllTestsMySql {
   // -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer
   /**

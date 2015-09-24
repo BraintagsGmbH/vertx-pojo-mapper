@@ -17,6 +17,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.AbstractColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
 
 /**
  * An abstract implementation for use with SQL based datastores The implementation checks, wether
@@ -47,12 +48,20 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
     }
   }
 
+  /**
+   * This method generates the metadata like type, length etc., if they are not defined already by annotations
+   * 
+   * @param ci
+   */
+  public final void applyMetaData(SqlColumnInfo ci) {
+    throw new UnsupportedOperationException();
+    // check ID field and separate handling, then call abstract method
+  }
+
   protected void addNotNull(StringBuilder colString, IColumnInfo ci) {
     if (!ci.isNullable())
       colString.append(" NOT NULL");
   }
-
-  // LONGTEXT DEFAULT zzzzz NOT NULL
 
   /**
    * Generates a sequence like "id int(10) NOT NULL auto_increment"
@@ -65,18 +74,6 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
     int scale = ci.getScale();
     scale = scale == Property.UNDEFINED_INTEGER ? 10 : scale;
     return String.format(ID_COLUMN_STRING, propName, scale);
-  }
-
-  /**
-   * Get the defined length of the {@link IColumnInfo}. If this value is undefined, then the given default value is
-   * returned
-   * 
-   * @param ci
-   * @param defaultValue
-   * @return
-   */
-  public int getLength(IColumnInfo ci, int defaultValue) {
-    return ci.getLength() == Property.UNDEFINED_INTEGER ? defaultValue : ci.getLength();
   }
 
   /**

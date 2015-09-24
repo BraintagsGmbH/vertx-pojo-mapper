@@ -76,13 +76,4 @@ public interface IColumnInfo {
    */
   public boolean isNullable();
 
-  /**
-   * Method checks, wether the current column is modified in comparison to the given instance
-   * 
-   * @param compare
-   *          the instance to check for changes
-   * @return true, if the current instance is changed in comparison to the given columninfo
-   */
-  public boolean isModified(IColumnInfo compare);
-
 }

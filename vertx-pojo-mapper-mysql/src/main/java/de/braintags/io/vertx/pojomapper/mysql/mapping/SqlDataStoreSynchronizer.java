@@ -13,8 +13,8 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
@@ -82,7 +82,6 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
         }
       }
     });
-
   }
 
   private void checkTable(SQLConnection connection, Mapper mapper, AsyncResult<SqlTableInfo> tableResult,
@@ -91,7 +90,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
       resultHandler.handle(Future.failedFuture(tableResult.cause()));
     } else {
       try {
-        ITableInfo dbTable = tableResult.result();
+        SqlTableInfo dbTable = tableResult.result();
         if (dbTable == null) {
           generateNewTable(connection, mapper, resultHandler);
         } else {
@@ -104,52 +103,15 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
 
   }
 
-  private void compareTables(IMapper mapper, ITableInfo currentDbTable,
+  private void compareTables(IMapper mapper, SqlTableInfo currentDbTable,
       Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
-    ITableInfo newTi = mapper.getTableInfo();
-    List<String> deletedCols = checkDeletedCols(newTi, currentDbTable);
-    List<String> newCols = checkNewCols(newTi, currentDbTable);
-    List<String> modifiedCols = checkModifiedCols(newTi, currentDbTable);
-
-    if (!newCols.isEmpty() || !modifiedCols.isEmpty()) {
+    Map<String, SyncAction> syncMap = currentDbTable.compareColumns(mapper);
+    if (!syncMap.isEmpty()) {
       throw new UnsupportedOperationException();
     } else {
       resultHandler.handle(Future.succeededFuture(new DefaultSyncResult(SyncAction.NO_ACTION)));
     }
 
-  }
-
-  private List<String> checkModifiedCols(ITableInfo newTableInfo, ITableInfo currentDbTable) {
-    List<String> modCols = new ArrayList<String>();
-    List<String> newCols = newTableInfo.getColumnNames();
-    for (String colName : newCols) {
-      IColumnInfo newCol = newTableInfo.getColumnInfo(colName);
-      IColumnInfo currCol = currentDbTable.getColumnInfo(colName);
-      if (newCol.isModified(currCol))
-        modCols.add(colName);
-    }
-    return modCols;
-  }
-
-  private List<String> checkNewCols(ITableInfo newTableInfo, ITableInfo currentDbTable) {
-    List<String> planedCols = newTableInfo.getColumnNames();
-    List<String> existingCols = currentDbTable.getColumnNames();
-    for (String planedCol : planedCols) {
-      if (existingCols.contains(planedCol))
-        planedCols.remove(planedCol);
-
-    }
-    return planedCols;
-  }
-
-  private List<String> checkDeletedCols(ITableInfo newTableInfo, ITableInfo currentDbTable) {
-    List<String> existingCols = currentDbTable.getColumnNames();
-
-    List<String> newCols = newTableInfo.getColumnNames();
-    for (String newCol : newCols) {
-      existingCols.remove(newCol);
-    }
-    return existingCols;
   }
 
   /*
@@ -171,7 +133,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
           if (tableResult.failed()) {
             resultHandler.handle(Future.failedFuture(tableResult.cause()));
           } else {
-            tableResult.result().copyInto((SqlTableInfo) mapper.getTableInfo());
+            tableResult.result().copyInto(mapper);
             resultHandler.handle(Future.succeededFuture(syncResult));
           }
         });

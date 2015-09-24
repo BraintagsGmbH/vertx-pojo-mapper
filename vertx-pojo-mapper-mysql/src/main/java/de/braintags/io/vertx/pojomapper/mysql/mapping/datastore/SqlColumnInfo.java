@@ -13,11 +13,12 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore;
 
-import de.braintags.io.vertx.pojomapper.annotation.field.Property;
+import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultColumnInfo;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -28,6 +29,11 @@ import io.vertx.core.json.JsonObject;
  */
 
 public class SqlColumnInfo extends DefaultColumnInfo {
+  private static final String NUMERIC_PRECISION = "NUMERIC_PRECISION";
+  private static final String NUMERIC_SCALE = "NUMERIC_SCALE";
+  private static final String DATA_TYPE = "DATA_TYPE";
+  private static final String IS_NULLABLE = "IS_NULLABLE";
+  private static final String CHARACTER_MAXIMUM_LENGTH = "CHARACTER_MAXIMUM_LENGTH";
 
   /**
    * The default constructor to create an instance during the mapping
@@ -37,6 +43,13 @@ public class SqlColumnInfo extends DefaultColumnInfo {
    */
   public SqlColumnInfo(IField field, IColumnHandler columnHandler) {
     super(field, columnHandler);
+  }
+
+  @Override
+  protected void init(IField field, IColumnHandler columnHandler) {
+    super.init(field, columnHandler);
+    ((AbstractSqlColumnHandler) columnHandler).applyMetaData(this);
+
   }
 
   /**
@@ -55,11 +68,18 @@ public class SqlColumnInfo extends DefaultColumnInfo {
     // CHARACTER_MAXIMUM_LENGTH, CHARACTER_OCTET_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, DATETIME_PRECISION,
     // CHARACTER_SET_NAME,
     // COLLATION_NAME, COLUMN_TYPE, COLUMN_KEY, EXTRA, PRIVILEGES, COLUMN_COMMENT]
-    setNullable(row.getBoolean("IS_NULLABLE"));
-    setLength(row.getInteger("CHARACTER_MAXIMUM_LENGTH"));
-    setPrecision(row.getInteger("NUMERIC_PRECISION", Property.UNDEFINED_INTEGER));
-    setScale(row.getInteger("NUMERIC_SCALE", Property.UNDEFINED_INTEGER));
-    setType(row.getString("DATA_TYPE", null));
+    Object nullable = row.getValue(IS_NULLABLE);
+    setNullable(nullable != null && nullable.equals("YES"));
+    if (row.containsKey(CHARACTER_MAXIMUM_LENGTH) && row.getInteger(CHARACTER_MAXIMUM_LENGTH) != null)
+      setLength(row.getInteger(CHARACTER_MAXIMUM_LENGTH));
+    if (row.containsKey(NUMERIC_PRECISION) && row.getInteger(NUMERIC_PRECISION) != null)
+      setPrecision(row.getInteger(NUMERIC_PRECISION));
+    if (row.containsKey(NUMERIC_SCALE) && row.getInteger(NUMERIC_SCALE) != null)
+      setScale(row.getInteger(NUMERIC_SCALE));
+    if (!row.containsKey(DATA_TYPE))
+      throw new MappingException(
+          String.format("Could not find the field %s in the row for column %s", DATA_TYPE, getName()));
+    setType(row.getString(DATA_TYPE, null));
   }
 
   /**

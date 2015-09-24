@@ -13,8 +13,10 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
 
 /**
  * 
@@ -23,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
  */
 
 public class StringColumnHandler extends AbstractSqlColumnHandler {
+  private static final int DEFAULT_LENGTH = 255;
 
   private static final int CHAR_MAX = 50;
   private int VARCHAR_MAX = 32000;
@@ -34,28 +37,62 @@ public class StringColumnHandler extends AbstractSqlColumnHandler {
     super(CharSequence.class);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#applyMetaData(de.
+   * braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo)
+   */
+  @Override
+  public void applyMetaData(SqlColumnInfo ci) {
+    if (ci.getLength() == Property.UNDEFINED_INTEGER)
+      ci.setLength(DEFAULT_LENGTH);
+    if (ci.getType() == null || ci.getType().isEmpty())
+      ci.setType(generateType(ci));
+
+  }
+
+  private String generateType(IColumnInfo ci) {
+    int length = ci.getLength();
+    if (length < CHAR_MAX)
+      return "char";
+    else if (length < VARCHAR_MAX)
+      return "varchar";
+    else
+      return "longtext";
+
+  }
+
   @Override
   protected StringBuilder generateColumn(IField field, IColumnInfo ci) {
     StringBuilder result = new StringBuilder();
-    int length = getLength(ci, 255);
+    int length = ci.getLength();
     if (length < CHAR_MAX)
-      generateChar(result, field, length);
+      generateChar(result, ci, length);
     else if (length < VARCHAR_MAX)
-      generateVarchar(result, field, length);
+      generateVarchar(result, ci, length);
     else
-      generateText(result, field, length);
+      generateText(result, ci, length);
     return result;
   }
 
-  private void generateChar(StringBuilder result, IField field, int length) {
-    result.append(String.format("%s CHAR( %d ) ", field.getColumnInfo().getName(), length));
+  private void generateChar(StringBuilder result, IColumnInfo ci, int length) {
+    result.append(String.format("%s %s( %d ) ", ci.getName(), ci.getType(), length));
   }
 
-  private void generateVarchar(StringBuilder result, IField field, int length) {
-    result.append(String.format("%s VARCHAR( %d ) ", field.getColumnInfo().getName(), length));
+  private void generateVarchar(StringBuilder result, IColumnInfo ci, int length) {
+    result.append(String.format("%s %s( %d ) ", ci.getName(), ci.getType(), length));
   }
 
-  private void generateText(StringBuilder result, IField field, int length) {
-    result.append(String.format("%s LONGTEXT ", field.getColumnInfo().getName(), length));
+  private void generateText(StringBuilder result, IColumnInfo ci, int length) {
+    result.append(String.format("%s %s ", ci.getName(), ci.getType(), length));
   }
+
+  @Override
+  public boolean isColumnModified(IColumnInfo plannedCi, IColumnInfo existingCi) {
+    if (!plannedCi.getType().equals(existingCi.getType()))
+      return true;
+    return false;
+  }
+
 }

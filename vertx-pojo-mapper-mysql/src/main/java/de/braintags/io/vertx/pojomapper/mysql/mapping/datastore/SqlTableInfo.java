@@ -13,10 +13,15 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.SyncAction;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
@@ -64,13 +69,15 @@ public class SqlTableInfo extends DefaultTableInfo {
   }
 
   /**
-   * This method copies the database metadata of the current instance into the destination, including the metadata of
-   * each {@link IColumnInfo}
+   * This method copies the database metadata of the current instance into the {@link SqlTableInfo} of the
+   * {@link IMapper}. That way, the current instance should be an instance which was created by the information inside
+   * the datastore
    * 
-   * @param destination
-   *          the destination to copy the meta data into
+   * @param mapper
+   *          the {@link ITableInfo} of the mapper will be the destination to copy the meta data into
    */
-  public void copyInto(SqlTableInfo destination) {
+  public void copyInto(IMapper mapper) {
+    SqlTableInfo destination = (SqlTableInfo) mapper.getTableInfo();
     Iterator<String> it = getColumnNames().iterator();
     while (it.hasNext()) {
       String colName = it.next();
@@ -78,6 +85,68 @@ public class SqlTableInfo extends DefaultTableInfo {
       SqlColumnInfo destinationCol = (SqlColumnInfo) destination.getColumnInfo(colName);
       sourceCol.copyInto(destinationCol);
     }
+  }
+
+  /**
+   * Compares the columns of the current {@link ITableInfo} with the ones of the mapper
+   * 
+   * @param mapper
+   *          the mapper, which contains the {@link ITableInfo} to be compared
+   * @return A map with the names of the modified, deleted or new columns and the {@link SyncAction}
+   */
+  public Map<String, SyncAction> compareColumns(IMapper mapper) {
+    Map<String, SyncAction> ret = new HashMap<>();
+    SqlTableInfo newTi = (SqlTableInfo) mapper.getTableInfo();
+    List<String> deletedCols = checkDeletedCols(newTi);
+    List<String> newCols = checkNewCols(newTi);
+    List<String> modifiedCols = checkModifiedCols(newTi);
+
+    for (String colName : deletedCols) {
+      ret.put(colName, SyncAction.DELETE);
+    }
+
+    for (String colName : modifiedCols) {
+      ret.put(colName, SyncAction.UPDATE);
+    }
+
+    for (String colName : newCols) {
+      ret.put(colName, SyncAction.CREATE);
+    }
+    return ret;
+  }
+
+  private List<String> checkModifiedCols(SqlTableInfo newTableInfo) {
+    List<String> modCols = new ArrayList<String>();
+    List<String> newCols = newTableInfo.getColumnNames();
+    for (String colName : newCols) {
+      IColumnInfo newCol = newTableInfo.getColumnInfo(colName);
+      IColumnInfo currCol = getColumnInfo(colName);
+      boolean modified = newCol.getColumnHandler().isColumnModified(newCol, currCol);
+      if (modified)
+        modCols.add(colName);
+    }
+    return modCols;
+  }
+
+  private List<String> checkNewCols(ITableInfo newTableInfo) {
+    List<String> returnList = new ArrayList<String>();
+    List<String> planedCols = newTableInfo.getColumnNames();
+    List<String> existingCols = getColumnNames();
+    for (String planedCol : planedCols) {
+      if (!existingCols.contains(planedCol))
+        returnList.add(planedCol);
+    }
+    return returnList;
+  }
+
+  private List<String> checkDeletedCols(ITableInfo newTableInfo) {
+    List<String> existingCols = getColumnNames();
+
+    List<String> newCols = newTableInfo.getColumnNames();
+    for (String newCol : newCols) {
+      existingCols.remove(newCol);
+    }
+    return existingCols;
   }
 
 }

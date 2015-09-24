@@ -14,6 +14,7 @@
 package de.braintags.io.vertx.pojomapper.mapping.datastore;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 
 /**
  * The IColumnHandler is used to generate and update columns inside the connected datastore and to read structural
@@ -60,4 +61,18 @@ public interface IColumnHandler {
    * @return the creation object, like a column creation string
    */
   public Object generate(IField field);
+
+  /**
+   * Method checks, wether the {@link IColumnInfo} plannedCi has some modifications to be done in comparison to
+   * existingCi. This action is performed by an IColumnHander, cause the check will respect different properties when
+   * checking a Text field or a numeric field for instance
+   * 
+   * @param plannedCi
+   *          the planned IColumnInfo, which is coming out of an {@link IMapper}
+   * @param existingCi
+   *          the existing IColumnInfo typically read from a datastore
+   * @return true, if the plannedCi is changed in comparison to the existingCi
+   */
+  public boolean isColumnModified(IColumnInfo plannedCi, IColumnInfo existingCi);
+
 }

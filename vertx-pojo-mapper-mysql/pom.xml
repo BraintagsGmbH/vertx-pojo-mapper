@@ -40,6 +40,13 @@
 			<classifier>tests</classifier>
 		</dependency>
 
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-json</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<classifier>tests</classifier>
+		</dependency>
+
 
 	</dependencies>
 

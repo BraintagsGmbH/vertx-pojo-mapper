@@ -13,7 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper.mapping.datastore.impl;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +79,7 @@ public class DefaultTableInfo implements ITableInfo {
    *          the {@link IColumnInfo} to be looked up
    */
   protected void addColumnInfo(IField field, IColumnInfo ci) {
-    colsByJavaFieldName.put(field.getName(), ci);
+    colsByJavaFieldName.put(field.getName().toLowerCase(), ci);
   }
 
   /**
@@ -89,7 +89,7 @@ public class DefaultTableInfo implements ITableInfo {
    *          the {@link IColumnInfo} to be looked up
    */
   protected void addColumnInfo(IColumnInfo ci) {
-    colsByColumnName.put(ci.getName(), ci);
+    colsByColumnName.put(ci.getName().toLowerCase(), ci);
   }
 
   /**
@@ -112,7 +112,7 @@ public class DefaultTableInfo implements ITableInfo {
    */
   @Override
   public final IColumnInfo getColumnInfo(IField field) {
-    return colsByJavaFieldName.get(field.getName());
+    return colsByJavaFieldName.get(field.getName().toLowerCase());
   }
 
   /*
@@ -122,18 +122,12 @@ public class DefaultTableInfo implements ITableInfo {
    */
   @Override
   public final IColumnInfo getColumnInfo(String columnName) {
-    return colsByColumnName.get(columnName);
+    return colsByColumnName.get(columnName.toLowerCase());
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo#getColumnNames()
-   */
   @Override
   public List<String> getColumnNames() {
-    String[] keys = (String[]) colsByColumnName.keySet().toArray();
-    return Arrays.asList(keys);
+    return new ArrayList<String>(colsByColumnName.keySet());
   }
 
 }
