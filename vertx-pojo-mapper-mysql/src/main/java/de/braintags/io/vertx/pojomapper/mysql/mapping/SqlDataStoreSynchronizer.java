@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -30,7 +29,6 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultSyncResult;
 import de.braintags.io.vertx.pojomapper.mapping.impl.Mapper;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
-import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlTableInfo;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -87,7 +85,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
 
   }
 
-  private void checkTable(SQLConnection connection, Mapper mapper, AsyncResult<ITableInfo> tableResult,
+  private void checkTable(SQLConnection connection, Mapper mapper, AsyncResult<SqlTableInfo> tableResult,
       Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
     if (tableResult.failed()) {
       resultHandler.handle(Future.failedFuture(tableResult.cause()));
@@ -173,7 +171,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
           if (tableResult.failed()) {
             resultHandler.handle(Future.failedFuture(tableResult.cause()));
           } else {
-            mapper.setTableInfo(tableResult.result());
+            tableResult.result().copyInto((SqlTableInfo) mapper.getTableInfo());
             resultHandler.handle(Future.succeededFuture(syncResult));
           }
         });
@@ -226,7 +224,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
   }
 
   private void readTableFromDatabase(SQLConnection connection, IMapper mapper,
-      Handler<AsyncResult<ITableInfo>> resultHandler) {
+      Handler<AsyncResult<SqlTableInfo>> resultHandler) {
     String tableQuery = String.format(TABLE_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
     executeCommand(connection, tableQuery, result -> {
       if (result.failed()) {
@@ -258,45 +256,28 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
    *          the handler to be called
    */
   private void readColumns(IMapper mapper, SqlTableInfo tInfo, AsyncResult<ResultSet> result,
-      Handler<AsyncResult<ITableInfo>> resultHandler) {
+      Handler<AsyncResult<SqlTableInfo>> resultHandler) {
     if (result.failed()) {
       resultHandler.handle(Future.failedFuture(result.cause()));
     } else {
       ResultSet rs = result.result();
       if (rs.getNumRows() == 0) {
         String message = String.format("No column definitions found for '%s'", tInfo.getName());
-        resultHandler.handle(Future.failedFuture(new UnsupportedOperationException(message)));
+        resultHandler.handle(Future.failedFuture(new MappingException(message)));
         return;
       }
 
       try {
         List<JsonObject> rows = rs.getRows();
         for (JsonObject row : rows) {
-          readColumn(row, tInfo);
+          tInfo.createColumnInfo(row);
         }
         resultHandler.handle(Future.succeededFuture(tInfo));
       } catch (Exception e) {
         resultHandler.handle(Future.failedFuture(e));
         return;
       }
-
     }
-  }
-
-  private void readColumn(JsonObject row, SqlTableInfo tInfo) {
-    // [TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE,
-    // CHARACTER_MAXIMUM_LENGTH, CHARACTER_OCTET_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, DATETIME_PRECISION,
-    // CHARACTER_SET_NAME,
-    // COLLATION_NAME, COLUMN_TYPE, COLUMN_KEY, EXTRA, PRIVILEGES, COLUMN_COMMENT]
-    String colName = row.getString("COLUMN_NAME");
-    SqlColumnInfo ci = (SqlColumnInfo) tInfo.getColumnInfo(colName);
-    if (ci == null)
-      throw new NullPointerException(String.format("Could not find required column with name '%s'", colName));
-    ci.setNullable(row.getBoolean("IS_NULLABLE"));
-    ci.setLength(row.getInteger("CHARACTER_MAXIMUM_LENGTH"));
-    ci.setPrecision(row.getInteger("NUMERIC_PRECISION", Property.UNDEFINED_INTEGER));
-    ci.setScale(row.getInteger("NUMERIC_SCALE", Property.UNDEFINED_INTEGER));
-    ci.setType(row.getString("DATA_TYPE", null));
   }
 
   private SqlTableInfo createTableInfo(IMapper mapper, ResultSet resultSet) {

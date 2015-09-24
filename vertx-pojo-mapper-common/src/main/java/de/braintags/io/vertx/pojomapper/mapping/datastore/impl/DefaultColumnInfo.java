@@ -39,6 +39,16 @@ public class DefaultColumnInfo implements IColumnInfo {
   private boolean nullable = true;
 
   /**
+   * Constructor to create an instance with the given column name
+   * 
+   * @param colName
+   *          the name of the column
+   */
+  protected DefaultColumnInfo(String colName) {
+    this.colName = colName;
+  }
+
+  /**
    * Initializes an instance by using a defined {@link Property} and adds the defined {@link IColumnHandler}
    * 
    * @param field

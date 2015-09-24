@@ -410,16 +410,6 @@ public class Mapper implements IMapper {
     return tableInfo;
   }
 
-  /**
-   * Set the internal instance of {@link ITableInfo}
-   * 
-   * @param tInfo
-   *          the instance to be set
-   */
-  public void setTableInfo(ITableInfo tInfo) {
-    this.tableInfo = tInfo;
-  }
-
   @Override
   public IField getIdField() {
     return idField;

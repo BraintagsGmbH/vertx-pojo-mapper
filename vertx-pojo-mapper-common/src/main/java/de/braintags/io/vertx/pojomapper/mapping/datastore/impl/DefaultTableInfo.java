@@ -66,7 +66,29 @@ public class DefaultTableInfo implements ITableInfo {
   @Override
   public final void createColumnInfo(IField field, IColumnHandler columnHandler) {
     IColumnInfo ci = generateColumnInfo(field, columnHandler);
+    addColumnInfo(field, ci);
+    addColumnInfo(ci);
+  }
+
+  /**
+   * Add an {@link IColumnInfo} so that it can be looked up by the {@link IField}.
+   * 
+   * @param field
+   *          the instance of {@link IField} to be used as lookup
+   * @param ci
+   *          the {@link IColumnInfo} to be looked up
+   */
+  protected void addColumnInfo(IField field, IColumnInfo ci) {
     colsByJavaFieldName.put(field.getName(), ci);
+  }
+
+  /**
+   * Add an {@link IColumnInfo} so that it can be looked up by the name of the column.
+   * 
+   * @param ci
+   *          the {@link IColumnInfo} to be looked up
+   */
+  protected void addColumnInfo(IColumnInfo ci) {
     colsByColumnName.put(ci.getName(), ci);
   }
 
