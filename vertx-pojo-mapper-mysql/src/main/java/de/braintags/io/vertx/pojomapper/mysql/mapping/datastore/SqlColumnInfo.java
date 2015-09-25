@@ -48,7 +48,7 @@ public class SqlColumnInfo extends DefaultColumnInfo {
   @Override
   protected void init(IField field, IColumnHandler columnHandler) {
     super.init(field, columnHandler);
-    ((AbstractSqlColumnHandler) columnHandler).applyMetaData(this);
+    ((AbstractSqlColumnHandler) columnHandler).applyMetaData(field, this);
 
   }
 

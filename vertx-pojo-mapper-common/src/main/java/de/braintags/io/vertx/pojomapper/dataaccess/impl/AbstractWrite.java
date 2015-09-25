@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 
 /**
@@ -27,7 +28,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
  * 
  */
 
-public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> implements IWrite<T> {
+public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T>implements IWrite<T> {
   private List<T> objectsToSave = new ArrayList<T>();
 
   /**
@@ -50,6 +51,16 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
   @Override
   public final void add(T mapper) {
     objectsToSave.add(mapper);
+  }
+
+  /**
+   * execute the methods marked with {@link AfterSave}
+   * 
+   * @param entity
+   *          the entity to be handled
+   */
+  protected void executePostSave(T entity) {
+    getMapper().executeLifecycle(AfterSave.class, entity);
   }
 
 }

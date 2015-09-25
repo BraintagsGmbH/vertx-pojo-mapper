@@ -67,8 +67,7 @@ public class TestTableInfo extends DatastoreBaseTest {
     List<String> colNames = ti.getColumnNames();
     assertEquals(2, colNames.size());
 
-    checkColumn(ti, "id", "varchar", 255, Property.UNDEFINED_INTEGER, Property.UNDEFINED_INTEGER,
-        StringColumnHandler.class);
+    checkColumn(ti, "id", "int", Property.UNDEFINED_INTEGER, Property.UNDEFINED_INTEGER, 10, StringColumnHandler.class);
     checkColumn(ti, "name", "varchar", 255, Property.UNDEFINED_INTEGER, Property.UNDEFINED_INTEGER,
         StringColumnHandler.class);
   }

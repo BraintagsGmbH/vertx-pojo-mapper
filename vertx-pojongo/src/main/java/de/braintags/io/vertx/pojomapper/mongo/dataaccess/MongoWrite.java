@@ -12,7 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
@@ -50,6 +49,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
       resultHandler.handle(Future.succeededFuture(rr));
       return;
     }
+
     ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>();
     CounterObject counter = new CounterObject(getObjectsToSave().size());
     for (T entity : getObjectsToSave()) {
@@ -80,16 +80,6 @@ public class MongoWrite<T> extends AbstractWrite<T> {
         });
       }
     });
-  }
-
-  /**
-   * execute the methods marked with {@link AfterSave}
-   * 
-   * @param entity
-   *          the entity to be handled
-   */
-  private void executePostSave(T entity) {
-    getMapper().executeLifecycle(AfterSave.class, entity);
   }
 
   /**

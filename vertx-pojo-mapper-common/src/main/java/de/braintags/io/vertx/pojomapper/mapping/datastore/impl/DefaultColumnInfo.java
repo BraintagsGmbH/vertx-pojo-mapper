@@ -37,6 +37,7 @@ public class DefaultColumnInfo implements IColumnInfo {
   private int precision = Property.UNDEFINED_INTEGER;
 
   private boolean nullable = true;
+  private boolean id = false;
 
   /**
    * Constructor to create an instance with the given column name
@@ -81,6 +82,8 @@ public class DefaultColumnInfo implements IColumnInfo {
       precision = prop.precision();
       nullable = prop.nullable();
     }
+    if (field.getMapper().getIdField() == field)
+      id = true;
   }
 
   /*
@@ -191,6 +194,16 @@ public class DefaultColumnInfo implements IColumnInfo {
    */
   public final void setNullable(boolean nullable) {
     this.nullable = nullable;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#isId()
+   */
+  @Override
+  public boolean isId() {
+    return id;
   }
 
 }

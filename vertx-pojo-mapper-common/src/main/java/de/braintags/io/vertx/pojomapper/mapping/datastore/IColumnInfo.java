@@ -13,6 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper.mapping.datastore;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 
@@ -75,5 +76,12 @@ public interface IColumnInfo {
    * @return true, if null is allowed
    */
   public boolean isNullable();
+
+  /**
+   * Get the information wether the current column is the {@link Id} column of the mapper
+   * 
+   * @return
+   */
+  public boolean isId();
 
 }

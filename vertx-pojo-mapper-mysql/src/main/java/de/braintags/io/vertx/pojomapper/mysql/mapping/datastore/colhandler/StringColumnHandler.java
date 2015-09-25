@@ -30,6 +30,10 @@ public class StringColumnHandler extends AbstractSqlColumnHandler {
   private static final int CHAR_MAX = 50;
   private int VARCHAR_MAX = 32000;
 
+  private static final String CHAR_TYPE = "char";
+  private static final String VARCHAR_TYPE = "varchar";
+  private static final String LONGTEXT_TYPE = "longtext";
+
   /**
    * 
    */
@@ -55,44 +59,32 @@ public class StringColumnHandler extends AbstractSqlColumnHandler {
   private String generateType(IColumnInfo ci) {
     int length = ci.getLength();
     if (length < CHAR_MAX)
-      return "char";
+      return CHAR_TYPE;
     else if (length < VARCHAR_MAX)
-      return "varchar";
+      return VARCHAR_TYPE;
     else
-      return "longtext";
+      return LONGTEXT_TYPE;
 
   }
 
   @Override
   protected StringBuilder generateColumn(IField field, IColumnInfo ci) {
     StringBuilder result = new StringBuilder();
-    int length = ci.getLength();
-    if (length < CHAR_MAX)
-      generateChar(result, ci, length);
-    else if (length < VARCHAR_MAX)
-      generateVarchar(result, ci, length);
+    if (ci.getType().equalsIgnoreCase(CHAR_TYPE) || ci.getType().equals(VARCHAR_TYPE))
+      generateChar(result, ci);
+    else if (ci.getType().equalsIgnoreCase(LONGTEXT_TYPE))
+      generateText(result, ci);
     else
-      generateText(result, ci, length);
+      throw new UnsupportedOperationException(String.format("Undefined type: %s", ci.getType()));
     return result;
   }
 
-  private void generateChar(StringBuilder result, IColumnInfo ci, int length) {
-    result.append(String.format("%s %s( %d ) ", ci.getName(), ci.getType(), length));
+  private void generateChar(StringBuilder result, IColumnInfo ci) {
+    result.append(String.format("%s %s( %d ) ", ci.getName(), ci.getType(), ci.getLength()));
   }
 
-  private void generateVarchar(StringBuilder result, IColumnInfo ci, int length) {
-    result.append(String.format("%s %s( %d ) ", ci.getName(), ci.getType(), length));
-  }
-
-  private void generateText(StringBuilder result, IColumnInfo ci, int length) {
-    result.append(String.format("%s %s ", ci.getName(), ci.getType(), length));
-  }
-
-  @Override
-  public boolean isColumnModified(IColumnInfo plannedCi, IColumnInfo existingCi) {
-    if (!plannedCi.getType().equals(existingCi.getType()))
-      return true;
-    return false;
+  private void generateText(StringBuilder result, IColumnInfo ci) {
+    result.append(String.format("%s %s ", ci.getName(), ci.getType()));
   }
 
 }

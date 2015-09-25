@@ -13,8 +13,10 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.AbstractColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
@@ -27,7 +29,7 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
  */
 
 public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
-  private static final String ID_COLUMN_STRING = "%s INT(%d) NOT NULL auto_increment";
+  private static final String ID_COLUMN_STRING = "%s %s (%d) NOT NULL auto_increment";
 
   /**
    * @param classesToDeal
@@ -53,10 +55,34 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
    * 
    * @param ci
    */
-  public final void applyMetaData(SqlColumnInfo ci) {
-    throw new UnsupportedOperationException();
-    // check ID field and separate handling, then call abstract method
+  public final void applyMetaData(IField field, SqlColumnInfo ci) {
+    if (ci.isId()) {
+      applyIdMetaData(field, ci);
+    } else {
+      applyMetaData(ci);
+    }
   }
+
+  /**
+   * Applies the meta data for the field, which is specified as {@link Id}
+   * 
+   * @param field
+   *          the underlaying field
+   * @param ci
+   *          the {@link SqlColumnInfo}
+   */
+  protected void applyIdMetaData(IField field, SqlColumnInfo ci) {
+    ci.setType("int");
+    ci.setScale(10);
+  }
+
+  /**
+   * Apply the metadata for columns
+   * 
+   * @param column
+   *          the {@link SqlColumnInfo} to handle
+   */
+  public abstract void applyMetaData(SqlColumnInfo column);
 
   protected void addNotNull(StringBuilder colString, IColumnInfo ci) {
     if (!ci.isNullable())
@@ -73,7 +99,42 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
     String propName = ci.getName();
     int scale = ci.getScale();
     scale = scale == Property.UNDEFINED_INTEGER ? 10 : scale;
-    return String.format(ID_COLUMN_STRING, propName, scale);
+    return String.format(ID_COLUMN_STRING, propName, ci.getType(), scale);
+  }
+
+  @Override
+  public final boolean isColumnModified(IColumnInfo plannedCi, IColumnInfo existingCi) {
+    if (plannedCi.isId()) {
+      return checkIdColumnModified(plannedCi, existingCi);
+    } else {
+      return checkColumnModified(plannedCi, existingCi);
+    }
+  }
+
+  /**
+   * The implementation checks wether the type of columns changed
+   * 
+   * @param plannedCi
+   *          the planned {@link IColumnInfo} from out of the {@link IMapper}
+   * @param existingCi
+   *          the existing {@link IColumnInfo} read from the datastore
+   * @return true, if structure changed
+   */
+  protected boolean checkIdColumnModified(IColumnInfo plannedCi, IColumnInfo existingCi) {
+    return (!plannedCi.getType().equals(existingCi.getType()));
+  }
+
+  /**
+   * The implementation checks wether the type of columns changed
+   * 
+   * @param plannedCi
+   *          the planned {@link IColumnInfo} from out of the {@link IMapper}
+   * @param existingCi
+   *          the existing {@link IColumnInfo} read from the datastore
+   * @return true, if structure changed
+   */
+  protected boolean checkColumnModified(IColumnInfo plannedCi, IColumnInfo existingCi) {
+    return (!plannedCi.getType().equals(existingCi.getType()));
   }
 
   /**
