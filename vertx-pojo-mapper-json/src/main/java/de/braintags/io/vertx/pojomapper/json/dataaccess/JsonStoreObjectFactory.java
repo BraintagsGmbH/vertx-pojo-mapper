@@ -34,12 +34,6 @@ import io.vertx.core.json.JsonObject;
 
 public class JsonStoreObjectFactory implements IStoreObjectFactory {
 
-  /**
-   * 
-   */
-  public JsonStoreObjectFactory() {
-  }
-
   @Override
   public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler) {
     mapper.executeLifecycle(BeforeSave.class, entity);

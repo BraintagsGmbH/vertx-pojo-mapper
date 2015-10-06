@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.mysql;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
@@ -19,10 +20,11 @@ import org.junit.Test;
 import de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
+import io.vertx.ext.sql.UpdateResult;
 
 /**
  * 
@@ -58,34 +60,37 @@ public class TestSqlExpressions extends DatastoreBaseTest {
       } else {
         SQLConnection conn = cr.result();
         JsonArray array = new JsonArray().add("new name");
-        String insertExpression = "insert into MiniMapper set name=\"new update\"; SELECT LAST_INSERT_ID()";
+        String insertExpression = "insert into MiniMapper set name=?; ";
 
-        conn.query(insertExpression, ur -> {
+        conn.updateWithParams(insertExpression, array, ur -> {
           if (ur.failed()) {
             log.error("", ur.cause());
             latch.countDown();
           } else {
-            ResultSet rs = ur.result();
-            latch.countDown();
+            UpdateResult res = ur.result();
+            log.info(res.toJson());
+            log.info(res.getKeys());
+
+            String lastInsertIdCmd = String.format("SELECT LAST_INSERT_ID() from %s;", "MiniMapper");
+            conn.query(lastInsertIdCmd, idResult -> {
+              if (idResult.failed()) {
+                log.error("", ur.cause());
+                latch.countDown();
+              } else {
+                List<JsonObject> ids = idResult.result().getRows();
+                for (JsonObject row : ids) {
+                  log.info(row);
+                }
+                latch.countDown();
+              }
+            });
+
           }
         });
 
-        // conn.updateWithParams(insertExpression, array, ur -> {
-        // if (ur.failed()) {
-        // log.error("", ur.cause());
-        // latch.countDown();
-        // } else {
-        // UpdateResult res = ur.result();
-        // log.info(res.toJson());
-        // log.info(res.getKeys());
-        //
-        // latch.countDown();
-        // }
-        // });
-
       }
     });
-
+    // SELECT LAST_INSERT_ID()S
     try {
       latch.await();
     } catch (InterruptedException e) {

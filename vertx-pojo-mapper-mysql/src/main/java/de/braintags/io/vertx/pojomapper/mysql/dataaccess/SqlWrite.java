@@ -17,9 +17,9 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
-import de.braintags.io.vertx.pojomapper.json.dataaccess.JsonStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
+import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObject.SqlSequence;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
@@ -99,7 +99,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
-        doSaveEntity(entity, (JsonStoreObject) result.result(), writeResult, connection, sResult -> {
+        doSaveEntity(entity, (SqlStoreObject) result.result(), writeResult, connection, sResult -> {
           if (sResult.failed()) {
             resultHandler.handle(Future.failedFuture(sResult.cause()));
           } else {
@@ -116,7 +116,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param storeObject
    * @param resultHandler
    */
-  private void doSaveEntity(T entity, JsonStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
+  private void doSaveEntity(T entity, SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
       Handler<AsyncResult<Void>> resultHandler) {
     IMapper mapper = getMapper();
     String tableName = mapper.getTableInfo().getName();
@@ -143,26 +143,12 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     // connection.updateWithParams(arg0, arg1, arg2);
     resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
 
-    // mongoClient.save(column, storeObject.getContainer(), result -> {
-    // if (result.failed()) {
-    // LOGGER.info("failed", result.cause());
-    // Future<Void> future = Future.failedFuture(result.cause());
-    // resultHandler.handle(future);
-    // return;
-    // } else {
-    // LOGGER.info("saved");
-    // WriteAction action = WriteAction.UNKNOWN;
-    // String id = result.result();
-    // if (id == null) {
-    // id = currentId;
-    // action = WriteAction.UPDATE;
-    // } else
-    // action = WriteAction.INSERT;
-    // executePostSave(entity);
-    // writeResult.addEntry(storeObject, id, action);
-    // resultHandler.handle(Future.succeededFuture());
-    // }
-    // });
+  }
+
+  private void handleInsert(Handler<AsyncResult<Void>> resultHandler, IWriteResult writeResult,
+      SQLConnection connection) {
+    SqlSequence seq = storeObject.generateSqlInsertStatement();
+    connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), resultHandler);
 
   }
 
