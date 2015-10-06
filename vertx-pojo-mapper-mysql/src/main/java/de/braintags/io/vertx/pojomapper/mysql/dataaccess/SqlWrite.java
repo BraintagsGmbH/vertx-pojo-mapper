@@ -13,11 +13,14 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
+import java.util.List;
+
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.exception.InsertException;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObject.SqlSequence;
 import de.braintags.io.vertx.util.CounterObject;
@@ -25,9 +28,11 @@ import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.SQLConnection;
+import io.vertx.ext.sql.UpdateResult;
 
 /**
  * 
@@ -37,6 +42,7 @@ import io.vertx.ext.sql.SQLConnection;
 
 public class SqlWrite<T> extends AbstractWrite<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SqlWrite.class);
+  private static final String LAST_INSERT_ID_COMMAND = "SELECT LAST_INSERT_ID() from %s;";
 
   /**
    * @param mapperClass
@@ -87,7 +93,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         }
 
       } finally {
-        LOGGER.debug("closing connection - sync finished");
+        LOGGER.debug("closing connection - save finished");
         connection.close();
       }
     }
@@ -118,39 +124,71 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    */
   private void doSaveEntity(T entity, SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
       Handler<AsyncResult<Void>> resultHandler) {
-    IMapper mapper = getMapper();
-    String tableName = mapper.getTableInfo().getName();
-    Object currentId = storeObject.get(mapper.getIdField());
+    Object currentId = storeObject.get(getMapper().getIdField());
     LOGGER.info("now saving");
 
-    /*
-     * LAST_INSERT_ID The ID that was generated is maintained in the server on a per-connection basis. This means that
-     * the value returned by the function to a given client is the first AUTO_INCREMENT value generated for most recent
-     * statement affecting an AUTO_INCREMENT column by that client. This value cannot be affected by other clients, even
-     * if they generate AUTO_INCREMENT values of their own. This behavior ensures that each client can retrieve its own
-     * ID without concern for the activity of other clients, and without the need for locks or transactions.
-     * 
-     * 
-     */
-
     if (currentId == null) {
-
+      handleInsert(storeObject, writeResult, connection, resultHandler);
     } else {
+      resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
 
     }
-
-    // connection.updateWithParams(arg0, arg1, arg2);
-    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
-
   }
 
   private void handleInsert(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlInsertStatement();
     connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), updateResult -> {
+      if (updateResult.failed()) {
+        resultHandler.handle(Future.failedFuture(updateResult.cause()));
+        return;
+      }
+      UpdateResult res = updateResult.result();
+      if (res.getUpdated() != 1) {
+        String message = String.format("Error inserting a record, expected %d records saved, but was %d", 1,
+            res.getUpdated());
+        resultHandler.handle(Future.failedFuture(new InsertException(message)));
+        return;
+      }
 
+      if (res.getKeys() != null && res.getKeys().size() == 1) {
+        finishInsert(storeObject, writeResult, res.getKeys().getValue(0), resultHandler);
+        return;
+      }
+
+      String lastInsertIdCmd = String.format(LAST_INSERT_ID_COMMAND, getMapper().getTableInfo().getName());
+      connection.query(lastInsertIdCmd, idResult -> {
+        if (idResult.failed()) {
+          resultHandler.handle(Future.failedFuture(updateResult.cause()));
+          return;
+        }
+
+        List<JsonObject> ids = idResult.result().getRows();
+        if (ids.size() != 1) {
+          resultHandler.handle(Future.failedFuture(new InsertException("Error reading last inserted id")));
+          return;
+        }
+        finishInsert(storeObject, writeResult, ids.get(0), resultHandler);
+        return;
+      });
     });
-
   }
+
+  private void finishInsert(SqlStoreObject storeObject, IWriteResult writeResult, Object id,
+      Handler<AsyncResult<Void>> resultHandler) {
+    executePostSave((T) storeObject.getEntity());
+    writeResult.addEntry(storeObject, id, WriteAction.INSERT);
+    resultHandler.handle(Future.succeededFuture());
+  }
+
+  /*
+   * LAST_INSERT_ID The ID that was generated is maintained in the server on a per-connection basis. This means that the
+   * value returned by the function to a given client is the first AUTO_INCREMENT value generated for most recent
+   * statement affecting an AUTO_INCREMENT column by that client. This value cannot be affected by other clients, even
+   * if they generate AUTO_INCREMENT values of their own. This behavior ensures that each client can retrieve its own ID
+   * without concern for the activity of other clients, and without the need for locks or transactions.
+   * 
+   * 
+   */
 
 }

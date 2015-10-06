@@ -42,7 +42,7 @@ public interface IWriteResult {
    * @param action
    *          the {@link WriteAction} used
    */
-  void addEntry(IStoreObject<?> sto, String id, WriteAction action);
+  void addEntry(IStoreObject<?> sto, Object id, WriteAction action);
 
   /**
    * Get the number of {@link IWriteEntry}

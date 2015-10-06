@@ -25,10 +25,10 @@ import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 
 public class WriteEntry implements IWriteEntry {
   private final IStoreObject<?> sto;
-  private final String id;
+  private final Object id;
   private final WriteAction action;
 
-  WriteEntry(IStoreObject<?> sto, String id, WriteAction action) {
+  WriteEntry(IStoreObject<?> sto, Object id, WriteAction action) {
     this.sto = sto;
     this.id = id;
     this.action = action;

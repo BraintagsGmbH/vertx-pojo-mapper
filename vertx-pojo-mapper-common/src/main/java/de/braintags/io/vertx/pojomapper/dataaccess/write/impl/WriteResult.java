@@ -12,9 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.write.impl;
 
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +20,8 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * Default implementation of {@link IWriteResult}
@@ -56,15 +55,8 @@ public class WriteResult implements IWriteResult {
     logger.info(resultList.size());
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult#addEntry(de.braintags.io.vertx.pojomapper.mapping
-   * .IStoreObject, java.lang.String, de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction)
-   */
   @Override
-  public void addEntry(IStoreObject<?> sto, String id, WriteAction action) {
+  public void addEntry(IStoreObject<?> sto, Object id, WriteAction action) {
     addEntry(new WriteEntry(sto, id, action));
   }
 
