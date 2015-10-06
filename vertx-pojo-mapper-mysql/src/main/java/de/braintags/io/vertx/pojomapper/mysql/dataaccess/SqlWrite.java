@@ -134,7 +134,6 @@ public class SqlWrite<T> extends AbstractWrite<T> {
      */
 
     if (currentId == null) {
-      // INSERT INTO tbl_name VALUES (1, "row 1"), (2, "row 2");
 
     } else {
 
@@ -145,10 +144,12 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   }
 
-  private void handleInsert(Handler<AsyncResult<Void>> resultHandler, IWriteResult writeResult,
-      SQLConnection connection) {
+  private void handleInsert(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
+      Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlInsertStatement();
-    connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), resultHandler);
+    connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), updateResult -> {
+
+    });
 
   }
 
