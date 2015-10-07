@@ -42,7 +42,7 @@ import io.vertx.ext.sql.UpdateResult;
 
 public class SqlWrite<T> extends AbstractWrite<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SqlWrite.class);
-  private static final String LAST_INSERT_ID_COMMAND = "SELECT LAST_INSERT_ID() from %s;";
+  private static final String LAST_INSERT_ID_COMMAND = "SELECT LAST_INSERT_ID();";
 
   /**
    * @param mapperClass
@@ -78,7 +78,9 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
       ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>(resultHandler);
       CounterObject counter = new CounterObject(getObjectsToSave().size());
+      LOGGER.info(String.format("saving %d entities", getObjectsToSave().size()));
       for (T entity : getObjectsToSave()) {
+        LOGGER.info("saving entity");
         saveEntity(entity, rr, connection, result -> {
           if (result.failed()) {
             ro.setThrowable(result.cause());
@@ -146,6 +148,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   private void handleInsert(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlInsertStatement();
+    LOGGER.info("inserting: " + storeObject.toString());
     connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), updateResult -> {
       if (updateResult.failed()) {
         resultHandler.handle(Future.failedFuture(updateResult.cause()));
@@ -164,8 +167,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         return;
       }
 
-      String lastInsertIdCmd = String.format(LAST_INSERT_ID_COMMAND, getMapper().getTableInfo().getName());
-      connection.query(lastInsertIdCmd, idResult -> {
+      connection.query(LAST_INSERT_ID_COMMAND, idResult -> {
         if (idResult.failed()) {
           resultHandler.handle(Future.failedFuture(updateResult.cause()));
           return;
@@ -176,7 +178,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
           resultHandler.handle(Future.failedFuture(new InsertException("Error reading last inserted id")));
           return;
         }
-        finishInsert(storeObject, writeResult, ids.get(0), resultHandler);
+        finishInsert(storeObject, writeResult, ids.get(0).getValue("LAST_INSERT_ID()"), resultHandler);
         return;
       });
     });
@@ -184,6 +186,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   private void finishInsert(SqlStoreObject storeObject, IWriteResult writeResult, Object id,
       Handler<AsyncResult<Void>> resultHandler) {
+    LOGGER.info("inserted record with id " + id);
     executePostSave((T) storeObject.getEntity());
     writeResult.addEntry(storeObject, id, WriteAction.INSERT);
     resultHandler.handle(Future.succeededFuture());
