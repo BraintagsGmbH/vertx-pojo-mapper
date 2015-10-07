@@ -159,7 +159,7 @@ public class MongoQueryRambler implements IQueryRambler {
 
     CounterObject co = new CounterObject(count);
     Iterator<?> values = ((Iterable<?>) valueIterable).iterator();
-    ErrorObject<Void> errorObject = new ErrorObject<Void>();
+    ErrorObject<Void> errorObject = new ErrorObject<Void>(resultHandler);
     JsonArray resultArray = new JsonArray();
 
     // TODO check the loop handling here!! see below
@@ -168,7 +168,6 @@ public class MongoQueryRambler implements IQueryRambler {
       field.getTypeHandler().intoStore(value, field, result -> {
         if (result.failed()) {
           errorObject.setThrowable(result.cause());
-          errorObject.handleError(resultHandler);
           return;
         } else {
           resultArray.add(result.result().getResult());

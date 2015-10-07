@@ -112,17 +112,15 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
     }
     CounterObject co = new CounterObject(size());
     IteratorAsync<E> it = iterator();
-    ResultObject<Object[]> ro = new ResultObject<Object[]>();
+    ResultObject<Object[]> ro = new ResultObject<Object[]>(handler);
     while (it.hasNext() && !ro.isError()) {
       it.next(result -> {
         if (result.failed()) {
           ro.setThrowable(result.cause());
-          ro.handleError(handler);
         } else {
           list.add(result.result());
           if (co.reduce()) {
             ro.setResult(list.toArray());
-            ro.handleResult(handler);
           }
         }
       });

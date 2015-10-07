@@ -151,7 +151,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
       Handler<AsyncResult<Void>> handler) {
     if (javaValues == null || javaValues.length == 0)
       handler.handle(Future.succeededFuture());
-    ErrorObject<Void> errorObject = new ErrorObject<Void>();
+    ErrorObject<Void> errorObject = new ErrorObject<Void>(handler);
     CounterObject co = new CounterObject(javaValues.length);
     Object[] resultArray = new Object[javaValues.length];
     for (int i = 0; i < javaValues.length; i++) {
@@ -159,7 +159,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
       CurrentCounter cc = new CurrentCounter(i, javaValues[i]);
       writeSingleValue(cc.value, storeObject, field,
           result -> doWriteSingleValue(result, errorObject, co, resultArray, cc, storeObject, field, handler));
-      if (errorObject.handleError(handler))
+      if (errorObject.isError())
         return;
     }
   }
@@ -217,7 +217,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
       handler.handle(Future.succeededFuture(resultArray));
       return;
     }
-    ErrorObject<Object> errorObject = new ErrorObject<Object>();
+    ErrorObject<Object> errorObject = new ErrorObject<Object>(handler);
     CounterObject co = new CounterObject(jsonArray.size());
     int counter = 0;
     for (Object jo : jsonArray) {
@@ -226,7 +226,6 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
         if (result.failed()) {
           LOGGER.info("failed", result.cause());
           errorObject.setThrowable(result.cause());
-          errorObject.handleError(handler);
           return;
         } else {
           Object javaValue = result.result();
@@ -238,6 +237,8 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
           }
         }
       });
+      if (errorObject.isError())
+        return;
     }
   }
 
@@ -258,7 +259,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
     JsonArray jsonArray = (JsonArray) storeObject.get(field);
     if (jsonArray == null || jsonArray.isEmpty())
       handler.handle(Future.succeededFuture());
-    ErrorObject<Void> errorObject = new ErrorObject<Void>();
+    ErrorObject<Void> errorObject = new ErrorObject<Void>(handler);
     CounterObject co = new CounterObject(jsonArray.size());
     final MapEntry[] resultArray = new MapEntry[jsonArray.size()];
     int counter = 0;
@@ -300,7 +301,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
         }
       });
 
-      if (errorObject.handleError(handler))
+      if (errorObject.isError())
         return;
     }
   }
@@ -334,7 +335,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
     int size = map == null ? 0 : map.size();
     if (size == 0)
       handler.handle(Future.succeededFuture());
-    ErrorObject<Void> errorObject = new ErrorObject<Void>();
+    ErrorObject<Void> errorObject = new ErrorObject<Void>(handler);
     CounterObject co = new CounterObject(size);
     JsonArray[] resultArray = new JsonArray[size];
     Iterator<?> it = map.entrySet().iterator();
@@ -370,7 +371,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
           });
         }
       });
-      if (errorObject.handleError(handler))
+      if (errorObject.isError())
         return;
     }
   }
@@ -392,7 +393,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
     int size = Size.size(iterable);
     if (size == 0)
       handler.handle(Future.succeededFuture());
-    ErrorObject<Void> errorObject = new ErrorObject<Void>();
+    ErrorObject<Void> errorObject = new ErrorObject<Void>(handler);
     CounterObject co = new CounterObject(size);
     Object[] resultArray = new Object[size];
     Iterator<?> it = iterable.iterator();
@@ -403,7 +404,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
       CurrentCounter cc = new CurrentCounter(counter++, javaValue);
       writeSingleValue(cc.value, storeObject, field,
           result -> doWriteSingleValue(result, errorObject, co, resultArray, cc, storeObject, field, handler));
-      if (errorObject.handleError(handler))
+      if (errorObject.isError())
         return;
     }
   }

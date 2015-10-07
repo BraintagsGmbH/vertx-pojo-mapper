@@ -59,7 +59,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
     }
 
     CounterObject co = new CounterObject(((JsonArray) source).size());
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>();
+    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(resultHandler);
     @SuppressWarnings("rawtypes")
     Collection coll = field.getMapper().getObjectFactory().createCollection(field);
     Iterator<?> ji = ((JsonArray) source).iterator();
@@ -69,7 +69,6 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
       handleObjectFromStore(o, subHandler, coll, field, result -> {
         if (result.failed()) {
           errorObject.setThrowable(result.cause());
-          errorObject.handleError(resultHandler);
           return;
         } else {
           if (co.reduce()) {
@@ -116,7 +115,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
 
     JsonArray jsonArray = new JsonArray();
     CounterObject co = new CounterObject(((Collection<?>) source).size());
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>();
+    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(resultHandler);
     Iterator<?> sourceIt = ((Collection<?>) source).iterator();
     ITypeHandler subHandler = field.getSubTypeHandler();
     // no generics were defined, so that subhandler could not be defined from mapping
@@ -138,7 +137,6 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
       subHandler.intoStore(value, null, tmpResult -> {
         if (tmpResult.failed()) {
           errorObject.setThrowable(tmpResult.cause());
-          errorObject.handleError(resultHandler);
           return;
         } else {
           ITypeHandlerResult thResult = tmpResult.result();

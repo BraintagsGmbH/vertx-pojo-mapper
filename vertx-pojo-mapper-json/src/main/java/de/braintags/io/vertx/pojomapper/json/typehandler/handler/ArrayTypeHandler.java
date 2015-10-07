@@ -12,11 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonArray;
-
 import java.lang.reflect.Array;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
@@ -27,6 +22,10 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
 
 /**
  * 
@@ -70,7 +69,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
     JsonArray jsonArray = (JsonArray) source;
     if (jsonArray == null || jsonArray.isEmpty())
       handler.handle(Future.succeededFuture());
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>();
+    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(handler);
     CounterObject co = new CounterObject(jsonArray.size());
     final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
     int counter = 0;
@@ -92,7 +91,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
       });
     }
 
-    if (errorObject.handleError(handler))
+    if (errorObject.isError())
       return;
   }
 
@@ -107,7 +106,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
     int length = javaValues == null ? 0 : Array.getLength(javaValues);
     if (length == 0)
       handler.handle(Future.succeededFuture());
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>();
+    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(handler);
     CounterObject co = new CounterObject(length);
     Object[] resultArray = new Object[length];
     for (int i = 0; i < length; i++) {
@@ -129,7 +128,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
         }
       });
 
-      if (errorObject.handleError(handler))
+      if (errorObject.isError())
         return;
     }
   }

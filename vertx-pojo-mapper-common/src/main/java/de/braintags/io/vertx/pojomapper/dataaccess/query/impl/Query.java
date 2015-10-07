@@ -78,7 +78,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T>implements IQu
       finishCounter(rambler, resultHandler);
       return;
     }
-    ErrorObject<Void> error = new ErrorObject<Void>();
+    ErrorObject<Void> error = new ErrorObject<Void>(resultHandler);
     CounterObject co = new CounterObject(filters.size());
     for (Object filter : filters) {
       handleFilter(rambler, resultHandler, filter, error, co);
@@ -93,14 +93,12 @@ public abstract class Query<T> extends AbstractDataAccessObject<T>implements IQu
     if (!(filter instanceof IRamblerSource)) {
       error.setThrowable(
           new UnsupportedOperationException("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName()));
-      error.handleError(resultHandler);
       return;
     }
 
     ((IRamblerSource) filter).applyTo(rambler, result -> {
       if (result.failed()) {
         error.setThrowable(result.cause());
-        error.handleError(resultHandler);
         return;
       }
       if (co.reduce()) { // last element in the list

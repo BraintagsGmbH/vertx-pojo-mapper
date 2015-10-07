@@ -50,7 +50,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
       return;
     }
 
-    ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>();
+    ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>(resultHandler);
     CounterObject counter = new CounterObject(getObjectsToSave().size());
     for (T entity : getObjectsToSave()) {
       save(entity, rr, result -> {
@@ -61,7 +61,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
             resultHandler.handle(Future.succeededFuture(rr));
         }
       });
-      if (ro.handleError(resultHandler))
+      if (ro.isError())
         return;
     }
   }

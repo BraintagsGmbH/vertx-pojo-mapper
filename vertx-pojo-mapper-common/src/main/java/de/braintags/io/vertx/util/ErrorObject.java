@@ -29,11 +29,13 @@ public class ErrorObject<E> {
   private static Logger logger = LoggerFactory.getLogger(ErrorObject.class);
   private Throwable throwable;
   private boolean errorHandled = false;
+  private Handler<AsyncResult<E>> handler;
 
   /**
    * 
    */
-  public ErrorObject() {
+  public ErrorObject(Handler<AsyncResult<E>> handler) {
+    this.handler = handler;
   }
 
   /**
@@ -72,6 +74,7 @@ public class ErrorObject<E> {
   public final void setThrowable(Throwable throwable) {
     this.throwable = throwable;
     logger.info("", throwable);
+    handleError();
   }
 
   /**
@@ -90,7 +93,9 @@ public class ErrorObject<E> {
    * 
    * @param handler
    */
-  public boolean handleError(Handler<AsyncResult<E>> handler) {
+  boolean handleError() {
+    if (handler == null)
+      return false;
     if (isError()) {
       if (errorHandled)
         return true;
@@ -110,4 +115,12 @@ public class ErrorObject<E> {
     return errorHandled;
   }
 
+  /**
+   * The internal handler to be used for information
+   * 
+   * @return
+   */
+  protected Handler<AsyncResult<E>> getHandler() {
+    return handler;
+  }
 }

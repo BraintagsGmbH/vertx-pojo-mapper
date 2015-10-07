@@ -30,7 +30,8 @@ public class ResultObject<E> extends ErrorObject<E> {
   /**
    * 
    */
-  public ResultObject() {
+  public ResultObject(Handler<AsyncResult<E>> handler) {
+    super(handler);
   }
 
   /**
@@ -47,6 +48,7 @@ public class ResultObject<E> extends ErrorObject<E> {
   public final void setResult(E result) {
     this.result = result;
     this.resultDefined = true;
+    handleResult();
   }
 
   /**
@@ -61,11 +63,11 @@ public class ResultObject<E> extends ErrorObject<E> {
    * 
    * @param handler
    */
-  public boolean handleResult(Handler<AsyncResult<E>> handler) {
-    if (super.handleError(handler)) {
+  private boolean handleResult() {
+    if (super.handleError()) {
       return true;
     } else if (isResultDefined()) {
-      handler.handle(Future.succeededFuture(result));
+      getHandler().handle(Future.succeededFuture(result));
       return true;
     }
     return false;

@@ -69,7 +69,7 @@ public class MongoBulkTest extends MongoBaseTest {
   public void BulkTest() {
     CountDownLatch latch = new CountDownLatch(1);
     List<JsonObject> list = createRecords();
-    ErrorObject ro = new ErrorObject();
+    ErrorObject ro = new ErrorObject(null);
     doSaveList(list, result -> {
       if (result.failed()) {
         logger.error("", result.cause());
@@ -100,19 +100,18 @@ public class MongoBulkTest extends MongoBaseTest {
   private void doSaveList(List<JsonObject> list, Handler<AsyncResult<IWriteResult>> resultHandler) {
     WriteResult rr = new WriteResult();
     CounterObject counter = new CounterObject(list.size());
-    ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>();
+    ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>(resultHandler);
     for (JsonObject entity : list) {
       doSave(entity, rr, result -> {
         if (result.failed()) {
           ro.setThrowable(result.cause());
-          ro.handleError(resultHandler);
         } else {
           // logger.info("saving " + counter.getCount());
           if (counter.reduce())
             resultHandler.handle(Future.succeededFuture(rr));
         }
       });
-      if (ro.handleError(resultHandler))
+      if (ro.isError())
         return;
     }
   }

@@ -70,7 +70,7 @@ public class DatastoreBaseTest extends VertxTestBase {
     }
     datastoreContainer = (IDatastoreContainer) Class.forName(property).newInstance();
     CountDownLatch latch = new CountDownLatch(1);
-    ErrorObject<Void> err = new ErrorObject<Void>();
+    ErrorObject<Void> err = new ErrorObject<Void>(null);
     datastoreContainer.startup(vertx, result -> {
       if (result.failed()) {
         err.setThrowable(result.cause());
@@ -94,7 +94,7 @@ public class DatastoreBaseTest extends VertxTestBase {
     super.tearDown();
 
     CountDownLatch latch = new CountDownLatch(1);
-    ErrorObject<Void> err = new ErrorObject<Void>();
+    ErrorObject<Void> err = new ErrorObject<Void>(null);
     datastoreContainer.shutdown(result -> {
       if (result.failed()) {
         err.setThrowable(result.cause());

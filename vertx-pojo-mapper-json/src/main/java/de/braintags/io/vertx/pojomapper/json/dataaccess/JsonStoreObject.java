@@ -112,14 +112,13 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    */
   public void initToEntity(Handler<AsyncResult<Void>> handler) {
     Object o = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
-    ErrorObject<Void> error = new ErrorObject<Void>();
+    ErrorObject<Void> error = new ErrorObject<Void>(handler);
     CounterObject co = new CounterObject(getMapper().getFieldNames().size());
     for (String fieldName : getMapper().getFieldNames()) {
       IField field = getMapper().getField(fieldName);
       field.getPropertyMapper().fromStoreObject(o, this, field, result -> {
         if (result.failed()) {
           error.setThrowable(result.cause());
-          handler.handle(result);
         } else {
           if (co.reduce()) {
             entity = o;
@@ -140,14 +139,13 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    * @param handler
    */
   public void initFromEntity(Handler<AsyncResult<Void>> handler) {
-    ErrorObject<Void> error = new ErrorObject<Void>();
+    ErrorObject<Void> error = new ErrorObject<Void>(handler);
     CounterObject co = new CounterObject(mapper.getFieldNames().size());
     for (String fieldName : mapper.getFieldNames()) {
       IField field = mapper.getField(fieldName);
       field.getPropertyMapper().intoStoreObject(entity, this, field, result -> {
         if (result.failed()) {
           error.setThrowable(result.cause());
-          handler.handle(result);
         } else {
           if (co.reduce())
             handler.handle(Future.succeededFuture());

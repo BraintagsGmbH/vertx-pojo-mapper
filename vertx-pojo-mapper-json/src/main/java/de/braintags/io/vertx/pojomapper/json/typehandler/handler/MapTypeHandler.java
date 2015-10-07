@@ -57,23 +57,22 @@ public class MapTypeHandler extends AbstractTypeHandler {
     if (jsonArray == null || jsonArray.isEmpty())
       resultHandler.handle(Future.succeededFuture());
 
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>();
+    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(resultHandler);
     CounterObject co = new CounterObject(jsonArray.size());
     final MapEntry[] resultArray = new MapEntry[jsonArray.size()];
     int counter = 0;
     for (Object jo : jsonArray) {
-      if (errorObject.isError())
-        return;
       CurrentCounter cc = new CurrentCounter(counter++, jo);
       handleOneEntryFromStore(field, cc, resultArray, result -> {
         if (result.failed()) {
           errorObject.setThrowable(result.cause());
-          errorObject.handleError(resultHandler);
           return;
         } else {
           checkSuccessFromStore(field, co, resultArray, resultHandler);
         }
       });
+      if (errorObject.isError())
+        return;
     }
   }
 
@@ -145,7 +144,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
     int size = map == null ? 0 : map.size();
     if (size == 0)
       resultHandler.handle(Future.succeededFuture());
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>();
+    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(resultHandler);
     CounterObject co = new CounterObject(size);
     JsonArray[] resultArray = new JsonArray[size];
     Iterator<?> it = map.entrySet().iterator();
@@ -158,7 +157,6 @@ public class MapTypeHandler extends AbstractTypeHandler {
       valueIntoStore(field, cc, resultArray, result -> {
         if (result.failed()) {
           errorObject.setThrowable(result.cause());
-          errorObject.handleError(resultHandler);
           return;
         } else {
           checkSuccessIntoStore(co, resultArray, resultHandler);

@@ -76,13 +76,12 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       }
       SQLConnection connection = cr.result();
 
-      ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>();
+      ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>(resultHandler);
       CounterObject counter = new CounterObject(getObjectsToSave().size());
       for (T entity : getObjectsToSave()) {
         saveEntity(entity, rr, connection, result -> {
           if (result.failed()) {
             ro.setThrowable(result.cause());
-            ro.handleError(resultHandler);
             closeConnection(connection);
           } else {
             if (counter.reduce()) {
@@ -92,7 +91,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
             }
           }
         });
-        if (ro.handleError(resultHandler)) {
+        if (ro.isError()) {
           return;
         }
       }
