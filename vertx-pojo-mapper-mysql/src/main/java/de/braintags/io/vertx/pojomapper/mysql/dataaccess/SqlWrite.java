@@ -58,9 +58,10 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
         return;
-      } else {
-        ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> doSave(cr, resultHandler));
       }
+
+      ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> doSave(cr, resultHandler));
+
     });
   }
 

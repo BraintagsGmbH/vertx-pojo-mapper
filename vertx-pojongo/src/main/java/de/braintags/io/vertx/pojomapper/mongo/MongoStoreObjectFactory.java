@@ -12,15 +12,15 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo;
 
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import de.braintags.io.vertx.pojomapper.mapping.impl.AbstractStoreObjectFactory;
+import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoStoreObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
-import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
-import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoStoreObject;
 
 /**
  * An implementation for Mongo
@@ -29,7 +29,7 @@ import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoStoreObject;
  * 
  */
 
-public class MongoStoreObjectFactory implements IStoreObjectFactory {
+public class MongoStoreObjectFactory extends AbstractStoreObjectFactory {
 
   /**
    * 

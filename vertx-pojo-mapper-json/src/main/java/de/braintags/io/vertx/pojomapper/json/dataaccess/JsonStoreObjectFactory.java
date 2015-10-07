@@ -19,7 +19,7 @@ package de.braintags.io.vertx.pojomapper.json.dataaccess;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
-import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
+import de.braintags.io.vertx.pojomapper.mapping.impl.AbstractStoreObjectFactory;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -32,7 +32,7 @@ import io.vertx.core.json.JsonObject;
  * 
  */
 
-public class JsonStoreObjectFactory implements IStoreObjectFactory {
+public class JsonStoreObjectFactory extends AbstractStoreObjectFactory {
 
   @Override
   public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler) {

@@ -12,9 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.mapping;
 
+import java.util.List;
+
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import de.braintags.io.vertx.pojomapper.IDataStore;
 
 /**
  * A factory which creates instances of {@link IStoreObject} which are suitable for the current {@link IDataStore}
@@ -37,6 +39,20 @@ public interface IStoreObjectFactory {
    *          the handler to be recalled
    */
   public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler);
+
+  /**
+   * Creates a {@link List} of {@link IStoreObject} by using the informations of the given instances. All entities are
+   * converted into the format, which can be used to save into the {@link IDataStore}
+   * 
+   * @param mapper
+   *          the mapper for the entity to be handled
+   * @param entities
+   *          the pojos to be converted
+   * @param handler
+   *          the handler to be recalled
+   */
+  public void createStoreObjects(IMapper mapper, List<Object> entities,
+      Handler<AsyncResult<List<IStoreObject<?>>>> handler);
 
   /**
    * Creates a new instance of {@link IStoreObject} by using the information from the given stored object from the
