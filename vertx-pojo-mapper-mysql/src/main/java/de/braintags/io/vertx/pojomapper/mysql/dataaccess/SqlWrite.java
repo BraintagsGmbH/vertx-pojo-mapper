@@ -57,6 +57,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     sync(syncResult -> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
+        return;
       } else {
         ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> doSave(cr, resultHandler));
       }
@@ -74,28 +75,36 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         return;
       }
       SQLConnection connection = cr.result();
-      try {
-        ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>();
-        CounterObject counter = new CounterObject(getObjectsToSave().size());
-        for (T entity : getObjectsToSave()) {
-          saveEntity(entity, rr, connection, result -> {
-            if (result.failed()) {
-              ro.setThrowable(result.cause());
-            } else {
-              if (counter.reduce()) {
-                resultHandler.handle(Future.succeededFuture(rr));
-                return;
-              }
-            }
-          });
-          if (ro.handleError(resultHandler))
-            return;
-        }
 
-      } finally {
-        LOGGER.debug("closing connection - save finished");
-        connection.close();
+      ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>();
+      CounterObject counter = new CounterObject(getObjectsToSave().size());
+      for (T entity : getObjectsToSave()) {
+        saveEntity(entity, rr, connection, result -> {
+          if (result.failed()) {
+            ro.setThrowable(result.cause());
+            ro.handleError(resultHandler);
+            closeConnection(connection);
+          } else {
+            if (counter.reduce()) {
+              resultHandler.handle(Future.succeededFuture(rr));
+              closeConnection(connection);
+              return;
+            }
+          }
+        });
+        if (ro.handleError(resultHandler)) {
+          return;
+        }
       }
+    }
+  }
+
+  private void closeConnection(SQLConnection connection) {
+    try {
+      LOGGER.debug("closing connection - save finished");
+      connection.close();
+    } catch (Exception e) {
+      LOGGER.warn("Error in closing connection", e);
     }
   }
 

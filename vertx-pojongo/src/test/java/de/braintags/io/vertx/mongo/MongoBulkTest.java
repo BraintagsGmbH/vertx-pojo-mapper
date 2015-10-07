@@ -12,14 +12,6 @@
  */
 package de.braintags.io.vertx.mongo;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.mongo.MongoClient;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -34,6 +26,13 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
 import de.braintags.io.vertx.pojomapper.mongo.test.MongoBaseTest;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.mongo.MongoClient;
 
 /**
  * 
@@ -106,6 +105,7 @@ public class MongoBulkTest extends MongoBaseTest {
       doSave(entity, rr, result -> {
         if (result.failed()) {
           ro.setThrowable(result.cause());
+          ro.handleError(resultHandler);
         } else {
           // logger.info("saving " + counter.getCount());
           if (counter.reduce())
@@ -156,43 +156,37 @@ public class MongoBulkTest extends MongoBaseTest {
 
       if (LOOP != rr.size()) {
         // check wether records weren't written or "only" IWriteResult is incomplete
-        getMongoClient().count(
-            COLUMN,
-            new JsonObject(),
-            queryResult -> {
-              logger.error("incorrect result found in WriteResult, checking saved records");
-              if (queryResult.failed()) {
-                logger.error("query failed!", queryResult.cause());
-                resultHandler.handle(Future.failedFuture(queryResult.cause()));
-              } else {
-                if (LOOP != queryResult.result()) {
-                  resultHandler.handle(Future.failedFuture(new AssertionError(String.format(
-                      "UNSAVED ENTITIES, expected: %d - found in Mongo: %d", LOOP, queryResult.result()))));
-                } else {
-                  logger.info("records in database OK");
-                  resultHandler.handle(Future.failedFuture(new AssertionError(String.format(
-                      "Wrong WriteResult, expected: %d - logged in WriteResult: %d", LOOP, rr.size()))));
-                }
-              }
-            });
+        getMongoClient().count(COLUMN, new JsonObject(), queryResult -> {
+          logger.error("incorrect result found in WriteResult, checking saved records");
+          if (queryResult.failed()) {
+            logger.error("query failed!", queryResult.cause());
+            resultHandler.handle(Future.failedFuture(queryResult.cause()));
+          } else {
+            if (LOOP != queryResult.result()) {
+              resultHandler.handle(Future.failedFuture(new AssertionError(
+                  String.format("UNSAVED ENTITIES, expected: %d - found in Mongo: %d", LOOP, queryResult.result()))));
+            } else {
+              logger.info("records in database OK");
+              resultHandler.handle(Future.failedFuture(new AssertionError(
+                  String.format("Wrong WriteResult, expected: %d - logged in WriteResult: %d", LOOP, rr.size()))));
+            }
+          }
+        });
       } else {
-        getMongoClient().count(
-            COLUMN,
-            new JsonObject(),
-            queryResult -> {
-              logger.error("correct result found in WriteResult, checking saved records");
-              if (queryResult.failed()) {
-                logger.error("", queryResult.cause());
-                resultHandler.handle(Future.failedFuture(queryResult.cause()));
-              } else {
-                if (LOOP != queryResult.result()) {
-                  resultHandler.handle(Future.failedFuture(new AssertionError(String.format(
-                      "UNSAVED ENTITIES, expected: %d - found in Mongo: %d", LOOP, queryResult.result()))));
-                } else {
-                  resultHandler.handle(Future.succeededFuture());
-                }
-              }
-            });
+        getMongoClient().count(COLUMN, new JsonObject(), queryResult -> {
+          logger.error("correct result found in WriteResult, checking saved records");
+          if (queryResult.failed()) {
+            logger.error("", queryResult.cause());
+            resultHandler.handle(Future.failedFuture(queryResult.cause()));
+          } else {
+            if (LOOP != queryResult.result()) {
+              resultHandler.handle(Future.failedFuture(new AssertionError(
+                  String.format("UNSAVED ENTITIES, expected: %d - found in Mongo: %d", LOOP, queryResult.result()))));
+            } else {
+              resultHandler.handle(Future.succeededFuture());
+            }
+          }
+        });
       }
     } catch (Exception e) {
       resultHandler.handle(Future.failedFuture(e));
