@@ -21,6 +21,8 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
 import de.braintags.io.vertx.pojomapper.exception.InsertException;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObject.SqlSequence;
 import de.braintags.io.vertx.util.CounterObject;
@@ -59,46 +61,72 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
         return;
       }
-
-      ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> doSave(cr, resultHandler));
+      if (getObjectsToSave().isEmpty()) {
+        resultHandler.handle(Future.succeededFuture(new WriteResult()));
+        return;
+      }
+      getDataStore().getStoreObjectFactory().createStoreObjects(getMapper(), getObjectsToSave(), stoResult -> {
+        if (stoResult.failed()) {
+          resultHandler.handle(Future.failedFuture(stoResult.cause()));
+          return;
+        }
+        save(stoResult.result(), resultHandler);
+      });
 
     });
   }
 
-  private void doSave(AsyncResult<SQLConnection> cr, Handler<AsyncResult<IWriteResult>> resultHandler) {
-    if (cr.failed()) {
-      resultHandler.handle(Future.failedFuture(cr.cause()));
-      return;
-    } else {
-      WriteResult rr = new WriteResult();
-      if (getObjectsToSave().isEmpty()) {
-        resultHandler.handle(Future.succeededFuture(rr));
+  private void save(List<IStoreObject<?>> storeObjects, Handler<AsyncResult<IWriteResult>> resultHandler) {
+    CounterObject co = new CounterObject(storeObjects.size());
+    ErrorObject<IWriteResult> err = new ErrorObject<>(resultHandler);
+    WriteResult rr = new WriteResult();
+    for (IStoreObject<?> sto : storeObjects) {
+      saveStoreObject((SqlStoreObject) sto, rr, saveResult -> {
+        if (saveResult.failed()) {
+          err.setThrowable(saveResult.cause());
+          return;
+        }
+
+        if (co.reduce()) {
+          resultHandler.handle(Future.succeededFuture(rr));
+          return;
+        }
+
+      });
+      if (err.isError())
+        return;
+    }
+  }
+
+  /**
+   * execute the action to store ONE instance in mongo
+   * 
+   * @param storeObject
+   * @param resultHandler
+   */
+  private void saveStoreObject(SqlStoreObject storeObject, IWriteResult writeResult,
+      Handler<AsyncResult<Void>> resultHandler) {
+    Object currentId = storeObject.get(getMapper().getIdField());
+    LOGGER.info("now saving");
+
+    ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> {
+      if (cr.failed()) {
+        resultHandler.handle(Future.failedFuture(cr.cause()));
         return;
       }
       SQLConnection connection = cr.result();
-
-      ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>(resultHandler);
-      CounterObject counter = new CounterObject(getObjectsToSave().size());
-      LOGGER.info(String.format("saving %d entities", getObjectsToSave().size()));
-      for (T entity : getObjectsToSave()) {
-        LOGGER.info("saving entity");
-        saveEntity(entity, rr, connection, result -> {
-          if (result.failed()) {
-            ro.setThrowable(result.cause());
-            closeConnection(connection);
-          } else {
-            if (counter.reduce()) {
-              resultHandler.handle(Future.succeededFuture(rr));
-              closeConnection(connection);
-              return;
-            }
-          }
+      if (currentId == null) {
+        handleInsert(storeObject, writeResult, connection, ir -> {
+          closeConnection(connection);
+          resultHandler.handle(ir);
         });
-        if (ro.isError()) {
-          return;
-        }
+      } else {
+        resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+
       }
-    }
+
+    });
+
   }
 
   private void closeConnection(SQLConnection connection) {
@@ -108,23 +136,6 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     } catch (Exception e) {
       LOGGER.warn("Error in closing connection", e);
     }
-  }
-
-  private void saveEntity(T entity, IWriteResult writeResult, SQLConnection connection,
-      Handler<AsyncResult<Void>> resultHandler) {
-    getDataStore().getStoreObjectFactory().createStoreObject(getMapper(), entity, result -> {
-      if (result.failed()) {
-        resultHandler.handle(Future.failedFuture(result.cause()));
-      } else {
-        doSaveEntity(entity, (SqlStoreObject) result.result(), writeResult, connection, sResult -> {
-          if (sResult.failed()) {
-            resultHandler.handle(Future.failedFuture(sResult.cause()));
-          } else {
-            resultHandler.handle(Future.succeededFuture());
-          }
-        });
-      }
-    });
   }
 
   /**
@@ -189,8 +200,32 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       Handler<AsyncResult<Void>> resultHandler) {
     LOGGER.info("inserted record with id " + id);
     executePostSave((T) storeObject.getEntity());
+    setIdValue(id, storeObject, resultHandler);
     writeResult.addEntry(storeObject, id, WriteAction.INSERT);
     resultHandler.handle(Future.succeededFuture());
+  }
+
+  /**
+   * After inserting an instance, the id is placed into the entity. NOTE: this is still a hack, cause we are expecting
+   * the id field to be a String or numeric field, because of a potential switch from Mongo to MySql. Normally this
+   * should be handled by a special ITypeHandler, which can deal with changing types
+   * 
+   * @param id
+   * @param storeObject
+   */
+  private void setIdValue(Object id, SqlStoreObject storeObject, Handler<AsyncResult<Void>> resultHandler) {
+    IField idField = getMapper().getIdField();
+    Class fieldClass = idField.getType();
+    if (fieldClass.equals(Long.class)) {
+      if (id instanceof String)
+        id = Long.parseLong((String) id);
+    } else if (fieldClass.equals(String.class)) {
+      if (id instanceof Long)
+        id = String.valueOf(id);
+    } else
+      resultHandler.handle(Future
+          .failedFuture(new UnsupportedOperationException("unsupported type for id field: " + fieldClass.getName())));
+    idField.getPropertyAccessor().writeData(storeObject.getEntity(), id);
   }
 
   /*

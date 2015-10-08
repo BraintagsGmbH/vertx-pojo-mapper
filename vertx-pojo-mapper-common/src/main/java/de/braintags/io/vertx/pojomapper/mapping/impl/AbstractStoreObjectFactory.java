@@ -49,7 +49,7 @@ public abstract class AbstractStoreObjectFactory implements IStoreObjectFactory 
    * mapping.IMapper, java.util.List, io.vertx.core.Handler)
    */
   @Override
-  public void createStoreObjects(IMapper mapper, List<Object> entities,
+  public void createStoreObjects(IMapper mapper, List<?> entities,
       Handler<AsyncResult<List<IStoreObject<?>>>> handler) {
     ErrorObject<List<IStoreObject<?>>> err = new ErrorObject<List<IStoreObject<?>>>(handler);
     CounterObject co = new CounterObject(entities.size());

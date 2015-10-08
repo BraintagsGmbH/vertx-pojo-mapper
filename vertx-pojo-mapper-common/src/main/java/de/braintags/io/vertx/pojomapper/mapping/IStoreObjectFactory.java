@@ -51,8 +51,7 @@ public interface IStoreObjectFactory {
    * @param handler
    *          the handler to be recalled
    */
-  public void createStoreObjects(IMapper mapper, List<Object> entities,
-      Handler<AsyncResult<List<IStoreObject<?>>>> handler);
+  public void createStoreObjects(IMapper mapper, List<?> entities, Handler<AsyncResult<List<IStoreObject<?>>>> handler);
 
   /**
    * Creates a new instance of {@link IStoreObject} by using the information from the given stored object from the
