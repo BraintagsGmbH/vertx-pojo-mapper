@@ -13,7 +13,6 @@
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 
 /**
  * Translates the logic defintions into a propriate expression
@@ -31,10 +30,10 @@ public class QueryLogicTranslator {
   }
 
   /**
-   * Translate the {@link QueryOperator} into the String expression fitting for sql
+   * Translate the {@link QueryLogic} into the String expression fitting for sql
    * 
-   * @param op
-   *          the operator
+   * @param logic
+   *          the logic
    * @return the suitable expression
    */
   public static String translate(QueryLogic logic) {

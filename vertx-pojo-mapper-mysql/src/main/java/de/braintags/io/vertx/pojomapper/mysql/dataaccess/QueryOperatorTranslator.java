@@ -33,7 +33,8 @@ public class QueryOperatorTranslator {
    * Translate the given {@link QueryOperator} into an expression fitting for sql
    * 
    * @param op
-   * @return
+   *          the {@link QueryOperator} to be translated
+   * @return a suitable String expression
    */
   public static String translate(QueryOperator op) {
     switch (op) {

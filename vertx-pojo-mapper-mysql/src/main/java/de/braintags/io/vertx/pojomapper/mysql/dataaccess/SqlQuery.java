@@ -57,15 +57,12 @@ public class SqlQuery<T> extends Query<T> {
               resultHandler.handle(Future.failedFuture(result.cause()));
               return;
             }
-
             doFind(result.result(), resultHandler);
-
           });
         } catch (Exception e) {
           Future<IQueryResult<T>> future = Future.failedFuture(e);
           resultHandler.handle(future);
         }
-
       }
     });
   }

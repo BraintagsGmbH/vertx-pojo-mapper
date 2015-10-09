@@ -43,6 +43,9 @@ import io.vertx.ext.mongo.MongoClient;
  */
 
 public class MongoQueryRambler implements IQueryRambler {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(MongoQueryRambler.class);
+
   private JsonObject qDef = new JsonObject();
   private Object currentObject = qDef;
   private Deque<Object> deque = new ArrayDeque<>();
@@ -74,6 +77,7 @@ public class MongoQueryRambler implements IQueryRambler {
   @Override
   public void stop(IQuery<?> query) {
     // no use for Mongo
+    LOGGER.info(qDef.toString());
   }
 
   /*
@@ -156,7 +160,6 @@ public class MongoQueryRambler implements IQueryRambler {
     ErrorObject<Void> errorObject = new ErrorObject<Void>(resultHandler);
     JsonArray resultArray = new JsonArray();
 
-    // TODO check the loop handling here!! see below
     while (values.hasNext() && !errorObject.isError()) {
       Object value = values.next();
       field.getTypeHandler().intoStore(value, field, result -> {

@@ -107,8 +107,6 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   private void saveStoreObject(SqlStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     Object currentId = storeObject.get(getMapper().getIdField());
-    LOGGER.info("now saving");
-
     ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> {
       if (cr.failed()) {
         resultHandler.handle(Future.failedFuture(cr.cause()));
@@ -138,29 +136,9 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     }
   }
 
-  /**
-   * execute the action to store ONE instance in mongo
-   * 
-   * @param storeObject
-   * @param resultHandler
-   */
-  private void doSaveEntity(T entity, SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
-      Handler<AsyncResult<Void>> resultHandler) {
-    Object currentId = storeObject.get(getMapper().getIdField());
-    LOGGER.info("now saving");
-
-    if (currentId == null) {
-      handleInsert(storeObject, writeResult, connection, resultHandler);
-    } else {
-      resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
-
-    }
-  }
-
   private void handleInsert(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlInsertStatement();
-    LOGGER.info("inserting: " + storeObject.toString());
     connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), updateResult -> {
       if (updateResult.failed()) {
         resultHandler.handle(Future.failedFuture(updateResult.cause()));
@@ -198,7 +176,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   private void finishInsert(SqlStoreObject storeObject, IWriteResult writeResult, Object id,
       Handler<AsyncResult<Void>> resultHandler) {
-    LOGGER.info("inserted record with id " + id);
+    LOGGER.debug("inserted record with id " + id);
     executePostSave((T) storeObject.getEntity());
     setIdValue(id, storeObject, resultHandler);
     writeResult.addEntry(storeObject, id, WriteAction.INSERT);

@@ -27,7 +27,6 @@ import io.vertx.ext.sql.ResultSet;
  * @author Michael Remme
  * 
  */
-
 public class SqlQueryResult<T> extends AbstractCollectionAsync<T>implements IQueryResult<T> {
   private ResultSet resultSet;
   private MySqlDataStore datastore;
@@ -35,7 +34,16 @@ public class SqlQueryResult<T> extends AbstractCollectionAsync<T>implements IQue
   private IMapper mapper;
 
   /**
+   * Creates a lazy loading instance
    * 
+   * @param resultSet
+   *          The {@link ResultSet} of an executed query
+   * @param store
+   *          the store which was used to execute the query
+   * @param mapper
+   *          the underlaying mapper
+   * @param query
+   *          the {@link SqlQueryRambler}
    */
   public SqlQueryResult(ResultSet resultSet, MySqlDataStore store, IMapper mapper, SqlQueryRambler query) {
     this.resultSet = resultSet;

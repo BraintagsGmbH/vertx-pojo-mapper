@@ -43,6 +43,9 @@ import io.vertx.core.json.JsonObject;
  */
 
 public class SqlQueryRambler implements IQueryRambler {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(SqlQueryRambler.class);
+
   private JsonObject qDef = new JsonObject();
   private Object currentObject = qDef;
   private Deque<Object> deque = new ArrayDeque<>();
@@ -149,13 +152,16 @@ public class SqlQueryRambler implements IQueryRambler {
           .handle(Future.failedFuture(new QueryParameterException("multivalued argument but no values defined")));
       return;
     }
+    iterateMultipleValues(field, ci, operator, count, (Iterable<?>) valueIterable, resultHandler);
+  }
 
+  private void iterateMultipleValues(IField field, IColumnInfo ci, String operator, int count,
+      Iterable<?> valueIterable, Handler<AsyncResult<Void>> resultHandler) {
     CounterObject co = new CounterObject(count);
-    Iterator<?> values = ((Iterable<?>) valueIterable).iterator();
+    Iterator<?> values = valueIterable.iterator();
     ErrorObject<Void> errorObject = new ErrorObject<Void>(resultHandler);
     JsonArray resultArray = new JsonArray();
 
-    // TODO check the loop handling here!! see below
     while (values.hasNext() && !errorObject.isError()) {
       Object value = values.next();
       field.getTypeHandler().intoStore(value, field, result -> {
@@ -255,9 +261,32 @@ public class SqlQueryRambler implements IQueryRambler {
     return !parameter.isEmpty();
   }
 
+  // {"name":{"=":"looper"}}
+  // {"name":{"$eq":"Dublette"},"secondProperty":{"$eq":"erste"}}
+  // {"$and":[{"name":{"$eq":"Dublette"}},{"secondProperty":{"$eq":"erste"}}]}
+  // {"secondProperty":{"$nin":["erste","zweite"]}}
+  // {"$and":[{"name":{"$eq":"AndOr"}},{"$or":[{"secondProperty":{"$eq":"AndOr 1"}},{"secondProperty":{"$eq":"AndOr
+  // 2"}}]}]}
+
+  private static final String SELECT_STATEMENT = "SELECT * from %s";
+
   private void checkStatement() {
+    LOGGER.info(qDef.toString());
     if (statement == null) {
+
       throw new UnsupportedOperationException();
     }
+  }
+
+  private String handleQdef() {
+    qDef.iterator()
+
+  }
+
+  public static void main(String[] args) {
+    SqlQueryRambler rambler = new SqlQueryRambler();
+    rambler.qDef = new JsonObject("{\"name\":{\"=\":\"looper\"}}");
+    System.out.println(rambler.handleQdef());
+
   }
 }
