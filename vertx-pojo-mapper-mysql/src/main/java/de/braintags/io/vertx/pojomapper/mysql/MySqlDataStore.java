@@ -21,6 +21,7 @@ import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
+import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQuery;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlWrite;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlDataStoreSynchronizer;
@@ -59,7 +60,7 @@ public class MySqlDataStore extends AbstractDataStore {
    */
   @Override
   public <T> IQuery<T> createQuery(Class<T> mapper) {
-    throw new UnsupportedOperationException();
+    return new SqlQuery<>(mapper, this);
   }
 
   /*

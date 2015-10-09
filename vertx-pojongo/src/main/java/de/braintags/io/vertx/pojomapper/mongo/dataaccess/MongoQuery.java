@@ -67,7 +67,7 @@ public class MongoQuery<T> extends Query<T> {
    */
   @Override
   public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    throw new UnsupportedOperationException("Not implemented yet");
+    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException("Not implemented yet")));
   }
 
   @Override

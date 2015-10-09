@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
+package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 
@@ -30,7 +30,7 @@ public class QueryOperatorTranslator {
   }
 
   /**
-   * Translate the given {@link QueryOperator} into an expression fitting for Mongo
+   * Translate the given {@link QueryOperator} into an expression fitting for sql
    * 
    * @param op
    * @return
@@ -38,21 +38,21 @@ public class QueryOperatorTranslator {
   public static String translate(QueryOperator op) {
     switch (op) {
     case EQUALS:
-      return "$eq";
+      return "=";
     case NOT_EQUALS:
-      return "$ne";
+      return "!=";
     case LARGER:
-      return "$gt";
+      return ">";
     case LARGER_EQUAL:
-      return "$gte";
+      return ">=";
     case SMALLER:
-      return "$lt";
+      return "<";
     case SMALLER_EQUAL:
-      return "$lte";
+      return "<=";
     case IN:
-      return "$in";
+      return "IN";
     case NOT_IN:
-      return "$nin";
+      return "NOT IN";
 
     default:
       throw new UnsupportedOperationException("No translator for " + op);

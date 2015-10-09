@@ -10,7 +10,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
+
+package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -23,6 +24,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.exception.QueryParameterException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
@@ -32,55 +34,51 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.mongo.MongoClient;
 
 /**
- * Implementation fills the contents into a {@link JsonObject} which then can be used as source for
- * {@link MongoClient#find(String, JsonObject, io.vertx.core.Handler)}
+ * FIrst creates a query tree as JsonObject and then from the JsonObject the statement
  * 
  * @author Michael Remme
  * 
  */
 
-public class MongoQueryRambler implements IQueryRambler {
+public class SqlQueryRambler implements IQueryRambler {
   private JsonObject qDef = new JsonObject();
   private Object currentObject = qDef;
   private Deque<Object> deque = new ArrayDeque<>();
-
-  /**
-   * @return the jsonObject
-   */
-  public JsonObject getJsonObject() {
-    return qDef;
-  }
+  private IMapper mapper;
+  private StringBuilder statement = null;
+  private JsonArray parameter = new JsonArray();
 
   /*
    * (non-Javadoc)
    * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#start(de.braintags.io.vertx.pojomapper.
-   * dataaccess .query.IQuery)
+   * dataaccess.query.IQuery)
    */
   @Override
   public void start(IQuery<?> query) {
-    // no use for Mongo
+    if (mapper != null)
+      throw new UnsupportedOperationException("sub query not implemented yet");
+    mapper = query.getMapper();
   }
 
   /*
    * (non-Javadoc)
    * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.
-   * dataaccess .query.IQuery)
+   * dataaccess.query.IQuery)
    */
   @Override
   public void stop(IQuery<?> query) {
-    // no use for Mongo
+    // nothing to do here
   }
 
   /*
    * (non-Javadoc)
    * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#start(de.braintags.io.vertx.pojomapper.
-   * dataaccess .query.ILogicContainer)
+   * dataaccess.query.ILogicContainer)
    */
   @Override
   public void start(ILogicContainer<?> container) {
@@ -95,7 +93,7 @@ public class MongoQueryRambler implements IQueryRambler {
    * (non-Javadoc)
    * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.
-   * dataaccess .query.ILogicContainer)
+   * dataaccess.query.ILogicContainer)
    */
   @Override
   public void stop(ILogicContainer<?> container) {
@@ -106,7 +104,7 @@ public class MongoQueryRambler implements IQueryRambler {
    * (non-Javadoc)
    * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#start(de.braintags.io.vertx.pojomapper.
-   * dataaccess .query.IFieldParameter)
+   * dataaccess.query.IFieldParameter, io.vertx.core.Handler)
    */
   @Override
   public void start(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
@@ -120,6 +118,7 @@ public class MongoQueryRambler implements IQueryRambler {
     default:
       handleSingleValue(fieldParameter, resultHandler);
     }
+
   }
 
   /**
@@ -137,7 +136,7 @@ public class MongoQueryRambler implements IQueryRambler {
       return;
     }
 
-    String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
+    String operator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
     Object valueIterable = fieldParameter.getValue();
     if (!(valueIterable instanceof Iterable)) {
       resultHandler.handle(
@@ -166,7 +165,7 @@ public class MongoQueryRambler implements IQueryRambler {
         } else {
           resultArray.add(result.result().getResult());
           if (co.reduce()) {
-            JsonObject arg = new JsonObject().put(mongoOperator, resultArray);
+            JsonObject arg = new JsonObject().put(operator, resultArray);
             String colName = ci.getName();
             add(colName, arg);
             resultHandler.handle(Future.succeededFuture());
@@ -190,7 +189,7 @@ public class MongoQueryRambler implements IQueryRambler {
           .handle(Future.failedFuture(new MappingException("Can't find columninfo for field " + field.getFullName())));
       return;
     }
-    String mongoOperator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
+    String operator = QueryOperatorTranslator.translate(fieldParameter.getOperator());
     Object value = fieldParameter.getValue();
 
     field.getTypeHandler().intoStore(value, field, result -> {
@@ -198,7 +197,7 @@ public class MongoQueryRambler implements IQueryRambler {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
         Object storeObject = result.result().getResult();
-        JsonObject arg = new JsonObject().put(mongoOperator, storeObject);
+        JsonObject arg = new JsonObject().put(operator, storeObject);
         add(ci.getName(), arg);
         resultHandler.handle(Future.succeededFuture());
       }
@@ -209,11 +208,11 @@ public class MongoQueryRambler implements IQueryRambler {
    * (non-Javadoc)
    * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.
-   * dataaccess .query.IFieldParameter)
+   * dataaccess.query.IFieldParameter)
    */
   @Override
   public void stop(IFieldParameter<?> fieldParameter) {
-    // no use for Mongo
+    // nothing to do here
   }
 
   private void add(String key, Object objectToAdd) {
@@ -226,4 +225,39 @@ public class MongoQueryRambler implements IQueryRambler {
       throw new UnsupportedOperationException("no definition to add for " + currentObject.getClass().getName());
   }
 
+  /**
+   * Get the sql statement
+   * 
+   * @return
+   */
+  public String getQueryStatement() {
+    checkStatement();
+    return statement.toString();
+  }
+
+  /**
+   * Get the possible parameters of the query
+   * 
+   * @return a {@link JsonArray} with query parameters or empty JsonArray, if none
+   */
+  public JsonArray getQueryParameters() {
+    checkStatement();
+    return parameter;
+  }
+
+  /**
+   * Returns true, if paramters exist
+   * 
+   * @return
+   */
+  public boolean hasQueryParameters() {
+    checkStatement();
+    return !parameter.isEmpty();
+  }
+
+  private void checkStatement() {
+    if (statement == null) {
+      throw new UnsupportedOperationException();
+    }
+  }
 }

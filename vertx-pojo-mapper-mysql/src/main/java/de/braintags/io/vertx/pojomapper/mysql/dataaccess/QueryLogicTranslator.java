@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
+package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
@@ -31,7 +31,7 @@ public class QueryLogicTranslator {
   }
 
   /**
-   * Translate the {@link QueryOperator} into the String expression fitting for Mongo
+   * Translate the {@link QueryOperator} into the String expression fitting for sql
    * 
    * @param op
    *          the operator
@@ -40,9 +40,9 @@ public class QueryLogicTranslator {
   public static String translate(QueryLogic logic) {
     switch (logic) {
     case AND:
-      return "$and";
+      return "AND";
     case OR:
-      return "$or";
+      return "OR";
 
     default:
       throw new UnsupportedOperationException("No translator for " + logic);
