@@ -12,9 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper;
 
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-
 import java.util.Arrays;
 
 import org.junit.Before;
@@ -26,6 +23,8 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.LogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.impl.DummyDataStore;
 import de.braintags.io.vertx.pojomapper.mapper.Person;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 public class TestQuery {
   private static Logger logger = LoggerFactory.getLogger(TestQuery.class);

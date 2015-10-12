@@ -28,7 +28,8 @@ import de.braintags.io.vertx.pojomapper.datastoretest.TestSimpleInsert;
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ AllTestsPojoJson.class, TestTableInfo.class, TestBaseTest.class, TestSimpleInsert.class })
+@SuiteClasses({ AllTestsPojoJson.class, TestTableInfo.class, TestSqlQueryRambler.class, TestBaseTest.class,
+    TestSimpleInsert.class })
 public class AllTestsMySql {
   // -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer
   /**

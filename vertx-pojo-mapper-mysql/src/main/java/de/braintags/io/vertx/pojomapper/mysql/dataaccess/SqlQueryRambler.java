@@ -16,6 +16,7 @@ package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.Map.Entry;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
@@ -50,7 +51,7 @@ public class SqlQueryRambler implements IQueryRambler {
   private Object currentObject = qDef;
   private Deque<Object> deque = new ArrayDeque<>();
   private IMapper mapper;
-  private StringBuilder statement = null;
+  private SqlExpression statement = null;
   private JsonArray parameter = new JsonArray();
 
   /*
@@ -261,32 +262,67 @@ public class SqlQueryRambler implements IQueryRambler {
     return !parameter.isEmpty();
   }
 
-  // {"name":{"=":"looper"}}
-  // {"name":{"$eq":"Dublette"},"secondProperty":{"$eq":"erste"}}
-  // {"$and":[{"name":{"$eq":"Dublette"}},{"secondProperty":{"$eq":"erste"}}]}
-  // {"secondProperty":{"$nin":["erste","zweite"]}}
-  // {"$and":[{"name":{"$eq":"AndOr"}},{"$or":[{"secondProperty":{"$eq":"AndOr 1"}},{"secondProperty":{"$eq":"AndOr
-  // 2"}}]}]}
-
   private static final String SELECT_STATEMENT = "SELECT * from %s";
 
   private void checkStatement() {
     LOGGER.info(qDef.toString());
     if (statement == null) {
-
-      throw new UnsupportedOperationException();
+      statement = new SqlExpression();
+      statement.addSelect(String.format(SELECT_STATEMENT, mapper.getTableInfo().getName()));
+      handleQdef();
     }
   }
 
-  private String handleQdef() {
-    qDef.iterator()
-
+  private void handleQdef() {
+    Iterator<Entry<String, Object>> it = qDef.iterator();
+    while (it.hasNext()) {
+      Entry<String, Object> entry = it.next();
+      handleEntry(entry.getKey(), entry.getValue());
+    }
   }
 
-  public static void main(String[] args) {
-    SqlQueryRambler rambler = new SqlQueryRambler();
-    rambler.qDef = new JsonObject("{\"name\":{\"=\":\"looper\"}}");
-    System.out.println(rambler.handleQdef());
-
+  private void handleEntry(String key, Object value) {
+    if (value instanceof JsonArray) {
+      handleJsonArray(key, (JsonArray) value);
+    } else if (value instanceof JsonObject) {
+      handleJsonObject(key, (JsonObject) value);
+    } else {
+      throw new UnsupportedOperationException("unsupported instance: " + value.getClass().getName());
+    }
   }
+
+  private void handleJsonObject(String fieldName, JsonObject object) {
+    Iterator<Entry<String, Object>> it = qDef.iterator();
+    while (it.hasNext()) {
+      Entry<String, Object> entry = it.next();
+      String logic = entry.getKey();
+      Object value = entry.getValue();
+      statement.addQuery(fieldName, logic, value);
+    }
+  }
+
+  private void handleAndOr(String logic, JsonArray array) {
+    statement.startConnectorBlock(logic);
+    Iterator<?> contents = array.iterator();
+    while (contents.hasNext()) {
+      Object entry = contents.next();
+      if (entry instanceof JsonObject) {
+        throw new UnsupportedOperationException();
+      }
+    }
+
+    statement.stopConnectorBlock();
+  }
+
+  private void handleJsonArray(String key, JsonArray array) {
+    if (key.equals("AND") || key.equals("OR")) {
+      handleAndOr(key, array);
+    } else if (key.equals("IN")) {
+      throw new UnsupportedOperationException("unsupported key for array handling: " + key);
+    } else if (key.equals("NOT IN")) {
+      throw new UnsupportedOperationException("unsupported key for array handling: " + key);
+    } else
+      throw new UnsupportedOperationException("unsupported key for array handling: " + key);
+  }
+
 }
