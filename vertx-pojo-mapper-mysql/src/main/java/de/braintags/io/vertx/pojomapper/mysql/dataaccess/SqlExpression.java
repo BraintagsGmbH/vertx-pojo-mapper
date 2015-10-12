@@ -36,6 +36,7 @@ public class SqlExpression {
    * 
    */
   public SqlExpression() {
+    connectorDeque.addLast(new Connector("AND"));
   }
 
   /**
@@ -80,9 +81,18 @@ public class SqlExpression {
     Connector conn = connectorDeque.getLast();
     if (conn.arguments > 0)
       whereClause.append(" ").append(conn.connector);
-    whereClause.append(" ").append(fieldName).append(logic).append(" ?");
+    whereClause.append(" ").append(fieldName).append(" ").append(logic).append(" ?");
     parameters.add(value);
     conn.arguments++;
+  }
+
+  /**
+   * Get the information, whether the query has parameters
+   * 
+   * @return true, if query has parameters
+   */
+  public boolean hasQueryParameters() {
+    return parameters != null && !parameters.isEmpty();
   }
 
   /**
@@ -102,7 +112,7 @@ public class SqlExpression {
   public String getCompleteExpression() {
     StringBuilder complete = new StringBuilder(select);
     if (whereClause.length() > 0)
-      complete.append(" WHERE ").append(whereClause);
+      complete.append(" WHERE").append(whereClause);
     return complete.toString();
   }
 

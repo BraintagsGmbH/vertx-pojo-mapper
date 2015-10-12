@@ -13,10 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Iterator;
-import java.util.Map.Entry;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
@@ -34,7 +31,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 
 /**
  * FIrst creates a query tree as JsonObject and then from the JsonObject the statement
@@ -46,13 +42,9 @@ import io.vertx.core.json.JsonObject;
 public class SqlQueryRambler implements IQueryRambler {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(SqlQueryRambler.class);
-
-  private JsonObject qDef = new JsonObject();
-  private Object currentObject = qDef;
-  private Deque<Object> deque = new ArrayDeque<>();
+  private static final String SELECT_STATEMENT = "SELECT * from %s";
   private IMapper mapper;
-  private SqlExpression statement = null;
-  private JsonArray parameter = new JsonArray();
+  private SqlExpression statement = new SqlExpression();
 
   /*
    * (non-Javadoc)
@@ -65,6 +57,7 @@ public class SqlQueryRambler implements IQueryRambler {
     if (mapper != null)
       throw new UnsupportedOperationException("sub query not implemented yet");
     mapper = query.getMapper();
+    statement.addSelect(String.format(SELECT_STATEMENT, mapper.getTableInfo().getName()));
   }
 
   /*
@@ -87,10 +80,7 @@ public class SqlQueryRambler implements IQueryRambler {
   @Override
   public void start(ILogicContainer<?> container) {
     String logic = QueryLogicTranslator.translate(container.getLogic());
-    JsonArray array = new JsonArray();
-    add(logic, array);
-    deque.addLast(currentObject);
-    currentObject = array;
+    statement.startConnectorBlock(logic);
   }
 
   /*
@@ -101,7 +91,7 @@ public class SqlQueryRambler implements IQueryRambler {
    */
   @Override
   public void stop(ILogicContainer<?> container) {
-    currentObject = deque.pollLast();
+    statement.stopConnectorBlock();
   }
 
   /*
@@ -172,9 +162,8 @@ public class SqlQueryRambler implements IQueryRambler {
         } else {
           resultArray.add(result.result().getResult());
           if (co.reduce()) {
-            JsonObject arg = new JsonObject().put(operator, resultArray);
             String colName = ci.getName();
-            add(colName, arg);
+            add(colName, operator, resultArray);
             resultHandler.handle(Future.succeededFuture());
           }
         }
@@ -204,8 +193,7 @@ public class SqlQueryRambler implements IQueryRambler {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
         Object storeObject = result.result().getResult();
-        JsonObject arg = new JsonObject().put(operator, storeObject);
-        add(ci.getName(), arg);
+        add(ci.getName(), operator, storeObject);
         resultHandler.handle(Future.succeededFuture());
       }
     });
@@ -222,107 +210,17 @@ public class SqlQueryRambler implements IQueryRambler {
     // nothing to do here
   }
 
-  private void add(String key, Object objectToAdd) {
-    if (currentObject instanceof JsonObject) {
-      ((JsonObject) currentObject).put(key, objectToAdd);
-    } else if (currentObject instanceof JsonArray) {
-      JsonObject ob = new JsonObject().put(key, objectToAdd);
-      ((JsonArray) currentObject).add(ob);
-    } else
-      throw new UnsupportedOperationException("no definition to add for " + currentObject.getClass().getName());
+  private void add(String colName, String operator, Object objectToAdd) {
+    statement.addQuery(colName, operator, objectToAdd);
   }
 
   /**
    * Get the sql statement
    * 
-   * @return
+   * @return the generated {@link SqlExpression}
    */
-  public String getQueryStatement() {
-    checkStatement();
-    return statement.toString();
-  }
-
-  /**
-   * Get the possible parameters of the query
-   * 
-   * @return a {@link JsonArray} with query parameters or empty JsonArray, if none
-   */
-  public JsonArray getQueryParameters() {
-    checkStatement();
-    return parameter;
-  }
-
-  /**
-   * Returns true, if paramters exist
-   * 
-   * @return
-   */
-  public boolean hasQueryParameters() {
-    checkStatement();
-    return !parameter.isEmpty();
-  }
-
-  private static final String SELECT_STATEMENT = "SELECT * from %s";
-
-  private void checkStatement() {
-    LOGGER.info(qDef.toString());
-    if (statement == null) {
-      statement = new SqlExpression();
-      statement.addSelect(String.format(SELECT_STATEMENT, mapper.getTableInfo().getName()));
-      handleQdef();
-    }
-  }
-
-  private void handleQdef() {
-    Iterator<Entry<String, Object>> it = qDef.iterator();
-    while (it.hasNext()) {
-      Entry<String, Object> entry = it.next();
-      handleEntry(entry.getKey(), entry.getValue());
-    }
-  }
-
-  private void handleEntry(String key, Object value) {
-    if (value instanceof JsonArray) {
-      handleJsonArray(key, (JsonArray) value);
-    } else if (value instanceof JsonObject) {
-      handleJsonObject(key, (JsonObject) value);
-    } else {
-      throw new UnsupportedOperationException("unsupported instance: " + value.getClass().getName());
-    }
-  }
-
-  private void handleJsonObject(String fieldName, JsonObject object) {
-    Iterator<Entry<String, Object>> it = qDef.iterator();
-    while (it.hasNext()) {
-      Entry<String, Object> entry = it.next();
-      String logic = entry.getKey();
-      Object value = entry.getValue();
-      statement.addQuery(fieldName, logic, value);
-    }
-  }
-
-  private void handleAndOr(String logic, JsonArray array) {
-    statement.startConnectorBlock(logic);
-    Iterator<?> contents = array.iterator();
-    while (contents.hasNext()) {
-      Object entry = contents.next();
-      if (entry instanceof JsonObject) {
-        throw new UnsupportedOperationException();
-      }
-    }
-
-    statement.stopConnectorBlock();
-  }
-
-  private void handleJsonArray(String key, JsonArray array) {
-    if (key.equals("AND") || key.equals("OR")) {
-      handleAndOr(key, array);
-    } else if (key.equals("IN")) {
-      throw new UnsupportedOperationException("unsupported key for array handling: " + key);
-    } else if (key.equals("NOT IN")) {
-      throw new UnsupportedOperationException("unsupported key for array handling: " + key);
-    } else
-      throw new UnsupportedOperationException("unsupported key for array handling: " + key);
+  public SqlExpression getSqlStatement() {
+    return statement;
   }
 
 }

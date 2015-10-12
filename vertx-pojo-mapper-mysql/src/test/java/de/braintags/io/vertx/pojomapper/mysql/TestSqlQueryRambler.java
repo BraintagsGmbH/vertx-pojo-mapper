@@ -18,7 +18,7 @@ import java.util.concurrent.CountDownLatch;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.mapper.MiniMapper;
+import de.braintags.io.vertx.pojomapper.datastoretest.mapper.RamblerMapper;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQuery;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQueryRambler;
 import io.vertx.core.VertxOptions;
@@ -43,22 +43,50 @@ public class TestSqlQueryRambler extends DatastoreBaseTest {
     return options;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest#setUp()
+   */
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
+    getDataStore().createQuery(RamblerMapper.class).execute(rh -> {
+
+    });
+  }
+
   @Test
-  public void simpleEquals() {
-    CountDownLatch latch = new CountDownLatch(1);
-    SqlQuery<MiniMapper> query = (SqlQuery<MiniMapper>) getDataStore().createQuery(MiniMapper.class);
+  public void test_1() {
+    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
     query.field("name").is("name to find");
+    executeRambler(query, 1);
+  }
+
+  @Test
+  public void test_2() {
+    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
+    query.field("name").is("name to find").field("name").isNot("unknown");
+    executeRambler(query, 2);
+  }
+
+  private void executeRambler(SqlQuery<?> query, int expectedParameters) {
+    CountDownLatch latch = new CountDownLatch(1);
     SqlQueryRambler rambler = new SqlQueryRambler();
     query.executeQueryRambler(rambler, result -> {
       if (result.failed()) {
         LOGGER.error("", result.cause());
         latch.countDown();
       } else {
-        String statement = rambler.getQueryStatement();
-        JsonArray parameter = rambler.getQueryParameters();
+        String statement = rambler.getSqlStatement().getCompleteExpression();
+        JsonArray parameter = rambler.getSqlStatement().getParameters();
         LOGGER.info(statement);
         LOGGER.info(parameter);
-        latch.countDown();
+        try {
+          assertEquals(expectedParameters, rambler.getSqlStatement().getParameters().size());
+        } finally {
+          latch.countDown();
+        }
       }
     });
 
@@ -69,7 +97,6 @@ public class TestSqlQueryRambler extends DatastoreBaseTest {
     } finally {
       testComplete();
     }
-
   }
 
 }

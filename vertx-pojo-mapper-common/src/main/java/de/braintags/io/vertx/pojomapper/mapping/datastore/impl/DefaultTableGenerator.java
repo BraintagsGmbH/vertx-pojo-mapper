@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
@@ -61,9 +62,8 @@ public class DefaultTableGenerator implements ITableGenerator {
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator#getColumnHandler(de.braintags.io.vertx.pojomapper
-   * .mapping.IField)
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator#getColumnHandler(de.braintags.io.vertx.
+   * pojomapper .mapping.IField)
    */
   @Override
   public IColumnHandler getColumnHandler(IField field) {
@@ -73,6 +73,8 @@ public class DefaultTableGenerator implements ITableGenerator {
     IColumnHandler handler = examineMatch(field);
     if (handler == null)
       handler = getDefaultColumnHandler();
+    if (handler == null)
+      throw new MappingException("Could not identfy a valid ColumnHandler for field " + field.getFullName());
     cachedColumnHandler.put(fieldClass, handler);
     return handler;
   }

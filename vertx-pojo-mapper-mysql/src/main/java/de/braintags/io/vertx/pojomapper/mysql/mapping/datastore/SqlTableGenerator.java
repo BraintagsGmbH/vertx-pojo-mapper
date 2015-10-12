@@ -17,6 +17,11 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableGenerator;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ByteColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.DoubleColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.IntegerColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.LongColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ShortColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.StringColumnHandler;
 
 /**
@@ -29,6 +34,11 @@ public class SqlTableGenerator extends DefaultTableGenerator {
 
   static {
     definedColumnHandlers.add(new StringColumnHandler());
+    definedColumnHandlers.add(new ByteColumnHandler());
+    definedColumnHandlers.add(new DoubleColumnHandler());
+    definedColumnHandlers.add(new IntegerColumnHandler());
+    definedColumnHandlers.add(new LongColumnHandler());
+    definedColumnHandlers.add(new ShortColumnHandler());
   }
 
   /**

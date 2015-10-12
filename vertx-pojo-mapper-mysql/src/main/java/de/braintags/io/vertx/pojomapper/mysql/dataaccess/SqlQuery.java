@@ -134,11 +134,13 @@ public class SqlQuery<T> extends Query<T> {
 
   private void executeQuery(SQLConnection connection, SqlQueryRambler query,
       Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    if (query.hasQueryParameters()) {
-      connection.queryWithParams(query.getQueryStatement(), query.getQueryParameters(),
+    SqlExpression statement = query.getSqlStatement();
+    if (statement.hasQueryParameters()) {
+      connection.queryWithParams(statement.getCompleteExpression(), statement.getParameters(),
           qRes -> handleQueryResult(qRes, connection, query, resultHandler));
     } else {
-      connection.query(query.getQueryStatement(), qRes -> handleQueryResult(qRes, connection, query, resultHandler));
+      connection.query(statement.getCompleteExpression(),
+          qRes -> handleQueryResult(qRes, connection, query, resultHandler));
     }
   }
 
