@@ -63,27 +63,51 @@ public class SqlExpression {
     return this;
   }
 
-  public SqlExpression startConnectorBlock(String logic) {
-    connectorDeque.addLast(new Connector(logic));
+  /**
+   * Start an AND / OR block
+   * 
+   * @param connector
+   *          the connector AND / OR
+   * @return the SqlExpression itself for fluent usage
+   */
+  public SqlExpression startConnectorBlock(String connector) {
+    connectorDeque.addLast(new Connector(connector));
     if (whereClause.length() > 0)
-      whereClause.append(logic);
+      whereClause.append(" ").append(connector);
     whereClause.append(" ( ");
     return this;
   }
 
+  /**
+   * Stop the current connector block
+   * 
+   * @return the SqlExpression itself for fluent usage
+   */
   public SqlExpression stopConnectorBlock() {
     whereClause.append(" ) ");
     connectorDeque.removeLast();
     return this;
   }
 
-  public void addQuery(String fieldName, String logic, Object value) {
+  /**
+   * add a query expression
+   * 
+   * @param fieldName
+   *          the name to search in
+   * @param logic
+   *          the logic
+   * @param value
+   *          the value
+   * @return the SqlExpression itself for fluent usage
+   */
+  public SqlExpression addQuery(String fieldName, String logic, Object value) {
     Connector conn = connectorDeque.getLast();
     if (conn.arguments > 0)
       whereClause.append(" ").append(conn.connector);
     whereClause.append(" ").append(fieldName).append(" ").append(logic).append(" ?");
     parameters.add(value);
     conn.arguments++;
+    return this;
   }
 
   /**

@@ -78,7 +78,7 @@ public class SqlQuery<T> extends Query<T> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
       } else {
-        throw new UnsupportedOperationException();
+        resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
 
       }
     });

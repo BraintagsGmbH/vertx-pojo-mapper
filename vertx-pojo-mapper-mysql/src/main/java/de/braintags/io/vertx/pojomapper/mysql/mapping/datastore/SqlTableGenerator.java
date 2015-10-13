@@ -13,6 +13,8 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore;
 
+import de.braintags.io.vertx.pojomapper.exception.MappingException;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
@@ -69,4 +71,14 @@ public class SqlTableGenerator extends DefaultTableGenerator {
     return new SqlTableInfo(mapper);
   }
 
+  /**
+   * The sql implementation does not allow NULL as return value here
+   */
+  @Override
+  public IColumnHandler getColumnHandler(IField field) {
+    IColumnHandler handler = super.getColumnHandler(field);
+    if (handler == null)
+      throw new MappingException("Could not identfy a valid ColumnHandler for field " + field.getFullName());
+    return handler;
+  }
 }

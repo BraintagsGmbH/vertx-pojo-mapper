@@ -12,13 +12,15 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import java.util.Arrays;
+
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * 
@@ -151,6 +153,26 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
         resultHandler.handle(Future.succeededFuture());
       }
     });
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#in(java.lang.Object[])
+   */
+  @Override
+  public T in(Object... values) {
+    return in(Arrays.asList(values));
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#notIn(java.lang.Object[])
+   */
+  @Override
+  public T notIn(Object... values) {
+    return notIn(Arrays.asList(values));
   }
 
 }

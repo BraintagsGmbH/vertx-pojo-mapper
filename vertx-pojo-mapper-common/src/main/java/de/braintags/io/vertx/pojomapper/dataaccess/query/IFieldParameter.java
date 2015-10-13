@@ -107,6 +107,15 @@ public interface IFieldParameter<T extends IQueryContainer> {
   T in(Iterable<?> value);
 
   /**
+   * Defines a query argument where the value is in the values in the given field
+   * 
+   * @param value
+   *          values to be checked as array
+   * @return the parent {@link IQueryContainer} to enable chaining of commands
+   */
+  T in(Object... values);
+
+  /**
    * Defines a query argument where the value is not in the values
    * 
    * @param value
@@ -114,5 +123,14 @@ public interface IFieldParameter<T extends IQueryContainer> {
    * @return the parent {@link IQueryContainer} to enable chaining of commands
    */
   T notIn(Iterable<?> value);
+
+  /**
+   * Defines a query argument where the value is not in the values
+   * 
+   * @param value
+   *          values to be checked as array
+   * @return the parent {@link IQueryContainer} to enable chaining of commands
+   */
+  T notIn(Object... values);
 
 }
