@@ -177,33 +177,31 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   private void finishInsert(SqlStoreObject storeObject, IWriteResult writeResult, Object id,
       Handler<AsyncResult<Void>> resultHandler) {
     LOGGER.debug("inserted record with id " + id);
-    executePostSave((T) storeObject.getEntity());
-    setIdValue(id, storeObject, resultHandler);
-    writeResult.addEntry(storeObject, id, WriteAction.INSERT);
-    resultHandler.handle(Future.succeededFuture());
+    try {
+      executePostSave((T) storeObject.getEntity());
+      setIdValue(id, storeObject, result -> {
+        if (result.failed()) {
+          resultHandler.handle(result);
+          return;
+        }
+        writeResult.addEntry(storeObject, id, WriteAction.INSERT);
+        resultHandler.handle(Future.succeededFuture());
+      });
+    } catch (Exception e) {
+      resultHandler.handle(Future.failedFuture(e));
+    }
   }
 
   /**
-   * After inserting an instance, the id is placed into the entity. NOTE: this is still a hack, cause we are expecting
-   * the id field to be a String or numeric field, because of a potential switch from Mongo to MySql. Normally this
-   * should be handled by a special ITypeHandler, which can deal with changing types
+   * After inserting an instance, the id is placed into the entity.
    * 
    * @param id
    * @param storeObject
    */
   private void setIdValue(Object id, SqlStoreObject storeObject, Handler<AsyncResult<Void>> resultHandler) {
     IField idField = getMapper().getIdField();
-    Class fieldClass = idField.getType();
-    if (fieldClass.equals(Long.class)) {
-      if (id instanceof String)
-        id = Long.parseLong((String) id);
-    } else if (fieldClass.equals(String.class)) {
-      if (id instanceof Long)
-        id = String.valueOf(id);
-    } else
-      resultHandler.handle(Future
-          .failedFuture(new UnsupportedOperationException("unsupported type for id field: " + fieldClass.getName())));
-    idField.getPropertyAccessor().writeData(storeObject.getEntity(), id);
+    storeObject.put(idField, id);
+    idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
   }
 
   /*

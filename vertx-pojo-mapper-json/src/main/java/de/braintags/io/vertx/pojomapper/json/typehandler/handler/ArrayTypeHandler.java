@@ -19,6 +19,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
@@ -39,8 +40,8 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
   /**
    * @param classesToDeal
    */
-  public ArrayTypeHandler() {
-    super();
+  public ArrayTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory);
   }
 
   /*

@@ -60,7 +60,8 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
           .put("password", password).put("database", database).put("port", 3306);
       mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
       datastore = new MySqlDataStore(mySQLClient, database);
-      handler.handle(Future.succeededFuture());
+      // handler.handle(Future.succeededFuture());
+      dropTables(handler);
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }
@@ -79,6 +80,12 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   @Override
   public void shutdown(Handler<AsyncResult<Void>> handler) {
     mySQLClient.close(handler);
+  }
+
+  @Override
+  public void dropTables(Handler<AsyncResult<Void>> handler) {
+
+    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
   }
 
 }

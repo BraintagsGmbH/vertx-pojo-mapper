@@ -27,6 +27,7 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeH
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.EnumTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.FloatTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.IdTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.LocaleTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectReferenceTypeHandler;
@@ -46,35 +47,37 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  */
 
 public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
-  private static final ITypeHandler defaultHandler = new ObjectTypeHandler();
-  private static final List<ITypeHandler> definedTypeHandlers = new ArrayList<ITypeHandler>();
-
-  static {
-    definedTypeHandlers.add(new FloatTypeHandler());
-    definedTypeHandlers.add(new DateTypeHandler());
-    definedTypeHandlers.add(new ShortTypeHandler());
-    definedTypeHandlers.add(new CalendarTypeHandler());
-    definedTypeHandlers.add(new BigDecimalTypeHandler());
-    definedTypeHandlers.add(new BigIntegerTypeHandler());
-    definedTypeHandlers.add(new CharSequenceTypeHandler());
-    definedTypeHandlers.add(new CharacterTypeHandler());
-    definedTypeHandlers.add(new ByteTypeHandler());
-    definedTypeHandlers.add(new URITypeHandler());
-    definedTypeHandlers.add(new URLTypeHandler());
-    definedTypeHandlers.add(new CollectionTypeHandler());
-    definedTypeHandlers.add(new ObjectReferenceTypeHandler());
-    definedTypeHandlers.add(new ClassTypeHandler());
-    definedTypeHandlers.add(new LocaleTypeHandler());
-    definedTypeHandlers.add(new EnumTypeHandler());
-    definedTypeHandlers.add(new MapTypeHandler());
-    definedTypeHandlers.add(new StringTypeHandler());
-    definedTypeHandlers.add(new ArrayTypeHandler());
-  }
+  private final ITypeHandler defaultHandler = new ObjectTypeHandler(this);
+  private final List<ITypeHandler> definedTypeHandlers = new ArrayList<ITypeHandler>();
 
   /**
    * 
    */
   public JsonTypeHandlerFactory() {
+    init();
+  }
+
+  private void init() {
+    definedTypeHandlers.add(new IdTypeHandler(this));
+    definedTypeHandlers.add(new FloatTypeHandler(this));
+    definedTypeHandlers.add(new DateTypeHandler(this));
+    definedTypeHandlers.add(new ShortTypeHandler(this));
+    definedTypeHandlers.add(new CalendarTypeHandler(this));
+    definedTypeHandlers.add(new BigDecimalTypeHandler(this));
+    definedTypeHandlers.add(new BigIntegerTypeHandler(this));
+    definedTypeHandlers.add(new CharSequenceTypeHandler(this));
+    definedTypeHandlers.add(new CharacterTypeHandler(this));
+    definedTypeHandlers.add(new ByteTypeHandler(this));
+    definedTypeHandlers.add(new URITypeHandler(this));
+    definedTypeHandlers.add(new URLTypeHandler(this));
+    definedTypeHandlers.add(new CollectionTypeHandler(this));
+    definedTypeHandlers.add(new ObjectReferenceTypeHandler(this));
+    definedTypeHandlers.add(new ClassTypeHandler(this));
+    definedTypeHandlers.add(new LocaleTypeHandler(this));
+    definedTypeHandlers.add(new EnumTypeHandler(this));
+    definedTypeHandlers.add(new MapTypeHandler(this));
+    definedTypeHandlers.add(new StringTypeHandler(this));
+    definedTypeHandlers.add(new ArrayTypeHandler(this));
   }
 
   /*

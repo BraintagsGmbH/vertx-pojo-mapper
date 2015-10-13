@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
+import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 import de.braintags.io.vertx.util.ClassUtil;
@@ -32,9 +33,11 @@ import io.vertx.core.Handler;
  */
 
 public abstract class AbstractTypeHandler implements ITypeHandler {
-  private final List<Class<?>> classesToHandle;
+  private List<Class<?>> classesToHandle;
+  private ITypeHandlerFactory typeHandlerFactory;
 
-  public AbstractTypeHandler(Class<?>... classesToDeal) {
+  public AbstractTypeHandler(ITypeHandlerFactory typeHandlerFactory, Class<?>... classesToDeal) {
+    this.typeHandlerFactory = typeHandlerFactory;
     classesToHandle = Arrays.asList(classesToDeal);
   }
 
@@ -113,5 +116,23 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
   protected void fail(Throwable thr, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     Future<ITypeHandlerResult> future = Future.failedFuture(thr);
     resultHandler.handle(future);
+  }
+
+  @Override
+  public final ITypeHandlerFactory getTypeHandlerFactory() {
+    return typeHandlerFactory;
+  }
+
+  @Override
+  public Object clone() {
+    try {
+      @SuppressWarnings("rawtypes")
+      Constructor con = ClassUtil.getConstructor(getClass(), ITypeHandlerFactory.class);
+      return con.newInstance(typeHandlerFactory);
+    } catch (Exception e) {
+      throw new TypeHandlerException(
+          "Constructor not existing with parameter ITypeHandlerFactory.class. Implement this constructor or override method clone in class "
+              + getClass().getName());
+    }
   }
 }

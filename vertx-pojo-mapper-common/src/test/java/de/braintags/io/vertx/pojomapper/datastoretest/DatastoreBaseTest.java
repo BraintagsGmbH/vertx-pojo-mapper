@@ -195,8 +195,8 @@ public class DatastoreBaseTest extends VertxTestBase {
         resultContainer.queryResult = result.result();
         checkQueryResult(result, expectedResult);
 
-        assertEquals(expectedResult, resultContainer.queryResult.size());
         logger.info(resultContainer.queryResult.getOriginalQuery());
+        assertEquals(expectedResult, resultContainer.queryResult.size());
 
       } catch (AssertionError e) {
         resultContainer.assertionError = e;

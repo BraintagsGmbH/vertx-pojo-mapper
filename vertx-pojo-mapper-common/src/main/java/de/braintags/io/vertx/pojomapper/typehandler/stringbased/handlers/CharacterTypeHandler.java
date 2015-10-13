@@ -12,11 +12,12 @@
  */
 package de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * 
@@ -30,8 +31,8 @@ public class CharacterTypeHandler extends AbstractTypeHandler {
   /**
    * @param classesToDeal
    */
-  public CharacterTypeHandler() {
-    super(char.class, Character.class);
+  public CharacterTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory, char.class, Character.class);
   }
 
   /*

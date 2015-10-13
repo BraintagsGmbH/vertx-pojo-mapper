@@ -12,11 +12,12 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * 
@@ -31,8 +32,8 @@ public class ObjectTypeHandler extends AbstractTypeHandler {
   /**
    * 
    */
-  public ObjectTypeHandler() {
-    super(handleClass);
+  public ObjectTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory, handleClass);
   }
 
   /*

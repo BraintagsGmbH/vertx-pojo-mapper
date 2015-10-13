@@ -28,18 +28,19 @@ import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ObjectT
  */
 
 public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
-  private static final ITypeHandler defaultHandler = new ObjectTypeHandler();
-  private static final List<ITypeHandler> definedTypeHandlers = new ArrayList<ITypeHandler>();
-
-  static {
-    definedTypeHandlers.add(new CharacterTypeHandler());
-
-  }
+  private final ITypeHandler defaultHandler = new ObjectTypeHandler(this);
+  private final List<ITypeHandler> definedTypeHandlers = new ArrayList<ITypeHandler>();
 
   /**
    * 
    */
   public StringTypeHandlerFactory() {
+    init();
+  }
+
+  private void init() {
+    definedTypeHandlers.add(new CharacterTypeHandler(this));
+
   }
 
   /*

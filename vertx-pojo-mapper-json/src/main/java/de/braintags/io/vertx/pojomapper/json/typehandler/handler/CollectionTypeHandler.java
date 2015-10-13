@@ -19,6 +19,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.impl.Mapper;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
@@ -39,8 +40,8 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
   /**
    * @param classesToDeal
    */
-  public CollectionTypeHandler() {
-    super(Collection.class);
+  public CollectionTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory, Collection.class);
   }
 
   /*
@@ -49,7 +50,6 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
-  @SuppressWarnings("unchecked")
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {

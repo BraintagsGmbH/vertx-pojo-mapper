@@ -12,14 +12,14 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * 
@@ -33,8 +33,8 @@ public class EnumTypeHandler extends AbstractTypeHandler {
   /**
    * @param classesToDeal
    */
-  public EnumTypeHandler() {
-    super(Enum.class);
+  public EnumTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory, Enum.class);
   }
 
   /*
@@ -52,8 +52,7 @@ public class EnumTypeHandler extends AbstractTypeHandler {
       Class enumClass = tp.get(0).getType();
       success(source == null ? source : Enum.valueOf(enumClass, source.toString()), resultHandler);
     } else {
-      fail(
-          new UnsupportedOperationException("Enum without generic are not supported in entity " + field.getFullName()),
+      fail(new UnsupportedOperationException("Enum without generic are not supported in entity " + field.getFullName()),
           resultHandler);
     }
 

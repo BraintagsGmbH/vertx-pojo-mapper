@@ -12,18 +12,20 @@
  */
 package de.braintags.io.vertx.pojomapper.typehandler;
 
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
 
 /**
- * The ITypehandler is responsible to change original values into the required format of the used datastore
+ * The ITypehandler is responsible to change original values into the required format of the used datastore. Cause
+ * {@link ITypeHandler} can have stateful information based on the {@link IField}, where an {@link ITypeHandler} is
+ * belonging to, each IField is getting its own clone
  * 
  * @author Michael Remme
  * 
  */
 
-public interface ITypeHandler {
+public interface ITypeHandler extends Cloneable {
 
   /**
    * Returned by method {@link #matches(IField)} to specify that the current typehandler won't handle the given field
@@ -91,4 +93,19 @@ public interface ITypeHandler {
    */
   public short matches(Class<?> cls);
 
+  /**
+   * Get the {@link ITypeHandlerFactory} where the current instance is belonging to.
+   * 
+   * @return
+   */
+  public ITypeHandlerFactory getTypeHandlerFactory();
+
+  /**
+   * Generates a new copy of this instance.
+   *
+   * @return a copy of this instance
+   *
+   * @see Object#clone()
+   */
+  public Object clone();
 }

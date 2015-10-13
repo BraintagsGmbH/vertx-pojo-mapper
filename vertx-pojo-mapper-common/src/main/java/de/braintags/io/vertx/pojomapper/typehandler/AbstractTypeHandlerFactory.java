@@ -48,16 +48,14 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
    */
   @Override
   public ITypeHandler getTypeHandler(IField field) {
+    // here we should NOT use a cache, otherwise the method examineMatch of the TypeHandler isn't called,
+    // which is important, cause this method can decide on other parameters than the class
     if (field.getPropertyMapper() instanceof IReferencedMapper || field.getPropertyMapper() instanceof IEmbeddedMapper)
       return null;
-    Class<?> fieldClass = field.getType();
-    if (cachedTypeHandler.containsKey(fieldClass))
-      return cachedTypeHandler.get(fieldClass);
     ITypeHandler handler = examineMatch(field);
     if (handler == null)
       handler = getDefaultTypeHandler();
-    cachedTypeHandler.put(fieldClass, handler);
-    return handler;
+    return (ITypeHandler) handler.clone();
   }
 
   /*
@@ -73,7 +71,7 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
     if (handler == null)
       handler = getDefaultTypeHandler();
     cachedTypeHandler.put(fieldClass, handler);
-    return handler;
+    return (ITypeHandler) handler.clone();
   }
 
   /**

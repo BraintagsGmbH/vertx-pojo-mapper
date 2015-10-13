@@ -43,19 +43,19 @@ public class TestSqlQueryRambler extends DatastoreBaseTest {
     return options;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest#setUp()
-   */
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
-    getDataStore().createQuery(RamblerMapper.class).execute(rh -> {
-
-    });
-  }
-
+  // /*
+  // * (non-Javadoc)
+  // *
+  // * @see de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest#setUp()
+  // */
+  // @Override
+  // public void setUp() throws Exception {
+  // super.setUp();
+  // getDataStore().createQuery(RamblerMapper.class).execute(rh -> {
+  //
+  // });
+  // }
+  //
   @Test
   public void test_1() {
     SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);

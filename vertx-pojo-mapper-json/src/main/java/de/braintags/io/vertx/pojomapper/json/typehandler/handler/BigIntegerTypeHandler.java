@@ -12,14 +12,14 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-
 import java.math.BigInteger;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * 
@@ -33,8 +33,8 @@ public class BigIntegerTypeHandler extends AbstractTypeHandler {
   /**
    * @param classesToDeal
    */
-  public BigIntegerTypeHandler() {
-    super(BigInteger.class);
+  public BigIntegerTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory, BigInteger.class);
   }
 
   /*

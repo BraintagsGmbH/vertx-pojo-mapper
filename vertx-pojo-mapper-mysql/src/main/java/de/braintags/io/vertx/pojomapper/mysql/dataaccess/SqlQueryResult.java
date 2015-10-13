@@ -13,12 +13,13 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryResult;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
-import de.braintags.io.vertx.util.AbstractCollectionAsync;
-import de.braintags.io.vertx.util.IteratorAsync;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.sql.ResultSet;
 
 /**
@@ -27,11 +28,8 @@ import io.vertx.ext.sql.ResultSet;
  * @author Michael Remme
  * 
  */
-public class SqlQueryResult<T> extends AbstractCollectionAsync<T>implements IQueryResult<T> {
+public class SqlQueryResult<T> extends AbstractQueryResult<T> {
   private ResultSet resultSet;
-  private MySqlDataStore datastore;
-  private SqlQueryRambler query;
-  private IMapper mapper;
 
   /**
    * Creates a lazy loading instance
@@ -46,35 +44,22 @@ public class SqlQueryResult<T> extends AbstractCollectionAsync<T>implements IQue
    *          the {@link SqlQueryRambler}
    */
   public SqlQueryResult(ResultSet resultSet, MySqlDataStore store, IMapper mapper, SqlQueryRambler query) {
+    super(store, mapper, resultSet.getNumRows(), query);
     this.resultSet = resultSet;
-    this.datastore = store;
-    this.query = query;
-    this.mapper = mapper;
   }
 
   @Override
-  public int size() {
-    return resultSet.getNumRows();
-  }
-
-  @Override
-  public IteratorAsync<T> iterator() {
-    return null;
-  }
-
-  @Override
-  public IDataStore getDataStore() {
-    return datastore;
-  }
-
-  @Override
-  public IMapper getMapper() {
-    return mapper;
-  }
-
-  @Override
-  public Object getOriginalQuery() {
-    return query;
+  protected void generatePojo(int i, Handler<AsyncResult<T>> handler) {
+    JsonObject sourceObject = resultSet.getRows().get(i);
+    getDataStore().getStoreObjectFactory().createStoreObject(sourceObject, getMapper(), result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        @SuppressWarnings("unchecked")
+        T pojo = (T) result.result().getEntity();
+        handler.handle(Future.succeededFuture(pojo));
+      }
+    });
   }
 
 }

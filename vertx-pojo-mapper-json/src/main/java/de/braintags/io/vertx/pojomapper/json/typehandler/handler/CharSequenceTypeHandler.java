@@ -12,15 +12,15 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * 
@@ -34,8 +34,8 @@ public class CharSequenceTypeHandler extends AbstractTypeHandler {
   /**
    * @param classesToDeal
    */
-  public CharSequenceTypeHandler() {
-    super(CharSequence.class);
+  public CharSequenceTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory, CharSequence.class);
   }
 
   /*
@@ -51,7 +51,8 @@ public class CharSequenceTypeHandler extends AbstractTypeHandler {
       Constructor<?> constr = getConstructor(field, cls, String.class);
       try {
         success(constr.newInstance(source), resultHandler);
-      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+          | InvocationTargetException e) {
         fail(e, resultHandler);
         return;
       }

@@ -33,4 +33,11 @@ public interface IDatastoreContainer {
   public void startup(Vertx vertx, Handler<AsyncResult<Void>> handler);
 
   public void shutdown(Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Drop all tables from the database which are not system tables
+   * 
+   * @param handler
+   */
+  public void dropTables(Handler<AsyncResult<Void>> handler);
 }

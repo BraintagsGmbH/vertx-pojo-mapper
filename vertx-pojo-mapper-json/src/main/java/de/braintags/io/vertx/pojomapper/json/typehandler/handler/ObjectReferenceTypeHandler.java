@@ -24,6 +24,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ObjectReference;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -40,8 +41,8 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
   /**
    * @param classesToDeal
    */
-  public ObjectReferenceTypeHandler() {
-    super(ObjectReference.class);
+  public ObjectReferenceTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory, ObjectReference.class);
   }
 
   /*

@@ -12,9 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
@@ -23,7 +20,10 @@ import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * An {@link ITypeHandler} which is dealing {@link Date}. Currently its only dealing with the long value of a Date.
@@ -39,8 +39,8 @@ public class DateTypeHandler extends AbstractTypeHandler {
   /**
    * @param classesToDeal
    */
-  public DateTypeHandler() {
-    super(Date.class);
+  public DateTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory, Date.class);
   }
 
   /*
@@ -60,7 +60,8 @@ public class DateTypeHandler extends AbstractTypeHandler {
       }
       try {
         result = constr.newInstance(source);
-      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+          | InvocationTargetException e) {
         fail(e, resultHandler);
         return;
       }
