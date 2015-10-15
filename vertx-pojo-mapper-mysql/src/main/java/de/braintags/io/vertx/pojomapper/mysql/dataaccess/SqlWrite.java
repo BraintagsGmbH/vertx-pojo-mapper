@@ -119,7 +119,10 @@ public class SqlWrite<T> extends AbstractWrite<T> {
           resultHandler.handle(ir);
         });
       } else {
-        resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+        handleUpdate(storeObject, writeResult, connection, ir -> {
+          closeConnection(connection);
+          resultHandler.handle(ir);
+        });
       }
     });
 
@@ -134,42 +137,97 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     }
   }
 
+  /**
+   * Perform an update of a record into the datastore
+   * 
+   * @param storeObject
+   *          the {@link IStoreObject}
+   * @param writeResult
+   *          the {@link IWriteResult} to be filled
+   * @param connection
+   *          the {@link SQLConnection} to be used
+   * @param resultHandler
+   *          the {@link Handler} to be informed
+   */
+  private void handleUpdate(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
+      Handler<AsyncResult<Void>> resultHandler) {
+    SqlSequence seq = storeObject.generateSqlUpdateStatement();
+    connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), updateResult -> {
+      if (!checkUpdateResult(updateResult, resultHandler))
+        return;
+      finishUpdate(storeObject, writeResult, resultHandler);
+    });
+  }
+
+  @SuppressWarnings("unchecked")
+  private void finishUpdate(SqlStoreObject storeObject, IWriteResult writeResult,
+      Handler<AsyncResult<Void>> resultHandler) {
+    Object id = getMapper().getIdField().getPropertyAccessor().readData(storeObject.getEntity());
+    LOGGER.debug("updated record with id " + id);
+    try {
+      executePostSave((T) storeObject.getEntity());
+      writeResult.addEntry(storeObject, id, WriteAction.UPDATE);
+      resultHandler.handle(Future.succeededFuture());
+    } catch (Exception e) {
+      resultHandler.handle(Future.failedFuture(e));
+    }
+  }
+
   private void handleInsert(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlInsertStatement();
     connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), updateResult -> {
-      if (updateResult.failed()) {
-        resultHandler.handle(Future.failedFuture(updateResult.cause()));
+      if (!checkUpdateResult(updateResult, resultHandler))
         return;
-      }
       UpdateResult res = updateResult.result();
-      if (res.getUpdated() != 1) {
-        String message = String.format("Error inserting a record, expected %d records saved, but was %d", 1,
-            res.getUpdated());
-        resultHandler.handle(Future.failedFuture(new InsertException(message)));
-        return;
-      }
-
       if (res.getKeys() != null && res.getKeys().size() == 1) {
         finishInsert(storeObject, writeResult, res.getKeys().getValue(0), resultHandler);
         return;
       }
-
-      connection.query(LAST_INSERT_ID_COMMAND, idResult -> {
-        if (idResult.failed()) {
-          resultHandler.handle(Future.failedFuture(updateResult.cause()));
-          return;
-        }
-
-        List<JsonObject> ids = idResult.result().getRows();
-        if (ids.size() != 1) {
-          resultHandler.handle(Future.failedFuture(new InsertException("Error reading last inserted id")));
-          return;
-        }
-        finishInsert(storeObject, writeResult, ids.get(0).getValue("LAST_INSERT_ID()"), resultHandler);
-        return;
-      });
+      loadLastInsertedId(storeObject, writeResult, connection, resultHandler);
     });
+  }
+
+  private void loadLastInsertedId(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
+      Handler<AsyncResult<Void>> resultHandler) {
+    connection.query(LAST_INSERT_ID_COMMAND, idResult -> {
+      if (idResult.failed()) {
+        resultHandler.handle(Future.failedFuture(idResult.cause()));
+        return;
+      }
+      List<JsonObject> ids = idResult.result().getRows();
+      if (ids.size() != 1) {
+        resultHandler.handle(Future.failedFuture(new InsertException("Error reading last inserted id")));
+        return;
+      }
+      finishInsert(storeObject, writeResult, ids.get(0).getValue("LAST_INSERT_ID()"), resultHandler);
+      return;
+    });
+  }
+
+  /**
+   * Checks the UpdateResult and informs the Handler with an error, if needed
+   * 
+   * @param updateResult
+   *          the result to be checked
+   * @param resultHandler
+   *          the {@link Handler} to be informed
+   * @return false, if an error occured and handler was sent an error, otherwise true
+   */
+  private boolean checkUpdateResult(AsyncResult<UpdateResult> updateResult, Handler<AsyncResult<Void>> resultHandler) {
+    if (updateResult.failed()) {
+      resultHandler.handle(Future.failedFuture(updateResult.cause()));
+      return false;
+    }
+    UpdateResult res = updateResult.result();
+    if (res.getUpdated() != 1) {
+      String message = String.format("Error inserting a record, expected %d records saved, but was %d", 1,
+          res.getUpdated());
+      resultHandler.handle(Future.failedFuture(new InsertException(message)));
+      return false;
+    }
+    return true;
+
   }
 
   private void finishInsert(SqlStoreObject storeObject, IWriteResult writeResult, Object id,

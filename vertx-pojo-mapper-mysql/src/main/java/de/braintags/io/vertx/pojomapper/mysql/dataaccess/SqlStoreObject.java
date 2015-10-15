@@ -18,6 +18,7 @@ import java.util.Set;
 import de.braintags.io.vertx.pojomapper.json.dataaccess.JsonStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -63,13 +64,54 @@ public class SqlStoreObject extends JsonStoreObject {
     return sequence;
   }
 
+  /**
+   * Generates the sql statement to update a record into the database and a list of fitting parameters
+   * 
+   * @return the sql statement to be executed
+   */
+  public SqlSequence generateSqlUpdateStatement() {
+    ITableInfo tInfo = getMapper().getTableInfo();
+    IField idField = getMapper().getIdField();
+    Object id = get(idField);
+
+    SqlSequence sequence = new SqlSequence(tInfo.getName(), idField.getColumnInfo(), id);
+
+    Set<String> fieldNames = getMapper().getFieldNames();
+    for (String fieldName : fieldNames) {
+      IField field = getMapper().getField(fieldName);
+      if (field != idField) {
+        sequence.addEntry(tInfo.getColumnInfo(field).getName(), get(field));
+      }
+    }
+    return sequence;
+  }
+
   class SqlSequence {
     boolean added = false;
     private StringBuilder sqlStatement;
+    private StringBuilder whereStatement;
+    private Object id;
     private JsonArray parameters = new JsonArray();
 
+    /**
+     * Constructor for an insert command
+     * 
+     * @param tableName
+     */
     public SqlSequence(String tableName) {
       sqlStatement = new StringBuilder("Insert into ").append(tableName).append(" set ");
+    }
+
+    /**
+     * Constructor for an update command
+     * 
+     * @param tableName
+     */
+    public SqlSequence(String tableName, IColumnInfo idColInfo, Object idValue) {
+      sqlStatement = new StringBuilder("UPDATE ").append(tableName).append(" set ");
+      whereStatement = new StringBuilder(" WHERE ").append(idColInfo.getName()).append(" = ?");
+      this.id = idValue;
+
     }
 
     void addEntry(String colName, Object value) {
@@ -80,13 +122,14 @@ public class SqlStoreObject extends JsonStoreObject {
       sqlStatement.append(colName).append(" = ?");
       parameters.add(value);
       added = true;
-
     }
 
     /**
      * @return the sqlStatement
      */
     public final String getSqlStatement() {
+      if (whereStatement != null)
+        return sqlStatement.toString() + whereStatement.toString();
       return sqlStatement.toString();
     }
 
@@ -94,6 +137,8 @@ public class SqlStoreObject extends JsonStoreObject {
      * @return the parameters
      */
     public final JsonArray getParameters() {
+      if (id != null)
+        return parameters.copy().add(id);
       return parameters;
     }
 

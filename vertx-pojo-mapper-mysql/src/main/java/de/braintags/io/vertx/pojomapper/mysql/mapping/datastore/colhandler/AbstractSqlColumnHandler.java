@@ -134,7 +134,7 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
    * @return true, if structure changed
    */
   protected boolean checkColumnModified(IColumnInfo plannedCi, IColumnInfo existingCi) {
-    return (!plannedCi.getType().equals(existingCi.getType()));
+    return (!plannedCi.getType().equalsIgnoreCase(existingCi.getType()));
   }
 
   /**

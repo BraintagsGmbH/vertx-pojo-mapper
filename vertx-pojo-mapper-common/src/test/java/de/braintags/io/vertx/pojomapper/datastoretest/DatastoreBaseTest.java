@@ -344,7 +344,7 @@ public class DatastoreBaseTest extends VertxTestBase {
   public void dropTable(String tableName) {
     CountDownLatch latch = new CountDownLatch(1);
     ErrorObject<Void> err = new ErrorObject<Void>(null);
-    datastoreContainer.dropTable("MiniMapper", result -> {
+    datastoreContainer.dropTable(tableName, result -> {
       if (result.failed()) {
         err.setThrowable(result.cause());
       }

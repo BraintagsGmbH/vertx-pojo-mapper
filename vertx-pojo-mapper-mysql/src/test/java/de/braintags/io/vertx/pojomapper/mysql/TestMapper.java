@@ -14,11 +14,15 @@ package de.braintags.io.vertx.pojomapper.mysql;
 
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.MiniMapper;
+import de.braintags.io.vertx.pojomapper.exception.MappingException;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
@@ -28,19 +32,19 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
 /**
- * 
+ * Testing mapped {@link IMapper} and {@link ITableInfo}
  * 
  * @author Michael Remme
  * 
  */
 
-public class TestTableInfo extends DatastoreBaseTest {
-  private static final Logger log = LoggerFactory.getLogger(TestTableInfo.class);
+public class TestMapper extends DatastoreBaseTest {
+  private static final Logger log = LoggerFactory.getLogger(TestMapper.class);
 
   /**
    * 
    */
-  public TestTableInfo() {
+  public TestMapper() {
   }
 
   @Override
@@ -56,6 +60,35 @@ public class TestTableInfo extends DatastoreBaseTest {
     log.info("-->>test");
     assertNotNull(datastoreContainer);
     testComplete();
+  }
+
+  @Test
+  public void testId() {
+    IMapper mapper = getDataStore().getMapperFactory().getMapper(MiniMapper.class);
+    IField idField = mapper.getField("id");
+    assertNotNull("Improve that the name of the id field is 'id'", idField);
+
+    Id ann = (Id) idField.getAnnotation(Id.class);
+    if (ann == null)
+      Assert.fail("Annotation Id must not be null");
+
+    IField field = mapper.getIdField();
+    assertNotNull(field);
+    Assert.assertSame(field, idField);
+
+    String javaName = field.getName();
+    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
+    assertNotNull(ci);
+    String dbName = ci.getName();
+    assertEquals(javaName, dbName);
+
+    try {
+      field = mapper.getField("doesntexist");
+      fail("this should throw an exception here");
+    } catch (MappingException e) {
+      // this is the expected result
+    }
+
   }
 
   @Test

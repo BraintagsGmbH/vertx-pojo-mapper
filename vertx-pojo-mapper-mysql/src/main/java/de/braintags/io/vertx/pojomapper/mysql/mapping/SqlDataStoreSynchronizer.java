@@ -107,11 +107,16 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
       Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
     Map<String, SyncAction> syncMap = currentDbTable.compareColumns(mapper);
     if (!syncMap.isEmpty()) {
+      logSyncMap(syncMap);
       throw new UnsupportedOperationException("Implement update of table structure");
     } else {
       resultHandler.handle(Future.succeededFuture(new DefaultSyncResult(SyncAction.NO_ACTION)));
     }
 
+  }
+
+  private void logSyncMap(Map<String, SyncAction> syncMap) {
+    LOGGER.info(syncMap);
   }
 
   /*

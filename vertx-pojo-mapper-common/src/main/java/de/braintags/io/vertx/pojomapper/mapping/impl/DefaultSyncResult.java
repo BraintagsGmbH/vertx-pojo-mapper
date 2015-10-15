@@ -76,4 +76,8 @@ public class DefaultSyncResult implements ISyncResult<String> {
     this.action = action;
   }
 
+  @Override
+  public String toString() {
+    return syncCommand + ": " + action;
+  }
 }
