@@ -23,6 +23,9 @@ package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
 public class DoubleColumnHandler extends NumericColumnHandler {
 
+  /**
+   * Constructor for a DoubleColumnHandler
+   */
   public DoubleColumnHandler() {
     super("DOUBLE", true, true, Double.class, Float.class, double.class, float.class);
   }

@@ -43,7 +43,8 @@ public class IdTypeHandler extends AbstractTypeHandler {
   private ITypeHandler internalTypehandler;
 
   /**
-   * @param classesToDeal
+   * @param typeHandlerFactory
+   *          the {@link ITypeHandlerFactory} where the current instance is part of
    */
   public IdTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory);

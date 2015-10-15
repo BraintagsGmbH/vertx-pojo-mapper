@@ -39,7 +39,10 @@ public class SqlExpression {
   private int openedParenthesis;
 
   /**
+   * Used to render the propriate statements which will be executed in the database later
    * 
+   * @param mapper
+   *          the underlaying mapper, to retrive the name of the table in the database
    */
   public SqlExpression(IMapper mapper) {
     select.append(String.format(SELECT_STATEMENT, mapper.getTableInfo().getName()));
@@ -64,6 +67,8 @@ public class SqlExpression {
    * 
    * @param connector
    *          the connector AND / OR
+   * @param openParenthesis
+   *          info, wether a parenthesis shall be opened
    * @return the SqlExpression itself for fluent usage
    */
   public SqlExpression startConnectorBlock(String connector, boolean openParenthesis) {

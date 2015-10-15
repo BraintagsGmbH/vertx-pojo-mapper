@@ -22,6 +22,9 @@ package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
 public class ByteColumnHandler extends NumericColumnHandler {
 
+  /**
+   * Constructor for a ByteColumnHandler
+   */
   public ByteColumnHandler() {
     super("TINYINT", false, false, Byte.class, byte.class);
   }

@@ -14,6 +14,7 @@
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
@@ -26,7 +27,10 @@ import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
 
 /**
+ * An implementation of {@link IDelete} for sql databases
  * 
+ * @param <T>
+ *          the type of the mapper, which is handled here
  * @author Michael Remme
  * 
  */

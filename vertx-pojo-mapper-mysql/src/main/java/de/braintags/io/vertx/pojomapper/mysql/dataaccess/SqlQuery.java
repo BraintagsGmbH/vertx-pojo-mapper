@@ -14,6 +14,7 @@
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
@@ -27,6 +28,10 @@ import io.vertx.ext.sql.SQLConnection;
 
 /**
  * 
+ * An implementation of {@link IQuery} for sql databases
+ * 
+ * @param <T>
+ *          the type of the mapper, which is handled here
  * @author Michael Remme
  * 
  */

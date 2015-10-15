@@ -19,6 +19,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
 
 /**
+ * Abstract handler dealing with numerics
  * 
  * @author Michael Remme
  * 
@@ -30,11 +31,20 @@ public abstract class NumericColumnHandler extends AbstractSqlColumnHandler {
   private boolean useScale;
 
   /**
+   * @param colType
+   *          the type of the column in the database
+   * @param usePrecision
+   *          wether to use precision information, which might be defined by annotation
+   * @param useScale
+   *          wether to use scale information, which might be defined by annotation
    * @param classesToDeal
+   *          the classes to be handled
    */
   public NumericColumnHandler(String colType, boolean usePrecision, boolean useScale, Class<?>... classesToDeal) {
     super(classesToDeal);
     this.colType = colType;
+    this.usePrecision = usePrecision;
+    this.useScale = useScale;
   }
 
   /*

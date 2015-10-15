@@ -21,6 +21,7 @@ import io.vertx.ext.asyncsql.AsyncSQLClient;
 import io.vertx.ext.sql.SQLConnection;
 
 /**
+ * Meta information about the connected database
  * 
  * @author Michael Remme
  * 
@@ -31,7 +32,10 @@ public class MySqlMetaData implements IDataStoreMetaData {
   private String version;
 
   /**
+   * Constructor for the Metadata
    * 
+   * @param sqlClient
+   *          the client to be used
    */
   public MySqlMetaData(AsyncSQLClient sqlClient) {
     this.sqlClient = sqlClient;

@@ -22,6 +22,9 @@ package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
 public class IntegerColumnHandler extends NumericColumnHandler {
 
+  /**
+   * Constructor for a IntegerColumnHandler
+   */
   public IntegerColumnHandler() {
     super("INT", false, false, Integer.class, int.class);
   }

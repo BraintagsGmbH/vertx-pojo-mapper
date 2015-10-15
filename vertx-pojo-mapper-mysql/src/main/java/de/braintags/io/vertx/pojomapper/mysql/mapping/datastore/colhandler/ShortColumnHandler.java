@@ -22,6 +22,9 @@ package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
 public class ShortColumnHandler extends NumericColumnHandler {
 
+  /**
+   * Constructor for a ShortColumnHandler
+   */
   public ShortColumnHandler() {
     super("SMALLINT", false, false, Short.class, short.class);
   }

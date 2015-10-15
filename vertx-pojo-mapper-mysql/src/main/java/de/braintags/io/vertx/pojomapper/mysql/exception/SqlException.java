@@ -45,7 +45,11 @@ public class SqlException extends RuntimeException {
   }
 
   /**
+   * 
+   * @param rambler
+   *          an instance of {@link SqlQueryRambler}
    * @param cause
+   *          the original exception
    */
   public SqlException(SqlQueryRambler rambler, Throwable cause) {
     super("Error in handling query or delete: " + rambler.toString(), cause);

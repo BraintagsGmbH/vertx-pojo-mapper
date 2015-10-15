@@ -18,12 +18,14 @@ import java.util.Set;
 import de.braintags.io.vertx.pojomapper.json.dataaccess.JsonStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 /**
+ * An implementation of {@link IStoreObject} for use with sql databases
  * 
  * @author Michael Remme
  * 
@@ -32,14 +34,20 @@ import io.vertx.core.json.JsonObject;
 public class SqlStoreObject extends JsonStoreObject {
 
   /**
+   * Creates a new instance by using a POJO. This constructor is usually used, when a pojo shall be stored
    * 
+   * @param mapper
+   * @param entity
    */
   public SqlStoreObject(IMapper mapper, Object entity) {
     super(mapper, entity);
   }
 
   /**
+   * Creates a new instance by using the result of a query inside the database
    * 
+   * @param rowResult
+   * @param mapper
    */
   public SqlStoreObject(JsonObject rowResult, IMapper mapper) {
     super(rowResult, mapper);
@@ -106,6 +114,11 @@ public class SqlStoreObject extends JsonStoreObject {
      * Constructor for an update command
      * 
      * @param tableName
+     *          the name of the table
+     * @param idColInfo
+     *          the {@link IColumnInfo} for the id column
+     * @param idValue
+     *          the id value
      */
     public SqlSequence(String tableName, IColumnInfo idColInfo, Object idValue) {
       sqlStatement = new StringBuilder("UPDATE ").append(tableName).append(" set ");
@@ -125,6 +138,8 @@ public class SqlStoreObject extends JsonStoreObject {
     }
 
     /**
+     * Get the statement
+     * 
      * @return the sqlStatement
      */
     public final String getSqlStatement() {

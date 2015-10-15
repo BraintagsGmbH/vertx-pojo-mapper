@@ -25,6 +25,8 @@ import io.vertx.ext.sql.ResultSet;
 /**
  * The {@link SqlQueryResult} contains the {@link ResultSet} from a query, by which the entities are created
  * 
+ * @param <T>
+ *          the type of the mapper, which is handled here
  * @author Michael Remme
  * 
  */

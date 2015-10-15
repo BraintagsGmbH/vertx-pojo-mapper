@@ -40,6 +40,7 @@ import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 
 /**
+ * Used to synchronize tables inside the database with the POJOs
  * 
  * @author Michael Remme
  * 
@@ -55,7 +56,10 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
   private static final String CREATE_TABLE = "CREATE TABLE %s.%s ( %s )";
 
   /**
+   * Create a new instance
    * 
+   * @param ds
+   *          the {@link MySqlDataStore} used
    */
   public SqlDataStoreSynchronizer(MySqlDataStore ds) {
     this.datastore = ds;

@@ -17,6 +17,7 @@ import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
@@ -38,6 +39,10 @@ import io.vertx.ext.sql.UpdateResult;
 
 /**
  * 
+ * An implementation of {@link IWrite} for sql databases
+ * 
+ * @param <T>
+ *          the type of the mapper, which is handled here
  * @author Michael Remme
  * 
  */

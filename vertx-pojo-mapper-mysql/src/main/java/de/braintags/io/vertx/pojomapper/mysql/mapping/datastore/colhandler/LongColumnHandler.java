@@ -22,6 +22,9 @@ package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
 public class LongColumnHandler extends NumericColumnHandler {
 
+  /**
+   * Constructor for a LongColumnHandler
+   */
   public LongColumnHandler() {
     super("BIGINT", false, false, Long.class, long.class);
   }

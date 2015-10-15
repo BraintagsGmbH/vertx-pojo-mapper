@@ -19,6 +19,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
 
 /**
+ * StringColumnHandler is used to generate columns which are character based
  * 
  * @author Michael Remme
  * 
@@ -35,7 +36,7 @@ public class StringColumnHandler extends AbstractSqlColumnHandler {
   private static final String LONGTEXT_TYPE = "longtext";
 
   /**
-   * 
+   * Constructor for a StringColumnHandler
    */
   public StringColumnHandler() {
     super(CharSequence.class);

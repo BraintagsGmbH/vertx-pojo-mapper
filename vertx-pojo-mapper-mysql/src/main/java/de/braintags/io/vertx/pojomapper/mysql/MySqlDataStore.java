@@ -40,7 +40,12 @@ public class MySqlDataStore extends AbstractDataStore {
   private MySqlMetaData metaData;
 
   /**
+   * Constructor for a sql based datastore
    * 
+   * @param sqlClient
+   *          the underlaying sqlclient used to process commands
+   * @param database
+   *          the name of the database used
    */
   public MySqlDataStore(AsyncSQLClient sqlClient, String database) {
     super(database);

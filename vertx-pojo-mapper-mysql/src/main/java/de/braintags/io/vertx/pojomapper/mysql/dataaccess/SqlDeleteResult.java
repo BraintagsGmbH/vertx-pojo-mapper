@@ -30,8 +30,13 @@ public class SqlDeleteResult extends DeleteResult {
 
   /**
    * @param datastore
+   *          the {@link IDataStore} where the result was created by
    * @param mapper
+   *          the underlaying {@link IMapper}
    * @param command
+   *          the native command for the datastore
+   * @param ur
+   *          {@link UpdateResult} from the datastore
    */
   public SqlDeleteResult(IDataStore datastore, IMapper mapper, Object command, UpdateResult ur) {
     super(datastore, mapper, command);
