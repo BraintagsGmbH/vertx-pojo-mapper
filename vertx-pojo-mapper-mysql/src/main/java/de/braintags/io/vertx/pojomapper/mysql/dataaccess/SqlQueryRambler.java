@@ -77,7 +77,7 @@ public class SqlQueryRambler implements IQueryRambler {
   @Override
   public void start(ILogicContainer<?> container) {
     String logic = QueryLogicTranslator.translate(container.getLogic());
-    statement.startConnectorBlock(logic);
+    statement.startConnectorBlock(logic, QueryLogicTranslator.opensParenthesis(container.getLogic()));
   }
 
   /*
@@ -205,7 +205,8 @@ public class SqlQueryRambler implements IQueryRambler {
    */
   @Override
   public void stop(IFieldParameter<?> fieldParameter) {
-    // nothing to do here
+    if (fieldParameter.isCloseParenthesis())
+      statement.closeParenthesis();
   }
 
   private void add(String colName, String operator, Object objectToAdd) {

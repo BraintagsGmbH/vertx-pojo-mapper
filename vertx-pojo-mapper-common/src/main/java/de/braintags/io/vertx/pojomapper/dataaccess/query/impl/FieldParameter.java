@@ -34,6 +34,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   private Object value;
   private QueryOperator operator;
   private T container;
+  private boolean closeParenthesis = false;
 
   /**
    * 
@@ -173,6 +174,26 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   @Override
   public T notIn(Object... values) {
     return notIn(Arrays.asList(values));
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#isCloseParenthesis()
+   */
+  @Override
+  public boolean isCloseParenthesis() {
+    return closeParenthesis;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#setCloseParenthesis(boolean)
+   */
+  @Override
+  public void setCloseParenthesis(boolean doClose) {
+    this.closeParenthesis = doClose;
   }
 
 }

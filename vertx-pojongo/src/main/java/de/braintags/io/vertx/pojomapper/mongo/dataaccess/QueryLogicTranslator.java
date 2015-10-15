@@ -40,8 +40,10 @@ public class QueryLogicTranslator {
   public static String translate(QueryLogic logic) {
     switch (logic) {
     case AND:
+    case AND_OPEN:
       return "$and";
     case OR:
+    case OR_OPEN:
       return "$or";
 
     default:

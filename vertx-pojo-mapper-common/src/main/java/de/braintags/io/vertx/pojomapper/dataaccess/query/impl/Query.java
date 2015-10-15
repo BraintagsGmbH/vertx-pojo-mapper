@@ -18,7 +18,9 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
@@ -27,13 +29,15 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 /**
- * 
+ * An abstract implementation of {@link IQuery}
  * 
  * @author Michael Remme
  * 
  */
 
 public abstract class Query<T> extends AbstractDataAccessObject<T>implements IQuery<T> {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory.getLogger(Query.class);
+
   private List<Object> filters = new ArrayList<Object>();
 
   /**
@@ -59,10 +63,30 @@ public abstract class Query<T> extends AbstractDataAccessObject<T>implements IQu
   }
 
   @Override
+  public IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> andOpen(String fieldName) {
+    LogicContainer<IQueryContainer> container = new LogicContainer<IQueryContainer>(this, QueryLogic.AND_OPEN);
+    filters.add(container);
+    return container.field(fieldName);
+  }
+
+  @Override
   public IFieldParameter<LogicContainer<Query<T>>> or(String fieldName) {
     LogicContainer<Query<T>> container = new LogicContainer<Query<T>>(this, QueryLogic.OR);
     filters.add(container);
     return container.field(fieldName);
+  }
+
+  @Override
+  public IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> orOpen(String fieldName) {
+    LogicContainer<IQueryContainer> container = new LogicContainer<IQueryContainer>(this, QueryLogic.OR_OPEN);
+    filters.add(container);
+    return container.field(fieldName);
+  }
+
+  @Override
+  public IQueryContainer close() {
+    LOGGER.warn("Closing on IQuery makes no sense");
+    return this;
   }
 
   /**

@@ -77,6 +77,20 @@ public class TestSqlQueryRambler extends DatastoreBaseTest {
     executeRambler(query, 6);
   }
 
+  @Test
+  public void test_6() {
+    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
+    query.orOpen("name").is("name to find").field("name").isNot("unknown");
+    executeRambler(query, 2);
+  }
+
+  @Test
+  public void test_7() {
+    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
+    query.orOpen("name").is("name to find").field("name").isNot("unknown").close().and("age").in(4, 5, 7, 9);
+    executeRambler(query, 6);
+  }
+
   private void executeRambler(SqlQuery<?> query, int expectedParameters) {
     CountDownLatch latch = new CountDownLatch(1);
     SqlQueryRambler rambler = new SqlQueryRambler();
@@ -89,7 +103,8 @@ public class TestSqlQueryRambler extends DatastoreBaseTest {
         LOGGER.info("DELETE STATEMENT: " + rambler.getSqlStatement().getDeleteExpression());
         LOGGER.info(rambler.getSqlStatement().getParameters());
         try {
-          assertEquals(expectedParameters, rambler.getSqlStatement().getParameters().size());
+          assertEquals("wrong number of parameters", expectedParameters,
+              rambler.getSqlStatement().getParameters().size());
         } finally {
           latch.countDown();
         }

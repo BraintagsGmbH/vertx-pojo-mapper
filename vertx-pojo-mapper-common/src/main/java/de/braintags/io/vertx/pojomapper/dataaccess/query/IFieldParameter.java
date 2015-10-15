@@ -133,4 +133,20 @@ public interface IFieldParameter<T extends IQueryContainer> {
    */
   T notIn(Object... values);
 
+  /**
+   * Get the information, wether after this field a parenthesis shall be closed. A closing parenthesis is set by
+   * {@link ILogicContainer#close()}
+   * 
+   * @return true, if parenthesis shall be closed
+   */
+  boolean isCloseParenthesis();
+
+  /**
+   * Set the information, whether after this field sequence a closing parenthesis shall be placed. A closing parenthesis
+   * is set by {@link ILogicContainer#close()}
+   * 
+   * @param doClose
+   *          true, if close is required
+   */
+  void setCloseParenthesis(boolean doClose);
 }

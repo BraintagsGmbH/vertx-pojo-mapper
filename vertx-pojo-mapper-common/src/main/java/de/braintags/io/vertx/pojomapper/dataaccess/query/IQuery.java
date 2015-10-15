@@ -12,10 +12,10 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * Define and execute queries inside the connected {@link IDataStore}

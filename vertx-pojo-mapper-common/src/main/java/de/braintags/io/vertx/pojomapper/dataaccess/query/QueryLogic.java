@@ -20,6 +20,9 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query;
  */
 
 public enum QueryLogic {
+
   AND,
-  OR;
+  AND_OPEN,
+  OR,
+  OR_OPEN;
 }

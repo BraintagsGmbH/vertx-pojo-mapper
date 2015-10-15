@@ -33,7 +33,7 @@ public interface IQueryContainer {
   IFieldParameter<? extends IQueryContainer> field(String fieldName);
 
   /**
-   * Start an "and" sequence
+   * Start an "and" sequence. The "and" is used, until an OR-connector is added
    * 
    * @param fieldName
    *          the name of the field to search for
@@ -42,13 +42,38 @@ public interface IQueryContainer {
   IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> and(String fieldName);
 
   /**
-   * Start an "or" sequence
+   * Start an "and" sequence and open a parenthesis "(". The "and" is used, until an OR-connector is added
+   * 
+   * @param fieldName
+   *          the name of the field to search for
+   * @return an instance of {@link IFieldParameter}
+   */
+  IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> andOpen(String fieldName);
+
+  /**
+   * Start an "or" sequence; the "or" is used, until an "and" is started
    * 
    * @param fieldName
    *          the name of the field to search for
    * @return an instance of {@link IFieldParameter}
    */
   IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> or(String fieldName);
+
+  /**
+   * Start an "or" sequence and open a parenthesis "("; the "or" is used, until an "and" is started
+   * 
+   * @param fieldName
+   *          the name of the field to search for
+   * @return an instance of {@link IFieldParameter}
+   */
+  IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> orOpen(String fieldName);
+
+  /**
+   * Closes a previously opened parenthesis which was opened by {@link #orOpen(String)} or {@link #andOpen(String)}
+   * 
+   * @return the container itself
+   */
+  IQueryContainer close();
 
   /**
    * Get the parent instance of the current object

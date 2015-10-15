@@ -36,6 +36,7 @@ public class SqlExpression {
   private StringBuilder whereClause = new StringBuilder();
   private JsonArray parameters = new JsonArray();
   private Deque<Connector> connectorDeque = new ArrayDeque<Connector>();
+  private int openedParenthesis;
 
   /**
    * 
@@ -65,12 +66,32 @@ public class SqlExpression {
    *          the connector AND / OR
    * @return the SqlExpression itself for fluent usage
    */
-  public SqlExpression startConnectorBlock(String connector) {
+  public SqlExpression startConnectorBlock(String connector, boolean openParenthesis) {
     connectorDeque.addLast(new Connector(connector));
     if (whereClause.length() > 0)
       whereClause.append(" ").append(connector);
-    whereClause.append(" ( ");
+    if (openParenthesis) {
+      openParenthesis();
+    }
     return this;
+  }
+
+  /**
+   * Append an opening parenthesis and handle the counter for open parenthesis
+   */
+  public void openParenthesis() {
+    whereClause.append(" ( ");
+    ++openedParenthesis;
+  }
+
+  /**
+   * Append a closing parenthesis and handle the counter for open parenthesis
+   */
+  public void closeParenthesis() {
+    whereClause.append(" ) ");
+    --openedParenthesis;
+    if (openedParenthesis < 0)
+      throw new IllegalArgumentException("closed more parenthesis than opened before");
   }
 
   /**
@@ -79,7 +100,6 @@ public class SqlExpression {
    * @return the SqlExpression itself for fluent usage
    */
   public SqlExpression stopConnectorBlock() {
-    whereClause.append(" ) ");
     connectorDeque.removeLast();
     return this;
   }
@@ -115,7 +135,6 @@ public class SqlExpression {
       whereClause.append(i == 0 ? "?" : ", ?");
       parameters.add(values.getValue(i));
     }
-
     whereClause.append(" ) ");
   }
 
@@ -144,8 +163,7 @@ public class SqlExpression {
    */
   public String getSelectExpression() {
     StringBuilder complete = new StringBuilder(select);
-    if (whereClause.length() > 0)
-      complete.append(" WHERE").append(whereClause);
+    appendWhereClause(complete);
     return complete.toString();
   }
 
@@ -156,9 +174,17 @@ public class SqlExpression {
    */
   public String getDeleteExpression() {
     StringBuilder complete = new StringBuilder(delete);
-    if (whereClause.length() > 0)
-      complete.append(" WHERE").append(whereClause);
+    appendWhereClause(complete);
     return complete.toString();
+  }
+
+  private void appendWhereClause(StringBuilder complete) {
+    if (whereClause.length() > 0) {
+      complete.append(" WHERE").append(whereClause);
+      int parCount = openedParenthesis;
+      while (parCount-- > 0)
+        complete.append(" )");
+    }
   }
 
   class Connector {

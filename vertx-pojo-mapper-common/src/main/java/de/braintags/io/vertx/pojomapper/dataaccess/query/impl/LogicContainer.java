@@ -73,11 +73,35 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   /*
    * (non-Javadoc)
    * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#andOpen(java.lang.String)
+   */
+  @Override
+  public IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> andOpen(String fieldName) {
+    LogicContainer<IQueryContainer> container = new LogicContainer<IQueryContainer>(this, QueryLogic.AND_OPEN);
+    filters.add(container);
+    return container.field(fieldName);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#or(java.lang.String)
    */
   @Override
   public IFieldParameter<LogicContainer<IQueryContainer>> or(String fieldName) {
     LogicContainer<IQueryContainer> container = new LogicContainer<IQueryContainer>(this, QueryLogic.OR);
+    filters.add(container);
+    return container.field(fieldName);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#orOpen(java.lang.String)
+   */
+  @Override
+  public IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> orOpen(String fieldName) {
+    LogicContainer<IQueryContainer> container = new LogicContainer<IQueryContainer>(this, QueryLogic.OR_OPEN);
     filters.add(container);
     return container.field(fieldName);
   }
@@ -154,6 +178,18 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   @Override
   public List<Object> getChildren() {
     return filters;
+  }
+
+  @SuppressWarnings("rawtypes")
+  @Override
+  public IQueryContainer close() {
+    Object filter = filters.get(filters.size() - 1);
+    if (filter instanceof IFieldParameter)
+      ((IFieldParameter) filter).setCloseParenthesis(true);
+    else
+      throw new UnsupportedOperationException(
+          "closing should be possible only after fields? Current instance is of class " + filter.getClass().getName());
+    return this;
   }
 
 }
