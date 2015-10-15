@@ -46,4 +46,11 @@ public interface IDeleteResult {
    */
   public Object getOriginalCommand();
 
+  /**
+   * Get the number of instances which were deleted
+   * 
+   * @return the number of deleted instances
+   */
+  public int getDeletedInstances();
+
 }

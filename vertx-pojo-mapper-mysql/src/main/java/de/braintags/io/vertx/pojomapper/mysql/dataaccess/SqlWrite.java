@@ -120,9 +120,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         });
       } else {
         resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
-
       }
-
     });
 
   }

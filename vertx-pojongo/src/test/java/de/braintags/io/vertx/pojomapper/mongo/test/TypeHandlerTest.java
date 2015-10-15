@@ -12,9 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.test;
 
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,6 +28,8 @@ import de.braintags.io.vertx.pojomapper.mongo.test.mapper.ReferenceMapper_Single
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.SimpleMapper;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.TypehandlerTestMapper;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * Test the {@link ITypeHandler} used for mongo with a mapper which contains all datatypes to be checked
@@ -238,7 +237,7 @@ public class TypeHandlerTest extends MongoBaseTest {
       } else {
         EmbeddedMapper_Single oom = (EmbeddedMapper_Single) result.result();
         assertNotNull(oom.simpleMapper);
-        assertTrue(oom.simpleMapper.id == null);
+        assertNull(oom.simpleMapper.id);
         assertEquals(om.simpleMapper.name, oom.simpleMapper.name);
         assertEquals(om.simpleMapper.getSecondProperty(), oom.simpleMapper.getSecondProperty());
         checkAnnotations(oom.simpleMapper);
@@ -277,7 +276,7 @@ public class TypeHandlerTest extends MongoBaseTest {
           SimpleMapper omSm = om.simpleMapper[i];
           SimpleMapper oomSm = oom.simpleMapper[i];
 
-          assertTrue(oomSm.id == null);
+          assertNull(oomSm.id);
           assertEquals(omSm.name, oomSm.name);
           assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
         }
@@ -311,7 +310,7 @@ public class TypeHandlerTest extends MongoBaseTest {
           SimpleMapper omSm = om.simpleMapper.get(i);
           SimpleMapper oomSm = oom.simpleMapper.get(i);
 
-          assertTrue(oomSm.id == null);
+          assertNull(oomSm.id);
           assertEquals(omSm.name, oomSm.name);
           assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
         }
@@ -345,7 +344,7 @@ public class TypeHandlerTest extends MongoBaseTest {
           SimpleMapper omSm = om.simpleMapper.get(i);
           SimpleMapper oomSm = oom.simpleMapper.get(i);
 
-          assertTrue(oomSm.id == null);
+          assertNull(oomSm.id);
           assertEquals(omSm.name, oomSm.name);
           assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
         }

@@ -13,12 +13,17 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
+import de.braintags.io.vertx.pojomapper.mysql.exception.SqlException;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.ext.sql.SQLConnection;
+import io.vertx.ext.sql.UpdateResult;
 
 /**
  * 
@@ -27,6 +32,8 @@ import de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete;
  */
 
 public class SqlDelete<T> extends Delete<T> {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(SqlDelete.class);
 
   /**
    * @param mapperClass
@@ -39,18 +46,54 @@ public class SqlDelete<T> extends Delete<T> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete#delete(io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete#deleteQuery(de.braintags.io.vertx.pojomapper.
+   * dataaccess.query.IQuery, io.vertx.core.Handler)
    */
   @Override
-  public void delete(Handler<AsyncResult<IDeleteResult>> resultHandler) {
-    sync(syncResult -> {
-      if (syncResult.failed()) {
-        resultHandler.handle(Future.failedFuture(syncResult.cause()));
+  protected void deleteQuery(IQuery<T> q, Handler<AsyncResult<IDeleteResult>> resultHandler) {
+    SqlQuery<T> query = (SqlQuery<T>) q;
+    query.createQueryDefinition(qDefResult -> {
+      if (qDefResult.failed()) {
+        resultHandler.handle(Future.failedFuture(qDefResult.cause()));
       } else {
-        throw new UnsupportedOperationException();
-
+        SqlQueryRambler rambler = qDefResult.result();
+        ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> {
+          if (cr.failed()) {
+            resultHandler.handle(Future.failedFuture(cr.cause()));
+            return;
+          }
+          SQLConnection connection = cr.result();
+          handleDelete(rambler, connection, dr -> {
+            closeConnection(connection);
+            resultHandler.handle(dr);
+          });
+        });
       }
     });
+  }
+
+  private void handleDelete(SqlQueryRambler rambler, SQLConnection connection,
+      Handler<AsyncResult<IDeleteResult>> resultHandler) {
+    SqlExpression expr = rambler.getSqlStatement();
+    connection.updateWithParams(expr.getDeleteExpression(), expr.getParameters(), ur -> {
+      if (ur.failed()) {
+        resultHandler.handle(Future.failedFuture(new SqlException(rambler, ur.cause())));
+        return;
+      }
+      UpdateResult updateResult = ur.result();
+      SqlDeleteResult deleteResult = new SqlDeleteResult(getDataStore(), getMapper(), expr, updateResult);
+      resultHandler.handle(Future.succeededFuture(deleteResult));
+    });
+
+  }
+
+  private void closeConnection(SQLConnection connection) {
+    try {
+      LOGGER.debug("closing connection - delete finished");
+      connection.close();
+    } catch (Exception e) {
+      LOGGER.warn("Error in closing connection", e);
+    }
   }
 
 }

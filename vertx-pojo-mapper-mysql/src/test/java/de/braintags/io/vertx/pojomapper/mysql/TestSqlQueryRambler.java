@@ -22,7 +22,6 @@ import de.braintags.io.vertx.pojomapper.datastoretest.mapper.RamblerMapper;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQuery;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQueryRambler;
 import io.vertx.core.VertxOptions;
-import io.vertx.core.json.JsonArray;
 
 /**
  * testing of {@link SqlQueryRambler}
@@ -43,19 +42,6 @@ public class TestSqlQueryRambler extends DatastoreBaseTest {
     return options;
   }
 
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest#setUp()
-  // */
-  // @Override
-  // public void setUp() throws Exception {
-  // super.setUp();
-  // getDataStore().createQuery(RamblerMapper.class).execute(rh -> {
-  //
-  // });
-  // }
-  //
   @Test
   public void test_1() {
     SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
@@ -88,7 +74,7 @@ public class TestSqlQueryRambler extends DatastoreBaseTest {
   public void test_5() {
     SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
     query.or("name").is("name to find").field("name").isNot("unknown").and("age").in(4, 5, 7, 9);
-    executeRambler(query, 3);
+    executeRambler(query, 6);
   }
 
   private void executeRambler(SqlQuery<?> query, int expectedParameters) {
@@ -99,10 +85,9 @@ public class TestSqlQueryRambler extends DatastoreBaseTest {
         LOGGER.error("", result.cause());
         latch.countDown();
       } else {
-        String statement = rambler.getSqlStatement().getCompleteExpression();
-        JsonArray parameter = rambler.getSqlStatement().getParameters();
-        LOGGER.info(statement);
-        LOGGER.info(parameter);
+        LOGGER.info("SELECT STATEMENT: " + rambler.getSqlStatement().getSelectExpression());
+        LOGGER.info("DELETE STATEMENT: " + rambler.getSqlStatement().getDeleteExpression());
+        LOGGER.info(rambler.getSqlStatement().getParameters());
         try {
           assertEquals(expectedParameters, rambler.getSqlStatement().getParameters().size());
         } finally {

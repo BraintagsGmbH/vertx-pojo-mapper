@@ -24,7 +24,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
  * 
  */
 
-public class DeleteResult implements IDeleteResult {
+public abstract class DeleteResult implements IDeleteResult {
   private IDataStore datastore;
   private IMapper mapper;
   private Object command;

@@ -16,6 +16,7 @@ package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import io.vertx.core.json.JsonArray;
 
 /**
@@ -27,7 +28,11 @@ import io.vertx.core.json.JsonArray;
  */
 
 public class SqlExpression {
+  private static final String SELECT_STATEMENT = "SELECT * from %s";
+  private static final String DELETE_STATEMENT = "DELETE from %s";
+
   private StringBuilder select = new StringBuilder();
+  private StringBuilder delete = new StringBuilder();
   private StringBuilder whereClause = new StringBuilder();
   private JsonArray parameters = new JsonArray();
   private Deque<Connector> connectorDeque = new ArrayDeque<Connector>();
@@ -35,20 +40,10 @@ public class SqlExpression {
   /**
    * 
    */
-  public SqlExpression() {
+  public SqlExpression(IMapper mapper) {
+    select.append(String.format(SELECT_STATEMENT, mapper.getTableInfo().getName()));
+    delete.append(String.format(DELETE_STATEMENT, mapper.getTableInfo().getName()));
     connectorDeque.addLast(new Connector("AND"));
-  }
-
-  /**
-   * Add a text part into the select part of the statement
-   * 
-   * @param text
-   *          the text to be added
-   * @return the SqlExpression itself for fluent usage
-   */
-  public SqlExpression addSelect(String text) {
-    select.append(text);
-    return this;
   }
 
   /**
@@ -104,10 +99,24 @@ public class SqlExpression {
     Connector conn = connectorDeque.getLast();
     if (conn.arguments > 0)
       whereClause.append(" ").append(conn.connector);
-    whereClause.append(" ").append(fieldName).append(" ").append(logic).append(" ?");
-    parameters.add(value);
+    if (logic.equalsIgnoreCase("IN") || logic.equalsIgnoreCase("NOT IN")) {
+      addQueryIn(fieldName, logic, (JsonArray) value);
+    } else {
+      whereClause.append(" ").append(fieldName).append(" ").append(logic).append(" ?");
+      parameters.add(value);
+    }
     conn.arguments++;
     return this;
+  }
+
+  private void addQueryIn(String fieldName, String logic, JsonArray values) {
+    whereClause.append(" ").append(fieldName).append(" ").append(logic).append(" ( ");
+    for (int i = 0; i < values.size(); i++) {
+      whereClause.append(i == 0 ? "?" : ", ?");
+      parameters.add(values.getValue(i));
+    }
+
+    whereClause.append(" ) ");
   }
 
   /**
@@ -129,12 +138,24 @@ public class SqlExpression {
   }
 
   /**
-   * Get the composite expression
+   * Get the composite select statement
    * 
    * @return the complete expression
    */
-  public String getCompleteExpression() {
+  public String getSelectExpression() {
     StringBuilder complete = new StringBuilder(select);
+    if (whereClause.length() > 0)
+      complete.append(" WHERE").append(whereClause);
+    return complete.toString();
+  }
+
+  /**
+   * Get the composite delete statement
+   * 
+   * @return the complete expression
+   */
+  public String getDeleteExpression() {
+    StringBuilder complete = new StringBuilder(delete);
     if (whereClause.length() > 0)
       complete.append(" WHERE").append(whereClause);
     return complete.toString();
@@ -147,5 +168,10 @@ public class SqlExpression {
     Connector(String connector) {
       this.connector = connector;
     }
+  }
+
+  @Override
+  public String toString() {
+    return getSelectExpression() + " | " + getDeleteExpression() + " | " + getParameters();
   }
 }

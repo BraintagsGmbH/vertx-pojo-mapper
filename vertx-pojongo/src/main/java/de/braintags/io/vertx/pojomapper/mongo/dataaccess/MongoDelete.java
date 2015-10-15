@@ -13,23 +13,16 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete;
+import de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.DeleteResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.ext.mongo.MongoClient;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeDelete;
-import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
-import de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete;
-import de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.DeleteResult;
-import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 
 /**
  * 
@@ -48,41 +41,11 @@ public class MongoDelete<T> extends Delete<T> {
     super(mapperClass, datastore);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete#delete(io.vertx.core.Handler)
-   */
   @Override
-  public void delete(Handler<AsyncResult<IDeleteResult>> resultHandler) {
-    if (getQuery() != null) {
-      deleteQuery((MongoQuery<T>) getQuery(), resultHandler);
-    } else if (!getRecordList().isEmpty()) {
-      deleteRecords(resultHandler);
-    } else
-      throw new ParameterRequiredException("Nor query nor records defined to be deleted");
-  }
-
-  private void deleteRecords(Handler<AsyncResult<IDeleteResult>> resultHandler) {
-    MongoQuery<T> query = (MongoQuery<T>) getDataStore().createQuery(getMapperClass());
-    IField idField = getMapper().getIdField();
-    List<Object> values = new ArrayList<Object>();
-    for (T record : getRecordList()) {
-      getMapper().executeLifecycle(BeforeDelete.class, record);
-      values.add(idField.getPropertyAccessor().readData(record));
-    }
-    query.field(idField.getName()).in(values);
-    deleteQuery(query, dr -> {
-      for (T record : getRecordList()) {
-        getMapper().executeLifecycle(AfterDelete.class, record);
-      }
-      resultHandler.handle(dr);
-    });
-  }
-
-  private void deleteQuery(MongoQuery<T> query, Handler<AsyncResult<IDeleteResult>> resultHandler) {
+  protected void deleteQuery(IQuery<T> q, Handler<AsyncResult<IDeleteResult>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
     String collection = getMapper().getTableInfo().getName();
+    MongoQuery<T> query = (MongoQuery<T>) q;
     query.createQueryDefinition(qDefResult -> {
       if (qDefResult.failed()) {
         resultHandler.handle(Future.failedFuture(qDefResult.cause()));
@@ -91,7 +54,7 @@ public class MongoDelete<T> extends Delete<T> {
           if (deleteHandler.failed()) {
             resultHandler.handle(Future.failedFuture(deleteHandler.cause()));
           } else {
-            DeleteResult deleteResult = new DeleteResult(getDataStore(), getMapper(), qDefResult.result());
+            DeleteResult deleteResult = new MongoDeleteResult(getDataStore(), getMapper(), qDefResult.result());
             resultHandler.handle(Future.succeededFuture(deleteResult));
           }
         });

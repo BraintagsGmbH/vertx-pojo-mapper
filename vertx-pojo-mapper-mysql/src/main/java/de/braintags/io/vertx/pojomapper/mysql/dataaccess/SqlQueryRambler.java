@@ -40,11 +40,8 @@ import io.vertx.core.json.JsonArray;
  */
 
 public class SqlQueryRambler implements IQueryRambler {
-  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
-      .getLogger(SqlQueryRambler.class);
-  private static final String SELECT_STATEMENT = "SELECT * from %s";
   private IMapper mapper;
-  private SqlExpression statement = new SqlExpression();
+  private SqlExpression statement;
 
   /*
    * (non-Javadoc)
@@ -57,7 +54,7 @@ public class SqlQueryRambler implements IQueryRambler {
     if (mapper != null)
       throw new UnsupportedOperationException("sub query not implemented yet");
     mapper = query.getMapper();
-    statement.addSelect(String.format(SELECT_STATEMENT, mapper.getTableInfo().getName()));
+    statement = new SqlExpression(mapper);
   }
 
   /*
@@ -161,6 +158,7 @@ public class SqlQueryRambler implements IQueryRambler {
           return;
         } else {
           resultArray.add(result.result().getResult());
+
           if (co.reduce()) {
             String colName = ci.getName();
             add(colName, operator, resultArray);
@@ -223,4 +221,8 @@ public class SqlQueryRambler implements IQueryRambler {
     return statement;
   }
 
+  @Override
+  public String toString() {
+    return statement.toString();
+  }
 }

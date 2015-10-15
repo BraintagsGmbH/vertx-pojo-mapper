@@ -23,6 +23,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
 import io.vertx.ext.asyncsql.MySQLClient;
+import io.vertx.ext.sql.SQLConnection;
 
 /**
  * 
@@ -60,8 +61,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
           .put("password", password).put("database", database).put("port", 3306);
       mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
       datastore = new MySqlDataStore(mySQLClient, database);
-      // handler.handle(Future.succeededFuture());
-      dropTables(handler);
+      handler.handle(Future.succeededFuture());
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }
@@ -83,9 +83,23 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   }
 
   @Override
-  public void dropTables(Handler<AsyncResult<Void>> handler) {
+  public void dropTable(String tableName, Handler<AsyncResult<Void>> handler) {
+    mySQLClient.getConnection(cr -> {
+      if (cr.failed()) {
+        handler.handle(Future.failedFuture(cr.cause()));
+        return;
+      }
+      SQLConnection conn = cr.result();
+      conn.execute("DROP TABLE IF EXISTS " + tableName, dr -> {
+        if (dr.failed()) {
+          handler.handle(Future.failedFuture(dr.cause()));
+          return;
+        }
+        handler.handle(Future.succeededFuture());
 
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+      });
+
+    });
   }
 
 }

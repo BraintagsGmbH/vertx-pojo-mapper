@@ -45,6 +45,8 @@ public class TestSimpleInsert extends DatastoreBaseTest {
 
   @Test
   public void testRoundtrip() {
+    dropTable("MiniMapper");
+
     MiniMapper sm = new MiniMapper();
     ResultContainer resultContainer = saveRecord(sm);
     if (resultContainer.assertionError != null)

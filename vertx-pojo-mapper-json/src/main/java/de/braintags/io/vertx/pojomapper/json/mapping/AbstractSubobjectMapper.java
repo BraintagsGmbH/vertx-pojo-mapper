@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
+import de.braintags.io.vertx.pojomapper.json.dataaccess.JsonStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
@@ -49,6 +50,24 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
    * 
    */
   public AbstractSubobjectMapper() {
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper#readForStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
+   */
+  @Override
+  public void readForStore(Object entity, IField field, Handler<AsyncResult<Object>> handler) {
+    JsonStoreObject jsto = new JsonStoreObject(field.getMapper(), entity);
+    intoStoreObject(entity, jsto, field, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+        return;
+      }
+      handler.handle(Future.succeededFuture(jsto.get(field)));
+    });
   }
 
   /*

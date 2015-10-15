@@ -269,10 +269,6 @@ public class DatastoreBaseTest extends VertxTestBase {
       try {
         resultContainer.deleteResult = result.result();
         checkDeleteResult(result);
-
-        ResultContainer queryResult = find(checkQuery, expectedResult);
-        resultContainer.assertionError = queryResult.assertionError;
-        resultContainer.queryResult = queryResult.queryResult;
       } catch (AssertionError e) {
         resultContainer.assertionError = e;
       } catch (Throwable e) {
@@ -288,6 +284,10 @@ public class DatastoreBaseTest extends VertxTestBase {
       e.printStackTrace();
     }
 
+    // Now perform the query check
+    ResultContainer queryResult = find(checkQuery, expectedResult);
+    resultContainer.assertionError = queryResult.assertionError;
+    resultContainer.queryResult = queryResult.queryResult;
     return resultContainer;
   }
 
@@ -341,4 +341,22 @@ public class DatastoreBaseTest extends VertxTestBase {
     }
   }
 
+  public void dropTable(String tableName) {
+    CountDownLatch latch = new CountDownLatch(1);
+    ErrorObject<Void> err = new ErrorObject<Void>(null);
+    datastoreContainer.dropTable("MiniMapper", result -> {
+      if (result.failed()) {
+        err.setThrowable(result.cause());
+      }
+      latch.countDown();
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    if (err.isError())
+      throw err.getRuntimeException();
+  }
 }

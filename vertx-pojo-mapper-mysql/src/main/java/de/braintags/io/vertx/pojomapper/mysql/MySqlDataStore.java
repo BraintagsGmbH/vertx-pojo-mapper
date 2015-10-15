@@ -19,13 +19,14 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
-import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
+import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlDelete;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQuery;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlWrite;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlTableGenerator;
+import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlTypeHandlerFactory;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
 
 /**
@@ -47,7 +48,7 @@ public class MySqlDataStore extends AbstractDataStore {
     metaData = new MySqlMetaData(sqlClient);
     setMapperFactory(new MapperFactory(this));
     setPropertyMapperFactory(new JsonPropertyMapperFactory());
-    setTypeHandlerFactory(new JsonTypeHandlerFactory());
+    setTypeHandlerFactory(new SqlTypeHandlerFactory());
     setStoreObjectFactory(new SqlStoreObjectFactory());
     setDataStoreSynchronizer(new SqlDataStoreSynchronizer(this));
     setTableGenerator(new SqlTableGenerator());
@@ -80,7 +81,7 @@ public class MySqlDataStore extends AbstractDataStore {
    */
   @Override
   public <T> IDelete<T> createDelete(Class<T> mapper) {
-    throw new UnsupportedOperationException();
+    return new SqlDelete<T>(mapper, this);
   }
 
   /**

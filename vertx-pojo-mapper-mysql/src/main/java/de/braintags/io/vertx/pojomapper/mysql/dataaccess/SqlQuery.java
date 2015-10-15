@@ -18,6 +18,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
+import de.braintags.io.vertx.pojomapper.mysql.exception.SqlException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -136,10 +137,10 @@ public class SqlQuery<T> extends Query<T> {
       Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     SqlExpression statement = query.getSqlStatement();
     if (statement.hasQueryParameters()) {
-      connection.queryWithParams(statement.getCompleteExpression(), statement.getParameters(),
+      connection.queryWithParams(statement.getSelectExpression(), statement.getParameters(),
           qRes -> handleQueryResult(qRes, connection, query, resultHandler));
     } else {
-      connection.query(statement.getCompleteExpression(),
+      connection.query(statement.getSelectExpression(),
           qRes -> handleQueryResult(qRes, connection, query, resultHandler));
     }
   }
@@ -148,7 +149,8 @@ public class SqlQuery<T> extends Query<T> {
       Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     connection.close();
     if (qRes.failed()) {
-      resultHandler.handle(Future.failedFuture(qRes.cause()));
+      String message = "Executed query: " + query.getSqlStatement().toString();
+      resultHandler.handle(Future.failedFuture(new SqlException(message, qRes.cause())));
       return;
     }
     SqlQueryResult<T> qr = createQueryResult(qRes.result(), query);

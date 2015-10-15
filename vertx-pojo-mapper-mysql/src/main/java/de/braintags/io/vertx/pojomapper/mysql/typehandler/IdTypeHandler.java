@@ -11,13 +11,16 @@
  * #L%
  */
 
-package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
+package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
+import de.braintags.io.vertx.pojomapper.mysql.SqlUtil;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -70,6 +73,8 @@ public class IdTypeHandler extends AbstractTypeHandler {
   }
 
   private Object convertToString(Object id) {
+    if (id == null)
+      return id;
     if (id instanceof Number)
       return String.valueOf(id);
     if (id instanceof String)
@@ -78,6 +83,8 @@ public class IdTypeHandler extends AbstractTypeHandler {
   }
 
   private Object convertToLong(Object id) {
+    if (id == null)
+      return id;
     if (id instanceof String)
       return Long.parseLong((String) id);
     if (id instanceof Number)
@@ -93,7 +100,19 @@ public class IdTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    getInternalTypeHandler(field).intoStore(source, field, resultHandler);
+    // getInternalTypeHandler(field).intoStore(source, field, resultHandler);
+    // here we would need an ITypehandler reacting to the column type in spite of the java field, if types are different
+    IColumnInfo colInfo = field.getColumnInfo();
+    if (SqlUtil.isCharacter(colInfo)) {
+      source = convertToString(source);
+    } else if (SqlUtil.isNumeric(colInfo)) {
+      source = convertToLong(source);
+    } else
+      resultHandler
+          .handle(Future.failedFuture(new UnsupportedOperationException("id column is nor numeric nor character")));
+
+    DefaultTypeHandlerResult thResult = new DefaultTypeHandlerResult(source);
+    resultHandler.handle(Future.succeededFuture(thResult));
   }
 
   private ITypeHandler getInternalTypeHandler(IField field) {

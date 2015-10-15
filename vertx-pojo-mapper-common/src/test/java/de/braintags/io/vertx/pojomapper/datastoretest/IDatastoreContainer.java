@@ -39,5 +39,5 @@ public interface IDatastoreContainer {
    * 
    * @param handler
    */
-  public void dropTables(Handler<AsyncResult<Void>> handler);
+  public void dropTable(String tablename, Handler<AsyncResult<Void>> handler);
 }
