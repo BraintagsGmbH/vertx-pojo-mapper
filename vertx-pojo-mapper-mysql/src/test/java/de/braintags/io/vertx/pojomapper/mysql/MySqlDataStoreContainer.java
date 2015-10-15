@@ -92,13 +92,13 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
       SQLConnection conn = cr.result();
       conn.execute("DROP TABLE IF EXISTS " + tableName, dr -> {
         if (dr.failed()) {
+          LOGGER.error("error deleting table", dr.cause());
           handler.handle(Future.failedFuture(dr.cause()));
           return;
         }
+        LOGGER.info("Deleted table " + tableName);
         handler.handle(Future.succeededFuture());
-
       });
-
     });
   }
 

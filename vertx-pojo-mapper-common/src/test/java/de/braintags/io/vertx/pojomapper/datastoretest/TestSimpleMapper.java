@@ -97,6 +97,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
 
   @Test
   public void testSimpleOr() {
+    dropTable("SimpleMapper");
     createDemoRecords();
 
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
@@ -114,17 +115,20 @@ public class TestSimpleMapper extends DatastoreBaseTest {
 
   @Test
   public void testSimpleAnd() {
+    dropTable("SimpleMapper");
     createDemoRecords();
 
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
     query.and("name").is("Dublette").field("secondProperty").is("erste");
     ResultContainer resultContainer = find(query, 1);
+    logger.info(resultContainer.queryResult.getOriginalQuery().toString());
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
   }
 
   @Test
   public void testSimpleAndCount() {
+    dropTable("SimpleMapper");
     createDemoRecords();
 
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
@@ -136,6 +140,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
 
   @Test
   public void testQueryMultipleFields() {
+    dropTable("SimpleMapper");
     createDemoRecords();
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
     query.field("name").is("Dublette");
@@ -154,11 +159,13 @@ public class TestSimpleMapper extends DatastoreBaseTest {
    */
   @Test
   public void testAndOr() {
+    dropTable("SimpleMapper");
     createDemoRecords();
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
     query.and("name").is("AndOr").or("secondProperty").is("AndOr 1").field("secondProperty").is("AndOr 2");
 
     ResultContainer resultContainer = find(query, 2);
+    logger.info(resultContainer.queryResult.getOriginalQuery().toString());
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
   }
@@ -168,6 +175,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
    */
   @Test
   public void testIn() {
+    dropTable("SimpleMapper");
     createDemoRecords();
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
     List<String> it = Arrays.asList("Dublette", "AndOr");
@@ -183,6 +191,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
    */
   @Test
   public void testNotIn() {
+    dropTable("SimpleMapper");
     createDemoRecords();
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
     List<String> it = Arrays.asList("erste", "zweite");
@@ -198,6 +207,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
    */
   @Test
   public void testIsNot() {
+    dropTable("SimpleMapper");
     createDemoRecords();
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
     query.field("name").isNot("Dublette");
