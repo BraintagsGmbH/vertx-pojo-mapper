@@ -30,9 +30,12 @@ import io.vertx.core.json.JsonArray;
 public class SqlExpression {
   private static final String SELECT_STATEMENT = "SELECT * from %s";
   private static final String DELETE_STATEMENT = "DELETE from %s";
+  private static final String COUNT_STATEMENT = "SELECT count(*) from %s";
 
   private StringBuilder select = new StringBuilder();
   private StringBuilder delete = new StringBuilder();
+  private StringBuilder count = new StringBuilder();
+
   private StringBuilder whereClause = new StringBuilder();
   private JsonArray parameters = new JsonArray();
   private Deque<Connector> connectorDeque = new ArrayDeque<Connector>();
@@ -47,6 +50,7 @@ public class SqlExpression {
   public SqlExpression(IMapper mapper) {
     select.append(String.format(SELECT_STATEMENT, mapper.getTableInfo().getName()));
     delete.append(String.format(DELETE_STATEMENT, mapper.getTableInfo().getName()));
+    count.append(String.format(COUNT_STATEMENT, mapper.getTableInfo().getName()));
     connectorDeque.addLast(new Connector("AND"));
   }
 
@@ -159,6 +163,17 @@ public class SqlExpression {
    */
   public JsonArray getParameters() {
     return parameters;
+  }
+
+  /**
+   * Get the composite statement for a count
+   * 
+   * @return the complete expression
+   */
+  public String getCountExpression() {
+    StringBuilder complete = new StringBuilder(count);
+    appendWhereClause(complete);
+    return complete.toString();
   }
 
   /**

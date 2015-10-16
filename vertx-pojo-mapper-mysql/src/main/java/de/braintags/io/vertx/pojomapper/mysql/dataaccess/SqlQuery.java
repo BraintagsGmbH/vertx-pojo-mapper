@@ -84,7 +84,20 @@ public class SqlQuery<T> extends Query<T> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
       } else {
-        resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+        try {
+          createQueryDefinition(result -> {
+            if (result.failed()) {
+              resultHandler.handle(Future.failedFuture(result.cause()));
+              return;
+            }
+
+            doCount(result.result(), resultHandler);
+
+          });
+        } catch (Exception e) {
+          Future<IQueryCountResult> future = Future.failedFuture(e);
+          resultHandler.handle(future);
+        }
 
       }
     });
@@ -125,6 +138,41 @@ public class SqlQuery<T> extends Query<T> {
         resultHandler.handle(Future.succeededFuture(rambler));
       }
     });
+  }
+
+  private void doCount(SqlQueryRambler query, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+    ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> {
+      if (cr.failed()) {
+        resultHandler.handle(Future.failedFuture(cr.cause()));
+        return;
+      }
+      SQLConnection connection = cr.result();
+      executeCount(connection, query, resultHandler);
+    });
+  }
+
+  private void executeCount(SQLConnection connection, SqlQueryRambler query,
+      Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+    SqlExpression statement = query.getSqlStatement();
+    if (statement.hasQueryParameters()) {
+      connection.queryWithParams(statement.getCountExpression(), statement.getParameters(),
+          qRes -> handleCountResult(qRes, connection, query, resultHandler));
+    } else {
+      connection.query(statement.getCountExpression(),
+          qRes -> handleCountResult(qRes, connection, query, resultHandler));
+    }
+  }
+
+  private void handleCountResult(AsyncResult<ResultSet> qRes, SQLConnection connection, SqlQueryRambler query,
+      Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+    connection.close();
+    if (qRes.failed()) {
+      String message = "Executed count: " + query.getSqlStatement().toString();
+      resultHandler.handle(Future.failedFuture(new SqlException(message, qRes.cause())));
+      return;
+    }
+    SqlQueryCountResult cr = new SqlQueryCountResult(getMapper(), getDataStore(), qRes.result(), query);
+    resultHandler.handle(Future.succeededFuture(cr));
   }
 
   private void doFind(SqlQueryRambler query, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
