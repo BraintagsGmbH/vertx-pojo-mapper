@@ -32,16 +32,16 @@ public class QueryCountResult implements IQueryCountResult {
   private Object originalQuery;
 
   /**
+   * Constructor based on various information
    * 
-   */
-  public QueryCountResult() {
-  }
-
-  /**
    * @param mapper
+   *          the mapper which was used
    * @param dataStore
+   *          the datastore which was used
    * @param count
+   *          the number of instances found
    * @param originalQuery
+   *          the object which was used to process native the query
    */
   public QueryCountResult(IMapper mapper, IDataStore dataStore, long count, Object originalQuery) {
     this.mapper = mapper;

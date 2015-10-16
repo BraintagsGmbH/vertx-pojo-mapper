@@ -90,15 +90,12 @@ public class SqlQuery<T> extends Query<T> {
               resultHandler.handle(Future.failedFuture(result.cause()));
               return;
             }
-
             doCount(result.result(), resultHandler);
-
           });
         } catch (Exception e) {
           Future<IQueryCountResult> future = Future.failedFuture(e);
           resultHandler.handle(future);
         }
-
       }
     });
   }

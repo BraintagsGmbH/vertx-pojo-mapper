@@ -33,16 +33,16 @@ import io.vertx.ext.sql.ResultSet;
 public class SqlQueryCountResult extends QueryCountResult {
 
   /**
+   * Constructor based on various information
    * 
-   */
-  public SqlQueryCountResult() {
-  }
-
-  /**
    * @param mapper
+   *          the mapper which was used
    * @param dataStore
-   * @param count
+   *          the datastore which was used
+   * @param resultSet
+   *          the resultSet which contains the number of records found
    * @param originalQuery
+   *          the object which was used to process native the query
    */
   public SqlQueryCountResult(IMapper mapper, IDataStore dataStore, ResultSet resultSet, Object originalQuery) {
     super(mapper, dataStore, getCount(resultSet), originalQuery);
