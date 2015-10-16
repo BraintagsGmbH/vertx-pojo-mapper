@@ -15,6 +15,7 @@ public class TestOnlyIdMapper extends DatastoreBaseTest {
 
   @Test
   public void testInsert() {
+    dropTable("OnlyIdMapper");
     OnlyIdMapper sm = new OnlyIdMapper();
     ResultContainer resultContainer = saveRecord(sm);
     if (resultContainer.assertionError != null)

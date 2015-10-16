@@ -61,8 +61,10 @@ public class IdTypeHandler extends AbstractTypeHandler {
     @SuppressWarnings("rawtypes")
     Class fieldClass = field.getType();
     try {
-      if (fieldClass.equals(Long.class)) {
+      if (fieldClass.equals(Long.class) || fieldClass.equals(long.class)) {
         id = convertToLong(id);
+      } else if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
+        id = convertToInt(id);
       } else if (fieldClass.equals(String.class)) {
         id = convertToString(id);
       } else
@@ -88,6 +90,16 @@ public class IdTypeHandler extends AbstractTypeHandler {
       return id;
     if (id instanceof String)
       return Long.parseLong((String) id);
+    if (id instanceof Number)
+      return id;
+    throw new UnsupportedOperationException("unsupported type to convert: " + id.getClass().getName());
+  }
+
+  private Object convertToInt(Object id) {
+    if (id == null)
+      return id;
+    if (id instanceof String)
+      return Integer.parseInt((String) id);
     if (id instanceof Number)
       return id;
     throw new UnsupportedOperationException("unsupported type to convert: " + id.getClass().getName());
@@ -137,4 +149,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
     return MATCH_NONE;
   }
 
+  public static void main(String[] args) {
+    System.out.println(Long.class.isAssignableFrom(long.class));
+  }
 }

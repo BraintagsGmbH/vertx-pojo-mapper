@@ -119,7 +119,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         return;
       }
       SQLConnection connection = cr.result();
-      if (currentId == null) {
+      if (currentId == null || (currentId instanceof Number && ((Number) currentId).intValue() == 0)) {
         handleInsert(storeObject, writeResult, connection, ir -> {
           closeConnection(connection);
           resultHandler.handle(ir);
