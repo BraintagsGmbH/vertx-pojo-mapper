@@ -26,6 +26,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObject.SqlSequence;
+import de.braintags.io.vertx.pojomapper.mysql.exception.SqlException;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
@@ -157,11 +158,18 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   private void handleUpdate(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlUpdateStatement();
-    connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), updateResult -> {
-      if (!checkUpdateResult(updateResult, resultHandler))
-        return;
-      finishUpdate(storeObject, writeResult, resultHandler);
-    });
+    if (seq.getParameters().isEmpty()) {
+      // should not happen, but ...
+      resultHandler
+          .handle(Future.failedFuture("Update without parameters should not happen normally: " + seq.toString()));
+    } else {
+      connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), updateResult -> {
+        if (!checkUpdateResult(seq, updateResult, resultHandler))
+          return;
+        finishUpdate(storeObject, writeResult, resultHandler);
+      });
+    }
+
   }
 
   @SuppressWarnings("unchecked")
@@ -181,8 +189,40 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   private void handleInsert(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlInsertStatement();
+    if (seq.getParameters().isEmpty()) {
+      insertWithoutParameters(storeObject, writeResult, connection, seq, resultHandler);
+    } else {
+      insertWithParameters(storeObject, writeResult, connection, seq, resultHandler);
+    }
+  }
+
+  /**
+   * This can happen, when a record is inserted which has only the ID field
+   * 
+   * @param storeObject
+   * @param writeResult
+   * @param connection
+   * @param seq
+   * @param resultHandler
+   */
+  private void insertWithoutParameters(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
+      SqlSequence seq, Handler<AsyncResult<Void>> resultHandler) {
+    connection.update(seq.getSqlStatement(), updateResult -> {
+      if (!checkUpdateResult(seq, updateResult, resultHandler))
+        return;
+      UpdateResult res = updateResult.result();
+      if (res.getKeys() != null && res.getKeys().size() == 1) {
+        finishInsert(storeObject, writeResult, res.getKeys().getValue(0), resultHandler);
+        return;
+      }
+      loadLastInsertedId(storeObject, writeResult, connection, resultHandler);
+    });
+  }
+
+  private void insertWithParameters(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
+      SqlSequence seq, Handler<AsyncResult<Void>> resultHandler) {
     connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), updateResult -> {
-      if (!checkUpdateResult(updateResult, resultHandler))
+      if (!checkUpdateResult(seq, updateResult, resultHandler))
         return;
       UpdateResult res = updateResult.result();
       if (res.getKeys() != null && res.getKeys().size() == 1) {
@@ -219,9 +259,11 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    *          the {@link Handler} to be informed
    * @return false, if an error occured and handler was sent an error, otherwise true
    */
-  private boolean checkUpdateResult(AsyncResult<UpdateResult> updateResult, Handler<AsyncResult<Void>> resultHandler) {
+  private boolean checkUpdateResult(SqlSequence seq, AsyncResult<UpdateResult> updateResult,
+      Handler<AsyncResult<Void>> resultHandler) {
     if (updateResult.failed()) {
-      resultHandler.handle(Future.failedFuture(updateResult.cause()));
+      SqlException ex = new SqlException("Error in saving record; Statement: " + seq.toString(), updateResult.cause());
+      resultHandler.handle(Future.failedFuture(ex));
       return false;
     }
     UpdateResult res = updateResult.result();

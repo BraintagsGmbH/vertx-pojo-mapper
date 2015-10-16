@@ -31,7 +31,6 @@ import io.vertx.core.logging.LoggerFactory;
  * @author Michael Remme
  * 
  */
-
 public class TestSimpleMapper extends DatastoreBaseTest {
   private static Logger logger = LoggerFactory.getLogger(TestSimpleMapper.class);
 

@@ -96,7 +96,8 @@ public class SqlStoreObject extends JsonStoreObject {
 
   class SqlSequence {
     boolean added = false;
-    private StringBuilder sqlStatement;
+    private StringBuilder headStatement;
+    private StringBuilder setStatement;
     private StringBuilder whereStatement;
     private Object id;
     private JsonArray parameters = new JsonArray();
@@ -107,7 +108,8 @@ public class SqlStoreObject extends JsonStoreObject {
      * @param tableName
      */
     public SqlSequence(String tableName) {
-      sqlStatement = new StringBuilder("Insert into ").append(tableName).append(" set ");
+      headStatement = new StringBuilder("Insert into ").append(tableName);
+      setStatement = new StringBuilder(" set ");
     }
 
     /**
@@ -121,7 +123,8 @@ public class SqlStoreObject extends JsonStoreObject {
      *          the id value
      */
     public SqlSequence(String tableName, IColumnInfo idColInfo, Object idValue) {
-      sqlStatement = new StringBuilder("UPDATE ").append(tableName).append(" set ");
+      headStatement = new StringBuilder("UPDATE ").append(tableName);
+      setStatement = new StringBuilder(" set ");
       whereStatement = new StringBuilder(" WHERE ").append(idColInfo.getName()).append(" = ?");
       this.id = idValue;
 
@@ -131,8 +134,8 @@ public class SqlStoreObject extends JsonStoreObject {
       if (value == null)
         return;
       if (added)
-        sqlStatement.append(", ");
-      sqlStatement.append(colName).append(" = ?");
+        setStatement.append(", ");
+      setStatement.append(colName).append(" = ?");
       parameters.add(value);
       added = true;
     }
@@ -143,9 +146,14 @@ public class SqlStoreObject extends JsonStoreObject {
      * @return the sqlStatement
      */
     public final String getSqlStatement() {
+      StringBuilder ret = new StringBuilder(headStatement);
+      if (parameters.isEmpty())
+        ret.append(" () VALUES ()");// insert into SimpleMapper () VALUES ()
+      else
+        ret.append(setStatement);
       if (whereStatement != null)
-        return sqlStatement.toString() + whereStatement.toString();
-      return sqlStatement.toString();
+        ret.append(whereStatement);
+      return ret.toString();
     }
 
     /**
@@ -157,5 +165,9 @@ public class SqlStoreObject extends JsonStoreObject {
       return parameters;
     }
 
+    @Override
+    public String toString() {
+      return getSqlStatement() + " | " + getParameters();
+    }
   }
 }

@@ -41,12 +41,6 @@ import io.vertx.core.logging.LoggerFactory;
 public class TestMapper extends DatastoreBaseTest {
   private static final Logger log = LoggerFactory.getLogger(TestMapper.class);
 
-  /**
-   * 
-   */
-  public TestMapper() {
-  }
-
   @Override
   protected VertxOptions getOptions() {
     VertxOptions options = new VertxOptions();
