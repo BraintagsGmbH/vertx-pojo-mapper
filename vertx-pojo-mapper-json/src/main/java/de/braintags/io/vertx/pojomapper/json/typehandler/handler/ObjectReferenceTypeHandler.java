@@ -39,7 +39,10 @@ import io.vertx.core.Handler;
 public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
 
   /**
-   * @param classesToDeal
+   * Constructor with parent {@link ITypeHandlerFactory}
+   * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public ObjectReferenceTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, ObjectReference.class);

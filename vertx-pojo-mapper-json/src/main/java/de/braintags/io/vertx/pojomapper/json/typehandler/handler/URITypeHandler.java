@@ -31,7 +31,10 @@ import io.vertx.core.Handler;
 public class URITypeHandler extends AbstractTypeHandler {
 
   /**
-   * @param classesToDeal
+   * Constructor with parent {@link ITypeHandlerFactory}
+   * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public URITypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, URI.class);

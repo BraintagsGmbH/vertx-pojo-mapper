@@ -29,7 +29,10 @@ import io.vertx.core.Handler;
 public class CharacterTypeHandler extends AbstractTypeHandler {
 
   /**
-   * @param classesToDeal
+   * Constructor with parent {@link ITypeHandlerFactory}
+   * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public CharacterTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, char.class, Character.class);

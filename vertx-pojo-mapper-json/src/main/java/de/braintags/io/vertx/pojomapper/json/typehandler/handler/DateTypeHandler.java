@@ -37,7 +37,10 @@ import io.vertx.core.Handler;
 public class DateTypeHandler extends AbstractTypeHandler {
 
   /**
-   * @param classesToDeal
+   * Constructor with parent {@link ITypeHandlerFactory}
+   * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public DateTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, Date.class);

@@ -38,7 +38,10 @@ import io.vertx.core.json.JsonArray;
 public class MapTypeHandler extends AbstractTypeHandler {
 
   /**
-   * @param classesToDeal
+   * Constructor with parent {@link ITypeHandlerFactory}
+   * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public MapTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, Map.class);

@@ -29,7 +29,10 @@ import io.vertx.core.Handler;
 public class ByteTypeHandler extends AbstractTypeHandler {
 
   /**
-   * @param classesToDeal
+   * Constructor with parent {@link ITypeHandlerFactory}
+   * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public ByteTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, byte.class, Byte.class);

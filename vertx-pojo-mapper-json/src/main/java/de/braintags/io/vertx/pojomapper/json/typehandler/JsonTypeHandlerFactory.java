@@ -101,4 +101,17 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     return defaultHandler;
   }
 
+  /**
+   * Remove the typehandler specified by the given class
+   * 
+   * @param typeHandlerClass
+   *          the class of the typehandler, which shall be removed
+   */
+  public void remove(Class typeHandlerClass) {
+    for (int i = definedTypeHandlers.size() - 1; i >= 0; i--) {
+      if (definedTypeHandlers.get(i).getClass() == typeHandlerClass)
+        definedTypeHandlers.remove(i);
+    }
+  }
+
 }

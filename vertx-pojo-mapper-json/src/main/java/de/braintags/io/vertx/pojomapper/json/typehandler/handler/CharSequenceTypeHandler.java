@@ -32,7 +32,10 @@ import io.vertx.core.Handler;
 public class CharSequenceTypeHandler extends AbstractTypeHandler {
 
   /**
-   * @param classesToDeal
+   * Constructor with parent {@link ITypeHandlerFactory}
+   * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public CharSequenceTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, CharSequence.class);

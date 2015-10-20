@@ -30,4 +30,14 @@ public class DoubleColumnHandler extends NumericColumnHandler {
     super("DOUBLE", true, true, Double.class, Float.class, double.class, float.class);
   }
 
+  /**
+   * Constructor for a extending classes
+   * 
+   * @param classesToDeal
+   *          the classes, which shall be handled
+   */
+  protected DoubleColumnHandler(Class<?>... classesToDeal) {
+    super("DOUBLE", true, true, classesToDeal);
+  }
+
 }

@@ -29,7 +29,10 @@ import io.vertx.core.Handler;
 public class FloatTypeHandler extends AbstractTypeHandler {
 
   /**
-   * @param classesToDeal
+   * Constructor with parent {@link ITypeHandlerFactory}
+   * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public FloatTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, float.class, Float.class, float[].class, Float[].class);

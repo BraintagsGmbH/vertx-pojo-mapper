@@ -31,15 +31,25 @@ public class StringColumnHandler extends AbstractSqlColumnHandler {
   private static final int CHAR_MAX = 50;
   private int VARCHAR_MAX = 32000;
 
-  private static final String CHAR_TYPE = "char";
-  private static final String VARCHAR_TYPE = "varchar";
-  private static final String LONGTEXT_TYPE = "longtext";
+  public static final String CHAR_TYPE = "char";
+  public static final String VARCHAR_TYPE = "varchar";
+  public static final String LONGTEXT_TYPE = "longtext";
 
   /**
    * Constructor for a StringColumnHandler
    */
   public StringColumnHandler() {
     super(CharSequence.class);
+  }
+
+  /**
+   * Constructor for a extending classes
+   * 
+   * @param classesToDeal
+   *          the classes, which shall be handled
+   */
+  protected StringColumnHandler(Class<?>... classesToDeal) {
+    super(classesToDeal);
   }
 
   /*

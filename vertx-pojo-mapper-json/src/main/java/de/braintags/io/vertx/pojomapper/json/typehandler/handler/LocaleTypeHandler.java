@@ -31,7 +31,10 @@ import io.vertx.core.Handler;
 public class LocaleTypeHandler extends AbstractTypeHandler {
 
   /**
-   * @param classesToDeal
+   * Constructor with parent {@link ITypeHandlerFactory}
+   * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public LocaleTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, Locale.class);

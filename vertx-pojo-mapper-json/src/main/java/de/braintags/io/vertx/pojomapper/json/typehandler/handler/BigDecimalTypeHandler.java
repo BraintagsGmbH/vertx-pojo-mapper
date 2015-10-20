@@ -31,7 +31,10 @@ import io.vertx.core.Handler;
 public class BigDecimalTypeHandler extends AbstractTypeHandler {
 
   /**
-   * @param classesToDeal
+   * Constructor with parent {@link ITypeHandlerFactory}
+   * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public BigDecimalTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, BigDecimal.class);

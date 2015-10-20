@@ -31,7 +31,10 @@ import io.vertx.core.Handler;
 public class EnumTypeHandler extends AbstractTypeHandler {
 
   /**
-   * @param classesToDeal
+   * Constructor with parent {@link ITypeHandlerFactory}
+   * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public EnumTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, Enum.class);

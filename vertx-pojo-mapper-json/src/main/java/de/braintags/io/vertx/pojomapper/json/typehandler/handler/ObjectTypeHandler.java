@@ -30,7 +30,10 @@ public class ObjectTypeHandler extends AbstractTypeHandler {
   private static final Class<?>[] handleClass = { Object.class };
 
   /**
+   * Constructor with parent {@link ITypeHandlerFactory}
    * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public ObjectTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, handleClass);

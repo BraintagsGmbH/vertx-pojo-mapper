@@ -38,7 +38,10 @@ import io.vertx.core.json.JsonArray;
 public class CollectionTypeHandler extends AbstractTypeHandler {
 
   /**
-   * @param classesToDeal
+   * Constructor with parent {@link ITypeHandlerFactory}
+   * 
+   * @param typeHandlerFactory
+   *          the parent {@link ITypeHandlerFactory}
    */
   public CollectionTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, Collection.class);
