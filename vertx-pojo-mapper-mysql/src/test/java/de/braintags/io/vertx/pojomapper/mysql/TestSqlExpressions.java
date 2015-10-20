@@ -52,6 +52,64 @@ public class TestSqlExpressions extends DatastoreBaseTest {
   }
 
   @Test
+  public void testTimeField() {
+    String createTableString = "Create TABLE IF NOT EXISTS  timetable (id INT NOT NULL AUTO_INCREMENT, myTime TIME, PRIMARY KEY(id))";
+    CountDownLatch latch = new CountDownLatch(1);
+    ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> {
+      if (cr.failed()) {
+        log.error("", cr.cause());
+        latch.countDown();
+      } else {
+        SQLConnection conn = cr.result();
+        conn.execute(createTableString, createTableResult -> {
+          if (createTableResult.failed()) {
+            log.error("", createTableResult.cause());
+            fail();
+            latch.countDown();
+          } else {
+            String insertExpression = "insert into timetable set myTime=?; ";
+            JsonArray array = new JsonArray().add("18:45:22");
+            conn.updateWithParams(insertExpression, array, ur -> {
+              if (ur.failed()) {
+                log.error("", ur.cause());
+                latch.countDown();
+              } else {
+                UpdateResult res = ur.result();
+                log.info(res.toJson());
+                log.info(res.getKeys());
+
+                String allRecords = "SELECT * from timetable";
+                conn.query(allRecords, idResult -> {
+                  if (idResult.failed()) {
+                    log.error("", idResult.cause());
+                    fail(idResult.cause().toString());
+                    latch.countDown();
+                  } else {
+                    List<JsonObject> ids = idResult.result().getRows();
+                    for (JsonObject row : ids) {
+                      log.info(row);
+                    }
+                    latch.countDown();
+                  }
+                });
+
+              }
+            });
+          }
+        });
+      }
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      log.error("", e);
+    } finally {
+      testComplete();
+    }
+  }
+
+  @Test
   public void simpleTest() {
     CountDownLatch latch = new CountDownLatch(1);
     ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> {

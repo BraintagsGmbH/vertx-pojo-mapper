@@ -105,7 +105,6 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
    * @param field
    * @return
    */
-  @SuppressWarnings("unused")
   private ITypeHandler examineMatch(IField field) {
     ITypeHandler returnHandler = null;
     List<ITypeHandler> ths = getDefinedTypehandlers();

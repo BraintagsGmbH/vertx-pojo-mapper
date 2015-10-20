@@ -12,12 +12,16 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest.typehandler;
 
+import java.util.Iterator;
+
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.datastoretest.ResultContainer;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.BaseRecord;
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 
 /**
  * 
@@ -36,6 +40,11 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
     ResultContainer resultContainer = saveRecord(record);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
+    Iterator<IWriteEntry> it = resultContainer.writeResult.iterator();
+    while (it.hasNext()) {
+      IStoreObject<?> entry = it.next().getStoreObject();
+      LOGGER.info(entry.toString());
+    }
 
     // SimpleQuery for all records
     IQuery<? extends BaseRecord> query = getDataStore().createQuery(record.getClass());

@@ -12,8 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.mapping;
 
-import io.vertx.codegen.annotations.Fluent;
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import io.vertx.codegen.annotations.Fluent;
 
 /**
  * The IStoreObject is building the bridge between the propriate format coming from out of the used {@link IDataStore}
@@ -60,4 +60,7 @@ public interface IStoreObject<T> {
    * @return the entity
    */
   public Object getEntity();
+
+  @Override
+  public String toString();
 }

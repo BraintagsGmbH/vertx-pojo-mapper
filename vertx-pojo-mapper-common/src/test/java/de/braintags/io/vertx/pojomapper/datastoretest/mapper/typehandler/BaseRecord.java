@@ -64,7 +64,7 @@ public class BaseRecord {
     }
 
     if (!value.equals(compareValue))
-      throw new MappingException("Contents are not equal: " + fieldName);
+      throw new MappingException("Contents are not equal: " + fieldName + ": " + value + " / " + compareValue);
     return true;
   }
 

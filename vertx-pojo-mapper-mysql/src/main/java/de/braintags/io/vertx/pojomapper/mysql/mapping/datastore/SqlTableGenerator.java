@@ -21,12 +21,16 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.BigDecimalColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.BigIntegerColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.BooleanColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ByteColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.DateColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.DoubleColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.IntegerColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.LongColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ShortColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.StringColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.TimeColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.TimestampColumnHandler;
 
 /**
  * 
@@ -45,6 +49,10 @@ public class SqlTableGenerator extends DefaultTableGenerator {
     definedColumnHandlers.add(new ShortColumnHandler());
     definedColumnHandlers.add(new BigIntegerColumnHandler());
     definedColumnHandlers.add(new BigDecimalColumnHandler());
+    definedColumnHandlers.add(new BooleanColumnHandler());
+    definedColumnHandlers.add(new TimeColumnHandler());
+    definedColumnHandlers.add(new DateColumnHandler());
+    definedColumnHandlers.add(new TimestampColumnHandler());
   }
 
   /**

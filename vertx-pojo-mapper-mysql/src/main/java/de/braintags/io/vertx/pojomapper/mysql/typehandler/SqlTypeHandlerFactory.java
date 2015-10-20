@@ -40,9 +40,9 @@ public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
   protected void init() {
     super.init();
     getDefinedTypehandlers().add(0, new IdTypeHandler(this));
+    getDefinedTypehandlers().add(0, new BooleanTypeHandler(this));
+    getDefinedTypehandlers().add(0, new TimeTypeHandler(this));
 
-    // remove(BigIntegerTypeHandler.class);
-    // getDefinedTypehandlers().add(0, new SqlBigIntgerTypeHandler(this));
   }
 
 }
