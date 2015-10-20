@@ -14,8 +14,6 @@ package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
 import java.sql.Time;
 
-import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
 
 /**
@@ -25,8 +23,8 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
  * 
  */
 
-public class TimeColumnHandler extends AbstractSqlColumnHandler {
-  public static final String TIME_TYPE = "TIME";
+public class TimeColumnHandler extends StringColumnHandler {
+  public static final String TIME_TYPE = "CHAR";
 
   /**
    * Constructor
@@ -44,18 +42,7 @@ public class TimeColumnHandler extends AbstractSqlColumnHandler {
   @Override
   public void applyMetaData(SqlColumnInfo column) {
     column.setType(TIME_TYPE);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#generateColumn(de.
-   * braintags.io.vertx.pojomapper.mapping.IField, de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo)
-   */
-  @Override
-  protected StringBuilder generateColumn(IField field, IColumnInfo ci) {
-    return new StringBuilder(String.format("%s %s ", ci.getName(), ci.getType()));
+    column.setLength(8);
   }
 
 }
