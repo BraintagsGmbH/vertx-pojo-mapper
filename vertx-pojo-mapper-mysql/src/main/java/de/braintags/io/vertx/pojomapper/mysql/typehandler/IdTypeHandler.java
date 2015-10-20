@@ -149,7 +149,4 @@ public class IdTypeHandler extends AbstractTypeHandler {
     return MATCH_NONE;
   }
 
-  public static void main(String[] args) {
-    System.out.println(Long.class.isAssignableFrom(long.class));
-  }
 }

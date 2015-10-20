@@ -12,16 +12,19 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest.typehandler;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.StringTestMapper;
+import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.NumericMapper;
 
 /**
- * 
+ * Mapper for testing numeric values
  * 
  * @author Michael Remme
  * 
  */
-public class StringTest extends AbstractTypeHandlerTest {
+public class NumericTest extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -30,9 +33,19 @@ public class StringTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance() {
-    StringTestMapper mapper = new StringTestMapper();
-    mapper.stringField = "testcontent";
-
+    NumericMapper mapper = new NumericMapper();
+    mapper.bigDecimal = new BigDecimal(23.44);
+    mapper.bigInteger = new BigInteger("9987");
+    mapper.myDoub = 333.5555;
+    mapper.myDouble = new Double(678.1234);
+    mapper.myFloat = 34.22f;
+    mapper.myFloatOb = new Float(234.45);
+    mapper.myInt = 45;
+    mapper.myInteger = new Integer(67);
+    mapper.myLong = 78934;
+    mapper.myLongOb = new Long(78797);
+    mapper.mySh = 34;
+    mapper.myShort = new Short((short) 45);
     return mapper;
   }
 
