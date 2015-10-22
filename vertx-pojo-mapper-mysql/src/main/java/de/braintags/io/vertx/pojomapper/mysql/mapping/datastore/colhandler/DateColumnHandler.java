@@ -12,27 +12,28 @@
  */
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
-import java.sql.Date;
+import java.util.Calendar;
+import java.util.Date;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
 
 /**
- * ColumnHandler dealing with {@link Date} and {@link java.util.Date}
+ * ColumnHandler dealing with instances of {@link Date} and {@link Calendar}
  * 
  * @author Michael Remme
  * 
  */
 
 public class DateColumnHandler extends AbstractSqlColumnHandler {
-  public static final String DATE_TYPE = "DATE";
+  public static final String DATE_TYPE = "TIMESTAMP";
 
   /**
    * Constructor
    */
   public DateColumnHandler() {
-    super(Date.class, java.util.Date.class);
+    super(Date.class, Calendar.class);
   }
 
   /*
@@ -55,7 +56,7 @@ public class DateColumnHandler extends AbstractSqlColumnHandler {
    */
   @Override
   protected StringBuilder generateColumn(IField field, IColumnInfo ci) {
-    return new StringBuilder(String.format("%s %s ", ci.getName(), ci.getType()));
+    return new StringBuilder(String.format("%s %s(3) ", ci.getName(), ci.getType()));
   }
 
 }

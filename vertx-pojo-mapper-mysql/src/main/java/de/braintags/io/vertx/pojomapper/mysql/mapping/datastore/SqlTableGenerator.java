@@ -29,8 +29,6 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.Integ
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.LongColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ShortColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.StringColumnHandler;
-import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.TimeColumnHandler;
-import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.TimestampColumnHandler;
 
 /**
  * 
@@ -50,9 +48,7 @@ public class SqlTableGenerator extends DefaultTableGenerator {
     definedColumnHandlers.add(new BigIntegerColumnHandler());
     definedColumnHandlers.add(new BigDecimalColumnHandler());
     definedColumnHandlers.add(new BooleanColumnHandler());
-    definedColumnHandlers.add(new TimeColumnHandler());
     definedColumnHandlers.add(new DateColumnHandler());
-    definedColumnHandlers.add(new TimestampColumnHandler());
   }
 
   /**

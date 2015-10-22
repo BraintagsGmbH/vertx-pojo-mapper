@@ -12,9 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.Date;
+import java.util.Calendar;
 
 /**
  * Mapper for testing boolean
@@ -22,10 +20,7 @@ import java.util.Date;
  * @author Michael Remme
  * 
  */
-public class DateMapper extends BaseRecord {
-  public Time myTime = new Time(System.currentTimeMillis());
-  public Timestamp myTimeStamp = new Timestamp(System.currentTimeMillis());
-  public Date javaDate = new Date(System.currentTimeMillis());
-  public java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+public class CalendarMapper extends BaseRecord {
+  public Calendar myCal = Calendar.getInstance();
 
 }

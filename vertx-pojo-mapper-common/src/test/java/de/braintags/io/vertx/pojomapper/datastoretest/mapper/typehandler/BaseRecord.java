@@ -2,7 +2,7 @@ package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.sql.Time;
+import java.util.Date;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
@@ -64,11 +64,12 @@ public class BaseRecord {
       return true;
     }
 
-    if (value instanceof Time) {
-      long t = ((Time) value).getTime();
-      long p = ((Time) compareValue).getTime();
+    if (value instanceof Date) {
+      long t = ((Date) value).getTime();
+      long p = ((Date) compareValue).getTime();
       if (t != p)
-        throw new MappingException("Contents are not equal: " + fieldName + ": " + value + " / " + compareValue);
+        throw new MappingException(
+            "Contents are not equal: " + fieldName + ": " + value + " - " + t + " / " + compareValue + " - " + p);
     }
 
     if (!value.equals(compareValue))

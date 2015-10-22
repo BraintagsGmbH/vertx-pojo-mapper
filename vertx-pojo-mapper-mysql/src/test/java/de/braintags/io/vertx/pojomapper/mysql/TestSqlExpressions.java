@@ -53,7 +53,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
 
   @Test
   public void testTimeField() {
-    String createTableString = "Create TABLE IF NOT EXISTS  timetable (id INT NOT NULL AUTO_INCREMENT, myTime TIME, PRIMARY KEY(id))";
+    String createTableString = "Create TABLE IF NOT EXISTS  timetable (id INT NOT NULL AUTO_INCREMENT, myTime TIMESTAMP, PRIMARY KEY(id))";
     CountDownLatch latch = new CountDownLatch(1);
     ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> {
       if (cr.failed()) {
@@ -68,7 +68,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
             latch.countDown();
           } else {
             String insertExpression = "insert into timetable set myTime=?; ";
-            JsonArray array = new JsonArray().add("18:45:22");
+            JsonArray array = new JsonArray().add("2015-10-13 18:45:22");
             conn.updateWithParams(insertExpression, array, ur -> {
               if (ur.failed()) {
                 log.error("", ur.cause());

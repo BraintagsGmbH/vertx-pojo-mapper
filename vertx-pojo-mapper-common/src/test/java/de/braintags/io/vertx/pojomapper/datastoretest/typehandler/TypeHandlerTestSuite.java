@@ -26,7 +26,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  * 
  */
 @RunWith(Suite.class)
-@SuiteClasses({ StringTest.class, NumericTest.class, BooleanTest.class, DateTest.class })
+@SuiteClasses({ StringTest.class, NumericTest.class, BooleanTest.class, DateTest.class, CalendarTest.class })
 public class TypeHandlerTestSuite {
 
 }
