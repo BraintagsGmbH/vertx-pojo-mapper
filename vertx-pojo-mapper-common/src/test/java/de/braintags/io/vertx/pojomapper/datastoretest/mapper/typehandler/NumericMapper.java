@@ -28,5 +28,7 @@ public class NumericMapper extends BaseRecord {
   public Short myShort;
   public BigDecimal bigDecimal;
   public BigInteger bigInteger;
+  public byte byteValue = 123;
+  public Byte byteObject = 88;
 
 }
