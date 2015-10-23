@@ -36,6 +36,14 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
   private List<Class<?>> classesToHandle;
   private ITypeHandlerFactory typeHandlerFactory;
 
+  /**
+   * Constructor
+   * 
+   * @param typeHandlerFactory
+   *          the parent factory
+   * @param classesToDeal
+   *          the classes to deal with
+   */
   public AbstractTypeHandler(ITypeHandlerFactory typeHandlerFactory, Class<?>... classesToDeal) {
     this.typeHandlerFactory = typeHandlerFactory;
     classesToHandle = Arrays.asList(classesToDeal);
@@ -138,4 +146,15 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
               + getClass().getName());
     }
   }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#getSubTypeHandler(java.lang.Class)
+   */
+  @Override
+  public ITypeHandler getSubTypeHandler(Class<?> subClass) {
+    return getTypeHandlerFactory().getTypeHandler(subClass);
+  }
+
 }

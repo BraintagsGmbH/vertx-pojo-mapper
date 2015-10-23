@@ -210,7 +210,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
     Class valueClass = field.getSubClass();
     if (valueClass == null || valueClass == Object.class)
       valueClass = value.getClass();
-    return field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(valueClass);
+    return getSubTypeHandler(valueClass);
   }
 
   @SuppressWarnings("rawtypes")
@@ -218,7 +218,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
     Class keyClass = field.getMapKeyClass();
     if (keyClass == null || keyClass == Object.class)
       keyClass = value.getClass();
-    return field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(keyClass);
+    return getSubTypeHandler(keyClass);
   }
 
   class CurrentCounter {

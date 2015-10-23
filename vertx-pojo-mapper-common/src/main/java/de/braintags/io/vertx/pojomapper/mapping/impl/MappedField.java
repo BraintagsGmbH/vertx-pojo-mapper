@@ -124,8 +124,11 @@ public class MappedField implements IField {
   }
 
   private void computeSubTypeHandler() {
-    if (getSubClass() != null && getSubClass() != Object.class)
-      subTypeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(getSubClass());
+    if (getSubClass() != null && getSubClass() != Object.class) {
+      ITypeHandler th = getTypeHandler();
+      if (th != null)
+        subTypeHandler = th.getSubTypeHandler(getSubClass());
+    }
   }
 
   protected IPropertyMapper computePropertyMapper() {

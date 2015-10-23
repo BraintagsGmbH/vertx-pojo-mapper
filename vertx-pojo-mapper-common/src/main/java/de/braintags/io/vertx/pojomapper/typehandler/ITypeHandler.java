@@ -101,6 +101,18 @@ public interface ITypeHandler extends Cloneable {
   public ITypeHandlerFactory getTypeHandlerFactory();
 
   /**
+   * Some ITypeHandler, which are processing List, Array, Map etc., are using sub handler to process the values of the
+   * List etc. Those handler must not come from out of the same {@link ITypeHandlerFactory}. For example can decide a
+   * CollectionHandler, that it serializes all children into JSon and thus is using the JSonTypeHandlerFactory to define
+   * the typehandlers
+   * 
+   * @param subClass
+   *          the class to be examined
+   * @return a valid {@link ITypeHandler}
+   */
+  public ITypeHandler getSubTypeHandler(Class<?> subClass);
+
+  /**
    * Generates a new copy of this instance.
    *
    * @return a copy of this instance

@@ -13,27 +13,25 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
+import java.util.Collection;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
 
 /**
- * Handles {@link URI} and {@link URL}
+ * Handles {@link Collection}
  * 
  * @author Michael Remme
  * 
  */
 
-public class ListColumnHandler extends StringColumnHandler {
+public class CollectionColumnHandler extends StringColumnHandler {
 
   /**
    * Constructor
    */
-  public ListColumnHandler() {
-    super(List.class);
+  public CollectionColumnHandler() {
+    super(Collection.class);
   }
 
   @Override

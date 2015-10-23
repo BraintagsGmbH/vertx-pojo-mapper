@@ -13,9 +13,7 @@
 package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.Collection;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 
@@ -26,18 +24,18 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
  * 
  */
 public class EmbeddedListMapper extends BaseRecord {
-  @SuppressWarnings("rawtypes")
-  public List arrayList = Arrays.asList("Eins", "Zwei", "drei"); // no subtype defined
-  @SuppressWarnings("rawtypes")
-  public List mixedList = Arrays.asList("Eins", "Zwei", 5, "vier", new Long(99994444)); // no subtype defined
-
-  public List<Date> dateList = new ArrayList<Date>();
+  // @SuppressWarnings("rawtypes")
+  // public List arrayList = Arrays.asList("Eins", "Zwei", "drei"); // no subtype defined
+  // @SuppressWarnings("rawtypes")
+  // public List mixedList = Arrays.asList("Eins", "Zwei", 5, "vier", new Long(99994444)); // no subtype defined
+  //
+  // public List<Date> dateList = new ArrayList<Date>();
 
   @Embedded
-  public List<StringTestMapper> stringTestList = new ArrayList<>();
+  public Collection<StringTestMapper> stringTestList = new ArrayList<>();
 
   public EmbeddedListMapper() {
-    dateList.add(new Date());
+    // dateList.add(new Date());
 
     stringTestList.add(new StringTestMapper(1));
     stringTestList.add(new StringTestMapper(2));

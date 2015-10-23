@@ -14,6 +14,7 @@ package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
@@ -66,6 +67,16 @@ public class SqlCollectionTypeHandler extends CollectionTypeHandler {
       String res = array.encode();
       success(res, resultHandler);
     });
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#getSubTypeHandler(java.lang.Class)
+   */
+  @Override
+  public ITypeHandler getSubTypeHandler(Class<?> subClass) {
+    return ((SqlTypeHandlerFactory) getTypeHandlerFactory()).getSubFactory().getTypeHandler(subClass);
   }
 
 }

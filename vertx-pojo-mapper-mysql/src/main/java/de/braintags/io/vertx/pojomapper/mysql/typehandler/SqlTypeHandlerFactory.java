@@ -13,6 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ByteTypeHandler;
@@ -29,6 +30,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
  */
 
 public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
+  private JsonTypeHandlerFactory jsonFactory = new JsonTypeHandlerFactory();
 
   /*
    * (non-Javadoc)
@@ -58,6 +60,17 @@ public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
     remove(ArrayTypeHandler.class);
     getDefinedTypehandlers().add(new SqlArrayTypehandler(this));
 
+  }
+
+  /**
+   * Some typehandlers, like {@link SqlCollectionTypeHandler}, are storing child objects of those Collections, which are
+   * marked as {@link Embedded}, as JsonObjects. Thius, for the child processing, another {@link ITypeHandlerFactory} is
+   * used
+   * 
+   * @return the {@link ITypeHandlerFactory} for child objects
+   */
+  public ITypeHandlerFactory getSubFactory() {
+    return jsonFactory;
   }
 
 }

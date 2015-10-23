@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.mapping.impl.Mapper;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
@@ -131,8 +130,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
         boolean valueClassChanged = valueClass != null && value.getClass() != valueClass;
         valueClass = value.getClass();
         if (subHandler == null || valueClassChanged) {
-          subHandler = ((Mapper) field.getMapper()).getMapperFactory().getDataStore().getTypeHandlerFactory()
-              .getTypeHandler(value.getClass());
+          subHandler = getSubTypeHandler(value.getClass());
           // TODO could it be useful to write the class of the value into the field, to restore it proper from
           // datastore?
         }
