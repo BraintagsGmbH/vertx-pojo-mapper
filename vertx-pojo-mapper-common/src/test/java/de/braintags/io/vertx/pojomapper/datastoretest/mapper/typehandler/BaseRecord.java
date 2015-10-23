@@ -2,6 +2,7 @@ package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Date;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
@@ -46,6 +47,7 @@ public class BaseRecord {
 
   }
 
+  @SuppressWarnings({ "unused", "rawtypes" })
   private boolean equalValues(Object value, Object compareValue, String fieldName) {
     if (value == null && compareValue == null)
       return true;
@@ -72,8 +74,35 @@ public class BaseRecord {
             "Contents are not equal: " + fieldName + ": " + value + " - " + t + " / " + compareValue + " - " + p);
     }
 
+    if (value instanceof Collection) {
+      if (value == null && compareValue == null)
+        return true;
+      return compareCollections((Collection) value, (Collection) compareValue, fieldName);
+    }
+
+    // by saving arrays or List as JsonArray, a type change can happen from Long to Integer for instance
+    if (value instanceof Number) {
+      if (((Number) value).hashCode() != ((Number) compareValue).hashCode())
+        throw new MappingException("Contents are not equal: " + fieldName + ": " + value + " - " + value.hashCode()
+            + " / " + compareValue + " - " + compareValue.hashCode());
+      return true;
+    }
+
     if (!value.equals(compareValue))
       throw new MappingException("Contents are not equal: " + fieldName + ": " + value + " / " + compareValue);
+    return true;
+  }
+
+  @SuppressWarnings("rawtypes")
+  private boolean compareCollections(Collection coll1, Collection coll2, String fieldName) {
+    if (coll1.size() != coll2.size())
+      throw new MappingException(
+          "Contents are not equal, unequal length: " + fieldName + ": " + coll1.size() + " / " + coll2.size());
+    Object[] arr1 = coll1.toArray();
+    Object[] arr2 = coll2.toArray();
+    for (int i = 0; i < arr1.length; i++) {
+      equalValues(arr1[i], arr2[i], fieldName);
+    }
     return true;
   }
 

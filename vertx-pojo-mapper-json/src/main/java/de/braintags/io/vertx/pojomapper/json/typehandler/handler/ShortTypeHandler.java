@@ -47,7 +47,7 @@ public class ShortTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : (Short) source, resultHandler);
+    success(source == null ? source : ((Number) source).shortValue(), resultHandler);
   }
 
   /*

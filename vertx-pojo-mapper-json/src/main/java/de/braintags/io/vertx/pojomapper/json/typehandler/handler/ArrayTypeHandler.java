@@ -91,10 +91,8 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
             success(resultArray, handler);
           }
         }
-
       });
     }
-
     if (errorObject.isError())
       return;
   }
