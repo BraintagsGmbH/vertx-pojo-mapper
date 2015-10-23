@@ -82,10 +82,13 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
    */
   @SuppressWarnings("rawtypes")
   public Constructor getConstructor(IField field, Class<?> cls, Class<?>... arguments) {
+    if (field == null && cls == null)
+      throw new NullPointerException("Class and field is null");
     if (field != null) {
-      Constructor<?> constr = field.getConstructor(String.class);
+      Constructor<?> constr = field.getConstructor(arguments);
       if (constr == null)
-        throw new MappingException("Contructor not found with String as parameter for field " + field.getFullName());
+        throw new MappingException(
+            "Constructor not found with arguments as parameter for field " + field.getFullName());
       return constr;
     }
     return ClassUtil.getConstructor(cls, arguments);

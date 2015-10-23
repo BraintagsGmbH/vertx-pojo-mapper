@@ -23,7 +23,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
-import de.braintags.io.vertx.util.ClassUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -57,7 +56,7 @@ public class SqlDateTypeHandler extends AbstractTypeHandler {
     }
     try {
       @SuppressWarnings("rawtypes")
-      Constructor constr = ClassUtil.getConstructor(field.getType(), long.class);
+      Constructor constr = getConstructor(field, cls, long.class);
       long millis = formater.parseMillis((String) source);
       Date date = (Date) constr.newInstance(millis);
       success(date, resultHandler);

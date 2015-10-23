@@ -11,4 +11,13 @@ public class StringTestMapper extends BaseRecord {
   public StringBuffer stringBufferField = new StringBuffer("myStringbuffer");
   public StringBuilder stringBuilderField = new StringBuilder("myStringbuilder");
 
+  public StringTestMapper() {
+  }
+
+  public StringTestMapper(int counter) {
+    stringField += " " + counter;
+    stringBufferField.append(" ").append(counter);
+    stringBuilderField.append(" ").append(counter);
+  }
+
 }

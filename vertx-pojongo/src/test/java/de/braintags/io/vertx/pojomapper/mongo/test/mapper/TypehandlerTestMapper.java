@@ -78,7 +78,9 @@ public class TypehandlerTestMapper {
 
   // complexer objects
 
+  @SuppressWarnings("rawtypes")
   public List arrayList = Arrays.asList("Eins", "Zwei", "drei"); // no subtype defined
+  @SuppressWarnings("rawtypes")
   public List mixedList = Arrays.asList("Eins", "Zwei", 5, "vier", new Long(99994444)); // no subtype defined
 
   public Class<?> clsProperty = String.class;
