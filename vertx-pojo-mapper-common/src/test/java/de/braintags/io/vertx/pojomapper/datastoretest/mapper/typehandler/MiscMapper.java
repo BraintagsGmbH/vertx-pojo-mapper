@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
@@ -23,9 +24,17 @@ import java.net.URL;
  */
 public class MiscMapper extends BaseRecord {
   public char charValue = 'a';
-  public Character character = new Character('c');
-  public URI uri;
+  public Character myCharacter = new Character('c');
+  public URI uri = URI.create("http://www.braintags.de");
   public URL url;
   public Class myClass = StringBuffer.class;
+
+  public MiscMapper() {
+    try {
+      url = new URL("http://www.brainags.de/subsite");
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
 }

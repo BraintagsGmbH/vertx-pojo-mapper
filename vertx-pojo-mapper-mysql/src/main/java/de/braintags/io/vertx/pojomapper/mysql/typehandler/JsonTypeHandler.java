@@ -1,6 +1,6 @@
 /*
  * #%L
- * vertx-pojo-mapper-json
+ * vertx-pojongo
  * %%
  * Copyright (C) 2015 Braintags GmbH
  * %%
@@ -10,25 +10,25 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
-
-import java.net.URI;
+package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
 /**
- * 
+ * implementation of {@link ITypeHandler} for {@link JsonObject}
  * 
  * @author Michael Remme
  * 
  */
 
-public class URITypeHandler extends AbstractTypeHandler {
+public class JsonTypeHandler extends AbstractTypeHandler {
 
   /**
    * Constructor with parent {@link ITypeHandlerFactory}
@@ -36,31 +36,19 @@ public class URITypeHandler extends AbstractTypeHandler {
    * @param typeHandlerFactory
    *          the parent {@link ITypeHandlerFactory}
    */
-  public URITypeHandler(ITypeHandlerFactory typeHandlerFactory) {
-    super(typeHandlerFactory, URI.class);
+  public JsonTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory, JsonObject.class);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField)
-   */
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : URI.create((String) source), resultHandler);
+    success(source == null ? source : new JsonObject((String) source), resultHandler);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField)
-   */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : ((URI) source).toString(), resultHandler);
+    success(source == null ? source : ((JsonObject) source).toString(), resultHandler);
   }
 
 }

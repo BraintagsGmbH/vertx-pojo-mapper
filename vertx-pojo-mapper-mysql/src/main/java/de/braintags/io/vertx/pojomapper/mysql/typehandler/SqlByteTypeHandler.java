@@ -1,6 +1,6 @@
 /*
  * #%L
- * vertx-pojo-mapper-json
+ * vertx-pojongo
  * %%
  * Copyright (C) 2015 Braintags GmbH
  * %%
@@ -10,12 +10,10 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
+package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
-import java.net.URI;
-
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ByteTypeHandler;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
@@ -23,21 +21,17 @@ import io.vertx.core.Handler;
 
 /**
  * 
- * 
  * @author Michael Remme
  * 
  */
 
-public class URITypeHandler extends AbstractTypeHandler {
+public class SqlByteTypeHandler extends ByteTypeHandler {
 
   /**
-   * Constructor with parent {@link ITypeHandlerFactory}
-   * 
    * @param typeHandlerFactory
-   *          the parent {@link ITypeHandlerFactory}
    */
-  public URITypeHandler(ITypeHandlerFactory typeHandlerFactory) {
-    super(typeHandlerFactory, URI.class);
+  public SqlByteTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory);
   }
 
   /*
@@ -49,7 +43,7 @@ public class URITypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : URI.create((String) source), resultHandler);
+    success(source, resultHandler);
   }
 
   /*
@@ -60,7 +54,7 @@ public class URITypeHandler extends AbstractTypeHandler {
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : ((URI) source).toString(), resultHandler);
+    success(source, resultHandler);
   }
 
 }

@@ -28,8 +28,8 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
 public class StringColumnHandler extends AbstractSqlColumnHandler {
   private static final int DEFAULT_LENGTH = 255;
 
-  private static final int CHAR_MAX = 50;
-  private int VARCHAR_MAX = 32000;
+  public static final int CHAR_MAX = 50;
+  public static final int VARCHAR_MAX = 32000;
 
   public static final String CHAR_TYPE = "char";
   public static final String VARCHAR_TYPE = "varchar";

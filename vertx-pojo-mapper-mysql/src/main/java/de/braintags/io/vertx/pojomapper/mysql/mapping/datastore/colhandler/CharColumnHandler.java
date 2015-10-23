@@ -16,10 +16,9 @@ package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
-import scala.Char;
 
 /**
- * Handles char and creates CHAR from it Properties for scale and precision are not used
+ * Handles char and Character
  * 
  * @author Michael Remme
  * 
@@ -31,7 +30,7 @@ public class CharColumnHandler extends AbstractSqlColumnHandler {
    * Constructor for a ByteColumnHandler
    */
   public CharColumnHandler() {
-    super(Char.class, char.class);
+    super(Character.class, char.class);
   }
 
   @Override

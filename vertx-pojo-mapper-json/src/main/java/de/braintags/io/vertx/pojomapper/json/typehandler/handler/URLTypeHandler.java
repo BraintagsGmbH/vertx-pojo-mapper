@@ -51,7 +51,7 @@ public class URLTypeHandler extends AbstractTypeHandler {
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     try {
-      success(new URL((String) source), resultHandler);
+      success(source == null ? source : new URL((String) source), resultHandler);
     } catch (MalformedURLException e) {
       fail(e, resultHandler);
     }

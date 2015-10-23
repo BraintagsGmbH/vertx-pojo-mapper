@@ -14,13 +14,14 @@ package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 /**
- * 
+ * An implementation of {@link ITypeHandler} dealing with {@link Byte}
  * 
  * @author Michael Remme
  * 

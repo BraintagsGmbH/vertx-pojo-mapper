@@ -24,12 +24,15 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.BigIn
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.BooleanColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ByteColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.CharColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ClassColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.DateColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.DoubleColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.IntegerColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.JsonColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.LongColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ShortColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.StringColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.UriColumnHandler;
 
 /**
  * 
@@ -51,22 +54,10 @@ public class SqlTableGenerator extends DefaultTableGenerator {
     definedColumnHandlers.add(new BooleanColumnHandler());
     definedColumnHandlers.add(new DateColumnHandler());
     definedColumnHandlers.add(new CharColumnHandler());
-  }
+    definedColumnHandlers.add(new ClassColumnHandler());
+    definedColumnHandlers.add(new UriColumnHandler());
+    definedColumnHandlers.add(new JsonColumnHandler());
 
-  /**
-   * 
-   */
-  public SqlTableGenerator() {
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableGenerator#getDefaultColumnHandler()
-   */
-  @Override
-  public IColumnHandler getDefaultColumnHandler() {
-    return super.getDefaultColumnHandler();
   }
 
   /*

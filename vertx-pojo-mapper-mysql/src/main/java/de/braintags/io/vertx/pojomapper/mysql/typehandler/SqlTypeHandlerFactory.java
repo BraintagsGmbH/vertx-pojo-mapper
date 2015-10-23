@@ -14,6 +14,7 @@
 package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
 import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ByteTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CalendarTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
@@ -45,11 +46,15 @@ public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
     getDefinedTypehandlers().add(0, new BooleanTypeHandler(this));
 
     remove(DateTypeHandler.class);
-    getDefinedTypehandlers().add(0, new SqlDateTypeHandler(this));
+    getDefinedTypehandlers().add(new SqlDateTypeHandler(this));
 
     remove(CalendarTypeHandler.class);
-    getDefinedTypehandlers().add(0, new SqlCalendarTypehandler(this));
+    getDefinedTypehandlers().add(new SqlCalendarTypehandler(this));
 
+    remove(ByteTypeHandler.class);
+    getDefinedTypehandlers().add(new SqlByteTypeHandler(this));
+
+    getDefinedTypehandlers().add(new JsonTypeHandler(this));
   }
 
 }
