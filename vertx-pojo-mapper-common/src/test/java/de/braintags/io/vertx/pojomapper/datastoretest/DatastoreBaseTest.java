@@ -103,11 +103,13 @@ public class DatastoreBaseTest extends VertxTestBase {
     });
 
     latch.await(5, TimeUnit.SECONDS);
-    if (err.isError())
-      throw err.getRuntimeException();
+    if (err.isError()) {
+      logger.warn("WARNING: " + err.getRuntimeException());
+    }
 
   }
 
+  @SuppressWarnings("unchecked")
   public ResultContainer saveRecords(List<?> records) {
     ResultContainer resultContainer = new ResultContainer();
     CountDownLatch latch = new CountDownLatch(1);
@@ -136,6 +138,7 @@ public class DatastoreBaseTest extends VertxTestBase {
     return resultContainer;
   }
 
+  @SuppressWarnings("unchecked")
   public ResultContainer saveRecord(Object sm) {
     ResultContainer resultContainer = new ResultContainer();
     CountDownLatch latch = new CountDownLatch(1);

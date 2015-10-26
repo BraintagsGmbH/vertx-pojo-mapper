@@ -16,9 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
 
 /**
  * An abstract implementation of {@link ITypeHandlerFactory}
@@ -50,8 +48,6 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
   public ITypeHandler getTypeHandler(IField field) {
     // here we should NOT use a cache, otherwise the method examineMatch of the TypeHandler isn't called,
     // which is important, cause this method can decide on other parameters than the class
-    if (field.getPropertyMapper() instanceof IReferencedMapper || field.getPropertyMapper() instanceof IEmbeddedMapper)
-      return null;
     ITypeHandler handler = examineMatch(field);
     if (handler == null)
       handler = getDefaultTypeHandler();

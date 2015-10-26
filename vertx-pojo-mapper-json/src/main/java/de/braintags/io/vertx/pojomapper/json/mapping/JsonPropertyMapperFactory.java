@@ -28,12 +28,6 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultPropertyMapper;
 
 public class JsonPropertyMapperFactory implements IPropertyMapperFactory {
 
-  /**
-   * 
-   */
-  public JsonPropertyMapperFactory() {
-  }
-
   /*
    * (non-Javadoc)
    * 

@@ -91,7 +91,14 @@ public class MappedField implements IField {
   private Map<String, Constructor<?>> constructors = new HashMap<String, Constructor<?>>();
 
   /**
+   * Constructor which creates a new instance by reading informations from the given {@link Field}
    * 
+   * @param field
+   *          the field to be used
+   * @param accessor
+   *          the {@link IPropertyAccessor} which shall be used by the current instance
+   * @param mapper
+   *          the parent {@link IMapper}
    */
   public MappedField(Field field, IPropertyAccessor accessor, Mapper mapper) {
     this.accessor = accessor;
@@ -104,7 +111,12 @@ public class MappedField implements IField {
   }
 
   /**
+   * Constructor which build a new instance from the given class
    * 
+   * @param type
+   *          the underlaying class for the new instance
+   * @param mapper
+   *          the parent {@link IMapper}
    */
   public MappedField(Type type, Mapper mapper) {
     this.mapper = mapper;
@@ -116,9 +128,7 @@ public class MappedField implements IField {
   protected void init() {
     computeAnnotations();
     propertyMapper = computePropertyMapper();
-    // typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
     computeType();
-    // computeConstructor();
     computeMultivalued();
     computeSubTypeHandler();
   }

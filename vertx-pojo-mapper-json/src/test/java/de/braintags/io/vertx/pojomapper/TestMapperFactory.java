@@ -147,9 +147,8 @@ public class TestMapperFactory {
     assertEquals(ObjectTypeHandler.class, th.getClass());
 
     th = mapperDef.getField("chicken").getTypeHandler();
-    assertNull("@Embedded must be null", th);
-
-    assertNull("@Referenced must be null", mapperDef.getField("animal").getTypeHandler());
+    assertNotNull("Typehandler for @Embedded must not be null", th);
+    assertNotNull("Typehandler for @Referenced must not be null", mapperDef.getField("animal").getTypeHandler());
 
   }
 
