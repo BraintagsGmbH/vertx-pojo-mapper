@@ -66,9 +66,20 @@ public class SimpleMapper {
   @Override
   public boolean equals(Object o) {
     SimpleMapper compare = (SimpleMapper) o;
+    if (compare == null && o == null)
+      return true;
+    if (compare == null || o == null)
+      return false;
 
-    return o != null && compare.id.equals(id) && compare.name.equals(name)
-        && compare.secondProperty.equals(secondProperty);
+    boolean idEqual = false;
+    if (compare.id == null && id == null)
+      idEqual = true;
+    else if (compare.id != null && id != null)
+      idEqual = true;
+    else
+      idEqual = id.equals(compare.id);
+
+    return o != null && idEqual && compare.name.equals(name) && compare.secondProperty.equals(secondProperty);
   }
 
   @Override

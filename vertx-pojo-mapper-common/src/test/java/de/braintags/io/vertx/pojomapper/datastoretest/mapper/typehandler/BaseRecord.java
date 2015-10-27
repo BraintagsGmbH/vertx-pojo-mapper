@@ -4,6 +4,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
@@ -75,8 +77,6 @@ public class BaseRecord {
     }
 
     if (value instanceof Collection) {
-      if (value == null && compareValue == null)
-        return true;
       return compareCollections((Collection) value, (Collection) compareValue, fieldName);
     }
 
@@ -88,6 +88,10 @@ public class BaseRecord {
       return true;
     }
 
+    if (value instanceof Map) {
+      return compareMaps((Map) value, (Map) compareValue, fieldName);
+    }
+
     if (!value.equals(compareValue))
       throw new MappingException("Contents are not equal: " + fieldName + ": " + value + " / " + compareValue);
     return true;
@@ -95,6 +99,8 @@ public class BaseRecord {
 
   @SuppressWarnings("rawtypes")
   private boolean compareCollections(Collection coll1, Collection coll2, String fieldName) {
+    if (coll1 == null && coll2 == null)
+      return true;
     if (coll1.size() != coll2.size())
       throw new MappingException(
           "Contents are not equal, unequal length: " + fieldName + ": " + coll1.size() + " / " + coll2.size());
@@ -102,6 +108,23 @@ public class BaseRecord {
     Object[] arr2 = coll2.toArray();
     for (int i = 0; i < arr1.length; i++) {
       equalValues(arr1[i], arr2[i], fieldName);
+    }
+    return true;
+  }
+
+  @SuppressWarnings("rawtypes")
+  private boolean compareMaps(Map value, Map compareValue, String fieldName) {
+    if (value == null && compareValue == null)
+      return true;
+    if (value.size() != compareValue.size())
+      throw new MappingException(
+          "Contents are not equal, unequal length: " + fieldName + ": " + value.size() + " / " + compareValue.size());
+    Iterator<?> it = value.keySet().iterator();
+    while (it.hasNext()) {
+      Object key = it.next();
+      Object value1 = value.get(key);
+      Object value2 = compareValue.get(key);
+      equalValues(value1, value2, fieldName);
     }
     return true;
   }

@@ -10,11 +10,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.datastoretest.mapper;
+package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
+import de.braintags.io.vertx.pojomapper.datastoretest.mapper.SimpleMapper;
 
 /**
  * Mapper to test {@link Referenced} annotation
@@ -23,9 +23,8 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
  * 
  */
 
-public class EmbeddedMapper_Single {
-  @Id
-  public String id;
+public class EmbeddedMapper_Single extends BaseRecord {
+
   @Embedded
   public SimpleMapper simpleMapper;
 
@@ -38,8 +37,9 @@ public class EmbeddedMapper_Single {
   @Override
   public boolean equals(Object o) {
     EmbeddedMapper_Single om = (EmbeddedMapper_Single) o;
-    boolean equal = om.id.equals(id);
-    boolean equal2 = om.simpleMapper.equals(simpleMapper);
+    boolean equal = om.id == id;
+    boolean equal2 = (om.simpleMapper == null && simpleMapper == null)
+        || (om.simpleMapper != null && simpleMapper != null && om.simpleMapper.equals(simpleMapper));
     return equal && equal2;
   }
 

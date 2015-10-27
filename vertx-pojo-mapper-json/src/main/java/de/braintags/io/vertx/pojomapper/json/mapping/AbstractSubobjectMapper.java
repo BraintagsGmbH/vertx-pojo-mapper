@@ -81,8 +81,10 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
       Handler<AsyncResult<Void>> handler) {
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object javaValue = pAcc.readData(entity);
-    if (javaValue == null)
+    if (javaValue == null) {
+      handler.handle(Future.succeededFuture());
       return;
+    }
     if (field.isMap()) {
       writeMap((Map<?, ?>) javaValue, storeObject, field, handler);
     } else if (field.isArray()) {
@@ -140,11 +142,17 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
       }
     } else {
       Object dbValue = storeObject.get(field);
+      IPropertyAccessor pAcc = field.getPropertyAccessor();
+      if (dbValue == null) {
+        pAcc.writeData(entity, null);
+        handler.handle(Future.succeededFuture());
+        return;
+      }
+
       readSingleValue(dbValue, field, null, result -> {
         if (result.failed()) {
           handler.handle(Future.failedFuture(result.cause()));
         } else {
-          IPropertyAccessor pAcc = field.getPropertyAccessor();
           Object javaValue = result.result();
           if (javaValue != null)
             pAcc.writeData(entity, javaValue);
@@ -229,7 +237,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
     });
   }
 
-  private void readInternal(IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Object>> handler) {
+  protected void readInternal(IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Object>> handler) {
     JsonArray jsonArray = (JsonArray) storeObject.get(field);
     final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
     if (jsonArray == null || jsonArray.isEmpty()) {

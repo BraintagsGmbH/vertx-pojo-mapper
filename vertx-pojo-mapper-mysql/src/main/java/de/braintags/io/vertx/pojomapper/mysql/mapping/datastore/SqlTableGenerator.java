@@ -19,18 +19,21 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableGenerator;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ArrayColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.BigDecimalColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.BigIntegerColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.BooleanColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ByteColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.CharColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ClassColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.CollectionColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.DateColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.DoubleColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.EmbeddedColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.IntegerColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.JsonColumnHandler;
-import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.CollectionColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.LongColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.MapColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ShortColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.StringColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.UriColumnHandler;
@@ -59,6 +62,9 @@ public class SqlTableGenerator extends DefaultTableGenerator {
     definedColumnHandlers.add(new UriColumnHandler());
     definedColumnHandlers.add(new JsonColumnHandler());
     definedColumnHandlers.add(new CollectionColumnHandler());
+    definedColumnHandlers.add(new MapColumnHandler());
+    definedColumnHandlers.add(new ArrayColumnHandler());
+    definedColumnHandlers.add(new EmbeddedColumnHandler());
 
   }
 

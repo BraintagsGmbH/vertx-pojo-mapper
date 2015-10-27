@@ -95,12 +95,16 @@ public class DatastoreBaseTest extends VertxTestBase {
 
     CountDownLatch latch = new CountDownLatch(1);
     ErrorObject<Void> err = new ErrorObject<Void>(null);
-    datastoreContainer.shutdown(result -> {
-      if (result.failed()) {
-        err.setThrowable(result.cause());
-      }
-      latch.countDown();
-    });
+    try {
+      datastoreContainer.shutdown(result -> {
+        if (result.failed()) {
+          err.setThrowable(result.cause());
+        }
+        latch.countDown();
+      });
+    } catch (Exception e) {
+      logger.warn("WARNING: " + e);
+    }
 
     latch.await(5, TimeUnit.SECONDS);
     if (err.isError()) {
