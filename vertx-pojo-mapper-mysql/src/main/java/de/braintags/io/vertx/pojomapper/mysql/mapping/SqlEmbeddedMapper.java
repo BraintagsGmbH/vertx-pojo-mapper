@@ -39,10 +39,7 @@ public class SqlEmbeddedMapper extends JsonEmbeddedMapper {
   @Override
   protected void writeCollection(Iterable<?> iterable, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
-
-    super.writeCollection(iterable, storeObject, field, result -> {
-      modifyJsonArray(storeObject, field, result, handler);
-    });
+    super.writeCollection(iterable, storeObject, field, result -> modifyJsonArray(storeObject, field, result, handler));
   }
 
   /*
@@ -70,17 +67,13 @@ public class SqlEmbeddedMapper extends JsonEmbeddedMapper {
   @Override
   protected void writeArray(Object[] javaValues, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
-    super.writeArray(javaValues, storeObject, field, result -> {
-      modifyJsonArray(storeObject, field, result, handler);
-    });
+    super.writeArray(javaValues, storeObject, field, result -> modifyJsonArray(storeObject, field, result, handler));
   }
 
   @Override
   protected void writeMap(Map<?, ?> map, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
-    super.writeMap(map, storeObject, field, result -> {
-      modifyJsonArray(storeObject, field, result, handler);
-    });
+    super.writeMap(map, storeObject, field, result -> modifyJsonArray(storeObject, field, result, handler));
   }
 
   @Override

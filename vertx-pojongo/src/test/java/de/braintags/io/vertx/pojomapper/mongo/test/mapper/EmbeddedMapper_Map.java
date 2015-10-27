@@ -31,6 +31,8 @@ public class EmbeddedMapper_Map {
   public String id;
   @Embedded
   public Map<Integer, SimpleMapper> simpleMapper;
+  @Embedded
+  public Map<Integer, String> secondMap = new HashMap<>();
 
   /**
    * 
@@ -39,6 +41,7 @@ public class EmbeddedMapper_Map {
     simpleMapper = new HashMap<Integer, SimpleMapper>();
     for (int i = 0; i < 5; i++) {
       simpleMapper.put(i, new SimpleMapper("name " + i, "sec prop " + i));
+      secondMap.put(i, String.valueOf(i));
     }
   }
 

@@ -113,33 +113,11 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
   public void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
     if (field.isMap()) {
-      readMap(entity, storeObject, field, result -> {
-        if (result.failed()) {
-          handler.handle(Future.failedFuture(result.cause()));
-        } else {
-          handler.handle(Future.succeededFuture());
-        }
-      });
+      readMap(entity, storeObject, field, handler);
     } else if (field.isArray()) {
-      readArray(entity, storeObject, field, result -> {
-        if (result.failed()) {
-          handler.handle(Future.failedFuture(result.cause()));
-        } else {
-          handler.handle(Future.succeededFuture());
-        }
-      });
+      readArray(entity, storeObject, field, handler);
     } else if (!field.isSingleValue()) {
-      try {
-        readCollection(entity, storeObject, field, result -> {
-          if (result.failed()) {
-            handler.handle(Future.failedFuture(result.cause()));
-          } else {
-            handler.handle(Future.succeededFuture());
-          }
-        });
-      } catch (Exception e) {
-        handler.handle(Future.failedFuture(e));
-      }
+      readCollection(entity, storeObject, field, handler);
     } else {
       Object dbValue = storeObject.get(field);
       IPropertyAccessor pAcc = field.getPropertyAccessor();
