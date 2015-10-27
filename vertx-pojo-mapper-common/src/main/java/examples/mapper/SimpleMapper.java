@@ -12,15 +12,10 @@
  */
 package examples.mapper;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 
-/**
- * 
- *
- * @author Michael Remme
- * 
- */
-
+@Entity
 public class SimpleMapper {
   @Id
   public String id;

@@ -14,6 +14,7 @@ package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
 import java.util.Properties;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 
 /**
@@ -22,6 +23,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
  * @author Michael Remme
  * 
  */
+@Entity
 public class PropertiesRecord extends BaseRecord {
   @Embedded
   public Properties properties = new Properties();

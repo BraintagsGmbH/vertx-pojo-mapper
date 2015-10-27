@@ -14,12 +14,15 @@ package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
 import java.util.Locale;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+
 /**
  * 
  * 
  * @author Michael Remme
  * 
  */
+@Entity
 public class LocaleRecord extends BaseRecord {
   public Locale locale = Locale.FRANCE;
 

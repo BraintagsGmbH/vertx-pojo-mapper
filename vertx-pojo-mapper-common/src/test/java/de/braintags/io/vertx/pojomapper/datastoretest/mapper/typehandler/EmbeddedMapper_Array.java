@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.SimpleMapper;
@@ -23,6 +24,7 @@ import de.braintags.io.vertx.pojomapper.datastoretest.mapper.SimpleMapper;
  * 
  */
 
+@Entity
 public class EmbeddedMapper_Array extends BaseRecord {
 
   @Embedded

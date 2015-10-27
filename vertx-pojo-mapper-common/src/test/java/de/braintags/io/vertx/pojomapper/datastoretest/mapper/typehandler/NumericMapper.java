@@ -15,6 +15,9 @@ package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+
+@Entity
 public class NumericMapper extends BaseRecord {
   public int myInt;
   public Integer myInteger;

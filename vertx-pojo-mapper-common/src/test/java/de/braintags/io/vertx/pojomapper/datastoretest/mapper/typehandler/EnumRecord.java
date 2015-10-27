@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 
 /**
@@ -20,6 +21,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
  * @author Michael Remme
  * 
  */
+@Entity
 public class EnumRecord extends BaseRecord {
   public Enum<WriteAction> enumEnum = WriteAction.INSERT;
 

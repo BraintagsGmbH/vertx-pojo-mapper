@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 
 /**
@@ -23,6 +24,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
  * @author Michael Remme
  * 
  */
+@Entity
 public class EmbeddedListMapper extends BaseRecord {
 
   @Embedded

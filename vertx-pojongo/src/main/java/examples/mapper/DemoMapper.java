@@ -12,10 +12,12 @@
  */
 package examples.mapper;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 
+@Entity
 public class DemoMapper {
   @Id
   public String id;

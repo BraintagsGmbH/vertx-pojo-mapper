@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -17,6 +18,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  * @author Michael Remme
  * 
  */
+@Entity
 public class BaseRecord {
   @Id
   public long id;

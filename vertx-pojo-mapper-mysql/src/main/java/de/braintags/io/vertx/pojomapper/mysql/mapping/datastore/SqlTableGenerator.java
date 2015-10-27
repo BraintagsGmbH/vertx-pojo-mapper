@@ -30,8 +30,10 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.Colle
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.DateColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.DoubleColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.EmbeddedColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.EnumColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.IntegerColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.JsonColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.LocaleColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.LongColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.MapColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ShortColumnHandler;
@@ -65,6 +67,8 @@ public class SqlTableGenerator extends DefaultTableGenerator {
     definedColumnHandlers.add(new MapColumnHandler());
     definedColumnHandlers.add(new ArrayColumnHandler());
     definedColumnHandlers.add(new EmbeddedColumnHandler());
+    definedColumnHandlers.add(new EnumColumnHandler());
+    definedColumnHandlers.add(new LocaleColumnHandler());
 
   }
 

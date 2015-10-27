@@ -16,12 +16,15 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+
 /**
  * 
  * 
  * @author Michael Remme
  * 
  */
+@Entity
 public class MiscMapper extends BaseRecord {
   public char charValue = 'a';
   public Character myCharacter = new Character('c');

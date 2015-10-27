@@ -12,12 +12,15 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+
 /**
  * Mapper for testing boolean
  * 
  * @author Michael Remme
  * 
  */
+@Entity
 public class BooleanMapper extends BaseRecord {
   public boolean myBool;
   public Boolean myBooloean;

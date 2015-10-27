@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.datastoretest.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 
@@ -25,6 +26,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
  * 
  */
 
+@Entity
 public class ReferenceMapper_List {
   @Id
   public String id;

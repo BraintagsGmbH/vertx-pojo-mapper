@@ -14,12 +14,15 @@ package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
 import java.util.Calendar;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+
 /**
  * Mapper for testing boolean
  * 
  * @author Michael Remme
  * 
  */
+@Entity
 public class CalendarMapper extends BaseRecord {
   public Calendar myCal = Calendar.getInstance();
 

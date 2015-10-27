@@ -16,12 +16,15 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+
 /**
  * Mapper for testing boolean
  * 
  * @author Michael Remme
  * 
  */
+@Entity
 public class DateMapper extends BaseRecord {
   public Time myTime = new Time(System.currentTimeMillis());
   public Timestamp myTimeStamp = new Timestamp(System.currentTimeMillis());

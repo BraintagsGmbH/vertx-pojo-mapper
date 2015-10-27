@@ -10,15 +10,23 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package examples.mapper;
 
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
-@Entity
-public class DemoSubMapper {
-  @Id
-  public String id;
-  public String subname;
+/**
+ * Handles {@link Enum}
+ * 
+ * @author Michael Remme
+ * 
+ */
+
+public class EnumColumnHandler extends StringColumnHandler {
+
+  /**
+   * Constructor
+   */
+  public EnumColumnHandler() {
+    super(Enum.class);
+  }
 
 }

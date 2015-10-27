@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -20,6 +21,7 @@ import io.vertx.core.json.JsonObject;
  * @author Michael Remme
  * 
  */
+@Entity
 public class JsonMapper extends BaseRecord {
   public JsonObject json;
 
