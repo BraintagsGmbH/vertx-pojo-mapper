@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 import java.util.Collection;
 import java.util.Map;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
@@ -27,7 +28,7 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
  * @author Michael Remme
  * 
  */
-
+@Entity
 public class Person extends AbstractPerson {
   @Id
   public String idField;

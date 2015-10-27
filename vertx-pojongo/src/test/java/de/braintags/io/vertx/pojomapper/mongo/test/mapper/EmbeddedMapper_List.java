@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
@@ -26,6 +27,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
  * 
  */
 
+@Entity
 public class EmbeddedMapper_List {
   @Id
   public String id;

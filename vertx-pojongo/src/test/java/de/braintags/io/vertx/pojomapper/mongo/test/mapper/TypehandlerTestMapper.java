@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
@@ -44,6 +45,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  * 
  */
 
+@Entity
 public class TypehandlerTestMapper {
   @Id
   public String id;

@@ -17,6 +17,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -42,8 +43,29 @@ public class JsonEmbeddedMapper extends AbstractSubobjectMapper implements IEmbe
   public void writeSingleValue(Object embeddedObject, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Object>> handler) {
     IDataStore store = field.getMapper().getMapperFactory().getDataStore();
-    IMapper mapper = store.getMapperFactory().getMapper(embeddedObject.getClass());
+    if (store.getMapperFactory().isMapper(embeddedObject.getClass())) {
+      writeSingleValueAsMapper(store, embeddedObject, storeObject, field, handler);
+    } else {
+      writeSingleValueAsTypehandler(store, embeddedObject, storeObject, field, handler);
+    }
+  }
 
+  protected void writeSingleValueAsTypehandler(IDataStore store, Object embeddedObject, IStoreObject<?> storeObject,
+      IField field, Handler<AsyncResult<Object>> handler) {
+    ITypeHandler th = store.getTypeHandlerFactory().getTypeHandler(embeddedObject.getClass());
+    th.intoStore(embeddedObject, field, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        Object jo = result.result().getResult();
+        handler.handle(Future.succeededFuture(jo));
+      }
+    });
+  }
+
+  protected void writeSingleValueAsMapper(IDataStore store, Object embeddedObject, IStoreObject<?> storeObject,
+      IField field, Handler<AsyncResult<Object>> handler) {
+    IMapper mapper = store.getMapperFactory().getMapper(embeddedObject.getClass());
     store.getStoreObjectFactory().createStoreObject(mapper, embeddedObject, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -52,7 +74,6 @@ public class JsonEmbeddedMapper extends AbstractSubobjectMapper implements IEmbe
         handler.handle(Future.succeededFuture(jo));
       }
     });
-
   }
 
   @Override
@@ -60,13 +81,34 @@ public class JsonEmbeddedMapper extends AbstractSubobjectMapper implements IEmbe
       Handler<AsyncResult<Object>> handler) {
     IDataStore store = field.getMapper().getMapperFactory().getDataStore();
     Class<?> internalMapperClass = mapperClass != null ? mapperClass : field.getType();
-    IMapper mapper = store.getMapperFactory().getMapper(internalMapperClass);
+    if (store.getMapperFactory().isMapper(internalMapperClass)) {
+      readSingleValueAsMapper(store, internalMapperClass, dbValue, handler);
+    } else {
+      readSingleValueAsTypeHandler(store, field, internalMapperClass, dbValue, handler);
+    }
+  }
 
+  protected void readSingleValueAsMapper(IDataStore store, Class<?> internalMapperClass, Object dbValue,
+      Handler<AsyncResult<Object>> handler) {
+    IMapper mapper = store.getMapperFactory().getMapper(internalMapperClass);
     store.getStoreObjectFactory().createStoreObject(dbValue, mapper, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
         Object jo = result.result().getEntity();
+        handler.handle(Future.succeededFuture(jo));
+      }
+    });
+  }
+
+  protected void readSingleValueAsTypeHandler(IDataStore store, IField field, Class<?> internalMapperClass,
+      Object dbValue, Handler<AsyncResult<Object>> handler) {
+    ITypeHandler th = store.getTypeHandlerFactory().getTypeHandler(internalMapperClass);
+    th.fromStore(dbValue, field, internalMapperClass, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        Object jo = result.result().getResult();
         handler.handle(Future.succeededFuture(jo));
       }
     });

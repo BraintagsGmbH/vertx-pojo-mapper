@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
@@ -24,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
  * 
  */
 
+@Entity
 public class SimpleMapper {
   @Id
   public String id;

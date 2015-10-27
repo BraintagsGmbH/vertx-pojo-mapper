@@ -20,8 +20,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The annotation allows to give further information about the entity inside the used datastore ( database table, column
- * in mongo or others )
+ * The annotation defines a class to be a mappable instance and allows to give further information about the entity
+ * inside the used datastore ( database table, column in mongo or others ). All classes, which shall be mapped into a
+ * datastore must have this annotation
  * 
  * @author Michael Remme
  * 
@@ -32,10 +33,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface Entity {
+  public static final String UNDEFINED_NAME = "";
+
   /**
-   * Defines the name of the entity inside the datastore.
+   * Defines the name of the entity inside the datastore. Default is an {@link #UNDEFINED_NAME}, which will lead to the
+   * simple name of the class
    * 
    * @return
    */
-  String name();
+  String name() default UNDEFINED_NAME;
 }

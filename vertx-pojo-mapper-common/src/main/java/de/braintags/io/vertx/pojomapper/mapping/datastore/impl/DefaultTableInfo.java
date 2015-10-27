@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
@@ -40,7 +41,7 @@ public class DefaultTableInfo implements ITableInfo {
    * 
    */
   public DefaultTableInfo(IMapper mapper) {
-    if (mapper.getEntity() == null)
+    if (mapper.getEntity() == null || mapper.getEntity().name().equals(Entity.UNDEFINED_NAME))
       this.name = mapper.getMapperClass().getSimpleName();
     else
       this.name = mapper.getEntity().name();

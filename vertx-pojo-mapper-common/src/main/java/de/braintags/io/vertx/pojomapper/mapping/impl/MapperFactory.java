@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 
@@ -43,10 +44,13 @@ public class MapperFactory implements IMapperFactory {
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapperFactory#getMapper(java.lang.Class)
    */
   @Override
-  public IMapper getMapper(Class<?> mapperClass) {
+  public final IMapper getMapper(Class<?> mapperClass) {
     String className = mapperClass.getName();
     if (mappedClasses.containsKey(className))
       return mappedClasses.get(className);
+    if (!mapperClass.isAnnotationPresent(Entity.class))
+      throw new UnsupportedOperationException(String
+          .format("The class %s is no mappable entity. Add the annotation Entity to the class", mapperClass.getName()));
     Mapper mapper = createMapper(mapperClass);
     mappedClasses.put(className, mapper);
     return mapper;
@@ -71,5 +75,12 @@ public class MapperFactory implements IMapperFactory {
   @Override
   public IDataStore getDataStore() {
     return dataStore;
+  }
+
+  @Override
+  public final boolean isMapper(Class<?> mapperClass) {
+    if (mappedClasses.containsKey(mapperClass.getName()) || mapperClass.isAnnotationPresent(Entity.class))
+      return true;
+    return false;
   }
 }

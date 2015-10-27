@@ -13,6 +13,7 @@
 package de.braintags.io.vertx.pojomapper.mapping;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 
 /**
  * IMapperFactory is responsible to create and store instances of {@link IMapper} for all classes, which shall be
@@ -32,6 +33,16 @@ public interface IMapperFactory {
    *           any Exception which can occur in the init process
    */
   IMapper getMapper(Class<?> mapperClass);
+
+  /**
+   * Returns true, if the given class specifies a mappable class. At a minimum whic method will have to check, wether
+   * the class is marked with the {@link Entity} annotation
+   * 
+   * @param mapperClass
+   *          the class to be checkd
+   * @return true, if class specifies a mapper, false otherwise
+   */
+  boolean isMapper(Class<?> mapperClass);
 
   /**
    * Get the {@link IDataStore} which created the current instance

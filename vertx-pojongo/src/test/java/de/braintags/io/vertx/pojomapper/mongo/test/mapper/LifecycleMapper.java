@@ -16,6 +16,7 @@
 
 package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
@@ -29,6 +30,7 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
  * @author Michael Remme
  * 
  */
+@Entity
 public class LifecycleMapper {
   @Id
   public String id;

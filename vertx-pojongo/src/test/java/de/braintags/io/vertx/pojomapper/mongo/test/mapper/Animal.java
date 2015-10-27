@@ -12,6 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+
 /**
  * 
  * 
@@ -19,6 +21,7 @@ package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
  * 
  */
 
+@Entity
 public class Animal {
 
   public String name;

@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.test.mapper;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 
 /**
@@ -21,6 +22,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Id;
  * 
  */
 
+@Entity
 public class OnlyIdMapper {
   @Id
   public String id;
