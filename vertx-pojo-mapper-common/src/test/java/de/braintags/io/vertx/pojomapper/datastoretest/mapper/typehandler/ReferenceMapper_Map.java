@@ -10,14 +10,14 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.datastoretest.mapper;
+package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
+import de.braintags.io.vertx.pojomapper.datastoretest.mapper.SimpleMapper;
 
 /**
  * Mapper to test {@link Referenced} annotation
@@ -27,9 +27,8 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
  */
 
 @Entity
-public class ReferenceMapper_Map {
-  @Id
-  public String id;
+public class ReferenceMapper_Map extends BaseRecord {
+
   @Referenced
   public Map<Integer, SimpleMapper> simpleMapper;
 

@@ -12,9 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.json.mapping;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
@@ -22,6 +19,9 @@ import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ObjectReference;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * Implementation of {@link IReferencedMapper} to deal with subobjects, which shall be stored by their id in the
@@ -32,12 +32,6 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  */
 
 public class JsonReferencedMapper extends AbstractSubobjectMapper implements IReferencedMapper {
-
-  /**
-   * 
-   */
-  public JsonReferencedMapper() {
-  }
 
   /**
    * Write the reference to a child record into the field. This method expects, that the child is saved before, so that
@@ -73,28 +67,24 @@ public class JsonReferencedMapper extends AbstractSubobjectMapper implements IRe
       Handler<AsyncResult<Object>> handler) {
     ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
         .getTypeHandler(ObjectReference.class);
-    th.fromStore(
-        dbValue,
-        field,
-        mapperClass,
-        result -> {
-          if (result.failed()) {
-            Future<Object> future = Future.failedFuture(result.cause());
-            handler.handle(future);
-            return;
-          } else {
-            Object javaValue = result.result().getResult();
-            if (javaValue == null && dbValue != null) {
-              Future<Object> future = Future.failedFuture(new TypeHandlerException(String.format(
-                  "Value conversion failed: original = %s, conversion = NULL", String.valueOf(dbValue))));
-              handler.handle(future);
-              return;
-            }
-            Future<Object> future = Future.succeededFuture(javaValue);
-            handler.handle(future);
-            return;
-          }
-        });
+    th.fromStore(dbValue, field, mapperClass, result -> {
+      if (result.failed()) {
+        Future<Object> future = Future.failedFuture(result.cause());
+        handler.handle(future);
+        return;
+      } else {
+        Object javaValue = result.result().getResult();
+        if (javaValue == null && dbValue != null) {
+          Future<Object> future = Future.failedFuture(new TypeHandlerException(
+              String.format("Value conversion failed: original = %s, conversion = NULL", String.valueOf(dbValue))));
+          handler.handle(future);
+          return;
+        }
+        Future<Object> future = Future.succeededFuture(javaValue);
+        handler.handle(future);
+        return;
+      }
+    });
 
   }
 }

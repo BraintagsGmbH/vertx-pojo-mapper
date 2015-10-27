@@ -18,15 +18,15 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.datastoretest.ResultContainer;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.EmbeddedMapper_List;
-import de.braintags.io.vertx.pojomapper.datastoretest.mapper.ReferenceMapper_Array;
-import de.braintags.io.vertx.pojomapper.datastoretest.mapper.ReferenceMapper_List;
-import de.braintags.io.vertx.pojomapper.datastoretest.mapper.ReferenceMapper_Map;
-import de.braintags.io.vertx.pojomapper.datastoretest.mapper.ReferenceMapper_Single;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.SimpleMapper;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.TypehandlerTestMapper;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.EmbeddedMapper_Array;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.EmbeddedMapper_Map;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.EmbeddedMapper_Single;
+import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.ReferenceMapper_Array;
+import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.ReferenceMapper_List;
+import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.ReferenceMapper_Map;
+import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.ReferenceMapper_Single;
 
 /**
  * 

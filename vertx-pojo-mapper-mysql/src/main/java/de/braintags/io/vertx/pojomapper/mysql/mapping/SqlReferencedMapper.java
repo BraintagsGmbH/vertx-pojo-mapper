@@ -14,7 +14,7 @@ package de.braintags.io.vertx.pojomapper.mysql.mapping;
 
 import java.util.Map;
 
-import de.braintags.io.vertx.pojomapper.json.mapping.JsonEmbeddedMapper;
+import de.braintags.io.vertx.pojomapper.json.mapping.JsonReferencedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import io.vertx.core.AsyncResult;
@@ -22,34 +22,20 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 
 /**
- * An extension to handle embedded objects for sql based datastores
+ * An extension to handle referenced objects for sql based datastores
  * 
  * @author Michael Remme
  * 
  */
 
-public class SqlEmbeddedMapper extends JsonEmbeddedMapper {
+public class SqlReferencedMapper extends JsonReferencedMapper {
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.json.mapping.AbstractSubobjectMapper#writeCollection(java.lang.Iterable,
-   * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField,
-   * io.vertx.core.Handler)
-   */
   @Override
   protected void writeCollection(Iterable<?> iterable, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
     super.writeCollection(iterable, storeObject, field, result -> modifyJsonArray(storeObject, field, result, handler));
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.json.mapping.AbstractSubobjectMapper#readInternal(de.braintags.io.vertx.pojomapper
-   * .mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
-   */
   @Override
   protected void readInternal(IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Object>> handler) {
     String arrayString = (String) storeObject.get(field);
@@ -58,13 +44,6 @@ public class SqlEmbeddedMapper extends JsonEmbeddedMapper {
     super.readInternal(storeObject, field, handler);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.json.mapping.AbstractSubobjectMapper#writeArray(java.lang.Object[],
-   * de.braintags.io.vertx.pojomapper.mapping.IStoreObject, de.braintags.io.vertx.pojomapper.mapping.IField,
-   * io.vertx.core.Handler)
-   */
   @Override
   protected void writeArray(Object[] javaValues, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {

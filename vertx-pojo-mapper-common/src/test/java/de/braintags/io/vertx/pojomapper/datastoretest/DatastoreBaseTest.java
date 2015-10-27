@@ -28,6 +28,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
 import de.braintags.io.vertx.util.ErrorObject;
+import de.braintags.io.vertx.util.ExceptionUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -315,9 +316,16 @@ public class DatastoreBaseTest extends VertxTestBase {
 
   public void checkQueryResult(AsyncResult<? extends IQueryResult<?>> qResult, int expectedResult) {
     CountDownLatch latch = new CountDownLatch(1);
-    resultFine(qResult);
-    IQueryResult<?> qr = qResult.result();
-    assertNotNull(qr);
+    IQueryResult<?> qr = null;
+    try {
+      resultFine(qResult);
+      qr = qResult.result();
+      assertNotNull(qr);
+    } catch (Exception e) {
+      latch.countDown();
+      throw ExceptionUtil.createRuntimeException(e);
+    }
+
     if (expectedResult == 0) {
       try {
         assertFalse(qr.iterator().hasNext());
@@ -325,7 +333,13 @@ public class DatastoreBaseTest extends VertxTestBase {
         latch.countDown();
       }
     } else {
-      assertTrue(qr.iterator().hasNext());
+      try {
+        assertTrue(qr.iterator().hasNext());
+      } catch (Exception e) {
+        latch.countDown();
+        throw ExceptionUtil.createRuntimeException(e);
+      }
+
       qr.iterator().next(result -> {
         try {
           if (result.failed()) {

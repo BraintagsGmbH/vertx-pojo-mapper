@@ -73,22 +73,10 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
    */
   @Override
   public void synchronize(IMapper mapper, Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
-    datastore.getSqlClient().getConnection(cr -> {
-      if (cr.failed()) {
-        resultHandler.handle(Future.failedFuture(cr.cause()));
-      } else {
-        SQLConnection connection = cr.result();
-        try {
-          readTableFromDatabase(connection, mapper, res -> checkTable(connection, (Mapper) mapper, res, resultHandler));
-        } finally {
-          LOGGER.debug("closing connection - sync finished");
-          connection.close();
-        }
-      }
-    });
+    readTableFromDatabase(mapper, res -> checkTable((Mapper) mapper, res, resultHandler));
   }
 
-  private void checkTable(SQLConnection connection, Mapper mapper, AsyncResult<SqlTableInfo> tableResult,
+  private void checkTable(Mapper mapper, AsyncResult<SqlTableInfo> tableResult,
       Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
     if (tableResult.failed()) {
       resultHandler.handle(Future.failedFuture(tableResult.cause()));
@@ -96,7 +84,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
       try {
         SqlTableInfo dbTable = tableResult.result();
         if (dbTable == null) {
-          generateNewTable(connection, mapper, resultHandler);
+          generateNewTable(mapper, resultHandler);
         } else {
           compareTables(mapper, dbTable, resultHandler);
         }
@@ -130,15 +118,14 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
    * ENGINE=InnoDB DEFAULT CHARSET=utf8;
    * 
    */
-  private void generateNewTable(SQLConnection connection, Mapper mapper,
-      Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
+  private void generateNewTable(Mapper mapper, Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
     DefaultSyncResult syncResult = createSyncResult(mapper, SyncAction.CREATE);
-    connection.execute(syncResult.getSyncCommand(), exec -> {
+    executeCommand(syncResult.getSyncCommand(), exec -> {
       if (exec.failed()) {
         LOGGER.error("error in executing command: " + syncResult.getSyncCommand());
         resultHandler.handle(Future.failedFuture(exec.cause()));
       } else {
-        readTableFromDatabase(connection, mapper, tableResult -> {
+        readTableFromDatabase(mapper, tableResult -> {
           if (tableResult.failed()) {
             resultHandler.handle(Future.failedFuture(tableResult.cause()));
           } else {
@@ -194,10 +181,9 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
     return colString;
   }
 
-  private void readTableFromDatabase(SQLConnection connection, IMapper mapper,
-      Handler<AsyncResult<SqlTableInfo>> resultHandler) {
+  private void readTableFromDatabase(IMapper mapper, Handler<AsyncResult<SqlTableInfo>> resultHandler) {
     String tableQuery = String.format(TABLE_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
-    executeCommand(connection, tableQuery, result -> {
+    executeCommand(tableQuery, result -> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
@@ -208,7 +194,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
           return;
         }
         String columnQuery = String.format(COLUMN_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
-        executeCommand(connection, columnQuery, colResult -> readColumns(mapper, tInfo, colResult, resultHandler));
+        executeCommand(columnQuery, colResult -> readColumns(mapper, tInfo, colResult, resultHandler));
       }
     });
 
@@ -263,14 +249,24 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
    * @param command
    * @param resultHandler
    */
-  private void executeCommand(SQLConnection connection, String command, Handler<AsyncResult<ResultSet>> resultHandler) {
-    connection.query(command, qr -> {
-      if (qr.failed()) {
-        resultHandler.handle(Future.failedFuture(qr.cause()));
-      } else {
-        ResultSet res = qr.result();
-        resultHandler.handle(Future.succeededFuture(res));
+  private void executeCommand(String command, Handler<AsyncResult<ResultSet>> resultHandler) {
+    datastore.getSqlClient().getConnection(cr -> {
+      if (cr.failed()) {
+        resultHandler.handle(Future.failedFuture(cr.cause()));
+        return;
       }
+      SQLConnection connection = cr.result();
+      connection.query(command, qr -> {
+        if (qr.failed()) {
+          connection.close();
+          resultHandler.handle(Future.failedFuture(qr.cause()));
+          return;
+        }
+        ResultSet res = qr.result();
+        connection.close();
+        resultHandler.handle(Future.succeededFuture(res));
+      });
     });
   }
+
 }

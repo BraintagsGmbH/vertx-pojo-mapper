@@ -10,11 +10,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.datastoretest.mapper;
+package de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler;
 
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
+import de.braintags.io.vertx.pojomapper.datastoretest.mapper.SimpleMapper;
 
 /**
  * Mapper to test {@link Referenced} annotation
@@ -24,24 +24,18 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
  */
 
 @Entity
-public class ReferenceMapper_Single {
-  @Id
-  public String id;
+public class ReferenceMapper_Array extends BaseRecord {
   @Referenced
-  public SimpleMapper simpleMapper;
+  public SimpleMapper[] simpleMapper;
 
   /**
    * 
    */
-  public ReferenceMapper_Single() {
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    ReferenceMapper_Single om = (ReferenceMapper_Single) o;
-    boolean equal = om.id.equals(id);
-    boolean equal2 = om.simpleMapper.equals(simpleMapper);
-    return equal && equal2;
+  public ReferenceMapper_Array() {
+    simpleMapper = new SimpleMapper[5];
+    for (int i = 0; i < simpleMapper.length; i++) {
+      simpleMapper[i] = new SimpleMapper("name " + i, "sec prop " + i);
+    }
   }
 
 }
