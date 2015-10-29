@@ -12,6 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.json.dataaccess;
 
+import java.util.Set;
+
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -32,6 +34,9 @@ import io.vertx.core.json.JsonObject;
  */
 
 public class JsonStoreObject implements IStoreObject<JsonObject> {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(JsonStoreObject.class);
+
   private JsonObject jsonObject;
   private IMapper mapper;
   private Object entity = null;
@@ -113,14 +118,17 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   public void initToEntity(Handler<AsyncResult<Void>> handler) {
     Object o = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
     ErrorObject<Void> error = new ErrorObject<Void>(handler);
-    CounterObject co = new CounterObject(getMapper().getFieldNames().size());
-    for (String fieldName : getMapper().getFieldNames()) {
+    Set<String> fieldNames = getMapper().getFieldNames();
+    CounterObject co = new CounterObject(fieldNames.size());
+    for (String fieldName : fieldNames) {
       IField field = getMapper().getField(fieldName);
+      LOGGER.debug("handling field " + field.getFullName());
       field.getPropertyMapper().fromStoreObject(o, this, field, result -> {
         if (result.failed()) {
           error.setThrowable(result.cause());
         } else {
           if (co.reduce()) {
+            LOGGER.debug("counter finished");
             entity = o;
             getMapper().executeLifecycle(AfterLoad.class, entity);
             handler.handle(Future.succeededFuture());
@@ -131,6 +139,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
         return;
       }
     }
+    LOGGER.debug("finished loop");
   }
 
   /**

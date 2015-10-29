@@ -30,6 +30,8 @@ import io.vertx.core.Handler;
  */
 
 public class DefaultPropertyMapper implements IPropertyMapper {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(DefaultPropertyMapper.class);
 
   /**
    * 
@@ -103,9 +105,14 @@ public class DefaultPropertyMapper implements IPropertyMapper {
           handler.handle(future);
           return;
         }
-        if (javaValue != null)
-          pAcc.writeData(mapper, javaValue);
-        handler.handle(Future.succeededFuture());
+        try {
+          if (javaValue != null)
+            pAcc.writeData(mapper, javaValue);
+          handler.handle(Future.succeededFuture());
+        } catch (Exception e) {
+          LOGGER.error("", e);
+          handler.handle(Future.failedFuture(e));
+        }
       }
     });
   }

@@ -33,6 +33,7 @@ public class ReferenceMapper_Single extends BaseRecord {
    * 
    */
   public ReferenceMapper_Single() {
+    simpleMapper = new SimpleMapper("derSimpleMapper", "die prop");
   }
 
   @Override

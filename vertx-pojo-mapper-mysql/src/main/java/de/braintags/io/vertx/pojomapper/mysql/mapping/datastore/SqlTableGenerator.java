@@ -36,11 +36,13 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.JsonC
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.LocaleColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.LongColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.MapColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ReferencedColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ShortColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.StringColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.UriColumnHandler;
 
 /**
+ * An implementation for SQL datastores
  * 
  * @author Michael Remme
  * 
@@ -69,7 +71,7 @@ public class SqlTableGenerator extends DefaultTableGenerator {
     definedColumnHandlers.add(new EmbeddedColumnHandler());
     definedColumnHandlers.add(new EnumColumnHandler());
     definedColumnHandlers.add(new LocaleColumnHandler());
-
+    definedColumnHandlers.add(new ReferencedColumnHandler());
   }
 
   /*

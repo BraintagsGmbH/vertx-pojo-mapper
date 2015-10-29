@@ -25,8 +25,8 @@ import de.braintags.io.vertx.pojomapper.exception.InsertException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
+import de.braintags.io.vertx.pojomapper.mysql.SqlUtil;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObject.SqlSequence;
-import de.braintags.io.vertx.pojomapper.mysql.exception.SqlException;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
@@ -35,7 +35,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
 
 /**
@@ -113,34 +112,16 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   private void saveStoreObject(SqlStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     Object currentId = storeObject.get(getMapper().getIdField());
-    ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> {
-      if (cr.failed()) {
-        resultHandler.handle(Future.failedFuture(cr.cause()));
-        return;
-      }
-      SQLConnection connection = cr.result();
-      if (currentId == null || (currentId instanceof Number && ((Number) currentId).intValue() == 0)) {
-        handleInsert(storeObject, writeResult, connection, ir -> {
-          closeConnection(connection);
-          resultHandler.handle(ir);
-        });
-      } else {
-        handleUpdate(storeObject, writeResult, connection, ir -> {
-          closeConnection(connection);
-          resultHandler.handle(ir);
-        });
-      }
-    });
-
-  }
-
-  private void closeConnection(SQLConnection connection) {
-    try {
-      LOGGER.debug("closing connection - save finished");
-      connection.close();
-    } catch (Exception e) {
-      LOGGER.warn("Error in closing connection", e);
+    if (currentId == null || (currentId instanceof Number && ((Number) currentId).intValue() == 0)) {
+      handleInsert(storeObject, writeResult, ir -> {
+        resultHandler.handle(ir);
+      });
+    } else {
+      handleUpdate(storeObject, writeResult, ir -> {
+        resultHandler.handle(ir);
+      });
     }
+
   }
 
   /**
@@ -150,12 +131,10 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    *          the {@link IStoreObject}
    * @param writeResult
    *          the {@link IWriteResult} to be filled
-   * @param connection
-   *          the {@link SQLConnection} to be used
    * @param resultHandler
    *          the {@link Handler} to be informed
    */
-  private void handleUpdate(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
+  private void handleUpdate(SqlStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlUpdateStatement();
     if (seq.getParameters().isEmpty()) {
@@ -163,11 +142,12 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       resultHandler
           .handle(Future.failedFuture("Update without parameters should not happen normally: " + seq.toString()));
     } else {
-      connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), updateResult -> {
-        if (!checkUpdateResult(seq, updateResult, resultHandler))
-          return;
-        finishUpdate(storeObject, writeResult, resultHandler);
-      });
+      SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), seq.getSqlStatement(), seq.getParameters(),
+          updateResult -> {
+            if (!checkUpdateResult(seq, updateResult, resultHandler))
+              return;
+            finishUpdate(storeObject, writeResult, resultHandler);
+          });
     }
 
   }
@@ -186,13 +166,13 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     }
   }
 
-  private void handleInsert(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
+  private void handleInsert(SqlStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlInsertStatement();
     if (seq.getParameters().isEmpty()) {
-      insertWithoutParameters(storeObject, writeResult, connection, seq, resultHandler);
+      insertWithoutParameters(storeObject, writeResult, seq, resultHandler);
     } else {
-      insertWithParameters(storeObject, writeResult, connection, seq, resultHandler);
+      insertWithParameters(storeObject, writeResult, seq, resultHandler);
     }
   }
 
@@ -205,37 +185,38 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param seq
    * @param resultHandler
    */
-  private void insertWithoutParameters(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
-      SqlSequence seq, Handler<AsyncResult<Void>> resultHandler) {
-    connection.update(seq.getSqlStatement(), updateResult -> {
-      if (!checkUpdateResult(seq, updateResult, resultHandler))
-        return;
-      UpdateResult res = updateResult.result();
-      if (res.getKeys() != null && res.getKeys().size() == 1) {
-        finishInsert(storeObject, writeResult, res.getKeys().getValue(0), resultHandler);
-        return;
-      }
-      loadLastInsertedId(storeObject, writeResult, connection, resultHandler);
-    });
-  }
-
-  private void insertWithParameters(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
-      SqlSequence seq, Handler<AsyncResult<Void>> resultHandler) {
-    connection.updateWithParams(seq.getSqlStatement(), seq.getParameters(), updateResult -> {
-      if (!checkUpdateResult(seq, updateResult, resultHandler))
-        return;
-      UpdateResult res = updateResult.result();
-      if (res.getKeys() != null && res.getKeys().size() == 1) {
-        finishInsert(storeObject, writeResult, res.getKeys().getValue(0), resultHandler);
-        return;
-      }
-      loadLastInsertedId(storeObject, writeResult, connection, resultHandler);
-    });
-  }
-
-  private void loadLastInsertedId(SqlStoreObject storeObject, IWriteResult writeResult, SQLConnection connection,
+  private void insertWithoutParameters(SqlStoreObject storeObject, IWriteResult writeResult, SqlSequence seq,
       Handler<AsyncResult<Void>> resultHandler) {
-    connection.query(LAST_INSERT_ID_COMMAND, idResult -> {
+    SqlUtil.update((MySqlDataStore) getDataStore(), seq.getSqlStatement(), updateResult -> {
+      if (!checkUpdateResult(seq, updateResult, resultHandler))
+        return;
+      UpdateResult res = updateResult.result();
+      if (res.getKeys() != null && res.getKeys().size() == 1) {
+        finishInsert(storeObject, writeResult, res.getKeys().getValue(0), resultHandler);
+        return;
+      }
+      loadLastInsertedId(storeObject, writeResult, resultHandler);
+    });
+  }
+
+  private void insertWithParameters(SqlStoreObject storeObject, IWriteResult writeResult, SqlSequence seq,
+      Handler<AsyncResult<Void>> resultHandler) {
+    SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), seq.getSqlStatement(), seq.getParameters(),
+        updateResult -> {
+          if (!checkUpdateResult(seq, updateResult, resultHandler))
+            return;
+          UpdateResult res = updateResult.result();
+          if (res.getKeys() != null && res.getKeys().size() == 1) {
+            finishInsert(storeObject, writeResult, res.getKeys().getValue(0), resultHandler);
+            return;
+          }
+          loadLastInsertedId(storeObject, writeResult, resultHandler);
+        });
+  }
+
+  private void loadLastInsertedId(SqlStoreObject storeObject, IWriteResult writeResult,
+      Handler<AsyncResult<Void>> resultHandler) {
+    SqlUtil.query((MySqlDataStore) getDataStore(), LAST_INSERT_ID_COMMAND, idResult -> {
       if (idResult.failed()) {
         resultHandler.handle(Future.failedFuture(idResult.cause()));
         return;
@@ -262,8 +243,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   private boolean checkUpdateResult(SqlSequence seq, AsyncResult<UpdateResult> updateResult,
       Handler<AsyncResult<Void>> resultHandler) {
     if (updateResult.failed()) {
-      SqlException ex = new SqlException("Error in saving record; Statement: " + seq.toString(), updateResult.cause());
-      resultHandler.handle(Future.failedFuture(ex));
+      resultHandler.handle(Future.failedFuture(updateResult.cause()));
       return false;
     }
     UpdateResult res = updateResult.result();
@@ -291,6 +271,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         resultHandler.handle(Future.succeededFuture());
       });
     } catch (Exception e) {
+      LOGGER.error("", e);
       resultHandler.handle(Future.failedFuture(e));
     }
   }

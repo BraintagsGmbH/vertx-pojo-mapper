@@ -23,7 +23,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
 import io.vertx.ext.asyncsql.MySQLClient;
-import io.vertx.ext.sql.SQLConnection;
 
 /**
  * 
@@ -58,7 +57,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
 
       String database = "test";
       JsonObject mySQLClientConfig = new JsonObject().put("host", "localhost").put("username", username)
-          .put("password", password).put("database", database).put("port", 3306);
+          .put("password", password).put("database", database).put("port", 3306).put("initial_pool_size", 10);
       mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
       datastore = new MySqlDataStore(mySQLClient, database);
       handler.handle(Future.succeededFuture());
@@ -84,21 +83,15 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
 
   @Override
   public void dropTable(String tableName, Handler<AsyncResult<Void>> handler) {
-    mySQLClient.getConnection(cr -> {
-      if (cr.failed()) {
-        handler.handle(Future.failedFuture(cr.cause()));
+    String command = "DROP TABLE IF EXISTS " + tableName;
+    SqlUtil.execute(datastore, command, dr -> {
+      if (dr.failed()) {
+        LOGGER.error("error deleting table", dr.cause());
+        handler.handle(Future.failedFuture(dr.cause()));
         return;
       }
-      SQLConnection conn = cr.result();
-      conn.execute("DROP TABLE IF EXISTS " + tableName, dr -> {
-        if (dr.failed()) {
-          LOGGER.error("error deleting table", dr.cause());
-          handler.handle(Future.failedFuture(dr.cause()));
-          return;
-        }
-        LOGGER.info("Deleted table " + tableName);
-        handler.handle(Future.succeededFuture());
-      });
+      LOGGER.info("Deleted table " + tableName);
+      handler.handle(Future.succeededFuture());
     });
   }
 

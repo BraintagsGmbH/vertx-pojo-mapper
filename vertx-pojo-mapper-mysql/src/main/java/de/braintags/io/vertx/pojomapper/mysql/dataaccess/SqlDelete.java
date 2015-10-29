@@ -19,11 +19,11 @@ import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
+import de.braintags.io.vertx.pojomapper.mysql.SqlUtil;
 import de.braintags.io.vertx.pojomapper.mysql.exception.SqlException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
 
 /**
@@ -36,8 +36,6 @@ import io.vertx.ext.sql.UpdateResult;
  */
 
 public class SqlDelete<T> extends Delete<T> {
-  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
-      .getLogger(SqlDelete.class);
 
   /**
    * @param mapperClass
@@ -61,25 +59,14 @@ public class SqlDelete<T> extends Delete<T> {
         resultHandler.handle(Future.failedFuture(qDefResult.cause()));
       } else {
         SqlQueryRambler rambler = qDefResult.result();
-        ((MySqlDataStore) getDataStore()).getSqlClient().getConnection(cr -> {
-          if (cr.failed()) {
-            resultHandler.handle(Future.failedFuture(cr.cause()));
-            return;
-          }
-          SQLConnection connection = cr.result();
-          handleDelete(rambler, connection, dr -> {
-            closeConnection(connection);
-            resultHandler.handle(dr);
-          });
-        });
+        handleDelete(rambler, resultHandler);
       }
     });
   }
 
-  private void handleDelete(SqlQueryRambler rambler, SQLConnection connection,
-      Handler<AsyncResult<IDeleteResult>> resultHandler) {
+  private void handleDelete(SqlQueryRambler rambler, Handler<AsyncResult<IDeleteResult>> resultHandler) {
     SqlExpression expr = rambler.getSqlStatement();
-    connection.updateWithParams(expr.getDeleteExpression(), expr.getParameters(), ur -> {
+    SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), expr.getDeleteExpression(), expr.getParameters(), ur -> {
       if (ur.failed()) {
         resultHandler.handle(Future.failedFuture(new SqlException(rambler, ur.cause())));
         return;
@@ -89,15 +76,6 @@ public class SqlDelete<T> extends Delete<T> {
       resultHandler.handle(Future.succeededFuture(deleteResult));
     });
 
-  }
-
-  private void closeConnection(SQLConnection connection) {
-    try {
-      LOGGER.debug("closing connection - delete finished");
-      connection.close();
-    } catch (Exception e) {
-      LOGGER.warn("Error in closing connection", e);
-    }
   }
 
 }

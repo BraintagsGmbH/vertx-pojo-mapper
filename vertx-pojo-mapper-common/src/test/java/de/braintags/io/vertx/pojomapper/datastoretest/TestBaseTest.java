@@ -16,7 +16,6 @@ import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
 
-import io.vertx.core.VertxOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
@@ -34,14 +33,6 @@ public class TestBaseTest extends DatastoreBaseTest {
    * 
    */
   public TestBaseTest() {
-  }
-
-  @Override
-  protected VertxOptions getOptions() {
-    VertxOptions options = new VertxOptions();
-    options.setBlockedThreadCheckInterval(10000);
-    options.setWarningExceptionTime(10000);
-    return options;
   }
 
   @Test

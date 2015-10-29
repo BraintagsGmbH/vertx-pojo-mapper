@@ -13,37 +13,37 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler;
 
-import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
 
 /**
- * Handles embedded objects, which are stored as Json String into a text field
+ * Handles referenced objects, where the ids are stored inside a Json array as String into the field
  * 
  * @author Michael Remme
  * 
  */
 
-public class EmbeddedColumnHandler extends StringColumnHandler {
+public class ReferencedColumnHandler extends StringColumnHandler {
 
   /**
    * Constructor
    */
-  public EmbeddedColumnHandler() {
+  public ReferencedColumnHandler() {
     super();
   }
 
   @Override
   public void applyMetaData(SqlColumnInfo ci) {
     if (ci.getLength() == Property.UNDEFINED_INTEGER)
-      ci.setLength(VARCHAR_MAX);
+      ci.setLength(1024);
     super.applyMetaData(ci);
   }
 
   @Override
   public short matches(IField field) {
-    if (field.hasAnnotation(Embedded.class))
+    if (field.hasAnnotation(Referenced.class))
       return MATCH_MAJOR;
     return MATCH_NONE;
   }

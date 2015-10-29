@@ -30,6 +30,7 @@ import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ExceptionUtil;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.test.core.VertxTestBase;
@@ -53,6 +54,15 @@ public class DatastoreBaseTest extends VertxTestBase {
 
   public IDataStore getDataStore() {
     return datastoreContainer.getDataStore();
+  }
+
+  @Override
+  protected VertxOptions getOptions() {
+    super.getOptions();
+    VertxOptions options = new VertxOptions();
+    options.setBlockedThreadCheckInterval(10000);
+    options.setWarningExceptionTime(10000);
+    return options;
   }
 
   /*

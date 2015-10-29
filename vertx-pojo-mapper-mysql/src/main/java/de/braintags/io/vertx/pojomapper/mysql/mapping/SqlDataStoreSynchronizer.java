@@ -13,6 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultSyncResult;
 import de.braintags.io.vertx.pojomapper.mapping.impl.Mapper;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
+import de.braintags.io.vertx.pojomapper.mysql.SqlUtil;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlTableInfo;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -37,7 +39,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.ResultSet;
-import io.vertx.ext.sql.SQLConnection;
 
 /**
  * Used to synchronize tables inside the database with the POJOs
@@ -50,6 +51,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
   private static Logger LOGGER = LoggerFactory.getLogger(SqlDataStoreSynchronizer.class);
 
   private MySqlDataStore datastore;
+  private List<String> synchronizedInstances = new ArrayList<String>();
 
   private static final String TABLE_QUERY = "SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='%s' AND TABLE_NAME='%s'";
   private static final String COLUMN_QUERY = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA='%s' AND TABLE_NAME='%s'";
@@ -73,7 +75,14 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
    */
   @Override
   public void synchronize(IMapper mapper, Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
-    readTableFromDatabase(mapper, res -> checkTable((Mapper) mapper, res, resultHandler));
+    if (synchronizedInstances.contains(mapper.getMapperClass().getName())) {
+      // was synced already
+      DefaultSyncResult syncResult = createSyncResult(mapper, SyncAction.NO_ACTION);
+      resultHandler.handle(Future.succeededFuture(syncResult));
+    } else {
+      readTableFromDatabase(mapper, res -> checkTable((Mapper) mapper, res, resultHandler));
+      synchronizedInstances.add(mapper.getMapperClass().getName());
+    }
   }
 
   private void checkTable(Mapper mapper, AsyncResult<SqlTableInfo> tableResult,
@@ -120,7 +129,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
    */
   private void generateNewTable(Mapper mapper, Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
     DefaultSyncResult syncResult = createSyncResult(mapper, SyncAction.CREATE);
-    executeCommand(syncResult.getSyncCommand(), exec -> {
+    SqlUtil.query(datastore, syncResult.getSyncCommand(), exec -> {
       if (exec.failed()) {
         LOGGER.error("error in executing command: " + syncResult.getSyncCommand());
         resultHandler.handle(Future.failedFuture(exec.cause()));
@@ -183,7 +192,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
 
   private void readTableFromDatabase(IMapper mapper, Handler<AsyncResult<SqlTableInfo>> resultHandler) {
     String tableQuery = String.format(TABLE_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
-    executeCommand(tableQuery, result -> {
+    SqlUtil.query(datastore, tableQuery, result -> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
@@ -194,7 +203,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
           return;
         }
         String columnQuery = String.format(COLUMN_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
-        executeCommand(columnQuery, colResult -> readColumns(mapper, tInfo, colResult, resultHandler));
+        SqlUtil.query(datastore, columnQuery, colResult -> readColumns(mapper, tInfo, colResult, resultHandler));
       }
     });
 
@@ -241,32 +250,6 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
     if (resultSet.getNumRows() == 0)
       return null;
     return new SqlTableInfo(mapper);
-  }
-
-  /**
-   * Executed the given command and returns the {@link ResultSet} to the {@link Handler}
-   * 
-   * @param command
-   * @param resultHandler
-   */
-  private void executeCommand(String command, Handler<AsyncResult<ResultSet>> resultHandler) {
-    datastore.getSqlClient().getConnection(cr -> {
-      if (cr.failed()) {
-        resultHandler.handle(Future.failedFuture(cr.cause()));
-        return;
-      }
-      SQLConnection connection = cr.result();
-      connection.query(command, qr -> {
-        if (qr.failed()) {
-          connection.close();
-          resultHandler.handle(Future.failedFuture(qr.cause()));
-          return;
-        }
-        ResultSet res = qr.result();
-        connection.close();
-        resultHandler.handle(Future.succeededFuture(res));
-      });
-    });
   }
 
 }

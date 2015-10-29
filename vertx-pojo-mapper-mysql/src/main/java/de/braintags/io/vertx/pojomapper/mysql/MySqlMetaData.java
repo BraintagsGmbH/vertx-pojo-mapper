@@ -18,7 +18,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
-import io.vertx.ext.sql.SQLConnection;
 
 /**
  * Meta information about the connected database
@@ -28,6 +27,7 @@ import io.vertx.ext.sql.SQLConnection;
  */
 
 public class MySqlMetaData implements IDataStoreMetaData {
+  private static final String SELECT_VERSION = "SELECT VERSION()";
   private AsyncSQLClient sqlClient;
   private String version;
 
@@ -52,26 +52,15 @@ public class MySqlMetaData implements IDataStoreMetaData {
       handler.handle(Future.succeededFuture(version));
       return;
     }
-    sqlClient.getConnection(conn -> {
-      if (conn.failed()) {
-        handler.handle(Future.failedFuture(conn.cause()));
+
+    SqlUtil.query(sqlClient, SELECT_VERSION, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
       } else {
-        SQLConnection connection = conn.result();
-        connection.query("SELECT VERSION()", result -> {
-          try {
-            if (result.failed()) {
-              handler.handle(Future.failedFuture(conn.cause()));
-            } else {
-              version = result.result().getResults().get(0).getString(0);
-              handler.handle(Future.succeededFuture(version));
-            }
-          } finally {
-            connection.close();
-          }
-        });
+        version = result.result().getResults().get(0).getString(0);
+        handler.handle(Future.succeededFuture(version));
       }
     });
-
   }
 
 }
