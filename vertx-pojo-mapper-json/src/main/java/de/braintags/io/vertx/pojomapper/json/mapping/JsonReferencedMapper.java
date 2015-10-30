@@ -63,7 +63,7 @@ public class JsonReferencedMapper extends AbstractSubobjectMapper implements IRe
   }
 
   @Override
-  public void readSingleValue(Object dbValue, final IField field, Class<?> mapperClass,
+  public void readSingleValue(IStoreObject<?> storeObject, Object dbValue, final IField field, Class<?> mapperClass,
       Handler<AsyncResult<Object>> handler) {
     ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
         .getTypeHandler(ObjectReference.class);

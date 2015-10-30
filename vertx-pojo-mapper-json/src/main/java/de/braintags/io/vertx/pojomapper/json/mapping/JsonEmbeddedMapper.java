@@ -77,7 +77,7 @@ public class JsonEmbeddedMapper extends AbstractSubobjectMapper implements IEmbe
   }
 
   @Override
-  public void readSingleValue(Object dbValue, IField field, Class<?> mapperClass,
+  public void readSingleValue(IStoreObject<?> storeObject, Object dbValue, IField field, Class<?> mapperClass,
       Handler<AsyncResult<Object>> handler) {
     IDataStore store = field.getMapper().getMapperFactory().getDataStore();
     Class<?> internalMapperClass = mapperClass != null ? mapperClass : field.getType();

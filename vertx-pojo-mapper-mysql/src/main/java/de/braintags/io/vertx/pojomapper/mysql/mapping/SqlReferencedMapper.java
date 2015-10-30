@@ -37,14 +37,6 @@ public class SqlReferencedMapper extends JsonReferencedMapper {
   }
 
   @Override
-  protected void readInternal(IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Object>> handler) {
-    String arrayString = (String) storeObject.get(field);
-    JsonArray array = new JsonArray(arrayString);
-    storeObject.put(field, array);
-    super.readInternal(storeObject, field, handler);
-  }
-
-  @Override
   protected void writeArray(Object[] javaValues, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
     super.writeArray(javaValues, storeObject, field, result -> modifyJsonArray(storeObject, field, result, handler));
@@ -64,6 +56,22 @@ public class SqlReferencedMapper extends JsonReferencedMapper {
     super.readMap(entity, storeObject, field, handler);
   }
 
+  @Override
+  protected void readInternal(IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Object>> handler) {
+    String arrayString = (String) storeObject.get(field);
+    JsonArray array = new JsonArray(arrayString);
+    storeObject.put(field, array);
+    super.readInternal(storeObject, field, handler);
+  }
+
+  /**
+   * Encodes a {@link JsonArray} in the field into its String representation
+   * 
+   * @param storeObject
+   * @param field
+   * @param result
+   * @param handler
+   */
   private void modifyJsonArray(IStoreObject<?> storeObject, IField field, AsyncResult<Void> result,
       Handler<AsyncResult<Void>> handler) {
     if (result.failed()) {

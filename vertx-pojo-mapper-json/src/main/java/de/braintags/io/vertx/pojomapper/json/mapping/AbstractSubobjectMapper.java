@@ -127,7 +127,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
         return;
       }
 
-      readSingleValue(dbValue, field, null, result -> {
+      readSingleValue(storeObject, dbValue, field, null, result -> {
         if (result.failed()) {
           handler.handle(Future.failedFuture(result.cause()));
         } else {
@@ -227,7 +227,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
     int counter = 0;
     for (Object jo : jsonArray) {
       CurrentCounter cc = new CurrentCounter(counter++, jo);
-      readSingleValue(cc.value, field, field.getSubClass(), result -> {
+      readSingleValue(storeObject, cc.value, field, field.getSubClass(), result -> {
         if (result.failed()) {
           LOGGER.info("failed", result.cause());
           errorObject.setThrowable(result.cause());
@@ -281,7 +281,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
           errorObject.setThrowable(keyResult.cause());
         } else {
           Object valueIn = ((JsonArray) cc.value).getValue(1);
-          readSingleValue(valueIn, field, field.getSubClass(), valueResult -> {
+          readSingleValue(storeObject, valueIn, field, field.getSubClass(), valueResult -> {
             if (valueResult.failed()) {
               LOGGER.info("failed", valueResult.cause());
               errorObject.setThrowable(valueResult.cause());
@@ -464,6 +464,8 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
   /**
    * Generate a java value from the given dbValue
    * 
+   * @param storeObject
+   *          the storeobject from the datastore
    * @param dbValue
    *          the Object like read from the datastore
    * @param field
@@ -473,8 +475,8 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
    * @param handler
    *          the handler to be recalled
    */
-  protected abstract void readSingleValue(Object dbValue, final IField field, Class<?> mapperClass,
-      Handler<AsyncResult<Object>> handler);
+  protected abstract void readSingleValue(IStoreObject<?> storeObject, Object dbValue, final IField field,
+      Class<?> mapperClass, Handler<AsyncResult<Object>> handler);
 
   class CurrentCounter {
     int i;
