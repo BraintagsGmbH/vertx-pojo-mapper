@@ -31,7 +31,9 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeH
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.EnumTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.FloatTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.IntegerTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.LocaleTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.LongTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerReferenced;
@@ -70,6 +72,8 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     definedTypeHandlers.add(new FloatTypeHandler(this));
     definedTypeHandlers.add(new DateTypeHandler(this));
     definedTypeHandlers.add(new ShortTypeHandler(this));
+    definedTypeHandlers.add(new IntegerTypeHandler(this));
+    definedTypeHandlers.add(new LongTypeHandler(this));
     definedTypeHandlers.add(new CalendarTypeHandler(this));
     definedTypeHandlers.add(new BigDecimalTypeHandler(this));
     definedTypeHandlers.add(new BigIntegerTypeHandler(this));
@@ -93,7 +97,6 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     definedTypeHandlers.add(new ArrayTypeHandlerEmbedded(this));
     definedTypeHandlers.add(new ArrayTypeHandlerReferenced(this));
 
-    definedTypeHandlers.add(new ObjectTypeHandler(this));
     definedTypeHandlers.add(new ObjectTypeHandlerEmbedded(this));
     definedTypeHandlers.add(new ObjectTypeHandlerReferenced(this));
 

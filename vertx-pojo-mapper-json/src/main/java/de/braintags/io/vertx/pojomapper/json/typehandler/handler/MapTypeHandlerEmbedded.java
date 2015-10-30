@@ -14,8 +14,8 @@ package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -28,6 +28,7 @@ import io.vertx.core.Handler;
  */
 
 public class MapTypeHandlerEmbedded extends MapTypeHandler {
+  private ITypeHandler th = new ObjectTypeHandlerEmbedded(getTypeHandlerFactory());
 
   /**
    * Constructor with parent {@link ITypeHandlerFactory}
@@ -56,23 +57,31 @@ public class MapTypeHandlerEmbedded extends MapTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler#fromStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler#getValueTypeHandler(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+  protected ITypeHandler getValueTypeHandler(Object value, IField field) {
+    return th;
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler#intoStore(java.lang.Object,
+   * @see
+   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler#convertValueFromStore(java.lang.Object,
    * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public void intoStore(Object javaValues, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+  protected void convertValueFromStore(Object valueIn, IField field, Handler<AsyncResult<Object>> resultHandler) {
+    th.fromStore(valueIn, field, field.getSubClass(), valueResult -> {
+      if (valueResult.failed()) {
+        resultHandler.handle(Future.failedFuture(valueResult.cause()));
+      } else {
+        Object javaValue = valueResult.result().getResult();
+        resultHandler.handle(Future.succeededFuture(javaValue));
+      }
+    });
   }
 
 }

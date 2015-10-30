@@ -96,8 +96,7 @@ public class ObjectTypeHandlerEmbedded extends ObjectTypeHandler {
     if (store.getMapperFactory().isMapper(embeddedObject.getClass())) {
       writeSingleValueAsMapper(store, embeddedObject, field, handler);
     } else {
-      fail(new MappingException(
-          "Embedded should be used for mappable pojos only: " + embeddedObject.getClass().getName()), handler);
+      fail(new MappingException("Embedded should be used for mappable pojos only: " + field.getFullName()), handler);
     }
   }
 

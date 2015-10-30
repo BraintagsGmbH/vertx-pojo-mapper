@@ -145,7 +145,18 @@ public class MapTypeHandler extends AbstractTypeHandler {
 
   }
 
-  private void convertValueFromStore(Object valueIn, IField field, Handler<AsyncResult<Object>> resultHandler) {
+  /**
+   * Converts the value for one entry like it was coming from the datastore into the needed format for the object to be
+   * filled
+   * 
+   * @param valueIn
+   *          the value from the datastore
+   * @param field
+   *          the field of the {@link Map}
+   * @param resultHandler
+   *          the {@link Handler} to be informed
+   */
+  protected void convertValueFromStore(Object valueIn, IField field, Handler<AsyncResult<Object>> resultHandler) {
     if (field.getSubTypeHandler() == null) {
       resultHandler.handle(Future.succeededFuture(valueIn));
       return;
@@ -205,8 +216,20 @@ public class MapTypeHandler extends AbstractTypeHandler {
     }
   }
 
+  /**
+   * Transforms the key - value pair into the given Json Array
+   * 
+   * @param field
+   *          the field, which describes the {@link Map}
+   * @param cc
+   *          the instance of {@link CurrentCounter}
+   * @param resultArray
+   *          the {@link JsonArray} to be filled
+   * @param resultHandler
+   *          the {@link Handler} to be informed
+   */
   @SuppressWarnings("rawtypes")
-  private void valueIntoStore(IField field, CurrentCounter cc, JsonArray[] resultArray,
+  protected void valueIntoStore(IField field, CurrentCounter cc, JsonArray[] resultArray,
       Handler<AsyncResult<Void>> resultHandler) {
     ITypeHandler keyTh = getKeyTypeHandler(((Entry) cc.value).getKey(), field);
 
@@ -230,16 +253,34 @@ public class MapTypeHandler extends AbstractTypeHandler {
     });
   }
 
+  /**
+   * Get the {@link ITypeHandler} which shall be used for the entry value
+   * 
+   * @param value
+   *          the value to be written
+   * @param field
+   *          the field to be handled
+   * @return the {@link ITypeHandler} to be used
+   */
   @SuppressWarnings("rawtypes")
-  private ITypeHandler getValueTypeHandler(Object value, IField field) {
+  protected ITypeHandler getValueTypeHandler(Object value, IField field) {
     Class valueClass = field.getSubClass();
     if (valueClass == null || valueClass == Object.class)
       valueClass = value.getClass();
     return getSubTypeHandler(valueClass);
   }
 
+  /**
+   * Get the {@link ITypeHandler} which shall be used for the entry key
+   * 
+   * @param value
+   *          the value to be written
+   * @param field
+   *          the field to be handled
+   * @return the {@link ITypeHandler} to be used
+   */
   @SuppressWarnings("rawtypes")
-  private ITypeHandler getKeyTypeHandler(Object value, IField field) {
+  public ITypeHandler getKeyTypeHandler(Object value, IField field) {
     Class keyClass = field.getMapKeyClass();
     if (keyClass == null || keyClass == Object.class)
       keyClass = value.getClass();

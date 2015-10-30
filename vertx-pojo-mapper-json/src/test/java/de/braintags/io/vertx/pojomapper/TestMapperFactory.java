@@ -39,16 +39,18 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.impl.DummyDataStore;
 import de.braintags.io.vertx.pojomapper.impl.DummyObjectFactory;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.IntegerTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerEmbedded;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.StringTypeHandler;
 import de.braintags.io.vertx.pojomapper.mapper.Animal;
 import de.braintags.io.vertx.pojomapper.mapper.Person;
-import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
-import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ParametrizedMappedField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -133,8 +135,8 @@ public class TestMapperFactory {
   @Test
   public void testProperty() {
     assertTrue(mapperDef.getField("weight").getPropertyMapper() instanceof IPropertyMapper);
-    assertTrue(mapperDef.getField("animal").getPropertyMapper() instanceof IReferencedMapper);
-    assertTrue(mapperDef.getField("chicken").getPropertyMapper() instanceof IEmbeddedMapper);
+    assertTrue(mapperDef.getField("animal").getPropertyMapper() instanceof IPropertyMapper);
+    assertTrue(mapperDef.getField("chicken").getPropertyMapper() instanceof IPropertyMapper);
     assertTrue(mapperDef.getField("intValue").getPropertyMapper() instanceof IPropertyMapper);
 
   }
@@ -149,6 +151,15 @@ public class TestMapperFactory {
     th = mapperDef.getField("chicken").getTypeHandler();
     assertNotNull("Typehandler for @Embedded must not be null", th);
     assertNotNull("Typehandler for @Referenced must not be null", mapperDef.getField("animal").getTypeHandler());
+
+    assertTrue(mapperDef.getField("animal").getTypeHandler() instanceof ObjectTypeHandlerReferenced);
+    assertTrue(mapperDef.getField("chicken").getTypeHandler() instanceof ObjectTypeHandlerEmbedded);
+
+    IField field = mapperDef.getField("myMap"); // public Map<Integer, Double> myMap;
+    assertTrue(field.getTypeHandler() instanceof MapTypeHandler);
+    MapTypeHandler mth = (MapTypeHandler) field.getTypeHandler();
+    ITypeHandler keyTh = mth.getKeyTypeHandler(new Integer(5), field);
+    assertTrue(keyTh instanceof IntegerTypeHandler);
 
   }
 

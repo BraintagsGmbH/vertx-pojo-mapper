@@ -33,7 +33,6 @@ public class EmbeddedMapper_Map {
   public String id;
   @Embedded
   public Map<Integer, SimpleMapper> simpleMapper;
-  @Embedded
   public Map<Integer, String> secondMap = new HashMap<>();
 
   /**

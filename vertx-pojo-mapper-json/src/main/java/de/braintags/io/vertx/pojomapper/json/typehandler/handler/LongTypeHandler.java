@@ -26,7 +26,7 @@ import io.vertx.core.Handler;
  * 
  */
 
-public class ShortTypeHandler extends AbstractTypeHandler {
+public class LongTypeHandler extends AbstractTypeHandler {
 
   /**
    * Constructor with parent {@link ITypeHandlerFactory}
@@ -34,8 +34,8 @@ public class ShortTypeHandler extends AbstractTypeHandler {
    * @param typeHandlerFactory
    *          the parent {@link ITypeHandlerFactory}
    */
-  public ShortTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
-    super(typeHandlerFactory, short.class, Short.class);
+  public LongTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory, long.class, Long.class);
   }
 
   /*
@@ -47,7 +47,7 @@ public class ShortTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : ((Number) source).shortValue(), resultHandler);
+    success(source == null ? source : ((Number) source).longValue(), resultHandler);
   }
 
   /*
@@ -58,7 +58,7 @@ public class ShortTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : ((Short) source).shortValue(), resultHandler);
+    success(source == null ? source : ((Long) source).longValue(), resultHandler);
   }
 
 }
