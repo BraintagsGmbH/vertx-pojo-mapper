@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandlerEmbedded;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.BigDecimalTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.BigIntegerTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ByteTypeHandler;
@@ -24,13 +26,18 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CharSequenceTyp
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CharacterTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ClassTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandlerEmbedded;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.EnumTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.FloatTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.LocaleTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler;
-import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectReferenceTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerEmbedded;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerEmbedded;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ShortTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.StringTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.URITypeHandler;
@@ -72,13 +79,24 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     definedTypeHandlers.add(new URITypeHandler(this));
     definedTypeHandlers.add(new URLTypeHandler(this));
     definedTypeHandlers.add(new CollectionTypeHandler(this));
-    definedTypeHandlers.add(new ObjectReferenceTypeHandler(this));
+    definedTypeHandlers.add(new CollectionTypeHandlerEmbedded(this));
+    definedTypeHandlers.add(new CollectionTypeHandlerReferenced(this));
+    // definedTypeHandlers.add(new ObjectReferenceTypeHandler(this)); no more needed?
     definedTypeHandlers.add(new ClassTypeHandler(this));
     definedTypeHandlers.add(new LocaleTypeHandler(this));
     definedTypeHandlers.add(new EnumTypeHandler(this));
     definedTypeHandlers.add(new MapTypeHandler(this));
+    definedTypeHandlers.add(new MapTypeHandlerEmbedded(this));
+    definedTypeHandlers.add(new MapTypeHandlerReferenced(this));
     definedTypeHandlers.add(new StringTypeHandler(this));
     definedTypeHandlers.add(new ArrayTypeHandler(this));
+    definedTypeHandlers.add(new ArrayTypeHandlerEmbedded(this));
+    definedTypeHandlers.add(new ArrayTypeHandlerReferenced(this));
+
+    definedTypeHandlers.add(new ObjectTypeHandler(this));
+    definedTypeHandlers.add(new ObjectTypeHandlerEmbedded(this));
+    definedTypeHandlers.add(new ObjectTypeHandlerReferenced(this));
+
   }
 
   /*

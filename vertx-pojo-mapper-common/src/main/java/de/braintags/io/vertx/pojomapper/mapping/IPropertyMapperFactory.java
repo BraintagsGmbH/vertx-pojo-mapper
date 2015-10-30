@@ -22,12 +22,10 @@ package de.braintags.io.vertx.pojomapper.mapping;
 public interface IPropertyMapperFactory {
 
   /**
-   * Get an instance of {@link IPropertyMapper}
+   * Get an instance of {@link IPropertyMapper} for the given {@link IField}
    * 
-   * @param cls
-   *          the interface, for which an implementation shall be retrieved. This can be {@link IPropertyMapper},
-   *          {@link IEmbeddedMapper} or {@link IReferencedMapper}
-   * @return an imeplementation of the required interface
+   * @param field
+   *          the field to request a property mapper for
    */
-  public IPropertyMapper getPropertyMapper(Class<? extends IPropertyMapper> cls);
+  public IPropertyMapper getPropertyMapper(IField field);
 }

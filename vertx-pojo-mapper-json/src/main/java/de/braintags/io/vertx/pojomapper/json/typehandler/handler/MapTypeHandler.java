@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -29,7 +31,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 
 /**
- * 
+ * Deals all fields, which contain {@link Map} content, which are NOT annotated as {@link Referenced} or
+ * {@link Embedded}
  * 
  * @author Michael Remme
  * 
@@ -45,6 +48,28 @@ public class MapTypeHandler extends AbstractTypeHandler {
    */
   public MapTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, Map.class);
+  }
+
+  @Override
+  public final short matches(IField field) {
+    if (matchAnnotation(field) == MATCH_NONE)
+      return MATCH_NONE;
+    return super.matches(field);
+  }
+
+  /**
+   * Checks, wether an annotation like {@link Referenced} or {@link Embedded} is set to the field and returns the
+   * propriate match definition. If the method returns MATCH_NONE, then the class won't be checkd, otherwise it will be
+   * checked
+   * 
+   * @param field
+   *          the field to be checked
+   * @return MATCH_NONE or MATCH_MINOR
+   */
+  protected short matchAnnotation(IField field) {
+    if (field.hasAnnotation(Referenced.class) || field.hasAnnotation(Embedded.class))
+      return MATCH_NONE;
+    return MATCH_MINOR;
   }
 
   /*

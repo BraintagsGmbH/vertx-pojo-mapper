@@ -12,11 +12,9 @@
  */
 package de.braintags.io.vertx.pojomapper.json.mapping;
 
-import de.braintags.io.vertx.pojomapper.exception.MappingException;
-import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
-import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultPropertyMapper;
 
 /**
@@ -34,17 +32,10 @@ public class JsonPropertyMapperFactory implements IPropertyMapperFactory {
    * @see de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory#getPropertyMapper(java.lang.Class)
    */
   @Override
-  public IPropertyMapper getPropertyMapper(Class<? extends IPropertyMapper> cls) {
-    if (cls == null)
-      throw new NullPointerException("parameter must be specified: cls");
-    if (cls.equals(IEmbeddedMapper.class) || IEmbeddedMapper.class.isInstance(cls)) {
-      return new JsonEmbeddedMapper();
-    } else if (cls.equals(IReferencedMapper.class) || IReferencedMapper.class.isInstance(cls)) {
-      return new JsonReferencedMapper();
-    } else if (cls.equals(IPropertyMapper.class) || IPropertyMapper.class.isInstance(cls)) {
-      return new DefaultPropertyMapper();
-    }
-    throw new MappingException("could not create PropertyMapper for class: " + cls.getName());
+  public IPropertyMapper getPropertyMapper(IField field) {
+    if (field == null)
+      throw new NullPointerException("parameter must be specified: field");
+    return new DefaultPropertyMapper();
   }
 
 }

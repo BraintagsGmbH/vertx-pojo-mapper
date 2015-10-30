@@ -12,6 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
@@ -20,7 +22,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 /**
- * 
+ * Deals all fields, which are instanced of Object and which are NOT annotated as {@link Referenced} or {@link Embedded}
  * 
  * @author Michael Remme
  * 
@@ -37,6 +39,28 @@ public class ObjectTypeHandler extends AbstractTypeHandler {
    */
   public ObjectTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, handleClass);
+  }
+
+  @Override
+  public final short matches(IField field) {
+    if (matchAnnotation(field) == MATCH_NONE)
+      return MATCH_NONE;
+    return super.matches(field);
+  }
+
+  /**
+   * Checks, wether an annotation like {@link Referenced} or {@link Embedded} is set to the field and returns the
+   * propriate match definition. If the method returns MATCH_NONE, then the class won't be checkd, otherwise it will be
+   * checked
+   * 
+   * @param field
+   *          the field to be checked
+   * @return MATCH_NONE or MATCH_MINOR
+   */
+  protected short matchAnnotation(IField field) {
+    if (field.hasAnnotation(Referenced.class) || field.hasAnnotation(Embedded.class))
+      return MATCH_NONE;
+    return MATCH_MINOR;
   }
 
   /*

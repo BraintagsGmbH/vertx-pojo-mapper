@@ -39,12 +39,10 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
-import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
-import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.util.ClassUtil;
@@ -141,15 +139,9 @@ public class MappedField implements IField {
     }
   }
 
-  protected IPropertyMapper computePropertyMapper() {
+  protected final IPropertyMapper computePropertyMapper() {
     IDataStore store = mapper.getMapperFactory().getDataStore();
-    if (field.isAnnotationPresent(Embedded.class)) {
-      return store.getPropertyMapperFactory().getPropertyMapper(IEmbeddedMapper.class);
-    } else if (field.isAnnotationPresent(Referenced.class)) {
-      return store.getPropertyMapperFactory().getPropertyMapper(IReferencedMapper.class);
-    } else {
-      return store.getPropertyMapperFactory().getPropertyMapper(IPropertyMapper.class);
-    }
+    return store.getPropertyMapperFactory().getPropertyMapper(this);
   }
 
   // TODO Yet needed?
