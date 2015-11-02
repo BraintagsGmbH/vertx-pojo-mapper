@@ -17,6 +17,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandlerEmbedded;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandlerReferenced;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandlerEmbedded;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandlerReferenced;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerEmbedded;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerReferenced;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerEmbedded;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerReferenced;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.EmbeddedMapper_Array;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.EmbeddedMapper_List;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.EmbeddedMapper_Map;
@@ -84,6 +94,7 @@ public class TypeHandlerTest extends MongoBaseTest {
 
     ReferenceMapper_Single om = new ReferenceMapper_Single();
     om.simpleMapper = sc;
+    validateTypeHandler(om, "simpleMapper", ObjectTypeHandlerReferenced.class, null);
 
     ResultContainer resultContainer = saveRecord(om);
     if (resultContainer.assertionError != null)
@@ -114,6 +125,7 @@ public class TypeHandlerTest extends MongoBaseTest {
   public void testSaveAndRead_ReferenceMapperArray() {
 
     ReferenceMapper_Array om = new ReferenceMapper_Array();
+    validateTypeHandler(om, "simpleMapper", ArrayTypeHandlerReferenced.class, ObjectTypeHandlerReferenced.class);
 
     ResultContainer resultContainer = saveRecord(om);
     if (resultContainer.assertionError != null)
@@ -146,8 +158,8 @@ public class TypeHandlerTest extends MongoBaseTest {
 
   @Test
   public void testSaveAndRead_ReferenceMapperList() {
-
     ReferenceMapper_List om = new ReferenceMapper_List();
+    validateTypeHandler(om, "simpleMapper", CollectionTypeHandlerReferenced.class, ObjectTypeHandlerReferenced.class);
 
     ResultContainer resultContainer = saveRecord(om);
     if (resultContainer.assertionError != null)
@@ -180,8 +192,8 @@ public class TypeHandlerTest extends MongoBaseTest {
 
   @Test
   public void testSaveAndRead_ReferenceMapperMap() {
-
     ReferenceMapper_Map om = new ReferenceMapper_Map();
+    validateTypeHandler(om, "simpleMapper", MapTypeHandlerReferenced.class, ObjectTypeHandlerReferenced.class);
 
     ResultContainer resultContainer = saveRecord(om);
     if (resultContainer.assertionError != null)
@@ -221,6 +233,8 @@ public class TypeHandlerTest extends MongoBaseTest {
     EmbeddedMapper_Single om = new EmbeddedMapper_Single();
     om.simpleMapper = sc;
 
+    validateTypeHandler(om, "simpleMapper", ObjectTypeHandlerEmbedded.class, null);
+
     ResultContainer resultContainer = saveRecord(om);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
@@ -255,6 +269,7 @@ public class TypeHandlerTest extends MongoBaseTest {
   public void testSaveAndRead_EmbeddedMapperArray() {
 
     EmbeddedMapper_Array om = new EmbeddedMapper_Array();
+    validateTypeHandler(om, "simpleMapper", ArrayTypeHandlerEmbedded.class, ObjectTypeHandlerEmbedded.class);
 
     ResultContainer resultContainer = saveRecord(om);
     if (resultContainer.assertionError != null)
@@ -287,8 +302,8 @@ public class TypeHandlerTest extends MongoBaseTest {
 
   @Test
   public void testSaveAndRead_EmbeddedMapperList() {
-
     EmbeddedMapper_List om = new EmbeddedMapper_List();
+    validateTypeHandler(om, "simpleMapper", CollectionTypeHandlerEmbedded.class, ObjectTypeHandlerEmbedded.class);
 
     ResultContainer resultContainer = saveRecord(om);
     if (resultContainer.assertionError != null)
@@ -321,9 +336,8 @@ public class TypeHandlerTest extends MongoBaseTest {
 
   @Test
   public void testSaveAndRead_EmbeddedMapperMap() {
-
     EmbeddedMapper_Map om = new EmbeddedMapper_Map();
-
+    validateTypeHandler(om, "simpleMapper", MapTypeHandlerEmbedded.class, ObjectTypeHandlerEmbedded.class);
     ResultContainer resultContainer = saveRecord(om);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
@@ -351,6 +365,16 @@ public class TypeHandlerTest extends MongoBaseTest {
         logger.info("finished!");
       }
     });
+  }
+
+  private void validateTypeHandler(Object pojo, String fieldName, Class expectedTh, Class expectedSubTypeHandler) {
+    IMapper mapperDef = getDataStore().getMapperFactory().getMapper(pojo.getClass());
+    IField field = mapperDef.getField(fieldName);
+    assertNotNull("Typehandler must not be null for field: " + field.getFullName(), field.getTypeHandler());
+    assertEquals("wrong TypeHandler for field: " + field.getFullName(), expectedTh, field.getTypeHandler().getClass());
+    if (expectedSubTypeHandler != null)
+      assertEquals("wrong SubTypeHandler for field: " + field.getFullName(), expectedSubTypeHandler,
+          field.getSubTypeHandler().getClass());
   }
 
 }

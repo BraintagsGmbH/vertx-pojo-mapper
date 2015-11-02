@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import java.lang.annotation.Annotation;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -50,26 +51,15 @@ public class MapTypeHandler extends AbstractTypeHandler {
     super(typeHandlerFactory, Map.class);
   }
 
-  @Override
-  public final short matches(IField field) {
-    if (matchAnnotation(field) == MATCH_NONE)
-      return MATCH_NONE;
-    return super.matches(field);
-  }
-
-  /**
-   * Checks, wether an annotation like {@link Referenced} or {@link Embedded} is set to the field and returns the
-   * propriate match definition. If the method returns MATCH_NONE, then the class won't be checkd, otherwise it will be
-   * checked
+  /*
+   * (non-Javadoc)
    * 
-   * @param field
-   *          the field to be checked
-   * @return MATCH_NONE or MATCH_MINOR
+   * @see
+   * de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
    */
-  protected short matchAnnotation(IField field) {
-    if (field.hasAnnotation(Referenced.class) || field.hasAnnotation(Embedded.class))
-      return MATCH_NONE;
-    return MATCH_MINOR;
+  @Override
+  protected boolean matchesAnnotation(Annotation annotation) {
+    return annotation == null;
   }
 
   /*
@@ -120,9 +110,10 @@ public class MapTypeHandler extends AbstractTypeHandler {
   private void handleOneEntryFromStore(IField field, CurrentCounter cc, MapEntry[] resultArray,
       Handler<AsyncResult<Void>> resultHandler) {
     Object keyIn = ((JsonArray) cc.value).getValue(0);
-    ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
-        .getTypeHandler(field.getMapKeyClass());
-    th.fromStore(keyIn, field, field.getMapKeyClass(), keyResult -> {
+
+    ITypeHandler keyTypehandler = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
+        .getTypeHandler(field.getMapKeyClass(), null);
+    keyTypehandler.fromStore(keyIn, field, field.getMapKeyClass(), keyResult -> {
       if (keyResult.failed()) {
         resultHandler.handle(Future.failedFuture(keyResult.cause()));
         return;
@@ -267,7 +258,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
     Class valueClass = field.getSubClass();
     if (valueClass == null || valueClass == Object.class)
       valueClass = value.getClass();
-    return getSubTypeHandler(valueClass);
+    return getSubTypeHandler(valueClass, field.getEmbedRef());
   }
 
   /**
@@ -284,7 +275,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
     Class keyClass = field.getMapKeyClass();
     if (keyClass == null || keyClass == Object.class)
       keyClass = value.getClass();
-    return getSubTypeHandler(keyClass);
+    return getSubTypeHandler(keyClass, null);
   }
 
   class CurrentCounter {

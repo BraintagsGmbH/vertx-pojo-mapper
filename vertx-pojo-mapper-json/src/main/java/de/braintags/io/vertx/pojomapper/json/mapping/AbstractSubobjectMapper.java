@@ -40,9 +40,11 @@ import io.vertx.core.logging.LoggerFactory;
  * Array, {@link Map} or {@link Collection} and calls the convenient methods for those
  * 
  * @author Michael Remme
+ * @deprecated removed soon
  * 
  */
 
+@Deprecated
 public abstract class AbstractSubobjectMapper implements IPropertyMapper {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSubobjectMapper.class);
 
@@ -273,7 +275,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
       CurrentCounter cc = new CurrentCounter(counter++, jo);
       Object keyIn = ((JsonArray) cc.value).getValue(0);
       ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
-          .getTypeHandler(field.getMapKeyClass());
+          .getTypeHandler(field.getMapKeyClass(), field.getEmbedRef());
 
       th.fromStore(keyIn, field, field.getMapKeyClass(), keyResult -> {
         if (keyResult.failed()) {
@@ -350,7 +352,7 @@ public abstract class AbstractSubobjectMapper implements IPropertyMapper {
       Entry entry = (Entry) it.next();
       CurrentCounter cc = new CurrentCounter(counter++, entry);
       ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
-          .getTypeHandler(field.getMapKeyClass());
+          .getTypeHandler(field.getMapKeyClass(), field.getEmbedRef());
 
       th.intoStore(((Entry) cc.value).getKey(), field, keyResult -> {
         if (keyResult.failed()) {

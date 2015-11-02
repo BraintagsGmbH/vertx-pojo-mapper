@@ -12,10 +12,9 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 
-import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
-import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -50,16 +49,22 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matches(de.braintags.io.vertx.pojomapper.mapping
-   * .IField)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matchesClass(java.lang.Class)
    */
   @Override
-  public short matches(IField field) {
-    if (field.isArray() && (!field.hasAnnotation(Referenced.class) && (!field.hasAnnotation(Embedded.class))))
-      return MATCH_MAJOR;
+  protected short matchesClass(Class<?> cls) {
+    return cls.isArray() ? MATCH_MAJOR : MATCH_NONE;
+  }
 
-    return MATCH_NONE;
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
+   */
+  @Override
+  protected boolean matchesAnnotation(Annotation annotation) {
+    return annotation == null;
   }
 
   /*
@@ -144,4 +149,5 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
       this.value = value;
     }
   }
+
 }

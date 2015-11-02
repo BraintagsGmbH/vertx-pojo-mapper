@@ -84,4 +84,24 @@ public class ParametrizedMappedField extends MappedField {
   public MappedField getParent() {
     return parent;
   }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.impl.MappedField#getFullName()
+   */
+  @Override
+  public String getFullName() {
+    return getParent().getFullName();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.impl.MappedField#getName()
+   */
+  @Override
+  public String getName() {
+    return getParent().getName();
+  }
 }

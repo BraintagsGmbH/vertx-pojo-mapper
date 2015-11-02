@@ -37,9 +37,10 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
  */
 
 @Entity(name = "PersonColumn")
-@Indexes(@Index(fields = { @IndexField(fieldName = "name"), @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
+@Indexes(@Index(fields = { @IndexField(fieldName = "name"),
+    @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false) ))
 public class Person extends AbstractPerson {
-  public static final int NUMBER_OF_PROPERTIES = 16;
+  public static final int NUMBER_OF_PROPERTIES = 23;
 
   @Id
   public String idField;
@@ -53,11 +54,27 @@ public class Person extends AbstractPerson {
   @Embedded
   public Animal chicken;
 
+  @Embedded
+  public List<Animal> chickenFarm;
+
+  @Referenced
+  public List<Animal> dogFarm;
+
   public Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
 
   public Animal rabbit;
 
   public Map<Integer, Double> myMap;
+  @Embedded
+  public Map<Integer, Animal> myMapEmbedded;
+  @Referenced
+  public Map<Integer, Animal> myMapReferenced;
+
+  public Animal[] animalArray;
+  @Embedded
+  public Animal[] animalArrayEmbedded;
+  @Referenced
+  public Animal[] animalArrayReferenced;
 
   public Class<? extends Double> myClass;
 

@@ -12,6 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import java.lang.annotation.Annotation;
+
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
@@ -40,14 +42,11 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler#matchAnnotation(de.braintags.io.
-   * vertx.pojomapper.mapping.IField)
+   * de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
    */
   @Override
-  protected short matchAnnotation(IField field) {
-    if (field.hasAnnotation(Referenced.class))
-      return MATCH_MINOR;
-    return MATCH_NONE;
+  protected boolean matchesAnnotation(Annotation annotation) {
+    return annotation != null && annotation instanceof Referenced;
   }
 
   /*

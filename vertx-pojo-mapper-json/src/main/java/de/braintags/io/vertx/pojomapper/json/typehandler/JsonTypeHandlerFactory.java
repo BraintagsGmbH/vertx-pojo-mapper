@@ -12,9 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandlerReferenced;
@@ -56,6 +58,8 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
   private final ITypeHandler defaultHandler = new ObjectTypeHandler(this);
+  private final ITypeHandler defaultHandleEmbedded = new ObjectTypeHandlerEmbedded(this);
+  private final ITypeHandler defaultHandlerReferenced = new ObjectTypeHandlerReferenced(this);
   private final List<ITypeHandler> definedTypeHandlers = new ArrayList<ITypeHandler>();
 
   /**
@@ -96,10 +100,6 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     definedTypeHandlers.add(new ArrayTypeHandler(this));
     definedTypeHandlers.add(new ArrayTypeHandlerEmbedded(this));
     definedTypeHandlers.add(new ArrayTypeHandlerReferenced(this));
-
-    definedTypeHandlers.add(new ObjectTypeHandlerEmbedded(this));
-    definedTypeHandlers.add(new ObjectTypeHandlerReferenced(this));
-
   }
 
   /*
@@ -112,14 +112,11 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     return definedTypeHandlers;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandlerFactory#getDefaultTypeHandler()
-   */
   @Override
-  public ITypeHandler getDefaultTypeHandler() {
-    return defaultHandler;
+  public ITypeHandler getDefaultTypeHandler(Annotation embedRef) {
+    if (embedRef == null)
+      return defaultHandler;
+    return embedRef instanceof Embedded ? defaultHandleEmbedded : defaultHandlerReferenced;
   }
 
   /**

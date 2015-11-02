@@ -12,10 +12,13 @@
  */
 package de.braintags.io.vertx.pojomapper.typehandler;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 
 /**
@@ -29,7 +32,7 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
   /**
    * If for a class a {@link ITypeHandler} was requested and found, it is cached by here with the class to handle as key
    */
-  private final Map<Class<?>, ITypeHandler> cachedTypeHandler = new HashMap<Class<?>, ITypeHandler>();
+  private final Map<TypeHandlerCacheKey, ITypeHandler> cachedTypeHandler = new HashMap<TypeHandlerCacheKey, ITypeHandler>();
 
   /**
    * 
@@ -50,23 +53,19 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
     // which is important, cause this method can decide on other parameters than the class
     ITypeHandler handler = examineMatch(field);
     if (handler == null)
-      handler = getDefaultTypeHandler();
+      handler = getDefaultTypeHandler(field.getEmbedRef());
     return (ITypeHandler) handler.clone();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory#getTypeHandler(java.lang.Class)
-   */
   @Override
-  public ITypeHandler getTypeHandler(Class<?> fieldClass) {
-    if (cachedTypeHandler.containsKey(fieldClass))
-      return cachedTypeHandler.get(fieldClass);
-    ITypeHandler handler = examineMatch(fieldClass);
+  public ITypeHandler getTypeHandler(Class<?> fieldClass, Annotation annotation) {
+    TypeHandlerCacheKey key = new TypeHandlerCacheKey(fieldClass, annotation);
+    if (cachedTypeHandler.containsKey(key))
+      return cachedTypeHandler.get(key);
+    ITypeHandler handler = examineMatch(fieldClass, annotation);
     if (handler == null)
-      handler = getDefaultTypeHandler();
-    cachedTypeHandler.put(fieldClass, handler);
+      handler = getDefaultTypeHandler(annotation);
+    cachedTypeHandler.put(key, handler);
     return (ITypeHandler) handler.clone();
   }
 
@@ -74,12 +73,15 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
    * Checks for a valid TypeHandler by respecting graded results
    * 
    * @param field
+   * @param annotation
+   *          an annotation of type {@link Referenced} or {@link Embedded} or NULL. ITypeHandler can react to this
+   *          information
    * @return
    */
-  private ITypeHandler examineMatch(Class<?> cls) {
+  private ITypeHandler examineMatch(Class<?> cls, Annotation annotation) {
     ITypeHandler returnHandler = null;
     for (ITypeHandler th : getDefinedTypehandlers()) {
-      short matchResult = th.matches(cls);
+      short matchResult = th.matches(cls, annotation);
       switch (matchResult) {
       case ITypeHandler.MATCH_MAJOR:
         return th;
@@ -131,7 +133,24 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
   /**
    * Get the default {@link ITypeHandler}
    * 
+   * @param embedRef
+   *          an annotation instance of {@link Embedded}, {@link Referenced} or null
+   * 
    * @return the default {@link ITypeHandler}
    */
-  public abstract ITypeHandler getDefaultTypeHandler();
+  public abstract ITypeHandler getDefaultTypeHandler(Annotation embedRef);
+
+  private class TypeHandlerCacheKey {
+    private String cacheKey;
+
+    TypeHandlerCacheKey(Class cls, Annotation annotation) {
+      String annString = annotation == null ? "" : annotation.toString();
+      cacheKey = cls.getName() + annString;
+    }
+
+    @Override
+    public String toString() {
+      return cacheKey;
+    }
+  }
 }

@@ -28,9 +28,11 @@ import io.vertx.core.Handler;
  * datastore
  * 
  * @author Michael Remme
+ * @deprecated removed soon
  * 
  */
 
+@Deprecated
 public class JsonReferencedMapper extends AbstractSubobjectMapper implements IReferencedMapper {
 
   /**
@@ -49,7 +51,7 @@ public class JsonReferencedMapper extends AbstractSubobjectMapper implements IRe
       Handler<AsyncResult<Object>> handler) {
     ObjectReference ref = new ObjectReference(referencedObject);
     IMapperFactory mf = field.getMapper().getMapperFactory();
-    ITypeHandler th = mf.getDataStore().getTypeHandlerFactory().getTypeHandler(ref.getClass());
+    ITypeHandler th = mf.getDataStore().getTypeHandlerFactory().getTypeHandler(ref.getClass(), field.getEmbedRef());
     th.intoStore(ref, field, result -> {
       if (result.failed()) {
         Future<Object> future = Future.failedFuture(result.cause());
@@ -66,7 +68,7 @@ public class JsonReferencedMapper extends AbstractSubobjectMapper implements IRe
   public void readSingleValue(IStoreObject<?> storeObject, Object dbValue, final IField field, Class<?> mapperClass,
       Handler<AsyncResult<Object>> handler) {
     ITypeHandler th = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
-        .getTypeHandler(ObjectReference.class);
+        .getTypeHandler(ObjectReference.class, field.getEmbedRef());
     th.fromStore(dbValue, field, mapperClass, result -> {
       if (result.failed()) {
         Future<Object> future = Future.failedFuture(result.cause());

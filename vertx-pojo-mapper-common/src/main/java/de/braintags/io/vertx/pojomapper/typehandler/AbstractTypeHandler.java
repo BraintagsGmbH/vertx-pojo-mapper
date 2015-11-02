@@ -12,10 +12,13 @@
  */
 package de.braintags.io.vertx.pojomapper.typehandler;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -52,20 +55,31 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#matchesExcact(java.lang.Class)
+   * @see
+   * de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#matches(de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public short matches(IField field) {
-    return matches(field.getType());
+  public final short matches(IField field) {
+    return matches(field.getType(), field.getEmbedRef());
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#matches(java.lang.Class)
-   */
   @Override
-  public short matches(Class<?> cls) {
+  public final short matches(Class<?> cls, Annotation annotation) {
+    if (matchesAnnotation(annotation)) {
+      return matchesClass(cls);
+    }
+    return MATCH_NONE;
+  }
+
+  /**
+   * Checks wether the given Class is handled by the current implementation
+   * 
+   * @param cls
+   *          the class to be checked
+   * @return MATCH_NONE if the field is not handled by the current instance, MATCH_MINOR if it is fitting partially (
+   *         like a subclass for instance ) or MATCH_MAJOR if it is highly fitting, like the exact class for instance
+   */
+  protected short matchesClass(Class<?> cls) {
     for (Class<?> dCls : classesToHandle) {
       if (dCls.equals(cls))
         return MATCH_MAJOR;
@@ -75,6 +89,19 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
         return MATCH_MINOR;
     }
     return MATCH_NONE;
+  }
+
+  /**
+   * Checks wether the given implementation handles the Annotation of type Referenced or Embedded or null
+   * 
+   * @param annotation
+   *          an Annotation of type {@link Referenced}, {@link Embedded} or null
+   * @return true, if the current implementation handles this. The default implementation returns true
+   */
+  protected boolean matchesAnnotation(Annotation annotation) {
+    if (annotation != null && !(annotation instanceof Referenced) && !(annotation instanceof Embedded))
+      throw new MappingException("The annotation in this context must be Referenced, Embedded or null");
+    return true;
   }
 
   /**
@@ -153,8 +180,8 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#getSubTypeHandler(java.lang.Class)
    */
   @Override
-  public ITypeHandler getSubTypeHandler(Class<?> subClass) {
-    return getTypeHandlerFactory().getTypeHandler(subClass);
+  public ITypeHandler getSubTypeHandler(Class<?> subClass, Annotation embedRef) {
+    return getTypeHandlerFactory().getTypeHandler(subClass, embedRef);
   }
 
 }

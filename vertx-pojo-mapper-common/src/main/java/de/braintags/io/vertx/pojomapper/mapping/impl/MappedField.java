@@ -64,13 +64,19 @@ public class MappedField implements IField {
   private Mapper mapper;
   private ITypeHandler typeHandler;
   private ITypeHandler subTypeHandler;
+  private boolean subTypeHandlerComputed = false;
   private IPropertyMapper propertyMapper;
   private final List<IField> typeParameters = new ArrayList<IField>();
+
   /**
    * Annotations which shall be checked for a field definition
    */
   private static final List<Class<? extends Annotation>> FIELD_ANNOTATIONS = Arrays.asList(Id.class, Property.class,
       Referenced.class, Embedded.class, ConcreteClass.class);
+  /**
+   * If for the current field an Annotation {@link Embedded} or {@link Referenced} is defined, then it is stored in here
+   */
+  private Annotation embedRef;
 
   /**
    * Class annotations which were found inside the current definition
@@ -120,7 +126,7 @@ public class MappedField implements IField {
     this.mapper = mapper;
     genericType = type;
     computeType();
-    computeSubTypeHandler();
+    // computeSubTypeHandler();
   }
 
   protected void init() {
@@ -128,14 +134,17 @@ public class MappedField implements IField {
     propertyMapper = computePropertyMapper();
     computeType();
     computeMultivalued();
-    computeSubTypeHandler();
+    // computeSubTypeHandler();
   }
 
   private void computeSubTypeHandler() {
-    if (getSubClass() != null && getSubClass() != Object.class) {
-      ITypeHandler th = getTypeHandler();
-      if (th != null)
-        subTypeHandler = th.getSubTypeHandler(getSubClass());
+    if (!subTypeHandlerComputed) {
+      if (getSubClass() != null && getSubClass() != Object.class) {
+        ITypeHandler th = getTypeHandler();
+        if (th != null)
+          subTypeHandler = th.getSubTypeHandler(getSubClass(), getEmbedRef());
+      }
+      subTypeHandlerComputed = true;
     }
   }
 
@@ -272,6 +281,10 @@ public class MappedField implements IField {
       if (ann != null)
         existingClassAnnotations.put(annClass, ann);
     }
+    if (hasAnnotation(Referenced.class))
+      embedRef = getAnnotation(Referenced.class);
+    else if (hasAnnotation(Embedded.class))
+      embedRef = getAnnotation(Embedded.class);
   }
 
   /*
@@ -508,6 +521,11 @@ public class MappedField implements IField {
     return propertyMapper;
   }
 
+  @Override
+  public Annotation getEmbedRef() {
+    return embedRef;
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -547,6 +565,7 @@ public class MappedField implements IField {
    */
   @Override
   public ITypeHandler getSubTypeHandler() {
+    computeSubTypeHandler();
     return subTypeHandler;
   }
 

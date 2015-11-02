@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
@@ -85,6 +87,13 @@ public interface IField {
    * @return true, if annotatin is defined
    */
   public boolean hasAnnotation(Class<? extends Annotation> annotationClass);
+
+  /**
+   * If for the current field an annotation {@link Embedded} or {@link Referenced} is defined, then it is returned here
+   * 
+   * @return an annotation of type {@link Embedded} or {@link Referenced} or null
+   */
+  public Annotation getEmbedRef();
 
   /**
    * Get the parent instance of {@link IMapper}

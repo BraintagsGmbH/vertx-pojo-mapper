@@ -12,7 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.typehandler;
 
+import java.lang.annotation.Annotation;
+
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 
 /**
@@ -39,8 +43,11 @@ public interface ITypeHandlerFactory {
    * 
    * @param cls
    *          the class
+   * @param annotation
+   *          an annotation of type {@link Referenced} or {@link Embedded} or NULL. ITypeHandler can react to this
+   *          information
    * @return a fitting {@link ITypeHandler}
    */
-  ITypeHandler getTypeHandler(Class<?> cls);
+  ITypeHandler getTypeHandler(Class<?> cls, Annotation annotation);
 
 }

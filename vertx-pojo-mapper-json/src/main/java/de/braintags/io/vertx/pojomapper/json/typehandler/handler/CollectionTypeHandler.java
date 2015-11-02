@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -49,26 +50,15 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
     super(typeHandlerFactory, Collection.class);
   }
 
-  @Override
-  public final short matches(IField field) {
-    if (matchAnnotation(field) == MATCH_NONE)
-      return MATCH_NONE;
-    return super.matches(field);
-  }
-
-  /**
-   * Checks, wether an annotation like {@link Referenced} or {@link Embedded} is set to the field and returns the
-   * propriate match definition. If the method returns MATCH_NONE, then the class won't be checkd, otherwise it will be
-   * checked
+  /*
+   * (non-Javadoc)
    * 
-   * @param field
-   *          the field to be checked
-   * @return MATCH_NONE or MATCH_MINOR
+   * @see
+   * de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
    */
-  protected short matchAnnotation(IField field) {
-    if (field.hasAnnotation(Referenced.class) || field.hasAnnotation(Embedded.class))
-      return MATCH_NONE;
-    return MATCH_MINOR;
+  @Override
+  protected boolean matchesAnnotation(Annotation annotation) {
+    return annotation == null;
   }
 
   /*
@@ -111,7 +101,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
   private void handleObjectFromStore(Object o, ITypeHandler subHandler, Collection coll, IField field,
       Handler<AsyncResult<Void>> resultHandler) {
     if (subHandler != null) {
-      subHandler.fromStore(o, null, field.getSubClass(), tmpResult -> {
+      subHandler.fromStore(o, field, field.getSubClass(), tmpResult -> {
         if (tmpResult.failed()) {
           resultHandler.handle(Future.failedFuture(tmpResult.cause()));
           return;
@@ -155,12 +145,12 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
         boolean valueClassChanged = valueClass != null && value.getClass() != valueClass;
         valueClass = value.getClass();
         if (subHandler == null || valueClassChanged) {
-          subHandler = getSubTypeHandler(value.getClass());
+          subHandler = getSubTypeHandler(value.getClass(), field.getEmbedRef());
           // TODO could it be useful to write the class of the value into the field, to restore it proper from
           // datastore?
         }
       }
-      subHandler.intoStore(value, null, tmpResult -> {
+      subHandler.intoStore(value, field, tmpResult -> {
         if (tmpResult.failed()) {
           errorObject.setThrowable(tmpResult.cause());
           return;

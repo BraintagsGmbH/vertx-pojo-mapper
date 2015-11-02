@@ -12,13 +12,10 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import java.lang.annotation.Annotation;
+
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
 
 /**
  * handles Collections which are annotated to be {@link Embedded}
@@ -43,36 +40,11 @@ public class CollectionTypeHandlerEmbedded extends CollectionTypeHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler#matchAnnotation(de.braintags.io.
-   * vertx.pojomapper.mapping.IField)
+   * de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
    */
   @Override
-  protected short matchAnnotation(IField field) {
-    if (field.hasAnnotation(Embedded.class))
-      return MATCH_MINOR;
-    return MATCH_NONE;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler#fromStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
-   */
-  @Override
-  public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
-   */
-  @Override
-  public void intoStore(Object javaValues, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+  protected boolean matchesAnnotation(Annotation annotation) {
+    return annotation != null && annotation instanceof Embedded;
   }
 
 }

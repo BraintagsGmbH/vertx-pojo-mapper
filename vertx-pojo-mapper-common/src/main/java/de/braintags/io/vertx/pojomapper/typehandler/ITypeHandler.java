@@ -12,6 +12,10 @@
  */
 package de.braintags.io.vertx.pojomapper.typehandler;
 
+import java.lang.annotation.Annotation;
+
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -79,7 +83,8 @@ public interface ITypeHandler extends Cloneable {
    * 
    * @param field
    *          the field to be checked
-   * @return 0 ( zero ) if the Typ
+   * @return MATCH_NONE if the field is not handled by the current instance, MATCH_MINOR if it is fitting partially (
+   *         like a subclass for instance ) or MATCH_MAJOR if it is highly fitting, like the exact class for instance
    */
   public short matches(IField field);
 
@@ -89,9 +94,13 @@ public interface ITypeHandler extends Cloneable {
    * 
    * @param cls
    *          the Class to be checked
+   * @param embedRef
+   *          an annotation of type {@link Referenced} or {@link Embedded} or NULL. ITypeHandler can react to this
+   *          information
+   * 
    * @return 0 ( zero ) if the Typ
    */
-  public short matches(Class<?> cls);
+  public short matches(Class<?> cls, Annotation embedRef);
 
   /**
    * Get the {@link ITypeHandlerFactory} where the current instance is belonging to.
@@ -108,9 +117,12 @@ public interface ITypeHandler extends Cloneable {
    * 
    * @param subClass
    *          the class to be examined
+   * @param embedRef
+   *          an annotation of type {@link Referenced} or {@link Embedded} or NULL. ITypeHandler can react to this
+   *          information
    * @return a valid {@link ITypeHandler}
    */
-  public ITypeHandler getSubTypeHandler(Class<?> subClass);
+  public ITypeHandler getSubTypeHandler(Class<?> subClass, Annotation embedRef);
 
   /**
    * Generates a new copy of this instance.

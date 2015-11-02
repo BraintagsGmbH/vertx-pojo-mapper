@@ -28,9 +28,11 @@ import io.vertx.core.json.JsonObject;
  * instance
  * 
  * @author Michael Remme
+ * @deprecated removed soon
  * 
  */
 
+@Deprecated
 public class JsonEmbeddedMapper extends AbstractSubobjectMapper implements IEmbeddedMapper {
 
   /**
@@ -52,7 +54,7 @@ public class JsonEmbeddedMapper extends AbstractSubobjectMapper implements IEmbe
 
   protected void writeSingleValueAsTypehandler(IDataStore store, Object embeddedObject, IStoreObject<?> storeObject,
       IField field, Handler<AsyncResult<Object>> handler) {
-    ITypeHandler th = store.getTypeHandlerFactory().getTypeHandler(embeddedObject.getClass());
+    ITypeHandler th = store.getTypeHandlerFactory().getTypeHandler(embeddedObject.getClass(), field.getEmbedRef());
     th.intoStore(embeddedObject, field, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -103,7 +105,7 @@ public class JsonEmbeddedMapper extends AbstractSubobjectMapper implements IEmbe
 
   protected void readSingleValueAsTypeHandler(IDataStore store, IField field, Class<?> internalMapperClass,
       Object dbValue, Handler<AsyncResult<Object>> handler) {
-    ITypeHandler th = store.getTypeHandlerFactory().getTypeHandler(internalMapperClass);
+    ITypeHandler th = store.getTypeHandlerFactory().getTypeHandler(internalMapperClass, field.getEmbedRef());
     th.fromStore(dbValue, field, internalMapperClass, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));

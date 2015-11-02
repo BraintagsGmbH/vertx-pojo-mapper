@@ -117,7 +117,7 @@ public class ObjectReferenceTypeHandler extends AbstractTypeHandler {
               obToReference.getClass().getName())), resultHandler);
           return;
         }
-        ITypeHandler th = mf.getDataStore().getTypeHandlerFactory().getTypeHandler(id.getClass());
+        ITypeHandler th = mf.getDataStore().getTypeHandlerFactory().getTypeHandler(id.getClass(), field.getEmbedRef());
         th.intoStore(id, field, tmpResult -> {
           if (tmpResult.failed()) {
             resultHandler.handle(tmpResult);

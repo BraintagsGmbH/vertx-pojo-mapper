@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.typehandler.stringbased;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
    * @see de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandlerFactory#getDefaultTypeHandler()
    */
   @Override
-  public ITypeHandler getDefaultTypeHandler() {
+  public ITypeHandler getDefaultTypeHandler(Annotation embedRef) {
     return defaultHandler;
   }
 
