@@ -57,19 +57,21 @@ public class IdTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object id, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void fromStore(final Object id, IField field, Class<?> cls,
+      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     @SuppressWarnings("rawtypes")
     Class fieldClass = field.getType();
+    Object internalId = id;
     try {
       if (fieldClass.equals(Long.class) || fieldClass.equals(long.class)) {
-        id = convertToLong(id);
+        internalId = convertToLong(id);
       } else if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
-        id = convertToInt(id);
+        internalId = convertToInt(id);
       } else if (fieldClass.equals(String.class)) {
-        id = convertToString(id);
+        internalId = convertToString(id);
       } else
         throw new UnsupportedOperationException("unsupported type for id field: " + fieldClass.getName());
-      getInternalTypeHandler(field).fromStore(id, field, cls, resultHandler);
+      getInternalTypeHandler(field).fromStore(internalId, field, cls, resultHandler);
     } catch (Exception e) {
       resultHandler.handle(Future.failedFuture(e));
     }
@@ -130,7 +132,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
 
   private ITypeHandler getInternalTypeHandler(IField field) {
     if (internalTypehandler == null) {
-      internalTypehandler = getTypeHandlerFactory().getTypeHandler(field.getType());
+      internalTypehandler = getTypeHandlerFactory().getTypeHandler(field.getType(), field.getEmbedRef());
     }
     return internalTypehandler;
   }

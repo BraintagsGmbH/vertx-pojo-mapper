@@ -59,7 +59,7 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
    * de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#matches(de.braintags.io.vertx.pojomapper.mapping.IField)
    */
   @Override
-  public final short matches(IField field) {
+  public short matches(IField field) {
     return matches(field.getType(), field.getEmbedRef());
   }
 

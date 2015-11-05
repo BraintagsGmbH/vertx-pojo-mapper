@@ -55,7 +55,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
 
   private static final String TABLE_QUERY = "SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='%s' AND TABLE_NAME='%s'";
   private static final String COLUMN_QUERY = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA='%s' AND TABLE_NAME='%s'";
-  private static final String CREATE_TABLE = "CREATE TABLE %s.%s ( %s )";
+  private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS %s.%s ( %s )";
 
   /**
    * Create a new instance
