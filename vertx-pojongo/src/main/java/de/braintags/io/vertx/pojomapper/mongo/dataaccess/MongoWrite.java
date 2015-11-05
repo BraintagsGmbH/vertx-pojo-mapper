@@ -101,21 +101,36 @@ public class MongoWrite<T> extends AbstractWrite<T> {
         Future<Void> future = Future.failedFuture(result.cause());
         resultHandler.handle(future);
         return;
-      } else {
-        logger.info("saved");
-        WriteAction action = WriteAction.UNKNOWN;
-        String id = result.result();
-        if (id == null) {
-          id = currentId;
-          action = WriteAction.UPDATE;
-        } else
-          action = WriteAction.INSERT;
-        executePostSave(entity);
-        writeResult.addEntry(storeObject, id, action);
-        resultHandler.handle(Future.succeededFuture());
       }
+
+      logger.info("saved");
+      String id = result.result();
+      if (id == null) {
+        finishUpdate(currentId, entity, storeObject, writeResult, resultHandler);
+      } else
+        finishInsert(id, entity, storeObject, writeResult, resultHandler);
     });
 
+  }
+
+  private void finishInsert(String id, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
+      Handler<AsyncResult<Void>> resultHandler) {
+    setIdValue(id, storeObject, result -> {
+      if (result.failed()) {
+        resultHandler.handle(result);
+        return;
+      }
+      executePostSave(entity);
+      writeResult.addEntry(storeObject, id, WriteAction.INSERT);
+      resultHandler.handle(Future.succeededFuture());
+    });
+  }
+
+  private void finishUpdate(String id, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
+      Handler<AsyncResult<Void>> resultHandler) {
+    executePostSave(entity);
+    writeResult.addEntry(storeObject, id, WriteAction.UPDATE);
+    resultHandler.handle(Future.succeededFuture());
   }
 
 }

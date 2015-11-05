@@ -22,7 +22,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
 import de.braintags.io.vertx.pojomapper.exception.InsertException;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
 import de.braintags.io.vertx.pojomapper.mysql.SqlUtil;
@@ -257,6 +256,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   }
 
+  @SuppressWarnings("unchecked")
   private void finishInsert(SqlStoreObject storeObject, IWriteResult writeResult, Object id,
       Handler<AsyncResult<Void>> resultHandler) {
     LOGGER.debug("inserted record with id " + id);
@@ -274,18 +274,6 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       LOGGER.error("", e);
       resultHandler.handle(Future.failedFuture(e));
     }
-  }
-
-  /**
-   * After inserting an instance, the id is placed into the entity.
-   * 
-   * @param id
-   * @param storeObject
-   */
-  private void setIdValue(Object id, SqlStoreObject storeObject, Handler<AsyncResult<Void>> resultHandler) {
-    IField idField = getMapper().getIdField();
-    storeObject.put(idField, id);
-    idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
   }
 
   /*

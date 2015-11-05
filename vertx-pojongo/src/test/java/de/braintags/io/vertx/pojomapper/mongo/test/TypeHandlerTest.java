@@ -177,14 +177,7 @@ public class TypeHandlerTest extends MongoBaseTest {
       } else {
         ReferenceMapper_List oom = (ReferenceMapper_List) result.result();
         assertNotNull(oom.simpleMapper);
-        for (int i = 0; i < om.simpleMapper.size(); i++) {
-          SimpleMapper omSm = om.simpleMapper.get(i);
-          SimpleMapper oomSm = oom.simpleMapper.get(i);
-
-          assertTrue(oomSm.id != null && !oomSm.id.isEmpty());
-          assertEquals(omSm.name, oomSm.name);
-          assertEquals(omSm.getSecondProperty(), oomSm.getSecondProperty());
-        }
+        assertEquals(om, oom);
         logger.info("finished!");
       }
     });

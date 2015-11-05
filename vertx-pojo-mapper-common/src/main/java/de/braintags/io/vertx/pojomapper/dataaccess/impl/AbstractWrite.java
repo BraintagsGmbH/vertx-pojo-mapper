@@ -20,6 +20,10 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * 
@@ -61,6 +65,22 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T>implem
    */
   protected void executePostSave(T entity) {
     getMapper().executeLifecycle(AfterSave.class, entity);
+  }
+
+  /**
+   * After inserting an instance, the id is placed into the entity and into the IStoreObject.
+   * 
+   * @param id
+   *          the id to be stored
+   * @param storeObject
+   *          the instance of {@link IStoreObject}
+   * @param resultHandler
+   *          the handler to be informed
+   */
+  protected void setIdValue(Object id, IStoreObject<?> storeObject, Handler<AsyncResult<Void>> resultHandler) {
+    IField idField = getMapper().getIdField();
+    storeObject.put(idField, id);
+    idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
   }
 
 }

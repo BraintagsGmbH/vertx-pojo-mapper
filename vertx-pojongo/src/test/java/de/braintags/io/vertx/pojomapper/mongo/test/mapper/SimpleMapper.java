@@ -75,7 +75,7 @@ public class SimpleMapper {
 
   @Override
   public String toString() {
-    return String.valueOf(name);
+    return id + " | " + String.valueOf(name);
   }
 
   @BeforeSave

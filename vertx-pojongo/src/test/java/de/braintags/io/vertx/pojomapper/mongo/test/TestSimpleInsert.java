@@ -12,9 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.test;
 
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -26,6 +23,8 @@ import org.junit.Test;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.MiniMapper;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 public class TestSimpleInsert extends MongoBaseTest {
   private static Logger logger = LoggerFactory.getLogger(TestSimpleInsert.class);
@@ -50,6 +49,7 @@ public class TestSimpleInsert extends MongoBaseTest {
     ResultContainer resultContainer = saveRecord(sm);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
+    assertNotNull("the id of an inserted record must not be null", sm.id);
 
     List<MiniMapper> mapperList = new ArrayList<MiniMapper>();
     for (int i = 0; i < LOOP; i++) {
