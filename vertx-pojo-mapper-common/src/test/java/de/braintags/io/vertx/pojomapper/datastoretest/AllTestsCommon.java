@@ -10,31 +10,23 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-
-package de.braintags.io.vertx.pojomapper.mysql;
+package de.braintags.io.vertx.pojomapper.datastoretest;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import de.braintags.io.vertx.pojomapper.AllTestsPojoJson;
-import de.braintags.io.vertx.pojomapper.datastoretest.AllTestsCommon;
+import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.TypeHandlerTestSuite;
 
 /**
+ * 
  * 
  * @author Michael Remme
  * 
  */
-
 @RunWith(Suite.class)
-@SuiteClasses({ AllTestsPojoJson.class, TestMapper.class, TestSqlQueryRambler.class, AllTestsCommon.class })
-public class AllTestsMySql {
-  // -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer
-
-  /**
-   * 
-   */
-  public AllTestsMySql() {
-  }
+@SuiteClasses({ TestBaseTest.class, TestSimpleInsert.class, TestSimpleMapper.class, TestOnlyIdMapper.class,
+    TypeHandlerTestSuite.class })
+public class AllTestsCommon {
 
 }

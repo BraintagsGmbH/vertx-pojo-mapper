@@ -23,7 +23,7 @@ import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.impl.ObjectReference;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
@@ -71,11 +71,14 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler {
       fail(new NullPointerException("undefined mapper class"), resultHandler);
       return;
     }
+    ObjectReference objectReference = new ObjectReference(field, id, mapperClass);
+    success(objectReference, resultHandler);
 
-    IMapperFactory mf = field.getMapper().getMapperFactory();
-    IMapper subMapper = mf.getMapper(mapperClass);
-    IDataStore store = mf.getDataStore();
-    getReferencedObjectById(store, subMapper, id, resultHandler);
+    // IMapperFactory mf = field.getMapper().getMapperFactory();
+    // IMapper subMapper = mf.getMapper(mapperClass);
+    // IDataStore store = mf.getDataStore();
+
+    // getReferencedObjectById(store, subMapper, id, resultHandler);
   }
 
   private void getReferencedObjectById(IDataStore store, IMapper subMapper, Object id,

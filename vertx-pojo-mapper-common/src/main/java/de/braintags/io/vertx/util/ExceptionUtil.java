@@ -29,6 +29,8 @@ public class ExceptionUtil {
   public static RuntimeException createRuntimeException(Throwable e) {
     if (e instanceof RuntimeException)
       return (RuntimeException) e;
+    if (e instanceof Error)
+      throw (Error) e;
     return new RuntimeException(e);
   }
 

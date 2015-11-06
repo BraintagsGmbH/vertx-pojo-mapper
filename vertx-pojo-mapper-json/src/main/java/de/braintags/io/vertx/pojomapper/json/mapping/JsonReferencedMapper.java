@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.json.mapping;
 import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.IReferencedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ObjectReference;
@@ -49,7 +50,7 @@ public class JsonReferencedMapper extends AbstractSubobjectMapper implements IRe
   @Override
   public void writeSingleValue(final Object referencedObject, final IStoreObject<?> storeObject, final IField field,
       Handler<AsyncResult<Object>> handler) {
-    ObjectReference ref = new ObjectReference(referencedObject);
+    IObjectReference ref = null; // new ObjectReference(referencedObject);
     IMapperFactory mf = field.getMapper().getMapperFactory();
     ITypeHandler th = mf.getDataStore().getTypeHandlerFactory().getTypeHandler(ref.getClass(), field.getEmbedRef());
     th.intoStore(ref, field, result -> {

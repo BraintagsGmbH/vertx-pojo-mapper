@@ -34,6 +34,9 @@ import io.vertx.ext.mongo.MongoClient;
  * 
  */
 public class MongoMetaData implements IDataStoreMetaData {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(MongoMetaData.class);
+
   private MongoClient client;
   private JsonObject buildInfo;
 
@@ -52,10 +55,12 @@ public class MongoMetaData implements IDataStoreMetaData {
   @Override
   public void getVersion(Handler<AsyncResult<String>> handler) {
     if (buildInfo != null) {
+      LOGGER.debug("Buildinfo exists already: " + buildInfo);
       handler.handle(Future.succeededFuture(buildInfo.getString("version")));
       return;
     }
     JsonObject command = new JsonObject().put("buildInfo", 1);
+    LOGGER.debug("fetching buildinfo with: " + command);
     client.runCommand("buildInfo", command, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));

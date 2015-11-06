@@ -10,8 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-
-package de.braintags.io.vertx.pojomapper.mysql;
+package de.braintags.io.vertx.pojomapper.mongo.testNew;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -22,19 +21,19 @@ import de.braintags.io.vertx.pojomapper.datastoretest.AllTestsCommon;
 
 /**
  * 
+ * 
  * @author Michael Remme
  * 
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ AllTestsPojoJson.class, TestMapper.class, TestSqlQueryRambler.class, AllTestsCommon.class })
-public class AllTestsMySql {
-  // -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer
+@SuiteClasses({ AllTestsPojoJson.class, TestMongoMapper.class, TestMongoQueryRambler.class, AllTestsCommon.class })
+public class AllTestsMongo {
+  // -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mongo.testNew.MongoDataStoreContainer
+  // -DBlockedThreadCheckInterval=1000 -DWarningExceptionTime=1000
+  // -Ddb_name=unitTestDb
 
-  /**
-   * 
-   */
-  public AllTestsMySql() {
+  public AllTestsMongo() {
   }
 
 }

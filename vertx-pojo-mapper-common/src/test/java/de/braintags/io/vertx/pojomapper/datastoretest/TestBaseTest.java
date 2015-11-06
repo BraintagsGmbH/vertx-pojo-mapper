@@ -39,12 +39,13 @@ public class TestBaseTest extends DatastoreBaseTest {
   public void simpleTest() {
     log.info("-->>test");
     assertNotNull(datastoreContainer);
-    testComplete();
+    // testComplete();
   }
 
   @Test
   public void testMetaData() {
     CountDownLatch latch = new CountDownLatch(1);
+    assertNotNull(getDataStore());
     assertNotNull(getDataStore().getMetaData());
     getDataStore().getMetaData().getVersion(result -> {
       if (result.failed()) {
@@ -53,7 +54,7 @@ public class TestBaseTest extends DatastoreBaseTest {
       } else {
         String version = result.result();
         assertNotNull(version);
-        log.info(version);
+        log.info("Version is: " + version);
         latch.countDown();
       }
 

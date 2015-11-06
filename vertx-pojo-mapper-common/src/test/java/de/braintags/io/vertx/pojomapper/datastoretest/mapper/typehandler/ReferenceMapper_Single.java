@@ -41,7 +41,7 @@ public class ReferenceMapper_Single extends BaseRecord {
     ReferenceMapper_Single om = (ReferenceMapper_Single) o;
     boolean equal = om.id == id;
     boolean equal2 = (om.simpleMapper == null && simpleMapper == null)
-        || (om.simpleMapper != null && simpleMapper != null && om.simpleMapper.equals(simpleMapper));
+        || (om.simpleMapper != null && simpleMapper != null && simpleMapper.equals(om.simpleMapper));
     return equal && equal2;
   }
 

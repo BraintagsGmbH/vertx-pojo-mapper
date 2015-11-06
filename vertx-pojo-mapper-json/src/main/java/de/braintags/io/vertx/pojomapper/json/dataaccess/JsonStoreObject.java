@@ -12,12 +12,16 @@
  */
 package de.braintags.io.vertx.pojomapper.json.dataaccess;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.util.CounterObject;
@@ -40,6 +44,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   private JsonObject jsonObject;
   private IMapper mapper;
   private Object entity = null;
+  private Collection<IObjectReference> objectReferences = new ArrayList<IObjectReference>();
 
   /**
    * 
@@ -111,35 +116,79 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   }
 
   /**
-   * Initialize the internal entity
+   * Initialize the internal entity from the information previously read from the datastore.
    * 
    * @param handler
    */
-  public void initToEntity(Handler<AsyncResult<Void>> handler) {
-    Object o = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
+  public final void initToEntity(Handler<AsyncResult<Void>> handler) {
+    Object tmpObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
+    iterateFields(tmpObject, fieldResult -> {
+      if (fieldResult.failed()) {
+        handler.handle(fieldResult);
+        return;
+      }
+      iterateObjectReferences(tmpObject, orResult -> {
+        if (orResult.failed()) {
+          handler.handle(orResult);
+          return;
+        }
+        finishToEntity(tmpObject, handler);
+      });
+    });
+    LOGGER.debug("finished loop");
+  }
+
+  protected void finishToEntity(Object tmpObject, Handler<AsyncResult<Void>> handler) {
+    this.entity = tmpObject;
+    try {
+      getMapper().executeLifecycle(AfterLoad.class, entity);
+      handler.handle(Future.succeededFuture());
+    } catch (Exception e) {
+      handler.handle(Future.failedFuture(e));
+    }
+  }
+
+  protected void iterateFields(Object tmpObject, Handler<AsyncResult<Void>> handler) {
     ErrorObject<Void> error = new ErrorObject<Void>(handler);
     Set<String> fieldNames = getMapper().getFieldNames();
     CounterObject co = new CounterObject(fieldNames.size());
     for (String fieldName : fieldNames) {
       IField field = getMapper().getField(fieldName);
       LOGGER.debug("handling field " + field.getFullName());
-      field.getPropertyMapper().fromStoreObject(o, this, field, result -> {
+      field.getPropertyMapper().fromStoreObject(tmpObject, this, field, result -> {
         if (result.failed()) {
           error.setThrowable(result.cause());
-        } else {
-          if (co.reduce()) {
-            LOGGER.debug("counter finished");
-            entity = o;
-            getMapper().executeLifecycle(AfterLoad.class, entity);
-            handler.handle(Future.succeededFuture());
-          }
+          return;
+        }
+        if (co.reduce()) {
+          LOGGER.debug("counter finished");
+          handler.handle(Future.succeededFuture());
         }
       });
-      if (error.isError()) {
-        return;
-      }
     }
-    LOGGER.debug("finished loop");
+  }
+
+  protected void iterateObjectReferences(Object tmpObject, Handler<AsyncResult<Void>> handler) {
+    if (getObjectReferences().isEmpty()) {
+      handler.handle(Future.succeededFuture());
+      return;
+    }
+    IDataStore store = getMapper().getMapperFactory().getDataStore();
+    ErrorObject<Void> error = new ErrorObject<Void>(handler);
+    Collection<IObjectReference> refs = getObjectReferences();
+    CounterObject co = new CounterObject(refs.size());
+    for (IObjectReference ref : refs) {
+      ref.resolveObject(store, tmpObject, orResult -> {
+        if (orResult.failed()) {
+          error.setThrowable(orResult.cause());
+          return;
+        }
+        if (co.reduce()) {
+          LOGGER.debug("object references finished");
+          handler.handle(Future.succeededFuture());
+        }
+      });
+    }
   }
 
   /**
@@ -164,6 +213,16 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
         return;
       }
     }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#getObjectReferences()
+   */
+  @Override
+  public Collection<IObjectReference> getObjectReferences() {
+    return objectReferences;
   }
 
 }

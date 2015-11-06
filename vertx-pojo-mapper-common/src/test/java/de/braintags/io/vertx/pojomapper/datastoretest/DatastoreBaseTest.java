@@ -58,10 +58,13 @@ public class DatastoreBaseTest extends VertxTestBase {
 
   @Override
   protected VertxOptions getOptions() {
-    super.getOptions();
-    VertxOptions options = new VertxOptions();
-    options.setBlockedThreadCheckInterval(10000);
-    options.setWarningExceptionTime(10000);
+    VertxOptions options = super.getOptions();
+    String blockedThreadCheckInterval = System.getProperty("BlockedThreadCheckInterval");
+    if (blockedThreadCheckInterval != null)
+      options.setBlockedThreadCheckInterval(Integer.parseInt(blockedThreadCheckInterval));
+    String WarningExceptionTime = System.getProperty("WarningExceptionTime");
+    if (blockedThreadCheckInterval != null)
+      options.setWarningExceptionTime(Integer.parseInt(WarningExceptionTime));
     return options;
   }
 
@@ -82,14 +85,17 @@ public class DatastoreBaseTest extends VertxTestBase {
     datastoreContainer = (IDatastoreContainer) Class.forName(property).newInstance();
     CountDownLatch latch = new CountDownLatch(1);
     ErrorObject<Void> err = new ErrorObject<Void>(null);
+    logger.info("wait for startup of datastore");
     datastoreContainer.startup(vertx, result -> {
       if (result.failed()) {
         err.setThrowable(result.cause());
       }
+      logger.info("datastore started");
+      assertNotNull(getDataStore());
       latch.countDown();
     });
 
-    latch.await(5, TimeUnit.SECONDS);
+    latch.await();
     if (err.isError())
       throw err.getRuntimeException();
   }
@@ -102,7 +108,11 @@ public class DatastoreBaseTest extends VertxTestBase {
   @Override
   protected void tearDown() throws Exception {
     logger.info("teardown");
-    super.tearDown();
+    try {
+      super.tearDown();
+    } catch (Exception e) {
+      logger.warn("exception on tear down in super class", e);
+    }
 
     CountDownLatch latch = new CountDownLatch(1);
     ErrorObject<Void> err = new ErrorObject<Void>(null);

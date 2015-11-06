@@ -14,6 +14,7 @@ package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
@@ -91,29 +92,40 @@ public class DefaultPropertyMapper implements IPropertyMapper {
   public void fromStoreObject(Object mapper, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
     ITypeHandler th = field.getTypeHandler();
-    IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object dbValue = storeObject.get(field);
 
     th.fromStore(dbValue, field, null, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
-      } else {
-        Object javaValue = result.result().getResult();
-        if (javaValue == null && dbValue != null) {
-          Future<Void> future = Future.failedFuture(new TypeHandlerException(
-              String.format("Value conversion failed: original = %s, conversion = NULL", String.valueOf(dbValue))));
-          handler.handle(future);
-          return;
-        }
-        try {
-          if (javaValue != null)
-            pAcc.writeData(mapper, javaValue);
-          handler.handle(Future.succeededFuture());
-        } catch (Exception e) {
-          LOGGER.error("", e);
-          handler.handle(Future.failedFuture(e));
-        }
+        return;
       }
+      Object javaValue = result.result().getResult();
+      handleInstanceFromStore(storeObject, mapper, javaValue, dbValue, field, handler);
     });
+  }
+
+  private void handleInstanceFromStore(IStoreObject<?> storeObject, Object mapper, Object javaValue, Object dbValue,
+      IField field, Handler<AsyncResult<Void>> handler) {
+    if (javaValue == null && dbValue != null) {
+      Future<Void> future = Future.failedFuture(new TypeHandlerException(
+          String.format("Value conversion failed for field %s: original = %s, conversion = NULL", field.getFullName(),
+              String.valueOf(dbValue))));
+      handler.handle(future);
+      return;
+    }
+
+    try {
+      if (javaValue instanceof IObjectReference) {
+        storeObject.getObjectReferences().add((IObjectReference) javaValue);
+      } else if (javaValue != null) {
+        IPropertyAccessor pAcc = field.getPropertyAccessor();
+        pAcc.writeData(mapper, javaValue);
+      }
+      handler.handle(Future.succeededFuture());
+    } catch (Exception e) {
+      LOGGER.error("", e);
+      handler.handle(Future.failedFuture(e));
+    }
+
   }
 }

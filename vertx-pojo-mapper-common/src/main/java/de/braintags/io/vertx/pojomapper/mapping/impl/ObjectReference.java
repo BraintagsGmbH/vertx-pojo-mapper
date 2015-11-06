@@ -12,51 +12,93 @@
  */
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
-import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
+import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
+import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
- * An object reference is used to store a reference to an instance into a mapped entity, where the field is annotated as
- * {@link Referenced}
+ * ObjectReference is used as carrier when reading objects from the datastore, which contain referenced objects
  * 
  * @author Michael Remme
  * 
  */
-
-public class ObjectReference {
-  private Object reference;
-
-  /**
-   * 
-   */
-  public ObjectReference() {
-  }
+public class ObjectReference implements IObjectReference {
+  private IField field;
+  private Object id;
+  private Class<?> mapperClass;
 
   /**
+   * Create a new instance
    * 
+   * @param field
+   *          the underlaying field, where the object shall be stored
+   * @param id
+   *          the id of the instance
+   * @param mapperClass
+   *          the mapper class
    */
-  public ObjectReference(Object reference) {
-    this.reference = reference;
+  public ObjectReference(IField field, Object id, Class<?> mapperClass) {
+    this.field = field;
+    this.id = id;
+    this.mapperClass = mapperClass;
   }
 
-  /**
-   * The reference of the instance. When written into the datastore, this will be the real instance. When read from the
-   * datastore, this will be the ID of the referenced instance
+  /*
+   * (non-Javadoc)
    * 
-   * @return the reference
+   * @see de.braintags.io.vertx.pojomapper.mapping.impl.IObjectReference#getField()
    */
-  public final Object getReference() {
-    return reference;
+  @Override
+  public IField getField() {
+    return field;
   }
 
-  /**
-   * The reference of the instance. When written into the datastore, this will be the real instance. When read from the
-   * datastore, this will be the ID of the referenced instance
+  /*
+   * (non-Javadoc)
    * 
-   * @param reference
-   *          the reference to set
+   * @see de.braintags.io.vertx.pojomapper.mapping.impl.IObjectReference#resolveObject(de.braintags.io.vertx.pojomapper.
+   * IDataStore, io.vertx.core.Handler)
    */
-  public final void setReference(Object reference) {
-    this.reference = reference;
+  @Override
+  public void resolveObject(IDataStore store, Object instance, Handler<AsyncResult<Void>> resultHandler) {
+    IMapper mapper = store.getMapperFactory().getMapper(mapperClass);
+    IQuery<?> query = (IQuery<?>) store.createQuery(mapperClass).field(mapper.getIdField().getName()).is(id);
+    query.execute(result -> {
+      if (result.failed()) {
+        resultHandler.handle(Future.failedFuture(result.cause()));
+        return;
+      }
+      if (result.result().size() != 1) {
+        String formated = String.format("expected to find 1 record, but found %d in column %s with query '%s'",
+            result.result().size(), mapper.getTableInfo().getName(), result.result().getOriginalQuery());
+        resultHandler.handle(Future.failedFuture(new PropertyAccessException(formated)));
+        return;
+      }
+      result.result().iterator()
+          .next(iResult -> storeReferencedObject(iResult, store, mapper, instance, resultHandler));
+    });
   }
 
+  private void storeReferencedObject(AsyncResult<?> iResult, IDataStore store, IMapper mapper, Object instance,
+      Handler<AsyncResult<Void>> resultHandler) {
+    if (iResult.failed()) {
+      resultHandler.handle(Future.failedFuture(iResult.cause()));
+      return;
+    }
+    Object javaValue = iResult.result();
+    try {
+      IPropertyAccessor pAcc = field.getPropertyAccessor();
+      pAcc.writeData(mapper, javaValue);
+      resultHandler.handle(Future.succeededFuture());
+    } catch (Exception e) {
+      resultHandler.handle(Future.failedFuture(e));
+    }
+  }
 }

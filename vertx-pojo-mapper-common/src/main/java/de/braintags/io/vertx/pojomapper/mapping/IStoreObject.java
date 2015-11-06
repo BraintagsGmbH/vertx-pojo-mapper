@@ -12,6 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.mapping;
 
+import java.util.Collection;
+
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import io.vertx.codegen.annotations.Fluent;
 
@@ -33,34 +35,42 @@ public interface IStoreObject<T> {
    *          the {@link IField} describing the property
    * @return the value of the property in the propriate format of the current implementation of the {@link IDataStore}
    */
-  public Object get(IField field);
+  Object get(IField field);
 
   /**
    * Adds a new property into the internal container
    * 
-   * @param property
+   * @param field
    *          the {@link IField} used to describe the property
    * @param value
    *          the value to be stored in the proprietary format
    * @return a reference to itself
    */
   @Fluent
-  public IStoreObject<T> put(IField field, Object value);
+  IStoreObject<T> put(IField field, Object value);
 
   /**
    * Get the raw container, which stores the information
    * 
    * @return the container
    */
-  public T getContainer();
+  T getContainer();
 
   /**
    * Get the POJO entity, whihc was created from the stored information in the {@link IDataStore}
    * 
    * @return the entity
    */
-  public Object getEntity();
+  Object getEntity();
 
   @Override
-  public String toString();
+  String toString();
+
+  /**
+   * Retrive all instances of {@link IObjectReference} which were generated when rereading an instance from the
+   * datastore.
+   * 
+   * @return all instances of {@link IObjectReference}
+   */
+  Collection<IObjectReference> getObjectReferences();
 }
