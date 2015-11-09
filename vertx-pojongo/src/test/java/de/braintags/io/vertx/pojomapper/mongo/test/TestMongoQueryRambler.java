@@ -12,9 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.test;
 
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-
 import java.util.Arrays;
 
 import org.junit.AfterClass;
@@ -25,8 +22,11 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.LogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
+import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoQueryExpression;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoQueryRambler;
 import de.braintags.io.vertx.pojomapper.mongo.test.mapper.Person;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * 
@@ -76,7 +76,7 @@ public class TestMongoQueryRambler extends MongoBaseTest {
           }
         }
 
-        logger.info(rambler.getJsonObject());
+        logger.info(((MongoQueryExpression) rambler.getQueryExpression()).getQueryDefinition());
       }
     });
 

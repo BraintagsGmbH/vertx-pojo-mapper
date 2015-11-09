@@ -14,6 +14,7 @@ package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryLogicTranslator;
 
 /**
  * Translates the logic defintions into a propriate expression
@@ -22,13 +23,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
  * 
  */
 
-public class QueryLogicTranslator {
-
-  /**
-   * 
-   */
-  private QueryLogicTranslator() {
-  }
+public class QueryLogicTranslator implements IQueryLogicTranslator {
 
   /**
    * Translate the {@link QueryOperator} into the String expression fitting for Mongo
@@ -37,7 +32,8 @@ public class QueryLogicTranslator {
    *          the operator
    * @return the suitable expression
    */
-  public static String translate(QueryLogic logic) {
+  @Override
+  public String translate(QueryLogic logic) {
     switch (logic) {
     case AND:
     case AND_OPEN:
@@ -50,4 +46,28 @@ public class QueryLogicTranslator {
       throw new UnsupportedOperationException("No translator for " + logic);
     }
   }
+
+  /**
+   * Returns true, if the given logis is meant to open parenthesis
+   * 
+   * @param logic
+   *          the logic to be examined
+   * @return true, if parenthesis should be opened
+   */
+  @Override
+  public boolean opensParenthesis(QueryLogic logic) {
+    switch (logic) {
+    case AND:
+    case OR:
+      return false;
+
+    case AND_OPEN:
+    case OR_OPEN:
+      return true;
+
+    default:
+      throw new UnsupportedOperationException("No translator for " + logic);
+    }
+  }
+
 }

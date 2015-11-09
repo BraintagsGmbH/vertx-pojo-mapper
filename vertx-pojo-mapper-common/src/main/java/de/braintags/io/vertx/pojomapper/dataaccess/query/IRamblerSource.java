@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
+package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;

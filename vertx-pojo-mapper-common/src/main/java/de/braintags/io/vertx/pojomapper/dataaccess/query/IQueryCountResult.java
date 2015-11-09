@@ -15,6 +15,7 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 
 /**
@@ -45,7 +46,7 @@ public interface IQueryCountResult {
    * 
    * @return the query
    */
-  public Object getOriginalQuery();
+  public IQueryExpression getOriginalQuery();
 
   /**
    * Get the result of the query

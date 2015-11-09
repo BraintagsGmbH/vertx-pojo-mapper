@@ -10,13 +10,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
+package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 
 /**
  * The IQueryRambler is used as argument by {@link Query#executeQueryRambler(IQueryRambler)}. This method traverses

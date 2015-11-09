@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.RamblerMapper;
+import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlExpression;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQuery;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQueryRambler;
 import io.vertx.core.VertxOptions;
@@ -99,12 +100,12 @@ public class TestSqlQueryRambler extends DatastoreBaseTest {
         LOGGER.error("", result.cause());
         latch.countDown();
       } else {
-        LOGGER.info("SELECT STATEMENT: " + rambler.getSqlStatement().getSelectExpression());
-        LOGGER.info("DELETE STATEMENT: " + rambler.getSqlStatement().getDeleteExpression());
-        LOGGER.info(rambler.getSqlStatement().getParameters());
+        LOGGER.info("SELECT STATEMENT: " + ((SqlExpression) rambler.getQueryExpression()).getSelectExpression());
+        LOGGER.info("DELETE STATEMENT: " + ((SqlExpression) rambler.getQueryExpression()).getDeleteExpression());
+        LOGGER.info(((SqlExpression) rambler.getQueryExpression()).getParameters());
         try {
           assertEquals("wrong number of parameters", expectedParameters,
-              rambler.getSqlStatement().getParameters().size());
+              ((SqlExpression) rambler.getQueryExpression()).getParameters().size());
         } finally {
           latch.countDown();
         }

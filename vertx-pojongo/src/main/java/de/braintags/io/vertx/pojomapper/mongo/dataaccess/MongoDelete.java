@@ -50,7 +50,8 @@ public class MongoDelete<T> extends Delete<T> {
       if (qDefResult.failed()) {
         resultHandler.handle(Future.failedFuture(qDefResult.cause()));
       } else {
-        mongoClient.remove(collection, qDefResult.result(), deleteHandler -> {
+        mongoClient.remove(collection,
+            ((MongoQueryExpression) qDefResult.result().getQueryExpression()).getQueryDefinition(), deleteHandler -> {
           if (deleteHandler.failed()) {
             resultHandler.handle(Future.failedFuture(deleteHandler.cause()));
           } else {

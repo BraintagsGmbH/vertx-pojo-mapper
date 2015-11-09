@@ -10,10 +10,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
+package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTranslator;
 
 /**
  * Translates operator definitions into propriate expressions for the datastore
@@ -21,8 +20,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTran
  * @author Michael Remme
  * 
  */
-
-public class QueryOperatorTranslator implements IQueryOperatorTranslator {
+public interface IQueryOperatorTranslator {
 
   /**
    * Translate the given {@link QueryOperator} into an expression fitting for sql
@@ -31,28 +29,6 @@ public class QueryOperatorTranslator implements IQueryOperatorTranslator {
    *          the {@link QueryOperator} to be translated
    * @return a suitable String expression
    */
-  @Override
-  public String translate(QueryOperator op) {
-    switch (op) {
-    case EQUALS:
-      return "=";
-    case NOT_EQUALS:
-      return "!=";
-    case LARGER:
-      return ">";
-    case LARGER_EQUAL:
-      return ">=";
-    case SMALLER:
-      return "<";
-    case SMALLER_EQUAL:
-      return "<=";
-    case IN:
-      return "IN";
-    case NOT_IN:
-      return "NOT IN";
+  String translate(QueryOperator op);
 
-    default:
-      throw new UnsupportedOperationException("No translator for " + op);
-    }
-  }
 }

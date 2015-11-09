@@ -86,38 +86,39 @@ public class MongoQuery<T> extends Query<T> {
     }
   }
 
-  private void doFindCount(JsonObject query, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+  private void doFindCount(MongoQueryRambler rambler, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
     String column = getMapper().getTableInfo().getName();
-    mongoClient.count(column, query, qResult -> {
+    mongoClient.count(column, ((MongoQueryExpression) rambler.getQueryExpression()).getQueryDefinition(), qResult -> {
       if (qResult.failed()) {
         Future<IQueryCountResult> future = Future.failedFuture(qResult.cause());
         resultHandler.handle(future);
       } else {
-        QueryCountResult qcr = new QueryCountResult(getMapper(), getDataStore(), qResult.result(), query);
+        QueryCountResult qcr = new QueryCountResult(getMapper(), getDataStore(), qResult.result(),
+            rambler.getQueryExpression());
         Future<IQueryCountResult> future = Future.succeededFuture(qcr);
         resultHandler.handle(future);
       }
     });
   }
 
-  private void doFind(JsonObject query, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  private void doFind(MongoQueryRambler rambler, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
     String column = getMapper().getTableInfo().getName();
-    mongoClient.find(column, query, qResult -> {
+    mongoClient.find(column, ((MongoQueryExpression) rambler.getQueryExpression()).getQueryDefinition(), qResult -> {
       if (qResult.failed()) {
         Future<IQueryResult<T>> future = Future.failedFuture(qResult.cause());
         resultHandler.handle(future);
       } else {
-        IQueryResult<T> qR = createQueryResult(qResult.result(), query);
+        IQueryResult<T> qR = createQueryResult(qResult.result(), rambler);
         Future<IQueryResult<T>> future = Future.succeededFuture(qR);
         resultHandler.handle(future);
       }
     });
   }
 
-  private IQueryResult<T> createQueryResult(List<JsonObject> findList, JsonObject query) {
-    return new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(), (MongoMapper) getMapper(), query);
+  private IQueryResult<T> createQueryResult(List<JsonObject> findList, MongoQueryRambler rambler) {
+    return new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(), (MongoMapper) getMapper(), rambler);
   }
 
   /**
@@ -127,13 +128,13 @@ public class MongoQuery<T> extends Query<T> {
    * @param resultHandler
    *          the resulthandler which will receive notification
    */
-  void createQueryDefinition(Handler<AsyncResult<JsonObject>> resultHandler) {
+  void createQueryDefinition(Handler<AsyncResult<MongoQueryRambler>> resultHandler) {
     MongoQueryRambler rambler = new MongoQueryRambler();
     executeQueryRambler(rambler, result -> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
-        resultHandler.handle(Future.succeededFuture(rambler.getJsonObject()));
+        resultHandler.handle(Future.succeededFuture(rambler));
       }
     });
   }

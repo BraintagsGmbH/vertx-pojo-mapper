@@ -18,6 +18,8 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IRamblerSource;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;

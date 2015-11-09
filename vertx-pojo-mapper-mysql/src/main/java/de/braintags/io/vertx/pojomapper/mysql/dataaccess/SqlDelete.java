@@ -65,7 +65,7 @@ public class SqlDelete<T> extends Delete<T> {
   }
 
   private void handleDelete(SqlQueryRambler rambler, Handler<AsyncResult<IDeleteResult>> resultHandler) {
-    SqlExpression expr = rambler.getSqlStatement();
+    SqlExpression expr = (SqlExpression) rambler.getQueryExpression();
     SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), expr.getDeleteExpression(), expr.getParameters(), ur -> {
       if (ur.failed()) {
         resultHandler.handle(Future.failedFuture(new SqlException(rambler, ur.cause())));

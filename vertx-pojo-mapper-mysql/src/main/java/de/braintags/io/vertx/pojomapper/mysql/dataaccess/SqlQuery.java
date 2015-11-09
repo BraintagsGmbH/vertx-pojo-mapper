@@ -144,7 +144,7 @@ public class SqlQuery<T> extends Query<T> {
   }
 
   private void executeCount(SqlQueryRambler query, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
-    SqlExpression statement = query.getSqlStatement();
+    SqlExpression statement = (SqlExpression) query.getQueryExpression();
     if (statement.hasQueryParameters()) {
       SqlUtil.queryWithParams((MySqlDataStore) getDataStore(), statement.getCountExpression(),
           statement.getParameters(), qRes -> handleCountResult(qRes, query, resultHandler));
@@ -157,16 +157,17 @@ public class SqlQuery<T> extends Query<T> {
   private void handleCountResult(AsyncResult<ResultSet> qRes, SqlQueryRambler query,
       Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     if (qRes.failed()) {
-      String message = "Executed count: " + query.getSqlStatement().toString();
+      String message = "Executed count: " + query.getQueryExpression().toString();
       resultHandler.handle(Future.failedFuture(new SqlException(message, qRes.cause())));
       return;
     }
-    SqlQueryCountResult cr = new SqlQueryCountResult(getMapper(), getDataStore(), qRes.result(), query);
+    SqlQueryCountResult cr = new SqlQueryCountResult(getMapper(), getDataStore(), qRes.result(),
+        query.getQueryExpression());
     resultHandler.handle(Future.succeededFuture(cr));
   }
 
   private void doFind(SqlQueryRambler query, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    SqlExpression statement = query.getSqlStatement();
+    SqlExpression statement = (SqlExpression) query.getQueryExpression();
     if (statement.hasQueryParameters()) {
       SqlUtil.queryWithParams((MySqlDataStore) getDataStore(), statement.getSelectExpression(),
           statement.getParameters(), qRes -> handleQueryResult(qRes, query, resultHandler));
@@ -179,7 +180,7 @@ public class SqlQuery<T> extends Query<T> {
   private void handleQueryResult(AsyncResult<ResultSet> qRes, SqlQueryRambler query,
       Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     if (qRes.failed()) {
-      String message = "Executed query: " + query.getSqlStatement().toString();
+      String message = "Executed query: " + query.getQueryExpression().toString();
       resultHandler.handle(Future.failedFuture(new SqlException(message, qRes.cause())));
       return;
     }

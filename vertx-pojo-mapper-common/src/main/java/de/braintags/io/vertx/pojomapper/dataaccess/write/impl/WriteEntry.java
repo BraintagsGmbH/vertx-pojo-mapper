@@ -64,4 +64,8 @@ public class WriteEntry implements IWriteEntry {
     return action;
   }
 
+  @Override
+  public String toString() {
+    return "Action: " + action + " | " + getStoreObject().toString();
+  }
 }

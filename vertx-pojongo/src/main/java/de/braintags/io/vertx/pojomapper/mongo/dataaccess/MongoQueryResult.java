@@ -42,8 +42,8 @@ public class MongoQueryResult<T> extends AbstractQueryResult<T> {
    * @param originalQuery
    */
   public MongoQueryResult(List<JsonObject> jsonResult, MongoDataStore store, MongoMapper mapper,
-      JsonObject originalQuery) {
-    super(store, mapper, jsonResult.size(), originalQuery);
+      MongoQueryRambler rambler) {
+    super(store, mapper, jsonResult.size(), rambler.getQueryExpression());
     this.jsonResult = jsonResult;
   }
 

@@ -16,6 +16,8 @@ import java.util.Arrays;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IRamblerSource;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import io.vertx.core.AsyncResult;

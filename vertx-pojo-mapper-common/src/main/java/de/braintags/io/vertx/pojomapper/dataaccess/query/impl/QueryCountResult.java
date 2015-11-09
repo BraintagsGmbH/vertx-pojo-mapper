@@ -29,7 +29,7 @@ public class QueryCountResult implements IQueryCountResult {
   private IMapper mapper;
   private IDataStore dataStore;
   private long count;
-  private Object originalQuery;
+  private IQueryExpression originalQuery;
 
   /**
    * Constructor based on various information
@@ -43,7 +43,7 @@ public class QueryCountResult implements IQueryCountResult {
    * @param originalQuery
    *          the object which was used to process native the query
    */
-  public QueryCountResult(IMapper mapper, IDataStore dataStore, long count, Object originalQuery) {
+  public QueryCountResult(IMapper mapper, IDataStore dataStore, long count, IQueryExpression originalQuery) {
     this.mapper = mapper;
     this.dataStore = dataStore;
     this.count = count;
@@ -76,7 +76,7 @@ public class QueryCountResult implements IQueryCountResult {
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult#getOriginalQuery()
    */
   @Override
-  public Object getOriginalQuery() {
+  public IQueryExpression getOriginalQuery() {
     return originalQuery;
   }
 

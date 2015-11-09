@@ -1,0 +1,24 @@
+Formatted JSON Data
+{  
+   "$and":[
+      {  
+         "name":{  
+            "$eq":"AndOr"
+         }
+      },
+      {  
+         "secondProperty":{  
+            "$eq":"AndOr 1"
+         }
+      },
+      {  
+         "$or":[  
+            {  
+               "secondProperty":{  
+                  "$eq":"AndOr 2"
+               }
+            }
+         ]
+      }
+   ]
+}

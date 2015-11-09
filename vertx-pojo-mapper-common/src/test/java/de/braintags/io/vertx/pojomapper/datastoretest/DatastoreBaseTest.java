@@ -171,6 +171,7 @@ public class DatastoreBaseTest extends VertxTestBase {
     write.add(sm);
     write.save(result -> {
       try {
+        logger.info(result.result());
         resultContainer.writeResult = result.result();
         checkWriteResult(result);
       } catch (AssertionError e) {
@@ -354,7 +355,11 @@ public class DatastoreBaseTest extends VertxTestBase {
       }
     } else {
       try {
-        assertTrue(qr.iterator().hasNext());
+        if (expectedResult > 0)
+          assertTrue("expected records: " + expectedResult, qr.iterator().hasNext());
+        else
+          assertFalse(qr.iterator().hasNext());
+
       } catch (Exception e) {
         latch.countDown();
         throw ExceptionUtil.createRuntimeException(e);

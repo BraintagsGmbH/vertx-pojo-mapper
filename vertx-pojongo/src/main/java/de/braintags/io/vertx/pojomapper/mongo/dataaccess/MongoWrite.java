@@ -93,7 +93,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
     IMapper mapper = getMapper();
     String column = mapper.getTableInfo().getName();
-    final String currentId = (String) storeObject.get(mapper.getIdField());
+    final Object currentId = storeObject.get(mapper.getIdField());
     logger.info("now saving");
     mongoClient.save(column, storeObject.getContainer(), result -> {
       if (result.failed()) {
@@ -113,7 +113,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
 
   }
 
-  private void finishInsert(String id, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
+  private void finishInsert(Object id, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     setIdValue(id, storeObject, result -> {
       if (result.failed()) {
@@ -126,7 +126,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
     });
   }
 
-  private void finishUpdate(String id, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
+  private void finishUpdate(Object id, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     executePostSave(entity);
     writeResult.addEntry(storeObject, id, WriteAction.UPDATE);

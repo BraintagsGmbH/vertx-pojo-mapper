@@ -13,6 +13,7 @@
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryLogicTranslator;
 
 /**
  * Translates the logic defintions into a propriate expression
@@ -21,14 +22,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
  * 
  */
 
-public class QueryLogicTranslator {
-
-  /**
-   * 
-   */
-  private QueryLogicTranslator() {
-  }
-
+public class QueryLogicTranslator implements IQueryLogicTranslator {
   /**
    * Translate the {@link QueryLogic} into the String expression fitting for sql
    * 
@@ -36,7 +30,8 @@ public class QueryLogicTranslator {
    *          the logic
    * @return the suitable expression
    */
-  public static String translate(QueryLogic logic) {
+  @Override
+  public String translate(QueryLogic logic) {
     switch (logic) {
     case AND:
     case AND_OPEN:
@@ -57,7 +52,8 @@ public class QueryLogicTranslator {
    *          the logic to be examined
    * @return true, if parenthesis should be opened
    */
-  public static boolean opensParenthesis(QueryLogic logic) {
+  @Override
+  public boolean opensParenthesis(QueryLogic logic) {
     switch (logic) {
     case AND:
     case OR:

@@ -29,11 +29,11 @@ import io.vertx.core.Handler;
  * 
  */
 
-public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T>implements IQueryResult<T> {
+public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> implements IQueryResult<T> {
   private IMapper mapper;
   private IDataStore datastore;
   private T[] pojoResult;
-  private Object originalQuery;
+  private IQueryExpression originalQuery;
 
   /**
    * Constructor
@@ -46,7 +46,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T>i
    *          the size of the resulting query
    */
   @SuppressWarnings("unchecked")
-  public AbstractQueryResult(IDataStore datastore, IMapper mapper, int resultSize, Object originalQuery) {
+  public AbstractQueryResult(IDataStore datastore, IMapper mapper, int resultSize, IQueryExpression originalQuery) {
     this.datastore = datastore;
     this.mapper = mapper;
     this.originalQuery = originalQuery;
@@ -99,7 +99,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T>i
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult#getOriginalQuery()
    */
   @Override
-  public Object getOriginalQuery() {
+  public IQueryExpression getOriginalQuery() {
     return originalQuery;
   }
 

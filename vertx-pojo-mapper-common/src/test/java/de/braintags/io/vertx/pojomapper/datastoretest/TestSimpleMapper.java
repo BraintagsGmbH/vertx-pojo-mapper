@@ -46,7 +46,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
     IWriteEntry we = resultContainer.writeResult.iterator().next();
     assertEquals(we.getAction(), WriteAction.INSERT);
     assertNotNull(sm.id);
-    assertTrue("ID wasn't set by insert statement", Long.parseLong(sm.id) > 0);
+    assertTrue("ID wasn't set by insert statement", sm.id.hashCode() != 0);
 
     sm.name = "testNameModified";
     sm.setSecondProperty("my modified property");
@@ -155,6 +155,10 @@ public class TestSimpleMapper extends DatastoreBaseTest {
 
   /**
    * Search: Name = "AndOr" AND ( secondProperty="AndOr 1" OR secondProperty="AndOr 2" )
+   * 
+   * {"$and":[{"name":{"$eq":"AndOr"}},{"secondProperty":{"$eq":"AndOr 1"}},{"$or":[{"secondProperty":{"$eq":"AndOr 2"
+   * }}]}]}
+   * 
    */
   @Test
   public void testAndOr() {

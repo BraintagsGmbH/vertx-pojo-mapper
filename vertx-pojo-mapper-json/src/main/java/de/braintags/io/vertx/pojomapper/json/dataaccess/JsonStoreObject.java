@@ -225,4 +225,14 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
     return objectReferences;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return mapper.getTableInfo().getName() + ": " + String.valueOf(jsonObject);
+  }
+
 }

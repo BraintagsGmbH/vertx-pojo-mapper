@@ -17,6 +17,7 @@ import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.QueryCountResult;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mysql.exception.SqlException;
@@ -44,7 +45,8 @@ public class SqlQueryCountResult extends QueryCountResult {
    * @param originalQuery
    *          the object which was used to process native the query
    */
-  public SqlQueryCountResult(IMapper mapper, IDataStore dataStore, ResultSet resultSet, Object originalQuery) {
+  public SqlQueryCountResult(IMapper mapper, IDataStore dataStore, ResultSet resultSet,
+      IQueryExpression originalQuery) {
     super(mapper, dataStore, getCount(resultSet), originalQuery);
   }
 

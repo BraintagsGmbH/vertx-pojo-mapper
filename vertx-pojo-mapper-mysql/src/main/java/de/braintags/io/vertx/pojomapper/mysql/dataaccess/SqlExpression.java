@@ -16,6 +16,7 @@ package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import io.vertx.core.json.JsonArray;
 
@@ -27,10 +28,11 @@ import io.vertx.core.json.JsonArray;
  * 
  */
 
-public class SqlExpression {
+public class SqlExpression implements IQueryExpression {
   private static final String SELECT_STATEMENT = "SELECT * from %s";
   private static final String DELETE_STATEMENT = "DELETE from %s";
   private static final String COUNT_STATEMENT = "SELECT count(*) from %s";
+  private IMapper mapper;
 
   private StringBuilder select = new StringBuilder();
   private StringBuilder delete = new StringBuilder();
@@ -47,11 +49,16 @@ public class SqlExpression {
    * @param mapper
    *          the underlaying mapper, to retrive the name of the table in the database
    */
-  public SqlExpression(IMapper mapper) {
+  public SqlExpression() {
+    connectorDeque.addLast(new Connector("AND"));
+  }
+
+  @Override
+  public void setMapper(IMapper mapper) {
+    this.mapper = mapper;
     select.append(String.format(SELECT_STATEMENT, mapper.getTableInfo().getName()));
     delete.append(String.format(DELETE_STATEMENT, mapper.getTableInfo().getName()));
     count.append(String.format(COUNT_STATEMENT, mapper.getTableInfo().getName()));
-    connectorDeque.addLast(new Connector("AND"));
   }
 
   /**
@@ -75,6 +82,7 @@ public class SqlExpression {
    *          info, wether a parenthesis shall be opened
    * @return the SqlExpression itself for fluent usage
    */
+  @Override
   public SqlExpression startConnectorBlock(String connector, boolean openParenthesis) {
     connectorDeque.addLast(new Connector(connector));
     if (whereClause.length() > 0)
@@ -88,19 +96,23 @@ public class SqlExpression {
   /**
    * Append an opening parenthesis and handle the counter for open parenthesis
    */
-  public void openParenthesis() {
+  @Override
+  public IQueryExpression openParenthesis() {
     whereClause.append(" ( ");
     ++openedParenthesis;
+    return this;
   }
 
   /**
    * Append a closing parenthesis and handle the counter for open parenthesis
    */
-  public void closeParenthesis() {
+  @Override
+  public IQueryExpression closeParenthesis() {
     whereClause.append(" ) ");
     --openedParenthesis;
     if (openedParenthesis < 0)
       throw new IllegalArgumentException("closed more parenthesis than opened before");
+    return this;
   }
 
   /**
@@ -108,6 +120,7 @@ public class SqlExpression {
    * 
    * @return the SqlExpression itself for fluent usage
    */
+  @Override
   public SqlExpression stopConnectorBlock() {
     connectorDeque.removeLast();
     return this;
@@ -124,6 +137,7 @@ public class SqlExpression {
    *          the value
    * @return the SqlExpression itself for fluent usage
    */
+  @Override
   public SqlExpression addQuery(String fieldName, String logic, Object value) {
     Connector conn = connectorDeque.getLast();
     if (conn.arguments > 0)
@@ -220,4 +234,5 @@ public class SqlExpression {
   public String toString() {
     return getSelectExpression() + " | " + getDeleteExpression() + " | " + getParameters();
   }
+
 }

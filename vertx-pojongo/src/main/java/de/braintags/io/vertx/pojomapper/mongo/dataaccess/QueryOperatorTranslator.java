@@ -13,6 +13,7 @@
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTranslator;
 
 /**
  * Translates operator definitions into propriate expressions for the datastore
@@ -21,13 +22,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
  * 
  */
 
-public class QueryOperatorTranslator {
-
-  /**
-   * 
-   */
-  private QueryOperatorTranslator() {
-  }
+public class QueryOperatorTranslator implements IQueryOperatorTranslator {
 
   /**
    * Translate the given {@link QueryOperator} into an expression fitting for Mongo
@@ -35,7 +30,8 @@ public class QueryOperatorTranslator {
    * @param op
    * @return
    */
-  public static String translate(QueryOperator op) {
+  @Override
+  public String translate(QueryOperator op) {
     switch (op) {
     case EQUALS:
       return "$eq";
