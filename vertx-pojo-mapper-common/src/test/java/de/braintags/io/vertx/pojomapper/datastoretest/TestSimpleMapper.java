@@ -154,10 +154,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
   }
 
   /**
-   * Search: Name = "AndOr" AND ( secondProperty="AndOr 1" OR secondProperty="AndOr 2" )
-   * 
-   * {"$and":[{"name":{"$eq":"AndOr"}},{"secondProperty":{"$eq":"AndOr 1"}},{"$or":[{"secondProperty":{"$eq":"AndOr 2"
-   * }}]}]}
+   * Search: Name = "AndOr" AND secondProperty="AndOr 1" OR secondProperty="AndOr 2"
    * 
    */
   @Test
@@ -168,7 +165,6 @@ public class TestSimpleMapper extends DatastoreBaseTest {
     query.and("name").is("AndOr").field("secondProperty").is("AndOr 1").or("secondProperty").is("AndOr 2");
 
     ResultContainer resultContainer = find(query, 2);
-    logger.info(resultContainer.queryResult.getOriginalQuery().toString());
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
   }

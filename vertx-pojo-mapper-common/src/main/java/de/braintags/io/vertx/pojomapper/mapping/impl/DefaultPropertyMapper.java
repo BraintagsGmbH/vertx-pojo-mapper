@@ -47,6 +47,11 @@ public class DefaultPropertyMapper implements IPropertyMapper {
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object javaValue = pAcc.readData(mapper);
 
+    if (javaValue == null) {
+      handler.handle(Future.succeededFuture());
+      return;
+    }
+
     th.intoStore(javaValue, field, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -93,15 +98,18 @@ public class DefaultPropertyMapper implements IPropertyMapper {
       Handler<AsyncResult<Void>> handler) {
     ITypeHandler th = field.getTypeHandler();
     Object dbValue = storeObject.get(field);
-
-    th.fromStore(dbValue, field, null, result -> {
-      if (result.failed()) {
-        handler.handle(Future.failedFuture(result.cause()));
-        return;
-      }
-      Object javaValue = result.result().getResult();
-      handleInstanceFromStore(storeObject, mapper, javaValue, dbValue, field, handler);
-    });
+    if (dbValue == null) { // nothing to work with? Must null be set?
+      handler.handle(Future.succeededFuture());
+    } else {
+      th.fromStore(dbValue, field, null, result -> {
+        if (result.failed()) {
+          handler.handle(Future.failedFuture(result.cause()));
+          return;
+        }
+        Object javaValue = result.result().getResult();
+        handleInstanceFromStore(storeObject, mapper, javaValue, dbValue, field, handler);
+      });
+    }
   }
 
   private void handleInstanceFromStore(IStoreObject<?> storeObject, Object mapper, Object javaValue, Object dbValue,

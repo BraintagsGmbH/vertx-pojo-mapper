@@ -26,7 +26,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 @Entity
 public class RamblerMapper {
   @Id
-  public int id;
+  public String id;
   public String name;
   public int age;
 

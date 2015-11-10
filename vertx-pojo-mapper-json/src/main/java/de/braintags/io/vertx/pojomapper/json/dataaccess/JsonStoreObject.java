@@ -63,6 +63,8 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   public JsonStoreObject(JsonObject jsonObject, IMapper mapper) {
     if (mapper == null)
       throw new NullPointerException("Mapper must not be null");
+    if (jsonObject == null)
+      throw new NullPointerException("JsonObject must not be null");
     this.mapper = mapper;
     this.jsonObject = jsonObject;
   }

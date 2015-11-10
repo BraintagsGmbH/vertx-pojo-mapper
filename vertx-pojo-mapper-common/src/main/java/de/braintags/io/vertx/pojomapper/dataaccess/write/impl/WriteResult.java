@@ -65,4 +65,13 @@ public class WriteResult implements IWriteResult {
     return resultList.size();
   }
 
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    for (IWriteEntry entry : resultList) {
+      builder.append(entry.toString()).append("\n");
+    }
+    return builder.toString();
+  }
+
 }

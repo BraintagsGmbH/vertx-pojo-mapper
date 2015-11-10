@@ -39,7 +39,7 @@ public class EmbeddedMapper_Single extends BaseRecord {
   @Override
   public boolean equals(Object o) {
     EmbeddedMapper_Single om = (EmbeddedMapper_Single) o;
-    boolean equal = om.id == id;
+    boolean equal = om.id.equals(id);
     boolean equal2 = (om.simpleMapper == null && simpleMapper == null)
         || (om.simpleMapper != null && simpleMapper != null && om.simpleMapper.equals(simpleMapper));
     return equal && equal2;

@@ -12,22 +12,29 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest.typehandler;
 
-import de.braintags.io.vertx.pojomapper.datastoretest.mapper.SimpleMapper;
+import org.junit.Test;
+
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.EmbeddedMapper_Single;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
- * 
+ * Tests for testing embedded Single instance, but instance is null
  * 
  * @author Michael Remme
  * 
  */
-public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
+public class EmbeddedSingleTest_Null extends AbstractTypeHandlerTest {
 
-  /**
-   * 
-   */
-  public EmbeddedSingleTest() {
+  @Test
+  public void testTypeHandler() {
+    BaseRecord record = createInstance();
+    IMapper mapper = getDataStore().getMapperFactory().getMapper(record.getClass());
+    IField field = mapper.getField("simpleMapper");
+    ITypeHandler th = field.getTypeHandler();
+    assertNotNull(th);
   }
 
   /*
@@ -37,8 +44,8 @@ public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
    */
   @Override
   public BaseRecord createInstance() {
-    EmbeddedMapper_Single mapper = new EmbeddedMapper_Single();
-    mapper.simpleMapper = new SimpleMapper("testname", "secnd prop");
+    BaseRecord mapper = new EmbeddedMapper_Single();
     return mapper;
   }
+
 }

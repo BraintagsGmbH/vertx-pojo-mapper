@@ -131,4 +131,9 @@ public class MongoQueryExpression implements IQueryExpression {
     } else
       throw new UnsupportedOperationException("no definition to add for " + currentObject.getClass().getName());
   }
+
+  @Override
+  public String toString() {
+    return String.valueOf(qDef);
+  }
 }

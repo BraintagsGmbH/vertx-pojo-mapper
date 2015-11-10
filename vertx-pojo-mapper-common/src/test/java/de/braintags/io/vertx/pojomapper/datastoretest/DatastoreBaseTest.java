@@ -134,8 +134,21 @@ public class DatastoreBaseTest extends VertxTestBase {
 
   }
 
-  @SuppressWarnings("unchecked")
   public ResultContainer saveRecords(List<?> records) {
+    return saveRecords(records, 0);
+  }
+
+  /**
+   * save the list of records
+   * 
+   * @param records
+   *          the records to be saved
+   * @param waittime
+   *          the time to wait for saving
+   * @return the result
+   */
+  @SuppressWarnings("unchecked")
+  public ResultContainer saveRecords(List<?> records, int waittime) {
     ResultContainer resultContainer = new ResultContainer();
     CountDownLatch latch = new CountDownLatch(1);
     IWrite<Object> write = (IWrite<Object>) getDataStore().createWrite(records.get(0).getClass());
@@ -156,7 +169,12 @@ public class DatastoreBaseTest extends VertxTestBase {
     });
 
     try {
-      latch.await();
+      if (waittime == 0) {
+        latch.await();
+      } else {
+        latch.await(waittime, TimeUnit.MILLISECONDS);
+      }
+
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
@@ -222,9 +240,9 @@ public class DatastoreBaseTest extends VertxTestBase {
     query.execute(result -> {
       try {
         resultContainer.queryResult = result.result();
+        logger.info("performed find with: " + resultContainer.queryResult.getOriginalQuery());
         checkQueryResult(result, expectedResult);
 
-        logger.info(resultContainer.queryResult.getOriginalQuery());
         assertEquals(expectedResult, resultContainer.queryResult.size());
 
       } catch (AssertionError e) {
