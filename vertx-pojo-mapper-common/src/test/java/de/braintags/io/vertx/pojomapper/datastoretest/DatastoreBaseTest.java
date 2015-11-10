@@ -125,9 +125,10 @@ public class DatastoreBaseTest extends VertxTestBase {
       });
     } catch (Exception e) {
       logger.warn("WARNING: " + e);
+      latch.countDown();
     }
 
-    latch.await(5, TimeUnit.SECONDS);
+    latch.await();
     if (err.isError()) {
       logger.warn("WARNING: " + err.getRuntimeException());
     }
