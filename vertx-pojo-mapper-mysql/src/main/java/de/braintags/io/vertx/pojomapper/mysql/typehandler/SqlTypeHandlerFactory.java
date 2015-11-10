@@ -19,6 +19,7 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandle
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ByteTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CalendarTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.IdTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 /**
@@ -39,8 +40,9 @@ public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
   @Override
   protected void init() {
     super.init();
-    getDefinedTypehandlers().add(0, new IdTypeHandler(this));
-    getDefinedTypehandlers().add(0, new BooleanTypeHandler(this));
+    remove(IdTypeHandler.class);
+    getDefinedTypehandlers().add(0, new SqlIdTypeHandler(this));
+    getDefinedTypehandlers().add(1, new BooleanTypeHandler(this));
 
     remove(DateTypeHandler.class);
     getDefinedTypehandlers().add(new SqlDateTypeHandler(this));

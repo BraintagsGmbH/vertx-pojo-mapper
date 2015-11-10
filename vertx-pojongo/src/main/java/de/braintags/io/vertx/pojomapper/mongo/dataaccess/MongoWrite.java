@@ -33,7 +33,7 @@ import io.vertx.ext.mongo.MongoClient;
  */
 
 public class MongoWrite<T> extends AbstractWrite<T> {
-  private static Logger logger = LoggerFactory.getLogger(MongoWrite.class);
+  private static Logger LOG = LoggerFactory.getLogger(MongoWrite.class);
 
   /**
    * 
@@ -94,16 +94,16 @@ public class MongoWrite<T> extends AbstractWrite<T> {
     IMapper mapper = getMapper();
     String column = mapper.getTableInfo().getName();
     final Object currentId = storeObject.get(mapper.getIdField());
-    logger.info("now saving");
+    LOG.info("now saving");
     mongoClient.save(column, storeObject.getContainer(), result -> {
       if (result.failed()) {
-        logger.info("failed", result.cause());
+        LOG.info("failed", result.cause());
         Future<Void> future = Future.failedFuture(result.cause());
         resultHandler.handle(future);
         return;
       }
 
-      logger.info("saved");
+      LOG.info("saved");
       String id = result.result();
       if (id == null) {
         finishUpdate(currentId, entity, storeObject, writeResult, resultHandler);

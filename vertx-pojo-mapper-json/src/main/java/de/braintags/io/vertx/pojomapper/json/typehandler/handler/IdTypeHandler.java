@@ -1,6 +1,6 @@
 /*
  * #%L
- * vertx-pojo-mapper-common
+ * vertx-pojongo
  * %%
  * Copyright (C) 2015 Braintags GmbH
  * %%
@@ -10,12 +10,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-
-package de.braintags.io.vertx.pojomapper.mysql.typehandler;
+package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
-import de.braintags.io.vertx.pojomapper.mysql.SqlUtil;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
@@ -57,7 +54,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(final Object id, IField field, Class<?> cls,
+  public final void fromStore(final Object id, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     @SuppressWarnings("rawtypes")
     Class fieldClass = field.getType();
@@ -77,33 +74,42 @@ public class IdTypeHandler extends AbstractTypeHandler {
     }
   }
 
-  private Object convertToString(Object id) {
-    if (id == null)
+  private final Object convertToString(Object id) {
+    if (id == null) {
       return id;
-    if (id instanceof Number)
+    }
+    if (id instanceof Number) {
       return String.valueOf(id);
-    if (id instanceof String)
+    }
+    if (id instanceof String) {
       return id;
+    }
     return String.valueOf(id);
   }
 
-  private Object convertToLong(Object id) {
-    if (id == null)
+  private final Object convertToLong(Object id) {
+    if (id == null) {
       return id;
-    if (id instanceof String)
+    }
+    if (id instanceof String) {
       return Long.parseLong((String) id);
-    if (id instanceof Number)
-      return id;
+    }
+    if (id instanceof Number) {
+      return ((Number) id).longValue() == 0 ? null : id;
+    }
     throw new UnsupportedOperationException("unsupported type to convert: " + id.getClass().getName());
   }
 
-  private Object convertToInt(Object id) {
-    if (id == null)
+  private final Object convertToInt(Object id) {
+    if (id == null) {
       return id;
-    if (id instanceof String)
+    }
+    if (id instanceof String) {
       return Integer.parseInt((String) id);
-    if (id instanceof Number)
+    }
+    if (id instanceof Number) {
       return id;
+    }
     throw new UnsupportedOperationException("unsupported type to convert: " + id.getClass().getName());
   }
 
@@ -114,23 +120,31 @@ public class IdTypeHandler extends AbstractTypeHandler {
    * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public final void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     // getInternalTypeHandler(field).intoStore(source, field, resultHandler);
     // here we would need an ITypehandler reacting to the column type in spite of the java field, if types are different
-    IColumnInfo colInfo = field.getColumnInfo();
-    if (SqlUtil.isCharacter(colInfo)) {
+    if (isCharacterColumn(field)) {
       source = convertToString(source);
-    } else if (SqlUtil.isNumeric(colInfo)) {
+    } else if (isNumericColumn(field)) {
       source = convertToLong(source);
     } else
-      resultHandler
-          .handle(Future.failedFuture(new UnsupportedOperationException("id column is nor numeric nor character")));
+      resultHandler.handle(Future.failedFuture(
+          new UnsupportedOperationException("id column is nor numeric nor character: " + field.getType())));
 
     DefaultTypeHandlerResult thResult = new DefaultTypeHandlerResult(source);
     resultHandler.handle(Future.succeededFuture(thResult));
   }
 
-  private ITypeHandler getInternalTypeHandler(IField field) {
+  protected boolean isCharacterColumn(IField field) {
+    return CharSequence.class.isAssignableFrom(field.getType());
+  }
+
+  protected boolean isNumericColumn(IField field) {
+    return Number.class.isAssignableFrom(field.getType()) || field.getType().equals(long.class)
+        || field.getType().equals(int.class);
+  }
+
+  private final ITypeHandler getInternalTypeHandler(IField field) {
     if (internalTypehandler == null) {
       internalTypehandler = getTypeHandlerFactory().getTypeHandler(field.getType(), field.getEmbedRef());
     }
@@ -145,7 +159,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
    * IField)
    */
   @Override
-  public short matches(IField field) {
+  public final short matches(IField field) {
     if (field.getMapper().getIdField() == field)
       return MATCH_MAJOR;
     return MATCH_NONE;

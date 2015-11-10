@@ -33,6 +33,7 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeH
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.EnumTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.FloatTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.IdTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.IntegerTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.LocaleTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.LongTypeHandler;
@@ -73,6 +74,8 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
    * Initializes the {@link ITypeHandler} which are belonging to the current instance
    */
   protected void init() {
+    getDefinedTypehandlers().add(0, new IdTypeHandler(this));
+
     definedTypeHandlers.add(new FloatTypeHandler(this));
     definedTypeHandlers.add(new DateTypeHandler(this));
     definedTypeHandlers.add(new ShortTypeHandler(this));

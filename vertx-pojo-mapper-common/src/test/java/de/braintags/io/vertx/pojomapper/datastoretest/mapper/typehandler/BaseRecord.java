@@ -21,7 +21,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 @Entity
 public class BaseRecord {
   @Id
-  public long id;
+  public String id;
 
   @Override
   public boolean equals(Object ob) {

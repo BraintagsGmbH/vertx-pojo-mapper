@@ -20,7 +20,7 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.Mapper;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 
 /**
- * 
+ * An extension of {@link Mapper} for use with Mongo
  *
  * @author Michael Remme
  * 
@@ -34,6 +34,7 @@ public class MongoMapper extends Mapper {
    */
   public MongoMapper(Class<?> mapperClass, MapperFactory mapperFactory) {
     super(mapperClass, mapperFactory);
+    checkIdField();
   }
 
   /*
@@ -45,6 +46,17 @@ public class MongoMapper extends Mapper {
   @Override
   protected MappedField createMappedField(Field field, IPropertyAccessor accessor) {
     return new MongoMappedField(field, accessor, this);
+  }
+
+  /**
+   * Currently the id field for mongo must be character
+   */
+  @SuppressWarnings("rawtypes")
+  private void checkIdField() {
+    Class idClass = getIdField().getType();
+    if (!CharSequence.class.isAssignableFrom(idClass))
+      throw new UnsupportedOperationException(
+          "Currently the id field must be Character based for mongo driver. Class: " + getMapperClass());
   }
 
 }
