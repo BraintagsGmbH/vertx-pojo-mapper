@@ -32,6 +32,7 @@ public class AllTestsMongo {
   // -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mongo.testNew.MongoDataStoreContainer
   // -DBlockedThreadCheckInterval=1000 -DWarningExceptionTime=1000
   // -Ddb_name=PojongoTestDatabase
+  // -DstartMongoLocal=true
 
   public AllTestsMongo() {
   }

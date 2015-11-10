@@ -41,14 +41,47 @@ import io.vertx.ext.mongo.MongoClient;
 public class MongoDataStoreContainer implements IDatastoreContainer {
   private static final io.vertx.core.logging.Logger logger = io.vertx.core.logging.LoggerFactory
       .getLogger(MongoDataStoreContainer.class);
+
+  private static final int LOCAL_PORT = 27018;
+  private static final String START_MONGO_LOCAL_PROP = "startMongoLocal";
+  public static final String CONNECTION_STRING_PROPERTY = "connection_string";
+  public static final String DEFAULT_CONNECTION = "mongodb://localhost:27017";
+
+  private static boolean startMongoLocal = true;
+
   private static MongodExecutable exe;
   private static MongoClient mongoClient;
   private MongoDataStore mongoDataStore;
 
-  /**
+  /*
+   * (non-Javadoc)
    * 
+   * @see de.braintags.io.vertx.pojomapper.datastoretest.IDatastoreContainer#startup(io.vertx.core.Vertx,
+   * io.vertx.core.Handler)
    */
-  public MongoDataStoreContainer() {
+  @Override
+  public void startup(Vertx vertx, Handler<AsyncResult<Void>> handler) {
+    checkMongoLocal();
+    startMongoExe();
+    try {
+      if (mongoDataStore == null) {
+        logger.info("starting mongo datastore");
+        initMongoClient(vertx, initResult -> {
+          if (initResult.failed()) {
+            logger.error("could not start mongo client", initResult.cause());
+            handler.handle(Future.failedFuture(new InitException(initResult.cause())));
+            return;
+          }
+          mongoDataStore = new MongoDataStore(mongoClient, getDatabaseName());
+          handler.handle(Future.succeededFuture());
+          return;
+        });
+      } else {
+        handler.handle(Future.succeededFuture());
+      }
+    } catch (Exception e) {
+      handler.handle(Future.failedFuture(e));
+    }
   }
 
   /*
@@ -92,56 +125,6 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
     });
   }
 
-  /**
-   * Creates a config file for a mongo db
-   * 
-   * @return the prepared config file with the connection string and the database name to be used
-   */
-  protected static JsonObject getConfig() {
-    JsonObject config = new JsonObject();
-    String connectionString = getConnectionString();
-    if (connectionString != null) {
-      config.put("connection_string", connectionString);
-    } else {
-      config.put("connection_string", "mongodb://localhost:27018");
-    }
-    String databaseName = getDatabaseName();
-    if (databaseName != null) {
-      config.put("db_name", databaseName);
-    } else
-      throw new InitException("property db_name is undefined");
-    return config;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.datastoretest.IDatastoreContainer#startup(io.vertx.core.Vertx,
-   * io.vertx.core.Handler)
-   */
-  @Override
-  public void startup(Vertx vertx, Handler<AsyncResult<Void>> handler) {
-    try {
-      if (mongoDataStore == null) {
-        logger.info("starting mongo datastore");
-        initMongoClient(vertx, initResult -> {
-          if (initResult.failed()) {
-            logger.error("could not start mongo client", initResult.cause());
-            handler.handle(Future.failedFuture(new InitException(initResult.cause())));
-            return;
-          }
-          mongoDataStore = new MongoDataStore(mongoClient, getDatabaseName());
-          handler.handle(Future.succeededFuture());
-          return;
-        });
-      } else {
-        handler.handle(Future.succeededFuture());
-      }
-    } catch (Exception e) {
-      handler.handle(Future.failedFuture(e));
-    }
-  }
-
   /*
    * (non-Javadoc)
    * 
@@ -153,6 +136,9 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
     mongoClient.close();
     mongoClient = null;
     mongoDataStore = null;
+    if (exe != null) {
+      exe.stop();
+    }
 
     handler.handle(Future.succeededFuture());
   }
@@ -177,12 +163,37 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   }
 
   /**
+   * Creates a config file for a mongo db
+   * 
+   * @return the prepared config file with the connection string and the database name to be used
+   */
+  protected static JsonObject getConfig() {
+    JsonObject config = new JsonObject();
+    config.put("connection_string", getConnectionString());
+    config.put("db_name", getDatabaseName());
+    return config;
+  }
+
+  /**
+   * returns true if a local instance of Mongo shall be started
+   * 
+   * @return
+   */
+  protected static void checkMongoLocal() {
+    startMongoLocal = Boolean.parseBoolean(System.getProperty(START_MONGO_LOCAL_PROP, "false"));
+  }
+
+  /**
    * Get the connection String for the mongo db
    * 
    * @return
    */
   protected static String getConnectionString() {
-    return getProperty("connection_string", "mongodb://localhost:27017");
+    if (startMongoLocal) {
+      return "mongodb://localhost:" + LOCAL_PORT;
+    } else {
+      return getProperty(CONNECTION_STRING_PROPERTY, DEFAULT_CONNECTION);
+    }
   }
 
   /**
@@ -212,26 +223,17 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
     return defaultValue;
   }
 
-  public static void startMongo() {
+  public static void startMongoExe() {
     logger.info("STARTING MONGO");
-    if (getConnectionString() == null) {
+    if (startMongoLocal) {
       try {
         IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
-            .net(new Net(27018, Network.localhostIsIPv6())).build();
+            .net(new Net(LOCAL_PORT, Network.localhostIsIPv6())).build();
         exe = MongodStarter.getDefaultInstance().prepare(config);
         exe.start();
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-    }
-  }
-
-  public static void stopMongo() {
-    logger.info("STOPPING MONGO");
-    if (mongoClient != null)
-      mongoClient.close();
-    if (exe != null) {
-      exe.stop();
     }
   }
 

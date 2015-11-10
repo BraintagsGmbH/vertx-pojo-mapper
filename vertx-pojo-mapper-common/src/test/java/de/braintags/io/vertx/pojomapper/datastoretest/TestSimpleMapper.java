@@ -164,7 +164,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
     IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
     query.and("name").is("AndOr").field("secondProperty").is("AndOr 1").or("secondProperty").is("AndOr 2");
 
-    ResultContainer resultContainer = find(query, 2);
+    ResultContainer resultContainer = find(query, -1);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
   }

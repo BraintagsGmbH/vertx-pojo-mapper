@@ -23,6 +23,7 @@
   <properties>
     <doc.skip>false</doc.skip>
     <maven.test.skip>false</maven.test.skip>
+	<testjar.skip>false</testjar.skip>
   </properties>
 
 </project>

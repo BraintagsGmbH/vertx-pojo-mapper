@@ -14,13 +14,13 @@
 	<parent>
 		<groupId>de.braintags</groupId>
 		<artifactId>btVertxBasePOM</artifactId>
-		<version>7-SNAPSHOT</version>
+		<version>8-SNAPSHOT</version>
 	</parent>
 
 	<modules>
 		<module>vertx-pojo-mapper-common</module>
 		<module>vertx-pojo-mapper-json</module>
-		<module>vertx-pojongo</module>
+		<!--<module>vertx-pojongo</module>-->
 		<module>vertx-pojo-mapper-mysql</module>
 	</modules>
 

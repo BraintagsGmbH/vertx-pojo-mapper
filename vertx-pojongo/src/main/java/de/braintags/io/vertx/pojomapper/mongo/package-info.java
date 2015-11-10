@@ -26,9 +26,4 @@
  * 
  */
 
-@Document(fileName = "index.adoc")
-@ModuleGen(name = "vertx-pojongo", groupPackage = "de.braintags.io.vertx.pojomapper.mongo")
 package de.braintags.io.vertx.pojomapper.mongo;
-
-import io.vertx.codegen.annotations.ModuleGen;
-import io.vertx.docgen.Document;

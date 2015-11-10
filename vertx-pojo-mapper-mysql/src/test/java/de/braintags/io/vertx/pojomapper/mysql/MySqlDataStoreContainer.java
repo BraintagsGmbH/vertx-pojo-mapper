@@ -46,13 +46,13 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   @Override
   public void startup(Vertx vertx, Handler<AsyncResult<Void>> handler) {
     try {
-      String username = System.getProperty("username");
+      String username = System.getProperty("MySqlDataStoreContainer.username");
       if (username == null) {
-        throw new ParameterRequiredException("you must set the property 'username'");
+        throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.username'");
       }
-      String password = System.getProperty("password");
+      String password = System.getProperty("MySqlDataStoreContainer.password");
       if (password == null) {
-        throw new ParameterRequiredException("you must set the property 'password'");
+        throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.password'");
       }
 
       String database = "test";
