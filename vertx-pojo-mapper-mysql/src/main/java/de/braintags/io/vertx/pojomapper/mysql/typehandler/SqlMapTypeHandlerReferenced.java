@@ -12,7 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
-import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
@@ -26,12 +26,12 @@ import io.vertx.core.json.JsonArray;
  * 
  */
 
-public class SqlArrayTypehandler extends ArrayTypeHandler {
+public class SqlMapTypeHandlerReferenced extends MapTypeHandlerReferenced {
 
   /**
    * @param typeHandlerFactory
    */
-  public SqlArrayTypehandler(ITypeHandlerFactory typeHandlerFactory) {
+  public SqlMapTypeHandlerReferenced(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory);
   }
 

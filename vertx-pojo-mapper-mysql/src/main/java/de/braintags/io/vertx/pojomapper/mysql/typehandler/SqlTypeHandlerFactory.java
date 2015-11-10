@@ -13,13 +13,25 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
+import java.lang.annotation.Annotation;
+
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandlerEmbedded;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ByteTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CalendarTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandlerEmbedded;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.IdTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerEmbedded;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerReferenced;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 /**
@@ -30,6 +42,9 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
  */
 
 public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
+  private final ITypeHandler defaultHandler = new ObjectTypeHandler(this);
+  private final ITypeHandler defaultHandleEmbedded = new SqlObjectTypehandlerEmbedded(this);
+  private final ITypeHandler defaultHandlerReferenced = new SqlObjectTypehandlerReferenced(this);
   private JsonTypeHandlerFactory jsonFactory = new JsonTypeHandlerFactory();
 
   /*
@@ -57,6 +72,24 @@ public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
 
     remove(ArrayTypeHandler.class);
     getDefinedTypehandlers().add(new SqlArrayTypehandler(this));
+    remove(ArrayTypeHandlerEmbedded.class);
+    getDefinedTypehandlers().add(new SqlArrayTypeHandlerEmbedded(this));
+    remove(ArrayTypeHandlerReferenced.class);
+    getDefinedTypehandlers().add(new SqlArrayTypeHandlerReferenced(this));
+
+    remove(MapTypeHandler.class);
+    getDefinedTypehandlers().add(new SqlMapTypeHandler(this));
+    remove(MapTypeHandlerEmbedded.class);
+    getDefinedTypehandlers().add(new SqlMapTypeHandlerEmbedded(this));
+    remove(MapTypeHandlerReferenced.class);
+    getDefinedTypehandlers().add(new SqlMapTypeHandlerReferenced(this));
+
+    remove(CollectionTypeHandler.class);
+    getDefinedTypehandlers().add(new SqlCollectionTypeHandler(this));
+    remove(CollectionTypeHandlerEmbedded.class);
+    getDefinedTypehandlers().add(new SqlCollectionTypeHandlerEmbedded(this));
+    remove(CollectionTypeHandlerReferenced.class);
+    getDefinedTypehandlers().add(new SqlCollectionTypeHandlerReferenced(this));
 
   }
 
@@ -69,6 +102,20 @@ public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
    */
   public ITypeHandlerFactory getSubFactory() {
     return jsonFactory;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory#getDefaultTypeHandler(java.lang.annotation
+   * .Annotation)
+   */
+  @Override
+  public ITypeHandler getDefaultTypeHandler(Annotation embedRef) {
+    if (embedRef == null)
+      return defaultHandler;
+    return embedRef instanceof Embedded ? defaultHandleEmbedded : defaultHandlerReferenced;
   }
 
 }

@@ -12,13 +12,13 @@
  */
 package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
-import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 /**
  * 
@@ -26,26 +26,27 @@ import io.vertx.core.json.JsonArray;
  * 
  */
 
-public class SqlArrayTypehandler extends ArrayTypeHandler {
+public class SqlObjectTypehandlerReferenced extends ObjectTypeHandlerReferenced {
 
   /**
    * @param typeHandlerFactory
    */
-  public SqlArrayTypehandler(ITypeHandlerFactory typeHandlerFactory) {
+  public SqlObjectTypehandlerReferenced(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler#fromStore(java.lang.Object,
+   * @see
+   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerEmbedded#fromStore(java.lang.Object,
    * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void fromStore(Object dbValue, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     try {
-      JsonArray sourceArray = new JsonArray((String) source);
-      super.fromStore(sourceArray, field, cls, handler);
+      JsonObject jsonObject = new JsonObject((String) dbValue);
+      super.fromStore(dbValue, field, cls, handler);
     } catch (Exception e) {
       fail(e, handler);
     }
@@ -54,20 +55,21 @@ public class SqlArrayTypehandler extends ArrayTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler#intoStore(java.lang.Object,
+   * @see
+   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerEmbedded#intoStore(java.lang.Object,
    * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public void intoStore(Object javaValues, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    super.intoStore(javaValues, field, result -> {
+  public void intoStore(Object embeddedObject, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+    super.intoStore(embeddedObject, field, result -> {
       if (result.failed()) {
         handler.handle(result);
-        return;
       }
-      JsonArray resultArray = (JsonArray) result.result().getResult();
+
       try {
-        String arrayString = resultArray.encode();
-        success(arrayString, handler);
+        JsonObject json = (JsonObject) result.result().getResult();
+        String newResult = json.encode();
+        success(newResult, handler);
       } catch (Exception e) {
         fail(e, handler);
       }
