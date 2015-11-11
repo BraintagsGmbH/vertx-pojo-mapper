@@ -23,9 +23,11 @@ import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ObjectReference;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -38,7 +40,7 @@ import io.vertx.core.Handler;
  * 
  */
 
-public class ObjectTypeHandlerReferenced extends ObjectTypeHandler {
+public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements ITypeHandlerReferenced {
 
   /**
    * @param typeHandlerFactory
@@ -71,7 +73,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler {
       fail(new NullPointerException("undefined mapper class"), resultHandler);
       return;
     }
-    ObjectReference objectReference = new ObjectReference(field, id, mapperClass);
+    ObjectReference objectReference = new ObjectReference(field, id);
     success(objectReference, resultHandler);
 
     // IMapperFactory mf = field.getMapper().getMapperFactory();
@@ -79,6 +81,12 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler {
     // IDataStore store = mf.getDataStore();
 
     // getReferencedObjectById(store, subMapper, id, resultHandler);
+  }
+
+  @Override
+  public void resolveReferencedObjectById(IDataStore store, IObjectReference reference,
+      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
   }
 
   private void getReferencedObjectById(IDataStore store, IMapper subMapper, Object id,
