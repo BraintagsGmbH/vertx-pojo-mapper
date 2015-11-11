@@ -17,8 +17,11 @@ import java.lang.annotation.Annotation;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ObjectReference;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
@@ -76,7 +79,35 @@ public class MapTypeHandlerReferenced extends MapTypeHandler implements ITypeHan
   @Override
   public void resolveReferencedObject(IDataStore store, IObjectReference reference,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    super.fromStore(reference.getDbSource(), reference.getField(), null, resultHandler);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler#convertValueFromStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
+   */
+  @Override
+  protected void convertValueFromStore(Object valueIn, IField field, Handler<AsyncResult<Object>> resultHandler) {
+    ITypeHandler subHandler = field.getSubTypeHandler();
+    if (subHandler instanceof ObjectTypeHandlerReferenced) {
+      IDataStore store = field.getMapper().getMapperFactory().getDataStore();
+      IMapperFactory mf = store.getMapperFactory();
+      IMapper subMapper = mf.getMapper(field.getSubClass());
+      ((ObjectTypeHandlerReferenced) subHandler).getReferencedObjectById(store, subMapper, valueIn, tmpResult -> {
+        if (tmpResult.failed()) {
+          resultHandler.handle(Future.failedFuture(tmpResult.cause()));
+          return;
+        }
+        Object javaValue = tmpResult.result().getResult();
+        resultHandler.handle(Future.succeededFuture(javaValue));
+      });
+    } else {
+      resultHandler
+          .handle(Future.failedFuture(new UnsupportedOperationException("Need a ObjectTypeHandlerReferenced here! ")));
+    }
   }
 
 }

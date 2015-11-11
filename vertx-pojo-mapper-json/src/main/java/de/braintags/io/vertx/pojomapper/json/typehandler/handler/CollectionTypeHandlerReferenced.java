@@ -13,12 +13,16 @@
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ObjectReference;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
@@ -76,7 +80,38 @@ public class CollectionTypeHandlerReferenced extends CollectionTypeHandler imple
   @Override
   public void resolveReferencedObject(IDataStore store, IObjectReference reference,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    super.fromStore(reference.getDbSource(), reference.getField(), null, resultHandler);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler#handleObjectFromStore(java.lang.
+   * Object, de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler, java.util.Collection,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
+   */
+  @Override
+  protected void handleObjectFromStore(Object o, ITypeHandler subHandler, Collection coll, IField field,
+      Handler<AsyncResult<Void>> resultHandler) {
+    if (subHandler instanceof ObjectTypeHandlerReferenced) {
+      IDataStore store = field.getMapper().getMapperFactory().getDataStore();
+      IMapperFactory mf = store.getMapperFactory();
+      IMapper subMapper = mf.getMapper(field.getSubClass());
+      ((ObjectTypeHandlerReferenced) subHandler).getReferencedObjectById(store, subMapper, o, tmpResult -> {
+        if (tmpResult.failed()) {
+          resultHandler.handle(Future.failedFuture(tmpResult.cause()));
+          return;
+        }
+        Object dest = tmpResult.result().getResult();
+        coll.add(dest);
+        resultHandler.handle(Future.succeededFuture());
+      });
+    } else {
+      resultHandler
+          .handle(Future.failedFuture(new UnsupportedOperationException("Need a ObjectTypeHandlerReferenced here! ")));
+
+    }
   }
 
 }

@@ -71,12 +71,6 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
   public void fromStore(Object id, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     ObjectReference objectReference = new ObjectReference(field, id);
     success(objectReference, resultHandler);
-
-    // IMapperFactory mf = field.getMapper().getMapperFactory();
-    // IMapper subMapper = mf.getMapper(mapperClass);
-    // IDataStore store = mf.getDataStore();
-
-    // getReferencedObjectById(store, subMapper, id, resultHandler);
   }
 
   @Override
@@ -92,7 +86,16 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
     getReferencedObjectById(store, subMapper, reference.getDbSource(), resultHandler);
   }
 
-  private void getReferencedObjectById(IDataStore store, IMapper subMapper, Object id,
+  /**
+   * Loads an instance from teh datastore by the referenced ID
+   * 
+   * @param store
+   *          the {@link IDataStore} to be used
+   * @param subMapper
+   * @param id
+   * @param resultHandler
+   */
+  public void getReferencedObjectById(IDataStore store, IMapper subMapper, Object id,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     IQuery<?> query = (IQuery<?>) store.createQuery(subMapper.getMapperClass()).field(subMapper.getIdField().getName())
         .is(id);

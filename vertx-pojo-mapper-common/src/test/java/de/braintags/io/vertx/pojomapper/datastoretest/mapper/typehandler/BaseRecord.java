@@ -111,15 +111,9 @@ public class BaseRecord {
 
   @SuppressWarnings("rawtypes")
   private boolean compareCollections(Collection coll1, Collection coll2, String fieldName) {
-    if (coll1 == null && coll2 == null)
-      return true;
-    if (coll1.size() != coll2.size())
-      throw new MappingException(
-          "Contents are not equal, unequal length: " + fieldName + ": " + coll1.size() + " / " + coll2.size());
-    Object[] arr1 = coll1.toArray();
-    Object[] arr2 = coll2.toArray();
-    for (int i = 0; i < arr1.length; i++) {
-      equalValues(arr1[i], arr2[i], fieldName);
+    for (Object o : coll1) {
+      if (!coll2.contains(o))
+        return false;
     }
     return true;
   }

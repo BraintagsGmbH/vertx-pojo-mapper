@@ -13,19 +13,25 @@
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ObjectReference;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import de.braintags.io.vertx.util.CounterObject;
+import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
 
 /**
  * An implementation of {@link ITypeHandler} which handles Arrays which are annotated to be {@link Referenced}
@@ -76,8 +82,35 @@ public class ArrayTypeHandlerReferenced extends ArrayTypeHandler implements ITyp
 
   @Override
   public void resolveReferencedObject(IDataStore store, IObjectReference reference,
-      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+      Handler<AsyncResult<ITypeHandlerResult>> handler) {
+    IMapperFactory mf = store.getMapperFactory();
+    IField field = reference.getField();
+    IMapper subMapper = mf.getMapper(field.getSubClass());
+    JsonArray jsonArray = (JsonArray) reference.getDbSource();
+    if (jsonArray == null || jsonArray.isEmpty())
+      handler.handle(Future.succeededFuture());
+    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(handler);
+    CounterObject co = new CounterObject(jsonArray.size());
+    final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
+    int counter = 0;
+    for (Object jo : jsonArray) {
+      CurrentCounter cc = new CurrentCounter(counter++, jo);
+      ObjectTypeHandlerReferenced subTypehandler = (ObjectTypeHandlerReferenced) field.getSubTypeHandler();
+      subTypehandler.getReferencedObjectById(store, subMapper, jo, result -> {
+        if (result.failed()) {
+          errorObject.setThrowable(result.cause());
+          return;
+        }
+        Object javaValue = result.result().getResult();
+        if (javaValue != null) {
+          Array.set(resultArray, cc.i, javaValue);
+        }
+        if (co.reduce()) {
+          success(resultArray, handler);
+        }
+      });
+
+    }
   }
 
 }

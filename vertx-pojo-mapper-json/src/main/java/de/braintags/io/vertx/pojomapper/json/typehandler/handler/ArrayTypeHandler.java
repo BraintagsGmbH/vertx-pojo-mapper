@@ -88,18 +88,17 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
       subTypehandler.fromStore(cc.value, field, field.getSubClass(), result -> {
         if (result.failed()) {
           errorObject.setThrowable(result.cause());
-        } else {
-          Object javaValue = result.result().getResult();
-          if (javaValue != null)
-            Array.set(resultArray, cc.i, javaValue);
-          if (co.reduce()) {
-            success(resultArray, handler);
-          }
+          return;
         }
+        Object javaValue = result.result().getResult();
+        if (javaValue != null)
+          Array.set(resultArray, cc.i, javaValue);
+        if (co.reduce()) {
+          success(resultArray, handler);
+        }
+
       });
     }
-    if (errorObject.isError())
-      return;
   }
 
   /*

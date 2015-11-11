@@ -97,8 +97,22 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
     }
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  private void handleObjectFromStore(Object o, ITypeHandler subHandler, Collection coll, IField field,
+  /**
+   * Create one instance of the {@link Collection} and add it into the Collection
+   * 
+   * @param o
+   *          the object from the store
+   * @param subHandler
+   *          the subhandler to be used
+   * @param coll
+   *          the collection to be filled
+   * @param field
+   *          the field, where the Collection stays in
+   * @param resultHandler
+   *          the handler to be informed
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected void handleObjectFromStore(Object o, ITypeHandler subHandler, Collection coll, IField field,
       Handler<AsyncResult<Void>> resultHandler) {
     if (subHandler != null) {
       subHandler.fromStore(o, field, field.getSubClass(), tmpResult -> {
