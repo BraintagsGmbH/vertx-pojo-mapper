@@ -23,6 +23,7 @@ import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ObjectReference;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -68,11 +69,6 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    */
   @Override
   public void fromStore(Object id, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    Class<?> mapperClass = cls != null ? cls : field.getType();
-    if (mapperClass == null) {
-      fail(new NullPointerException("undefined mapper class"), resultHandler);
-      return;
-    }
     ObjectReference objectReference = new ObjectReference(field, id);
     success(objectReference, resultHandler);
 
@@ -84,9 +80,16 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
   }
 
   @Override
-  public void resolveReferencedObjectById(IDataStore store, IObjectReference reference,
+  public void resolveReferencedObject(IDataStore store, IObjectReference reference,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    Class<?> mapperClass = reference.getField().getType();
+    if (mapperClass == null) {
+      fail(new NullPointerException("undefined mapper class"), resultHandler);
+      return;
+    }
+    IMapperFactory mf = store.getMapperFactory();
+    IMapper subMapper = mf.getMapper(mapperClass);
+    getReferencedObjectById(store, subMapper, reference.getDbSource(), resultHandler);
   }
 
   private void getReferencedObjectById(IDataStore store, IMapper subMapper, Object id,

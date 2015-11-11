@@ -16,6 +16,7 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.mapping.IEmbeddedMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import io.vertx.core.AsyncResult;
@@ -114,6 +115,11 @@ public class JsonEmbeddedMapper extends AbstractSubobjectMapper implements IEmbe
         handler.handle(Future.succeededFuture(jo));
       }
     });
+  }
+
+  @Override
+  public void fromObjectReference(Object entity, IObjectReference reference, Handler<AsyncResult<Void>> handler) {
+    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
   }
 
 }

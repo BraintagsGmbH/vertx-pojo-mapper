@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -163,7 +162,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
           return;
         }
         if (co.reduce()) {
-          LOGGER.debug("counter finished");
+          LOGGER.debug("field counter finished");
           handler.handle(Future.succeededFuture());
         }
       });
@@ -175,14 +174,14 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
       handler.handle(Future.succeededFuture());
       return;
     }
-    IDataStore store = getMapper().getMapperFactory().getDataStore();
     ErrorObject<Void> error = new ErrorObject<Void>(handler);
     Collection<IObjectReference> refs = getObjectReferences();
     CounterObject co = new CounterObject(refs.size());
     for (IObjectReference ref : refs) {
-      ref.resolveObject(store, tmpObject, orResult -> {
-        if (orResult.failed()) {
-          error.setThrowable(orResult.cause());
+      LOGGER.debug("handling object reference " + ref.getField().getFullName());
+      ref.getField().getPropertyMapper().fromObjectReference(tmpObject, ref, result -> {
+        if (result.failed()) {
+          error.setThrowable(result.cause());
           return;
         }
         if (co.reduce()) {
@@ -190,6 +189,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
           handler.handle(Future.succeededFuture());
         }
       });
+
     }
   }
 

@@ -90,4 +90,9 @@ public class JsonReferencedMapper extends AbstractSubobjectMapper implements IRe
     });
 
   }
+
+  @Override
+  public void fromObjectReference(Object entity, IObjectReference reference, Handler<AsyncResult<Void>> handler) {
+    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+  }
 }

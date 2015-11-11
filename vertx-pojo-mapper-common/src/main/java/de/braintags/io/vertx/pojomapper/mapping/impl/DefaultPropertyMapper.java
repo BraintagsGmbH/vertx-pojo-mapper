@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
@@ -19,6 +20,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerReferenced;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -135,5 +137,25 @@ public class DefaultPropertyMapper implements IPropertyMapper {
       handler.handle(Future.failedFuture(e));
     }
 
+  }
+
+  @Override
+  public void fromObjectReference(Object entity, IObjectReference reference, Handler<AsyncResult<Void>> handler) {
+    IDataStore store = reference.getField().getMapper().getMapperFactory().getDataStore();
+    ITypeHandlerReferenced th = (ITypeHandlerReferenced) reference.getField().getTypeHandler();
+    Object dbValue = reference.getDbSource();
+    IField field = reference.getField();
+    if (dbValue == null) { // nothing to work with? Must null be set?
+      handler.handle(Future.succeededFuture());
+    } else {
+      th.resolveReferencedObject(store, reference, result -> {
+        if (result.failed()) {
+          handler.handle(Future.failedFuture(result.cause()));
+          return;
+        }
+        Object javaValue = result.result().getResult();
+        handleInstanceFromStore(null, entity, javaValue, dbValue, field, handler);
+      });
+    }
   }
 }

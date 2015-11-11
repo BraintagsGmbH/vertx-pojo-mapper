@@ -74,7 +74,7 @@ public class CollectionTypeHandlerReferenced extends CollectionTypeHandler imple
   }
 
   @Override
-  public void resolveReferencedObjectById(IDataStore store, IObjectReference reference,
+  public void resolveReferencedObject(IDataStore store, IObjectReference reference,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
   }

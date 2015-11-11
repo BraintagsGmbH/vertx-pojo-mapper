@@ -39,7 +39,7 @@ public class ReferenceMapper_Single extends BaseRecord {
   @Override
   public boolean equals(Object o) {
     ReferenceMapper_Single om = (ReferenceMapper_Single) o;
-    boolean equal = om.id == id;
+    boolean equal = compareId(om.id, id);
     boolean equal2 = (om.simpleMapper == null && simpleMapper == null)
         || (om.simpleMapper != null && simpleMapper != null && simpleMapper.equals(om.simpleMapper));
     return equal && equal2;

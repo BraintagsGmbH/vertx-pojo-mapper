@@ -38,7 +38,7 @@ public interface ITypeHandlerReferenced extends ITypeHandler {
    * @param resultHandler
    *          the handler to be informed
    */
-  void resolveReferencedObjectById(IDataStore store, IObjectReference reference,
+  void resolveReferencedObject(IDataStore store, IObjectReference reference,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler);
 
 }

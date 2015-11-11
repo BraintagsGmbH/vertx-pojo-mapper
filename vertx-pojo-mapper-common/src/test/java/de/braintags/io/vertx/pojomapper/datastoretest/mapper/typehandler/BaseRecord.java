@@ -48,7 +48,17 @@ public class BaseRecord {
     } catch (Exception e) {
       throw new RuntimeException("Error in field " + field.getName(), e);
     }
+  }
 
+  public boolean compareId(Object id, Object compareId) {
+    boolean idEqual = false;
+    if (compareId == null && id == null)
+      idEqual = true;
+    else if (compareId == null || id == null)
+      idEqual = false;
+    else
+      idEqual = id.equals(compareId);
+    return idEqual;
   }
 
   @SuppressWarnings({ "unused", "rawtypes" })

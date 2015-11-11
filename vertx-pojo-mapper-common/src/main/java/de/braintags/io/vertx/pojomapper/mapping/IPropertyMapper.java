@@ -13,6 +13,7 @@
 package de.braintags.io.vertx.pojomapper.mapping;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -49,7 +50,7 @@ public interface IPropertyMapper {
   void intoStoreObject(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler);
 
   /**
-   * This method reads the field value of the entity and converts the value into s suitable format for the datastore
+   * This method reads the field value of the entity and converts the value into a suitable format for the datastore
    * 
    * @param entity
    *          the entity to read the value from
@@ -61,7 +62,8 @@ public interface IPropertyMapper {
   void readForStore(Object entity, IField field, Handler<AsyncResult<Object>> handler);
 
   /**
-   * fetch the content from the {@link IStoreObject} and store it inside the mapper
+   * This method fetches the content for the given field from the {@link IStoreObject}, changes it into the propriate
+   * value ( normally by using an {@link ITypeHandler} ) and stores this value inside the entity into the given field
    * 
    * @param entity
    *          the mapper to be handled
@@ -74,4 +76,16 @@ public interface IPropertyMapper {
    */
   void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler);
 
+  /**
+   * This method resolves the given {@link IObjectReference} into the real value and stores this value inside the
+   * {@link IField} of the given entity
+   * 
+   * @param entity
+   *          the entity to be filled
+   * @param reference
+   *          the {@link IObjectReference}
+   * @param handler
+   *          the handler to be informed
+   */
+  void fromObjectReference(Object entity, IObjectReference reference, Handler<AsyncResult<Void>> handler);
 }

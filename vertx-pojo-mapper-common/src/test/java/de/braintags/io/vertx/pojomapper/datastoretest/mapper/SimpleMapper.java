@@ -13,10 +13,10 @@
 package de.braintags.io.vertx.pojomapper.datastoretest.mapper;
 
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
+import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.BaseRecord;
 
 /**
  * A simple mapper with some beans properties
@@ -26,9 +26,7 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
  */
 
 @Entity
-public class SimpleMapper {
-  @Id
-  public String id;
+public class SimpleMapper extends BaseRecord {
   public String name;
   private String secondProperty;
   public int intValue;
@@ -73,13 +71,7 @@ public class SimpleMapper {
     if (compare == null || o == null)
       return false;
 
-    boolean idEqual = false;
-    if (compare.id == null && id == null)
-      idEqual = true;
-    else if (compare.id != null && id != null)
-      idEqual = true;
-    else
-      idEqual = id.equals(compare.id);
+    boolean idEqual = compareId(compare.id, id);
 
     return o != null && idEqual && compare.name.equals(name) && compare.secondProperty.equals(secondProperty);
   }
