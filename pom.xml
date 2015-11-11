@@ -26,8 +26,8 @@
 
 	<properties>
 		<braintags.pojomapper.version>1.0.1-SNAPSHOT</braintags.pojomapper.version>
-	    <sonar.language>java</sonar.language>
-	    <sonar.host.url>http://sqube.bt-rz.net</sonar.host.url>
+		<sonar.language>java</sonar.language>
+		<sonar.host.url>http://sqube.bt-rz.net</sonar.host.url>
 		<testjar.skip>true</testjar.skip>
 		<doc.skip>true</doc.skip>
 		<maven.test.skip>true</maven.test.skip>

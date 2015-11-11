@@ -16,7 +16,7 @@
   	<dependency>
   		<groupId>de.braintags</groupId>
   		<artifactId>vertx-pojo-mapper-common</artifactId>
-    	<version>${braintags.pojomapper.version}</version>
+		<version>1.0.1-SNAPSHOT</version>
   	</dependency>
   </dependencies>
 

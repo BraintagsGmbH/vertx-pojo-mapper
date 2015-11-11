@@ -22,30 +22,29 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-json</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-common</artifactId>
+			<classifier>tests</classifier>
+			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-json</artifactId>
+			<classifier>tests</classifier>
+			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mysql-postgresql-client</artifactId>
 			<version>${mysql_version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-pojo-mapper-json</artifactId>
-			<version>${braintags.pojomapper.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-pojo-mapper-common</artifactId>
-			<version>${braintags.pojomapper.version}</version>
-			<classifier>tests</classifier>
-		</dependency>
-
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-pojo-mapper-json</artifactId>
-			<version>${braintags.pojomapper.version}</version>
-			<classifier>tests</classifier>
-		</dependency>
 	</dependencies>
 	
 	<build>
