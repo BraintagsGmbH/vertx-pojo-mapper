@@ -13,6 +13,7 @@
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
@@ -28,15 +29,22 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.MongoClient;
 
 /**
+ * An implementation of {@link IWrite} for Mongo
+ * 
  * @author Michael Remme
  * @param <T>
+ *          the type of the underlaying mapper
  */
-
 public class MongoWrite<T> extends AbstractWrite<T> {
   private static Logger LOG = LoggerFactory.getLogger(MongoWrite.class);
 
   /**
+   * Constructor
    * 
+   * @param mapperClass
+   *          the mapper class
+   * @param datastore
+   *          the datastore to be used
    */
   public MongoWrite(final Class<T> mapperClass, MongoDataStore datastore) {
     super(mapperClass, datastore);

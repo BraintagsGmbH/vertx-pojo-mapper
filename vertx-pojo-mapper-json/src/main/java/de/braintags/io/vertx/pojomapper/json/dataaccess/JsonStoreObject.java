@@ -46,7 +46,12 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   private Collection<IObjectReference> objectReferences = new ArrayList<IObjectReference>();
 
   /**
+   * Constructor
    * 
+   * @param mapper
+   *          the {@link IMapper} to be used
+   * @param entity
+   *          the entity to be used
    */
   public JsonStoreObject(IMapper mapper, Object entity) {
     if (mapper == null)
@@ -57,7 +62,12 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   }
 
   /**
+   * Constructor
    * 
+   * @param jsonObject
+   *          the {@link JsonObject} read from the datastore
+   * @param mapper
+   *          the mapper to be used
    */
   public JsonStoreObject(JsonObject jsonObject, IMapper mapper) {
     if (mapper == null)

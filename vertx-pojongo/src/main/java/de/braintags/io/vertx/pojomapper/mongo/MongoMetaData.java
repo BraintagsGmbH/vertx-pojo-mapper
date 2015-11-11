@@ -41,7 +41,10 @@ public class MongoMetaData implements IDataStoreMetaData {
   private JsonObject buildInfo;
 
   /**
+   * Constructor
    * 
+   * @param client
+   *          the {@link MongoClient} to be used
    */
   public MongoMetaData(MongoClient client) {
     this.client = client;

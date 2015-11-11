@@ -14,6 +14,7 @@ package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryResult;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
@@ -23,12 +24,12 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 
 /**
- * 
+ * An implementation of {@link IQueryResult} for Mongo
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the type of the underlaying mapper
  */
-
 public class MongoQueryResult<T> extends AbstractQueryResult<T> {
   /**
    * Contains the original result from mongo

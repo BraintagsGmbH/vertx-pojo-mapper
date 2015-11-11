@@ -64,7 +64,7 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
   private final List<ITypeHandler> definedTypeHandlers = new ArrayList<ITypeHandler>();
 
   /**
-   * 
+   * Constructor calls the init method
    */
   public JsonTypeHandlerFactory() {
     init();

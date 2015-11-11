@@ -22,14 +22,13 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryLogicTransla
  * @author Michael Remme
  * 
  */
-
 public class QueryLogicTranslator implements IQueryLogicTranslator {
 
   /**
    * Translate the {@link QueryOperator} into the String expression fitting for Mongo
    * 
-   * @param op
-   *          the operator
+   * @param logic
+   *          the logic operator
    * @return the suitable expression
    */
   @Override

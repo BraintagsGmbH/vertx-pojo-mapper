@@ -29,7 +29,6 @@ import io.vertx.core.Handler;
  * @author Michael Remme
  * 
  */
-
 public class ObjectTypeHandler extends AbstractTypeHandler {
 
   /**

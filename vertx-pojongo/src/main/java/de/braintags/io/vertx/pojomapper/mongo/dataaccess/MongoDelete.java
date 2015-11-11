@@ -14,6 +14,7 @@
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.DeleteResult;
@@ -25,17 +26,21 @@ import io.vertx.core.Handler;
 import io.vertx.ext.mongo.MongoClient;
 
 /**
- * 
+ * An implementation of {@link IDelete} for Mongo
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the type of the underlaying mapper
  */
-
 public class MongoDelete<T> extends Delete<T> {
 
   /**
+   * Constructor
+   * 
    * @param mapperClass
+   *          the mapper class
    * @param datastore
+   *          the datastore to be used
    */
   public MongoDelete(Class<T> mapperClass, IDataStore datastore) {
     super(mapperClass, datastore);

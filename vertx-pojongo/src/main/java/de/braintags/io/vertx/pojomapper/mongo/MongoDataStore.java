@@ -39,7 +39,12 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
   private MongoMetaData metaData;
 
   /**
+   * Constructor using the given {@link MongoClient}
    * 
+   * @param client
+   *          the {@link MongoClient} to be used
+   * @param database
+   *          the name of the database
    */
   public MongoDataStore(MongoClient client, String database) {
     super(database);

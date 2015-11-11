@@ -12,9 +12,9 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
-import io.vertx.core.json.JsonObject;
 import de.braintags.io.vertx.pojomapper.json.dataaccess.JsonStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import io.vertx.core.json.JsonObject;
 
 /**
  * 
@@ -25,6 +25,11 @@ public class MongoStoreObject extends JsonStoreObject {
 
   /**
    * Creates a new instance, where the internal container is filled from the contents of the given entity
+   * 
+   * @param mapper
+   *          the mapper to be used
+   * @param entity
+   *          the entity
    */
   public MongoStoreObject(IMapper mapper, Object entity) {
     super(mapper, entity);
@@ -32,6 +37,11 @@ public class MongoStoreObject extends JsonStoreObject {
 
   /**
    * Creates a new instance, where the internal container is filled from the contents of the given entity
+   * 
+   * @param json
+   *          the json object coming from the datastore
+   * @param mapper
+   *          the mapper to be used
    */
   public MongoStoreObject(JsonObject json, IMapper mapper) {
     super(json, mapper);

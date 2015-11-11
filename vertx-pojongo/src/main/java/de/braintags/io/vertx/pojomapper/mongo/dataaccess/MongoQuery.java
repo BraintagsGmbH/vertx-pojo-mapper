@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
@@ -28,17 +29,21 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
 
 /**
- * 
+ * An implementation of {@link IQuery} for Mongo
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the type of the underlaying mapper
  */
-
 public class MongoQuery<T> extends Query<T> {
 
   /**
+   * Constructor
+   * 
    * @param mapperClass
+   *          the mapper class
    * @param datastore
+   *          the datastore to be used
    */
   public MongoQuery(Class<T> mapperClass, IDataStore datastore) {
     super(mapperClass, datastore);
