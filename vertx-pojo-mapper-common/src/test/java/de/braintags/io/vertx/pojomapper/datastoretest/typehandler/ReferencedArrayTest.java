@@ -12,13 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest.typehandler;
 
-import org.junit.Test;
-
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.ReferenceMapper_Array;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
  * Tests for testing embedded Arrays
@@ -27,15 +22,6 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  * 
  */
 public class ReferencedArrayTest extends AbstractTypeHandlerTest {
-
-  @Test
-  public void testTypeHandler() {
-    BaseRecord record = createInstance();
-    IMapper mapper = getDataStore().getMapperFactory().getMapper(record.getClass());
-    IField field = mapper.getField("simpleMapper");
-    ITypeHandler th = field.getTypeHandler();
-    assertNotNull(th);
-  }
 
   /*
    * (non-Javadoc)
@@ -46,6 +32,16 @@ public class ReferencedArrayTest extends AbstractTypeHandlerTest {
   public BaseRecord createInstance() {
     BaseRecord mapper = new ReferenceMapper_Array();
     return mapper;
+  }
+
+  @Override
+  protected String getTestFieldName() {
+    return "simpleMapper";
+  }
+
+  @Override
+  protected String getExpectedTypeHandlerClassName() {
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandlerReferenced";
   }
 
 }

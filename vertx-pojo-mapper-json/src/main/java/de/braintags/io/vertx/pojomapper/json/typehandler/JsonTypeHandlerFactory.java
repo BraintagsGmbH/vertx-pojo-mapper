@@ -92,7 +92,6 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     definedTypeHandlers.add(new CollectionTypeHandler(this));
     definedTypeHandlers.add(new CollectionTypeHandlerEmbedded(this));
     definedTypeHandlers.add(new CollectionTypeHandlerReferenced(this));
-    // definedTypeHandlers.add(new ObjectReferenceTypeHandler(this)); no more needed?
     definedTypeHandlers.add(new ClassTypeHandler(this));
     definedTypeHandlers.add(new LocaleTypeHandler(this));
     definedTypeHandlers.add(new EnumTypeHandler(this));

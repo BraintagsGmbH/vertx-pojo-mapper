@@ -32,8 +32,17 @@ public class StringTest extends AbstractTypeHandlerTest {
   public BaseRecord createInstance() {
     StringTestMapper mapper = new StringTestMapper();
     mapper.stringField = "testcontent";
-
     return mapper;
+  }
+
+  @Override
+  protected String getTestFieldName() {
+    return "stringField";
+  }
+
+  @Override
+  protected String getExpectedTypeHandlerClassName() {
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.StringTypeHandler";
   }
 
 }

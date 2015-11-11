@@ -36,4 +36,14 @@ public class CalendarTest extends AbstractTypeHandlerTest {
     return mapper;
   }
 
+  @Override
+  protected String getTestFieldName() {
+    return "myCal";
+  }
+
+  @Override
+  protected String getExpectedTypeHandlerClassName() {
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.CalendarTypeHandler";
+  }
+
 }

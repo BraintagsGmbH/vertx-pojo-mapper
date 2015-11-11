@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.mysql;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.datastoretest.IDatastoreContainer;
+import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.AbstractTypeHandlerTest;
 import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -93,6 +94,11 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
       LOGGER.info("Deleted table " + tableName);
       handler.handle(Future.succeededFuture());
     });
+  }
+
+  @Override
+  public String getExpectedTypehandlerName(Class<? extends AbstractTypeHandlerTest> testClass, String defaultName) {
+    return defaultName;
   }
 
 }

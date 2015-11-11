@@ -368,6 +368,10 @@ public class DatastoreBaseTest extends VertxTestBase {
       throw ExceptionUtil.createRuntimeException(e);
     }
 
+    if (expectedResult < 0) {
+      latch.countDown();
+      return;
+    }
     if (expectedResult == 0) {
       try {
         assertFalse(qr.iterator().hasNext());
@@ -376,11 +380,7 @@ public class DatastoreBaseTest extends VertxTestBase {
       }
     } else {
       try {
-        if (expectedResult > 0)
-          assertTrue("expected records: " + expectedResult, qr.iterator().hasNext());
-        else
-          assertFalse(qr.iterator().hasNext());
-
+        assertTrue("expected records: " + expectedResult, qr.iterator().hasNext());
       } catch (Exception e) {
         latch.countDown();
         throw ExceptionUtil.createRuntimeException(e);

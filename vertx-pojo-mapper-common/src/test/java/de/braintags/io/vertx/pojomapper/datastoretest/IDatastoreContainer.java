@@ -14,6 +14,8 @@
 package de.braintags.io.vertx.pojomapper.datastoretest;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.AbstractTypeHandlerTest;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -40,4 +42,16 @@ public interface IDatastoreContainer {
    * @param handler
    */
   public void dropTable(String tablename, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Get the expected ITypeHandler for the given test class. With this method the expected {@link ITypeHandler} can be
+   * overwritten per datastore driver
+   * 
+   * @param testClass
+   *          the class as instance of {@link AbstractTypeHandlerTest} to be tested
+   * @param defaultName
+   *          the default typehandler
+   * @return the expected typehandler class name
+   */
+  public String getExpectedTypehandlerName(Class<? extends AbstractTypeHandlerTest> testClass, String defaultName);
 }

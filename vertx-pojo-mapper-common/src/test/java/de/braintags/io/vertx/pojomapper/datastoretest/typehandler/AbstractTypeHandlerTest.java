@@ -21,7 +21,10 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.datastoretest.ResultContainer;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.BaseRecord;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
  * 
@@ -32,6 +35,22 @@ import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(AbstractTypeHandlerTest.class);
+
+  @Test
+  public final void testTypeHandler() {
+    BaseRecord record = createInstance();
+    IMapper mapper = getDataStore().getMapperFactory().getMapper(record.getClass());
+    IField field = mapper.getField(getTestFieldName());
+    ITypeHandler th = field.getTypeHandler();
+    assertNotNull(th);
+    String typeHandlerName = datastoreContainer.getExpectedTypehandlerName(getClass(),
+        getExpectedTypeHandlerClassName());
+    assertEquals(typeHandlerName, th.getClass().getName());
+  }
+
+  protected abstract String getTestFieldName();
+
+  protected abstract String getExpectedTypeHandlerClassName();
 
   @Test
   public void testSaveAndReadRecord() {

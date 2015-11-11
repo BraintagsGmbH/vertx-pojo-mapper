@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.datastoretest.IDatastoreContainer;
+import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.AbstractTypeHandlerTest;
 import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.flapdoodle.embed.mongo.MongodExecutable;
@@ -235,6 +236,11 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
         throw new RuntimeException(e);
       }
     }
+  }
+
+  @Override
+  public String getExpectedTypehandlerName(Class<? extends AbstractTypeHandlerTest> testClass, String defaultName) {
+    return defaultName;
   }
 
 }

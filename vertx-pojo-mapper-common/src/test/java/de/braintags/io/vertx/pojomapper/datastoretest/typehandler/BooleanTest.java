@@ -36,4 +36,14 @@ public class BooleanTest extends AbstractTypeHandlerTest {
     return mapper;
   }
 
+  @Override
+  protected String getTestFieldName() {
+    return "myBooloean";
+  }
+
+  @Override
+  protected String getExpectedTypeHandlerClassName() {
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler";
+  }
+
 }

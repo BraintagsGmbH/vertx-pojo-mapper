@@ -34,4 +34,14 @@ public class MiscTest extends AbstractTypeHandlerTest {
     return mapper;
   }
 
+  @Override
+  protected String getTestFieldName() {
+    return "myCharacter";
+  }
+
+  @Override
+  protected String getExpectedTypeHandlerClassName() {
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.CharacterTypeHandler";
+  }
+
 }

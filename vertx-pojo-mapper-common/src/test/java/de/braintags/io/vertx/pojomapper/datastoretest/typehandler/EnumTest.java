@@ -39,4 +39,14 @@ public class EnumTest extends AbstractTypeHandlerTest {
     return new EnumRecord();
   }
 
+  @Override
+  protected String getTestFieldName() {
+    return "enumEnum";
+  }
+
+  @Override
+  protected String getExpectedTypeHandlerClassName() {
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.EnumTypeHandler";
+  }
+
 }

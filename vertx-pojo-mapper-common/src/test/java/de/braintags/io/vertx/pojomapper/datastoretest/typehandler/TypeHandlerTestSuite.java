@@ -28,8 +28,8 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 @RunWith(Suite.class)
 @SuiteClasses({ StringTest.class, NumericTest.class, BooleanTest.class, DateTest.class, CalendarTest.class,
     MiscTest.class, JsonTest.class, EnumTest.class, PropertiesTest.class, LocaleTest.class, MapTest.class,
-    ArrayTest.class, CollectionTest.class, TypeHandlerTestSuiteEmbedded.class })
+    ArrayTest.class, CollectionTest.class })
 public class TypeHandlerTestSuite {
 
 }
-// , TypeHandlerTestSuiteReferenced.class
+//

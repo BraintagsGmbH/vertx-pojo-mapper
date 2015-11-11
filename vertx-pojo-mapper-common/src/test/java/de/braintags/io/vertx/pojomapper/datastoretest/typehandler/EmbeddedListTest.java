@@ -12,13 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest.typehandler;
 
-import org.junit.Test;
-
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.EmbeddedListMapper;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
  * Mapper for testing boolean values
@@ -27,15 +22,6 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  * 
  */
 public class EmbeddedListTest extends AbstractTypeHandlerTest {
-
-  @Test
-  public void testTypeHandler() {
-    BaseRecord record = createInstance();
-    IMapper mapper = getDataStore().getMapperFactory().getMapper(record.getClass());
-    IField field = mapper.getField("stringTestList");
-    ITypeHandler th = field.getTypeHandler();
-    assertNotNull(th);
-  }
 
   /*
    * (non-Javadoc)
@@ -46,6 +32,16 @@ public class EmbeddedListTest extends AbstractTypeHandlerTest {
   public BaseRecord createInstance() {
     BaseRecord mapper = new EmbeddedListMapper();
     return mapper;
+  }
+
+  @Override
+  protected String getTestFieldName() {
+    return "stringTestList";
+  }
+
+  @Override
+  protected String getExpectedTypeHandlerClassName() {
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandlerEmbedded";
   }
 
 }

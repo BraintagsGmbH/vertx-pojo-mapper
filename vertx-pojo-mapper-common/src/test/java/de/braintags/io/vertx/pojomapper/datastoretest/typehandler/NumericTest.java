@@ -49,4 +49,14 @@ public class NumericTest extends AbstractTypeHandlerTest {
     return mapper;
   }
 
+  @Override
+  protected String getTestFieldName() {
+    return "myLong";
+  }
+
+  @Override
+  protected String getExpectedTypeHandlerClassName() {
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.LongTypeHandler";
+  }
+
 }

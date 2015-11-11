@@ -17,6 +17,8 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.TypeHandlerTestSuite;
+import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.TypeHandlerTestSuiteEmbedded;
+import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.TypeHandlerTestSuiteReferenced;
 
 /**
  * 
@@ -26,7 +28,7 @@ import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.TypeHandlerTes
  */
 @RunWith(Suite.class)
 @SuiteClasses({ TestBaseTest.class, TestSimpleInsert.class, TestSimpleMapper.class, TestOnlyIdMapper.class,
-    TypeHandlerTestSuite.class })
+    TypeHandlerTestSuite.class, TypeHandlerTestSuiteEmbedded.class, TypeHandlerTestSuiteReferenced.class })
 public class AllTestsCommon {
 
 }

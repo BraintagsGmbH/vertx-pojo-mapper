@@ -34,4 +34,14 @@ public class JsonTest extends AbstractTypeHandlerTest {
     return mapper;
   }
 
+  @Override
+  protected String getTestFieldName() {
+    return "json";
+  }
+
+  @Override
+  protected String getExpectedTypeHandlerClassName() {
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler";
+  }
+
 }

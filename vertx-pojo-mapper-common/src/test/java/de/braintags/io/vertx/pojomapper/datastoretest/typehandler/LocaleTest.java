@@ -39,4 +39,14 @@ public class LocaleTest extends AbstractTypeHandlerTest {
     return new LocaleRecord();
   }
 
+  @Override
+  protected String getTestFieldName() {
+    return "locale";
+  }
+
+  @Override
+  protected String getExpectedTypeHandlerClassName() {
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.LocaleTypeHandler";
+  }
+
 }

@@ -12,13 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.datastoretest.typehandler;
 
-import org.junit.Test;
-
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.PropertiesRecord;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
  * 
@@ -28,15 +23,6 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  */
 public class PropertiesTest extends AbstractTypeHandlerTest {
 
-  @Test
-  public void testTypeHandler() {
-    BaseRecord record = createInstance();
-    IMapper mapper = getDataStore().getMapperFactory().getMapper(record.getClass());
-    IField field = mapper.getField("properties");
-    ITypeHandler th = field.getTypeHandler();
-    assertNotNull(th);
-  }
-
   /*
    * (non-Javadoc)
    * 
@@ -45,6 +31,16 @@ public class PropertiesTest extends AbstractTypeHandlerTest {
   @Override
   public BaseRecord createInstance() {
     return new PropertiesRecord();
+  }
+
+  @Override
+  protected String getTestFieldName() {
+    return "properties";
+  }
+
+  @Override
+  protected String getExpectedTypeHandlerClassName() {
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler";
   }
 
 }

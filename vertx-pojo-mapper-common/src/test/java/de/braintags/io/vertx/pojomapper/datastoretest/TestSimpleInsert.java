@@ -56,7 +56,7 @@ public class TestSimpleInsert extends DatastoreBaseTest {
     for (int i = 0; i < LOOP; i++) {
       mapperList.add(new MiniMapper("looper"));
     }
-    resultContainer = saveRecords(mapperList, 5000);
+    resultContainer = saveRecords(mapperList, 10000);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
 
