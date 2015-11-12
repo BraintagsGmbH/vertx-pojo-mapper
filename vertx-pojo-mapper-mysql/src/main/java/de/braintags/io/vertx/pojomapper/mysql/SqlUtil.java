@@ -44,12 +44,6 @@ public class SqlUtil {
   private static final List<String> DATE_TYPES = Arrays.asList("DATE", "DATETIME", "TIMESTAMP", "TIME", "YEAR");
 
   /**
-   * 
-   */
-  private SqlUtil() {
-  }
-
-  /**
    * Returns true if the type of the {@link IColumnInfo} is numeric
    * 
    * @param col
@@ -107,6 +101,8 @@ public class SqlUtil {
    *          a resulthandler to be informed
    */
   public static void query(AsyncSQLClient sqlClient, String command, Handler<AsyncResult<ResultSet>> resultHandler) {
+    Thread.currentThread().setName("SQL Thread");
+
     LOGGER.debug("query: " + command);
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
