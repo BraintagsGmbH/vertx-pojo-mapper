@@ -42,6 +42,8 @@ import io.vertx.core.Handler;
  */
 
 public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements ITypeHandlerReferenced {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(ObjectTypeHandlerReferenced.class);
 
   /**
    * @param typeHandlerFactory
@@ -76,6 +78,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
   @Override
   public void resolveReferencedObject(IDataStore store, IObjectReference reference,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    LOGGER.debug("start resolveReferencedObject");
     Class<?> mapperClass = reference.getField().getType();
     if (mapperClass == null) {
       fail(new NullPointerException("undefined mapper class"), resultHandler);
@@ -97,6 +100,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    */
   public void getReferencedObjectById(IDataStore store, IMapper subMapper, Object id,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    LOGGER.debug("start getReferencedObjectById");
     IQuery<?> query = (IQuery<?>) store.createQuery(subMapper.getMapperClass()).field(subMapper.getIdField().getName())
         .is(id);
     query.execute(result -> {
@@ -113,8 +117,10 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
       result.result().iterator().next(iResult -> {
         if (iResult.failed()) {
           fail(iResult.cause(), resultHandler);
-        } else
+        } else {
+          LOGGER.debug("referenced object successfully loaded");
           success(iResult.result(), resultHandler);
+        }
       });
     });
   }

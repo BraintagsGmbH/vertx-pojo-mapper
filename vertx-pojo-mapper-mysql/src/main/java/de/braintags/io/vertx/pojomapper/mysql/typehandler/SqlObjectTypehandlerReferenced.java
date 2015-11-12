@@ -13,12 +13,7 @@
 package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerReferenced;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
 
 /**
  * 
@@ -33,47 +28,6 @@ public class SqlObjectTypehandlerReferenced extends ObjectTypeHandlerReferenced 
    */
   public SqlObjectTypehandlerReferenced(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerEmbedded#fromStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
-   */
-  @Override
-  public void fromStore(Object dbValue, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    try {
-      JsonObject jsonObject = new JsonObject((String) dbValue);
-      super.fromStore(dbValue, field, cls, handler);
-    } catch (Exception e) {
-      fail(e, handler);
-    }
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerEmbedded#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
-   */
-  @Override
-  public void intoStore(Object embeddedObject, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    super.intoStore(embeddedObject, field, result -> {
-      if (result.failed()) {
-        handler.handle(result);
-      }
-
-      try {
-        JsonObject json = (JsonObject) result.result().getResult();
-        String newResult = json.encode();
-        success(newResult, handler);
-      } catch (Exception e) {
-        fail(e, handler);
-      }
-    });
   }
 
 }

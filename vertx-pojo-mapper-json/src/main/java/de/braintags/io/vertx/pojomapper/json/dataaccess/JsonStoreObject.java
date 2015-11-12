@@ -133,6 +133,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    */
   public final void initToEntity(Handler<AsyncResult<Void>> handler) {
     Object tmpObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
+    LOGGER.debug("start initToEntity");
     iterateFields(tmpObject, fieldResult -> {
       if (fieldResult.failed()) {
         handler.handle(fieldResult);
@@ -144,9 +145,9 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
           return;
         }
         finishToEntity(tmpObject, handler);
+        LOGGER.debug("finished initToEntity");
       });
     });
-    LOGGER.debug("finished loop");
   }
 
   protected void finishToEntity(Object tmpObject, Handler<AsyncResult<Void>> handler) {
@@ -159,7 +160,8 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
     }
   }
 
-  protected void iterateFields(Object tmpObject, Handler<AsyncResult<Void>> handler) {
+  protected final void iterateFields(Object tmpObject, Handler<AsyncResult<Void>> handler) {
+    LOGGER.debug("start iterateFields");
     ErrorObject<Void> error = new ErrorObject<Void>(handler);
     Set<String> fieldNames = getMapper().getFieldNames();
     CounterObject co = new CounterObject(fieldNames.size());
@@ -180,7 +182,9 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   }
 
   protected void iterateObjectReferences(Object tmpObject, Handler<AsyncResult<Void>> handler) {
+    LOGGER.debug("start iterateObjectReferences");
     if (getObjectReferences().isEmpty()) {
+      LOGGER.debug("nothing to do");
       handler.handle(Future.succeededFuture());
       return;
     }

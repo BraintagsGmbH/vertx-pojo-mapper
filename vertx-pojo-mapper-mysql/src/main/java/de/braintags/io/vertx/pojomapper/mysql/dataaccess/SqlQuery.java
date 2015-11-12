@@ -167,6 +167,7 @@ public class SqlQuery<T> extends Query<T> {
   }
 
   private void doFind(SqlQueryRambler query, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    LOGGER.debug("start doFind");
     SqlExpression statement = (SqlExpression) query.getQueryExpression();
     if (statement.hasQueryParameters()) {
       SqlUtil.queryWithParams((MySqlDataStore) getDataStore(), statement.getSelectExpression(),

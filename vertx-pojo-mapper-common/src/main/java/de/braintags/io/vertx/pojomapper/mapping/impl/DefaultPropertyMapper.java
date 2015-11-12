@@ -98,11 +98,14 @@ public class DefaultPropertyMapper implements IPropertyMapper {
   @Override
   public void fromStoreObject(Object mapper, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
+    LOGGER.debug("starting fromStoreObject for field " + field.getFullName());
     ITypeHandler th = field.getTypeHandler();
     Object dbValue = storeObject.get(field);
     if (dbValue == null) { // nothing to work with? Must null be set?
+      LOGGER.debug("value is null - nothing to do");
       handler.handle(Future.succeededFuture());
     } else {
+      LOGGER.debug("fetching result from typehandler");
       th.fromStore(dbValue, field, null, result -> {
         if (result.failed()) {
           handler.handle(Future.failedFuture(result.cause()));
@@ -127,9 +130,11 @@ public class DefaultPropertyMapper implements IPropertyMapper {
     try {
       if (javaValue instanceof IObjectReference) {
         storeObject.getObjectReferences().add((IObjectReference) javaValue);
+        LOGGER.debug("added ObjectReference");
       } else if (javaValue != null) {
         IPropertyAccessor pAcc = field.getPropertyAccessor();
         pAcc.writeData(mapper, javaValue);
+        LOGGER.debug("writing data");
       }
       handler.handle(Future.succeededFuture());
     } catch (Exception e) {
@@ -141,19 +146,23 @@ public class DefaultPropertyMapper implements IPropertyMapper {
 
   @Override
   public void fromObjectReference(Object entity, IObjectReference reference, Handler<AsyncResult<Void>> handler) {
+    LOGGER.debug("starting fromObjectReference");
     IDataStore store = reference.getField().getMapper().getMapperFactory().getDataStore();
     ITypeHandlerReferenced th = (ITypeHandlerReferenced) reference.getField().getTypeHandler();
     Object dbValue = reference.getDbSource();
     IField field = reference.getField();
     if (dbValue == null) { // nothing to work with? Must null be set?
+      LOGGER.debug("nothing to do here - finished");
       handler.handle(Future.succeededFuture());
     } else {
+      LOGGER.debug("resolving referenced object");
       th.resolveReferencedObject(store, reference, result -> {
         if (result.failed()) {
           handler.handle(Future.failedFuture(result.cause()));
           return;
         }
         Object javaValue = result.result().getResult();
+        LOGGER.debug("resolved the obejct from datastore, now handling from store");
         handleInstanceFromStore(null, entity, javaValue, dbValue, field, handler);
       });
     }

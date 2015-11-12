@@ -75,13 +75,22 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
    */
   @Override
   public void synchronize(IMapper mapper, Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
+    LOGGER.debug("starting synchronize");
     if (synchronizedInstances.contains(mapper.getMapperClass().getName())) {
       // was synced already
       DefaultSyncResult syncResult = createSyncResult(mapper, SyncAction.NO_ACTION);
       resultHandler.handle(Future.succeededFuture(syncResult));
     } else {
-      readTableFromDatabase(mapper, res -> checkTable((Mapper) mapper, res, resultHandler));
-      synchronizedInstances.add(mapper.getMapperClass().getName());
+      LOGGER.debug("starting synchroniuzation for mapper " + mapper.getClass().getSimpleName());
+      readTableFromDatabase(mapper, res -> checkTable((Mapper) mapper, res, result -> {
+        if (result.failed()) {
+          resultHandler.handle(result);
+          return;
+        }
+        LOGGER.debug("finished synchronize");
+        synchronizedInstances.add(mapper.getMapperClass().getName());
+        resultHandler.handle(result);
+      }));
     }
   }
 

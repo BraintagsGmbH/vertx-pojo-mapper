@@ -159,7 +159,7 @@ public class DatastoreBaseTest extends VertxTestBase {
     write.save(result -> {
       try {
         resultContainer.writeResult = result.result();
-        checkWriteResult(result);
+        checkWriteResult(result, records.size());
       } catch (AssertionError e) {
         resultContainer.assertionError = e;
       } catch (Throwable e) {
@@ -192,7 +192,7 @@ public class DatastoreBaseTest extends VertxTestBase {
       try {
         logger.info(result.result());
         resultContainer.writeResult = result.result();
-        checkWriteResult(result);
+        checkWriteResult(result, 1);
       } catch (AssertionError e) {
         resultContainer.assertionError = e;
       } catch (Throwable e) {
@@ -210,13 +210,16 @@ public class DatastoreBaseTest extends VertxTestBase {
     return resultContainer;
   }
 
-  public void checkWriteResult(AsyncResult<IWriteResult> result) {
+  public void checkWriteResult(AsyncResult<IWriteResult> result, int expectedNumberOfRecords) {
     resultFine(result);
     assertNotNull(result.result());
     IWriteEntry entry = result.result().iterator().next();
     assertNotNull(entry);
     assertNotNull(entry.getStoreObject());
     assertNotNull(entry.getId());
+    if (expectedNumberOfRecords >= 0) {
+      assertEquals(expectedNumberOfRecords, result.result().size());
+    }
   }
 
   public void resultFine(AsyncResult<?> result) {

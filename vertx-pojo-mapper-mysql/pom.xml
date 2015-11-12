@@ -12,7 +12,7 @@
 	<artifactId>vertx-pojo-mapper-mysql</artifactId>
 
 	<properties>
-		<mysql_version>3.1.0-SNAPSHOT</mysql_version>
+		<mysql_version>3.2.0-SNAPSHOT</mysql_version>
 		<maven.test.skip>false</maven.test.skip>
 		<doc.skip>false</doc.skip>
 		<source.skip>false</source.skip>

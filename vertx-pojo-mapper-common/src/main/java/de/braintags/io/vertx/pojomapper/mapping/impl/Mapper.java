@@ -62,6 +62,9 @@ import de.braintags.io.vertx.util.ClassUtil;
  */
 
 public class Mapper implements IMapper {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(Mapper.class);
+
   private IObjectFactory objectFactory;
   private Map<String, MappedField> mappedFields = new HashMap<String, MappedField>();
   private IField idField;
@@ -372,9 +375,12 @@ public class Mapper implements IMapper {
    */
   @Override
   public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity) {
+    LOGGER.debug("start executing Lifecycle " + annotationClass.getSimpleName());
     List<Method> methods = getLifecycleMethods(annotationClass);
-    if (methods == null)
+    if (methods == null) {
+      LOGGER.debug("nothing to execute");
       return;
+    }
 
     for (Method method : methods) {
       method.setAccessible(true);
@@ -392,6 +398,7 @@ public class Mapper implements IMapper {
         throw new MethodAccessException(e);
       }
     }
+    LOGGER.debug("finished Lifecycle");
   }
 
   /**
