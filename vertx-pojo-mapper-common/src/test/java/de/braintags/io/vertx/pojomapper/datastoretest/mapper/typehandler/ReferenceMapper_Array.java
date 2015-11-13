@@ -28,6 +28,9 @@ public class ReferenceMapper_Array extends BaseRecord {
   @Referenced
   public SimpleMapper[] simpleMapper;
 
+  public ReferenceMapper_Array() {
+  }
+
   /**
    * 
    */

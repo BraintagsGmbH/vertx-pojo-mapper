@@ -32,6 +32,9 @@ public class ReferenceMapper_Map extends BaseRecord {
   @Referenced
   public Map<Integer, SimpleMapper> simpleMapper;
 
+  public ReferenceMapper_Map() {
+  }
+
   /**
    * 
    */

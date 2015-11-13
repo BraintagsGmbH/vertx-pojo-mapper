@@ -32,6 +32,9 @@ public class ReferenceMapper_List extends BaseRecord {
   @Referenced
   public List<SimpleMapper> simpleMapper;
 
+  public ReferenceMapper_List() {
+  }
+
   /**
    * 
    */
