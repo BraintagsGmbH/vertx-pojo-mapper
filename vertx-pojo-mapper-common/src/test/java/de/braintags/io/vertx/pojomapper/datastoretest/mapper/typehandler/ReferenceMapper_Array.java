@@ -34,7 +34,7 @@ public class ReferenceMapper_Array extends BaseRecord {
   public ReferenceMapper_Array() {
     simpleMapper = new SimpleMapper[5];
     for (int i = 0; i < simpleMapper.length; i++) {
-      simpleMapper[i] = new SimpleMapper("name " + i, "sec prop " + i);
+      simpleMapper[i] = new SimpleMapper("referencedArray " + i, "sec prop " + i);
     }
   }
 

@@ -73,6 +73,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   private MySqlDataStore datastore;
   private AsyncSQLClient mySQLClient;
   private Map<String, String> thMap = new HashMap<String, String>();
+  private static boolean handleReferencedRecursive = true;
 
   /**
    * 
@@ -111,9 +112,11 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
 
       String database = "test";
       JsonObject mySQLClientConfig = new JsonObject().put("host", "localhost").put("username", username)
-          .put("password", password).put("database", database).put("port", 3306).put("initial_pool_size", 10);
+          .put(IDataStore.HANDLE_REFERENCED_RECURSIVE, handleReferencedRecursive).put("password", password)
+          .put("database", database).put("port", 3306).put("initial_pool_size", 10);
+
       mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
-      datastore = new MySqlDataStore(mySQLClient, database);
+      datastore = new MySqlDataStore(mySQLClient, mySQLClientConfig);
       handler.handle(Future.succeededFuture());
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));

@@ -47,6 +47,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   private static final String START_MONGO_LOCAL_PROP = "startMongoLocal";
   public static final String CONNECTION_STRING_PROPERTY = "connection_string";
   public static final String DEFAULT_CONNECTION = "mongodb://localhost:27017";
+  private static boolean handleReferencedRecursive = true;
 
   private static boolean startMongoLocal = true;
 
@@ -73,7 +74,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
             handler.handle(Future.failedFuture(new InitException(initResult.cause())));
             return;
           }
-          mongoDataStore = new MongoDataStore(mongoClient, getDatabaseName());
+          mongoDataStore = new MongoDataStore(mongoClient, getConfig());
           handler.handle(Future.succeededFuture());
           return;
         });
@@ -172,6 +173,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
     JsonObject config = new JsonObject();
     config.put("connection_string", getConnectionString());
     config.put("db_name", getDatabaseName());
+    config.put(IDataStore.HANDLE_REFERENCED_RECURSIVE, handleReferencedRecursive);
     return config;
   }
 

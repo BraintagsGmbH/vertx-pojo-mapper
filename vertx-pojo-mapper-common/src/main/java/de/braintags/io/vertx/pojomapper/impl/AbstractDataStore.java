@@ -21,6 +21,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
+import io.vertx.core.json.JsonObject;
 
 /**
  * An abstract implementation of {@link IDataStore}
@@ -30,19 +31,19 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
  */
 
 public abstract class AbstractDataStore implements IDataStore {
+  private JsonObject properties;
   private IMapperFactory mapperFactory;
   private IPropertyMapperFactory propertyMapperFactory;
   private ITypeHandlerFactory typeHandlerFactory;
   private IStoreObjectFactory storeObjectFactory;
   private ITableGenerator tableGenerator;
   private IDataStoreSynchronizer dataStoreSynchronizer;
-  private String database;
 
   /**
    * 
    */
-  public AbstractDataStore(String database) {
-    this.database = database;
+  public AbstractDataStore(JsonObject properties) {
+    this.properties = properties;
   }
 
   /*
@@ -144,12 +145,14 @@ public abstract class AbstractDataStore implements IDataStore {
     this.dataStoreSynchronizer = dataStoreSynchronizer;
   }
 
-  /**
-   * @return the database
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getProperties()
    */
   @Override
-  public final String getDatabase() {
-    return database;
+  public JsonObject getProperties() {
+    return properties;
   }
 
 }

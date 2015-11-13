@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.junit.Assert;
+
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
@@ -110,15 +112,6 @@ public class BaseRecord {
   }
 
   @SuppressWarnings("rawtypes")
-  private boolean compareCollections(Collection coll1, Collection coll2, String fieldName) {
-    for (Object o : coll1) {
-      if (!coll2.contains(o))
-        return false;
-    }
-    return true;
-  }
-
-  @SuppressWarnings("rawtypes")
   private boolean compareMaps(Map value, Map compareValue, String fieldName) {
     if (value == null && compareValue == null)
       return true;
@@ -131,6 +124,34 @@ public class BaseRecord {
       Object value1 = value.get(key);
       Object value2 = compareValue.get(key);
       equalValues(value1, value2, fieldName);
+    }
+    return true;
+  }
+
+  @SuppressWarnings("rawtypes")
+  private boolean compareCollections(Collection coll1, Collection coll2, String fieldName) {
+    return compareCollectionsExistence(coll1, coll2, fieldName);
+  }
+
+  /**
+   * Checks wether all elements inside the collections are existing, equal the position
+   * 
+   * @param coll1
+   * @param coll2
+   * @param fieldName
+   * @return
+   */
+  @SuppressWarnings("rawtypes")
+  private boolean compareCollectionsExistence(Collection coll1, Collection coll2, String fieldName) {
+    for (Object o : coll1) {
+      if (!coll2.contains(o)) {
+        Assert.fail("collections are different, element does not exist: " + o);
+      }
+    }
+    for (Object o : coll2) {
+      if (!coll1.contains(o)) {
+        Assert.fail("collections are different, element does not exist: " + o);
+      }
     }
     return true;
   }

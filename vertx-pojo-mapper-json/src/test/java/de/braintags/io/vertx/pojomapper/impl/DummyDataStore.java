@@ -31,6 +31,7 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
 /**
  * 
@@ -45,6 +46,7 @@ public class DummyDataStore implements IDataStore {
   IPropertyMapperFactory pmf = new JsonPropertyMapperFactory();
   ITableGenerator tg = new DummyTableGenerator();
   String database;
+  private JsonObject properties;
 
   public DummyDataStore() {
   }
@@ -194,5 +196,15 @@ public class DummyDataStore implements IDataStore {
   @Override
   public IDataStoreMetaData getMetaData() {
     return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getProperties()
+   */
+  @Override
+  public JsonObject getProperties() {
+    return properties;
   }
 }

@@ -76,8 +76,14 @@ public class ArrayTypeHandlerReferenced extends ArrayTypeHandler implements ITyp
       fail(new NullPointerException("undefined mapper class"), handler);
       return;
     }
-    ObjectReference objectReference = new ObjectReference(field, source);
-    success(objectReference, handler);
+    if (field.getMapper().handleReferencedRecursive()) {
+      IDataStore store = field.getMapper().getMapperFactory().getDataStore();
+      ObjectReference objectReference = new ObjectReference(field, source);
+      resolveReferencedObject(store, objectReference, handler);
+    } else {
+      ObjectReference objectReference = new ObjectReference(field, source);
+      success(objectReference, handler);
+    }
   }
 
   @Override

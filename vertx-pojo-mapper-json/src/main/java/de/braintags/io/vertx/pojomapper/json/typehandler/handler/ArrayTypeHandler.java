@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 
+import de.braintags.io.vertx.pojomapper.exception.InsertException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -127,6 +128,14 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
           if (co.reduce()) {
             JsonArray arr = new JsonArray();
             for (int k = 0; k < resultArray.length; k++) {
+              Object value = resultArray[k];
+              if (arr.contains(value)) {
+                fail(
+                    new InsertException(
+                        String.format("duplicate value on inserting: %s | %s", String.valueOf(value), arr.toString())),
+                    handler);
+                return;
+              }
               arr.add(resultArray[k]);
             }
             success(arr, handler);

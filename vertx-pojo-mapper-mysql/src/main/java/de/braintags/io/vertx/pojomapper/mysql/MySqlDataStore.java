@@ -27,6 +27,7 @@ import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlWrite;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlTableGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlTypeHandlerFactory;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
 
 /**
@@ -36,6 +37,11 @@ import io.vertx.ext.asyncsql.AsyncSQLClient;
  */
 
 public class MySqlDataStore extends AbstractDataStore {
+  /**
+   * The name of the property, which describes the database to be used
+   */
+  public static final String DATABASE_NAME = "database";
+
   private AsyncSQLClient sqlClient;
   private MySqlMetaData metaData;
 
@@ -47,8 +53,8 @@ public class MySqlDataStore extends AbstractDataStore {
    * @param database
    *          the name of the database used
    */
-  public MySqlDataStore(AsyncSQLClient sqlClient, String database) {
-    super(database);
+  public MySqlDataStore(AsyncSQLClient sqlClient, JsonObject properties) {
+    super(properties);
     this.sqlClient = sqlClient;
     metaData = new MySqlMetaData(sqlClient);
     setMapperFactory(new MapperFactory(this));
@@ -101,6 +107,14 @@ public class MySqlDataStore extends AbstractDataStore {
   @Override
   public IDataStoreMetaData getMetaData() {
     return metaData;
+  }
+
+  /**
+   * @return the database
+   */
+  @Override
+  public final String getDatabase() {
+    return getProperties().getString(DATABASE_NAME);
   }
 
 }

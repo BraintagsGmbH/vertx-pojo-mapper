@@ -37,7 +37,7 @@ public class ReferenceMapper_List extends BaseRecord {
    */
   public ReferenceMapper_List() {
     simpleMapper = new ArrayList<SimpleMapper>();
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 50; i++) {
       simpleMapper.add(new SimpleMapper("name " + i, "sec prop " + i));
     }
   }

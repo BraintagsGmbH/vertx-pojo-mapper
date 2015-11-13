@@ -149,4 +149,13 @@ public interface IMapper {
    *          the syncNeeded to set
    */
   public void setSyncNeeded(boolean syncNeeded);
+
+  /**
+   * This property defines, wether referenced objects inside a mapper are stored direct and recursive or wether they are
+   * read from the store by using an {@link IObjectReference}
+   * 
+   * @return true, if referenced objects shall be stored recursive and false, if an {@link IObjectReference} shall be
+   *         used
+   */
+  public boolean handleReferencedRecursive();
 }

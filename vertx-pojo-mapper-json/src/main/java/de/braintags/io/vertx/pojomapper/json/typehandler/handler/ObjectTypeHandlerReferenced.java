@@ -71,8 +71,14 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    */
   @Override
   public void fromStore(Object id, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    ObjectReference objectReference = new ObjectReference(field, id);
-    success(objectReference, resultHandler);
+    if (field.getMapper().handleReferencedRecursive()) {
+      IDataStore store = field.getMapper().getMapperFactory().getDataStore();
+      ObjectReference objectReference = new ObjectReference(field, id);
+      resolveReferencedObject(store, objectReference, resultHandler);
+    } else {
+      ObjectReference objectReference = new ObjectReference(field, id);
+      success(objectReference, resultHandler);
+    }
   }
 
   @Override

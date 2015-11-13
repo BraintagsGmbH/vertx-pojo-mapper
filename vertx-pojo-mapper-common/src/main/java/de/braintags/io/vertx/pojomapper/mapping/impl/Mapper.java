@@ -441,4 +441,10 @@ public class Mapper implements IMapper {
   public final void setSyncNeeded(boolean syncNeeded) {
     this.syncNeeded = syncNeeded;
   }
+
+  @Override
+  public boolean handleReferencedRecursive() {
+    return this.getMapperFactory().getDataStore().getProperties().getBoolean(IDataStore.HANDLE_REFERENCED_RECURSIVE,
+        false);
+  }
 }

@@ -12,11 +12,6 @@
  */
 package examples;
 
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.mongo.MongoClient;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
@@ -26,6 +21,11 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import examples.mapper.DemoMapper;
 import examples.mapper.DemoSubMapper;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.mongo.MongoClient;
 
 /**
  * Simple example to write and read Pojos
@@ -48,7 +48,7 @@ public class Examples {
     config.put("connection_string", "mongodb://localhost:27017");
     config.put("db_name", "PojongoTestDatabase");
     MongoClient mongoClient = MongoClient.createNonShared(vertx, config);
-    MongoDataStore mongoDataStore = new MongoDataStore(mongoClient, "PojongoTestDatabase");
+    MongoDataStore mongoDataStore = new MongoDataStore(mongoClient, config);
   }
 
   /**

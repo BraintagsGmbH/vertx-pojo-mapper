@@ -17,11 +17,13 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
+import io.vertx.core.json.JsonObject;
 
 /**
  * IDataStore contains information about the destination datastore and creates the handler objects
@@ -31,6 +33,13 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
  */
 
 public interface IDataStore {
+
+  /**
+   * The name of the property, which defines the kind, how referenced objects in a mapper are read. In general this
+   * defines, wether an {@link IObjectReference} is used or not
+   * 
+   */
+  public static final String HANDLE_REFERENCED_RECURSIVE = "handleReferencedRecursive";
 
   /**
    * Returns a new {@link IQuery} bound to the given mapper
@@ -114,5 +123,12 @@ public interface IDataStore {
    * @return
    */
   public IDataStoreMetaData getMetaData();
+
+  /**
+   * The properties by which the current instance was initialized
+   * 
+   * @return the properties set for the current instance
+   */
+  public JsonObject getProperties();
 
 }
