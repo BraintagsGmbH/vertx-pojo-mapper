@@ -35,10 +35,10 @@ public class ReferenceMapper_List extends BaseRecord {
   /**
    * 
    */
-  public ReferenceMapper_List() {
+  public ReferenceMapper_List(int numberOfSubRecords) {
     simpleMapper = new ArrayList<SimpleMapper>();
-    for (int i = 0; i < 50; i++) {
-      simpleMapper.add(new SimpleMapper("name " + i, "sec prop " + i));
+    for (int i = 0; i < numberOfSubRecords; i++) {
+      simpleMapper.add(new SimpleMapper("referencedMapperList " + i, "sec prop " + i));
     }
   }
 

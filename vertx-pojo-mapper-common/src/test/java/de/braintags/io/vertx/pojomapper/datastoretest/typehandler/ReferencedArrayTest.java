@@ -30,7 +30,7 @@ public class ReferencedArrayTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance() {
-    BaseRecord mapper = new ReferenceMapper_Array();
+    BaseRecord mapper = new ReferenceMapper_Array(50);
     return mapper;
   }
 

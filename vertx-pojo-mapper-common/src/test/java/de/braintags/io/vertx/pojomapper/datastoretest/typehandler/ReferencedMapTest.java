@@ -30,7 +30,7 @@ public class ReferencedMapTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance() {
-    BaseRecord mapper = new ReferenceMapper_Map();
+    BaseRecord mapper = new ReferenceMapper_Map(50);
     return mapper;
   }
 
