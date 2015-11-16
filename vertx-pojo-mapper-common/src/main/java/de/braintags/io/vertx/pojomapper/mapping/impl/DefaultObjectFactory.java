@@ -39,12 +39,6 @@ public class DefaultObjectFactory implements IObjectFactory {
   private Class<?> DEFAULT_SET_CLASS = HashSet.class;
   private Class<?> DEFAULT_MAP_CLASS = HashMap.class;
 
-  /**
-   * 
-   */
-  public DefaultObjectFactory() {
-  }
-
   /*
    * (non-Javadoc)
    * 

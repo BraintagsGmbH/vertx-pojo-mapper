@@ -19,6 +19,7 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
+import de.braintags.io.vertx.pojomapper.exception.InsertException;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -33,6 +34,7 @@ import io.vertx.core.logging.LoggerFactory;
 public class WriteResult implements IWriteResult {
   private static final Logger logger = LoggerFactory.getLogger(WriteResult.class);
   private List<IWriteEntry> resultList = new ArrayList<IWriteEntry>();
+  private List insertedIds = new ArrayList();
 
   /*
    * (non-Javadoc)
@@ -53,6 +55,14 @@ public class WriteResult implements IWriteResult {
   private void addEntry(IWriteEntry entry) {
     resultList.add(entry);
     logger.info(resultList.size());
+    if (entry.getAction().equals(WriteAction.INSERT)) {
+      if (insertedIds.contains(entry.getId())) {
+        throw new InsertException(String.format("Trial to insert duplicate ID. Existing IDs: %s | new Id: %s ",
+            String.valueOf(insertedIds), String.valueOf(entry.getId())));
+      } else {
+        insertedIds.add(entry.getId());
+      }
+    }
   }
 
   @Override

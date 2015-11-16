@@ -68,4 +68,7 @@ public class MongoQueryResult<T> extends AbstractQueryResult<T> {
     });
   }
 
+  public List<JsonObject> getOriginalResult() {
+    return jsonResult;
+  }
 }

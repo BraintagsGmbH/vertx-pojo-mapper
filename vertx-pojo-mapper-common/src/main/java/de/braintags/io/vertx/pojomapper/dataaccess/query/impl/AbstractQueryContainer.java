@@ -42,7 +42,7 @@ public abstract class AbstractQueryContainer<T extends IQueryContainer> implemen
    * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#getQuery()
    */
-  public IQuery<?> getQuery() {
+  public IQuery getQuery() {
     IQueryContainer container = this;
     while (container != null) {
       if (container instanceof IQuery)

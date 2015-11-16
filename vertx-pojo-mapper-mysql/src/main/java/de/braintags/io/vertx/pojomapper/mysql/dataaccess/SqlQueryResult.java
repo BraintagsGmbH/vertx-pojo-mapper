@@ -64,4 +64,7 @@ public class SqlQueryResult<T> extends AbstractQueryResult<T> {
     });
   }
 
+  public ResultSet getResultSet() {
+    return resultSet;
+  }
 }

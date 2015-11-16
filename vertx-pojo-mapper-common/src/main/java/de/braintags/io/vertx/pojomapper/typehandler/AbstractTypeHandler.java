@@ -20,10 +20,10 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
-import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 import de.braintags.io.vertx.util.ClassUtil;
+import de.braintags.io.vertx.util.ExceptionUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -164,13 +164,9 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
   @Override
   public Object clone() {
     try {
-      @SuppressWarnings("rawtypes")
-      Constructor con = ClassUtil.getConstructor(getClass(), ITypeHandlerFactory.class);
-      return con.newInstance(typeHandlerFactory);
-    } catch (Exception e) {
-      throw new TypeHandlerException(
-          "Constructor not existing with parameter ITypeHandlerFactory.class. Implement this constructor or override method clone in class "
-              + getClass().getName());
+      return super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw ExceptionUtil.createRuntimeException(e);
     }
   }
 

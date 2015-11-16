@@ -259,7 +259,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   @SuppressWarnings("unchecked")
   private void finishInsert(SqlStoreObject storeObject, IWriteResult writeResult, Object id,
       Handler<AsyncResult<Void>> resultHandler) {
-    LOGGER.debug("inserted record with id " + id);
+    LOGGER.debug("==>>>> inserted record " + storeObject.getMapper().getTableInfo().getName() + " with id " + id);
     try {
       executePostSave((T) storeObject.getEntity());
       setIdValue(id, storeObject, result -> {

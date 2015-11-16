@@ -101,7 +101,7 @@ public class SqlUtil {
    *          a resulthandler to be informed
    */
   public static void query(AsyncSQLClient sqlClient, String command, Handler<AsyncResult<ResultSet>> resultHandler) {
-    Thread.currentThread().setName("SQL Thread");
+    // Thread.currentThread().setName("SQL Thread");
 
     LOGGER.debug("query: " + command);
     sqlClient.getConnection(cr -> {

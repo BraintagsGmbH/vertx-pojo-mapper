@@ -14,6 +14,8 @@ package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.exception.InsertException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -111,46 +113,84 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
   @Override
   public void intoStore(Object javaValues, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     int length = javaValues == null ? 0 : Array.getLength(javaValues);
-    if (length == 0)
+    if (length == 0) {
       handler.handle(Future.succeededFuture());
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(handler);
-    CounterObject co = new CounterObject(length);
-    Object[] resultArray = new Object[length];
-    for (int i = 0; i < length; i++) {
-      // trying to write the array in the order like it is
-      CurrentCounter cc = new CurrentCounter(i, Array.get(javaValues, i));
+    } else {
+      ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(handler);
       ITypeHandler subTypehandler = field.getSubTypeHandler();
-      subTypehandler.intoStore(cc.value, field, subResult -> {
-        if (subResult.failed()) {
-          errorObject.setThrowable(subResult.cause());
-        } else {
-          resultArray[cc.i] = subResult.result().getResult();
-          if (co.reduce()) {
-            JsonArray arr = new JsonArray();
-            for (int k = 0; k < resultArray.length; k++) {
-              Object value = resultArray[k];
-              if (arr.contains(value)) {
-                fail(
-                    new InsertException(
-                        String.format("duplicate value on inserting: %s | %s", String.valueOf(value), arr.toString())),
-                    handler);
-                return;
-              }
-              arr.add(resultArray[k]);
-            }
+      CounterObject co = new CounterObject(length);
+      ResultArray resultArray = new ResultArray(length);
+      for (int i = 0; i < length; i++) {
+        // trying to write the array in the order like it is
+        final CurrentCounter cc = new CurrentCounter(i, Array.get(javaValues, i));
+        writeEntry(cc, co, resultArray, subTypehandler, field, errorObject, handler);
+        if (errorObject.isError()) {
+          return;
+        }
+      }
+    }
+  }
+
+  private void writeEntry(final CurrentCounter cc, CounterObject co, ResultArray resultArray,
+      ITypeHandler subTypehandler, IField field, ErrorObject<ITypeHandlerResult> errorObject,
+      Handler<AsyncResult<ITypeHandlerResult>> handler) {
+    subTypehandler.intoStore(cc.value, field, subResult -> {
+      if (subResult.failed()) {
+        errorObject.setThrowable(subResult.cause());
+      } else {
+        resultArray.add(cc.i, subResult.result().getResult(), errorObject);
+        if (co.reduce()) {
+          JsonArray arr = resultArray.toJsonArray(errorObject);
+          if (!errorObject.isError()) {
             success(arr, handler);
           }
         }
-      });
+      }
+    });
+  }
 
-      if (errorObject.isError())
-        return;
+  class ResultArray {
+    final List contentList;
+    final Object[] content;
+
+    ResultArray(int length) {
+      content = new Object[length];
+      contentList = new ArrayList<>();
+    }
+
+    void add(int position, Object instance, ErrorObject<ITypeHandlerResult> errorObject) {
+      if (content[position] != null) {
+        errorObject.setThrowable(new InsertException(String.format(
+            "Trying to write an entry, which was filled already. Old: %s | new: %s", content[position], instance)));
+      } else if (contentList.contains(instance)) {
+        errorObject.setThrowable(
+            new InsertException(String.format("Trying to write an entry, which was filled already. List: %s | new: %s",
+                contentList.toString(), instance)));
+      } else {
+        content[position] = instance;
+        contentList.add(instance);
+      }
+
+    }
+
+    JsonArray toJsonArray(ErrorObject<ITypeHandlerResult> errorObject) {
+      JsonArray arr = new JsonArray();
+      for (int k = 0; k < content.length; k++) {
+        Object value = content[k];
+        if (arr.contains(value)) {
+          errorObject.setThrowable(new InsertException(
+              String.format("duplicate value on inserting: %s | %s", String.valueOf(value), arr.toString())));
+          return null;
+        }
+        arr.add(content[k]);
+      }
+      return arr;
     }
   }
 
   class CurrentCounter {
-    int i;
-    Object value;
+    final int i;
+    final Object value;
 
     CurrentCounter(int i, Object value) {
       this.i = i;

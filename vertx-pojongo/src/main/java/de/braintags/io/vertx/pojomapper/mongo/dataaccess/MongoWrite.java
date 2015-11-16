@@ -128,17 +128,25 @@ public class MongoWrite<T> extends AbstractWrite<T> {
         resultHandler.handle(result);
         return;
       }
-      executePostSave(entity);
-      writeResult.addEntry(storeObject, id, WriteAction.INSERT);
-      resultHandler.handle(Future.succeededFuture());
+      try {
+        executePostSave(entity);
+        writeResult.addEntry(storeObject, id, WriteAction.INSERT);
+        resultHandler.handle(Future.succeededFuture());
+      } catch (Exception e) {
+        resultHandler.handle(Future.failedFuture(e));
+      }
     });
   }
 
   private void finishUpdate(Object id, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
-    executePostSave(entity);
-    writeResult.addEntry(storeObject, id, WriteAction.UPDATE);
-    resultHandler.handle(Future.succeededFuture());
+    try {
+      executePostSave(entity);
+      writeResult.addEntry(storeObject, id, WriteAction.UPDATE);
+      resultHandler.handle(Future.succeededFuture());
+    } catch (Exception e) {
+      resultHandler.handle(Future.failedFuture(e));
+    }
   }
 
 }

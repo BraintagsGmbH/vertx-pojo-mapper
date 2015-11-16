@@ -12,7 +12,7 @@
 	<artifactId>vertx-pojo-mapper-mysql</artifactId>
 
 	<properties>
-		<mysql_version>3.2.1-SNAPSHOT</mysql_version>
+		<mysql_version>3.2.0-SNAPSHOT</mysql_version>
 		<maven.test.skip>false</maven.test.skip>
 		<doc.skip>false</doc.skip>
 		<source.skip>false</source.skip>
@@ -43,6 +43,13 @@
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mysql-postgresql-client</artifactId>
 			<version>${mysql_version}</version>
+		</dependency>
+
+		
+		<dependency>
+		  <groupId>io.vertx</groupId>
+		  <artifactId>vertx-unit</artifactId>
+		  <version>3.2.0-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>
