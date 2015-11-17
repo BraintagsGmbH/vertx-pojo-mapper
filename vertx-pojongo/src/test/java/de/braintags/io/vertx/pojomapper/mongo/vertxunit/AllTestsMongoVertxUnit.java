@@ -29,11 +29,11 @@ import de.braintags.io.vertx.pojomapper.testdatastore.AllTestsCommon;
 @RunWith(Suite.class)
 @SuiteClasses({ AllTestsPojoJson.class, TestMongoMapper.class, TestMongoQueryRambler.class, AllTestsCommon.class })
 public class AllTestsMongoVertxUnit {
-  // -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mongo.testNew.MongoDataStoreContainer
-  // -DBlockedThreadCheckInterval=1000 -DWarningExceptionTime=1000
+  // -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mongo.vertxunit.MongoDataStoreContainer
+  // -DBlockedThreadCheckInterval=10000000 -DWarningExceptionTime=10000000
   // -Ddb_name=PojongoTestDatabase
   // -DstartMongoLocal=true
-
+  // -DtestTimeout=5
   public AllTestsMongoVertxUnit() {
   }
 

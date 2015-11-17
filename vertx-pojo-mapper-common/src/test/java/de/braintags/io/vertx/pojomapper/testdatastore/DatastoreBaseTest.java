@@ -33,6 +33,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ExceptionUtil;
+import de.braintags.io.vertx.util.IteratorAsync;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
@@ -57,7 +58,7 @@ public abstract class DatastoreBaseTest {
   public static IDatastoreContainer datastoreContainer;
 
   @Rule
-  public Timeout rule = Timeout.seconds(5);
+  public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "5")));
 
   @AfterClass
   public static void tearDown(TestContext context) {
@@ -80,11 +81,15 @@ public abstract class DatastoreBaseTest {
   protected static VertxOptions getOptions() {
     VertxOptions options = new VertxOptions();
     String blockedThreadCheckInterval = System.getProperty("BlockedThreadCheckInterval");
-    if (blockedThreadCheckInterval != null)
-      options.setBlockedThreadCheckInterval(Integer.parseInt(blockedThreadCheckInterval));
-    String WarningExceptionTime = System.getProperty("WarningExceptionTime");
-    if (blockedThreadCheckInterval != null)
-      options.setWarningExceptionTime(Integer.parseInt(WarningExceptionTime));
+    if (blockedThreadCheckInterval != null) {
+      logger.info("setting setBlockedThreadCheckInterval to " + blockedThreadCheckInterval);
+      options.setBlockedThreadCheckInterval(Long.parseLong(blockedThreadCheckInterval));
+    }
+    String warningExceptionTime = System.getProperty("WarningExceptionTime");
+    if (warningExceptionTime != null) {
+      logger.info("setting setWarningExceptionTime to " + warningExceptionTime);
+      options.setWarningExceptionTime(Long.parseLong(warningExceptionTime));
+    }
     return options;
   }
 
@@ -195,13 +200,9 @@ public abstract class DatastoreBaseTest {
     ResultContainer resultContainer = new ResultContainer();
     query.execute(result -> {
       try {
+        resultFine(result);
         resultContainer.queryResult = result.result();
         logger.info("performed find with: " + resultContainer.queryResult.getOriginalQuery());
-        checkQueryResult(context, result, expectedResult);
-
-        if (expectedResult >= 0) {
-          context.assertEquals(expectedResult, resultContainer.queryResult.size());
-        }
       } catch (AssertionError e) {
         resultContainer.assertionError = e;
       } catch (Throwable e) {
@@ -212,6 +213,8 @@ public abstract class DatastoreBaseTest {
     });
 
     async.await();
+
+    checkQueryResult(context, resultContainer.queryResult, expectedResult);
     return resultContainer;
   }
 
@@ -299,13 +302,10 @@ public abstract class DatastoreBaseTest {
     context.assertEquals(new Long(expectedResult), new Long(qr.getCount()));
   }
 
-  public void checkQueryResult(TestContext context, AsyncResult<? extends IQueryResult<?>> qResult,
-      int expectedResult) {
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public void checkQueryResult(TestContext context, IQueryResult qr, int expectedResult) {
     Async async = context.async();
-    IQueryResult<?> qr = null;
     try {
-      resultFine(qResult);
-      qr = qResult.result();
       context.assertNotNull(qr);
     } catch (Exception e) {
       logger.error("", e);
@@ -324,23 +324,22 @@ public abstract class DatastoreBaseTest {
         async.complete();
       }
     } else {
+      IteratorAsync<?> itr = qr.iterator();
       try {
-        context.assertTrue(qr.iterator().hasNext());
+        context.assertTrue(itr.hasNext());
       } catch (Exception e) {
         logger.error("", e);
         async.complete();
         throw ExceptionUtil.createRuntimeException(e);
       }
 
-      qr.iterator().next(result -> {
+      itr.next(nitr -> {
         try {
-          if (result.failed()) {
-            logger.error("", result.cause());
-            throw result.cause() instanceof RuntimeException ? (RuntimeException) result.cause()
-                : new RuntimeException(result.cause());
-          } else {
-            context.assertNotNull(result.result());
+          if (nitr.failed()) {
+            logger.error("", nitr.cause());
+            throw ExceptionUtil.createRuntimeException(nitr.cause());
           }
+          context.assertNotNull(nitr.result());
         } finally {
           async.complete();
         }
