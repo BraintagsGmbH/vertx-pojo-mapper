@@ -36,4 +36,7 @@
 
 
 
+	<scm>
+		<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper.git</url>
+	</scm>
 </project>
