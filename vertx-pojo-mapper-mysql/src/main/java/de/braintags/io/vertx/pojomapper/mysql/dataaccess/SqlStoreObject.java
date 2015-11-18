@@ -86,16 +86,22 @@ public class SqlStoreObject extends JsonStoreObject {
           "No keygenerator defined for mapper %s. Did you set the property IKeyGenerator.DEFAULT_KEY_GERNERATOR for your datastore? ",
           getMapper().getMapperClass().getName()));
     }
-    Object genKey = gen.generateKey();
-    IField idField = getMapper().getIdField();
-    idField.getTypeHandler().intoStore(genKey, idField, thResult -> {
-      if (thResult.failed()) {
-        resultHandler.handle(Future.failedFuture(thResult.cause()));
+    gen.generateKey(getMapper(), keyResult -> {
+      if (keyResult.failed()) {
+        resultHandler.handle(Future.failedFuture(keyResult.cause()));
       } else {
-        Object idValue = thResult.result().getResult();
-        sequence.addEntry(idField.getColumnInfo().getName(), idValue);
-        put(idField, idValue);
-        resultHandler.handle(Future.succeededFuture(sequence));
+        Object genKey = keyResult.result().getKey();
+        IField idField = getMapper().getIdField();
+        idField.getTypeHandler().intoStore(genKey, idField, thResult -> {
+          if (thResult.failed()) {
+            resultHandler.handle(Future.failedFuture(thResult.cause()));
+          } else {
+            Object idValue = thResult.result().getResult();
+            sequence.addEntry(idField.getColumnInfo().getName(), idValue);
+            put(idField, idValue);
+            resultHandler.handle(Future.succeededFuture(sequence));
+          }
+        });
       }
     });
   }

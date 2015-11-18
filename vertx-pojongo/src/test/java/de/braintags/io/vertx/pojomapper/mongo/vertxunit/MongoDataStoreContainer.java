@@ -74,7 +74,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
             handler.handle(Future.failedFuture(new InitException(initResult.cause())));
             return;
           }
-          mongoDataStore = new MongoDataStore(mongoClient, getConfig());
+          mongoDataStore = new MongoDataStore(vertx, mongoClient, getConfig());
           handler.handle(Future.succeededFuture());
           return;
         });

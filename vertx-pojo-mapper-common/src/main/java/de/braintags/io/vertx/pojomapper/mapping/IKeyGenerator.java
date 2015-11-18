@@ -14,6 +14,9 @@ package de.braintags.io.vertx.pojomapper.mapping;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.KeyGenerator;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.Key;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * The IKeyGenerator is used to generate primary keys for new instances of an {@link IMapper}. The IKeyGenerator can be
@@ -26,7 +29,7 @@ public interface IKeyGenerator {
   /**
    * The name of the property which is used to set the default {@link IKeyGenerator} used by a datastore.
    */
-  public static final String DEFAULT_KEY_GERNERATOR = "defaultKeyGenerator";
+  public static final String DEFAULT_KEY_GENERATOR = "defaultKeyGenerator";
 
   /**
    * Get the name of the IKeyGenerator. This is the name, which can be set as value for the annotation
@@ -39,8 +42,9 @@ public interface IKeyGenerator {
   /**
    * Generates a key and returns it
    * 
-   * @return the generated key
+   * @param mapper
+   * @param idResult
    */
-  public Object generateKey();
+  void generateKey(IMapper mapper, Handler<AsyncResult<Key>> handler);
 
 }

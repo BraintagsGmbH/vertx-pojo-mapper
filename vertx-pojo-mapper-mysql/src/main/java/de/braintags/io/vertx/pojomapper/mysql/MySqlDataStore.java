@@ -21,6 +21,7 @@ import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DebugGenerator;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.FileKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlDelete;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQuery;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObjectFactory;
@@ -28,6 +29,7 @@ import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlWrite;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlTableGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlTypeHandlerFactory;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
 
@@ -53,8 +55,8 @@ public class MySqlDataStore extends AbstractDataStore {
    * @param database
    *          the name of the database used
    */
-  public MySqlDataStore(AsyncSQLClient sqlClient, JsonObject properties) {
-    super(properties);
+  public MySqlDataStore(Vertx vertx, AsyncSQLClient sqlClient, JsonObject properties) {
+    super(vertx, properties);
     this.sqlClient = sqlClient;
     metaData = new MySqlMetaData(sqlClient);
     setMapperFactory(new MapperFactory(this));
@@ -63,6 +65,17 @@ public class MySqlDataStore extends AbstractDataStore {
     setStoreObjectFactory(new SqlStoreObjectFactory());
     setDataStoreSynchronizer(new SqlDataStoreSynchronizer(this));
     setTableGenerator(new SqlTableGenerator());
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.impl.AbstractDataStore#initSupportedKeyGenerators()
+   */
+  @Override
+  protected void initSupportedKeyGenerators() {
+    addSupportedKeyGenerator(new DebugGenerator(this));
+    addSupportedKeyGenerator(new FileKeyGenerator(this));
   }
 
   /*
@@ -115,16 +128,6 @@ public class MySqlDataStore extends AbstractDataStore {
   @Override
   public final String getDatabase() {
     return getProperties().getString(DATABASE_NAME);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.impl.AbstractDataStore#initSupportedKeyGenerators()
-   */
-  @Override
-  protected void initSupportedKeyGenerators() {
-    addSupportedKeyGenerator(new DebugGenerator(this));
   }
 
 }

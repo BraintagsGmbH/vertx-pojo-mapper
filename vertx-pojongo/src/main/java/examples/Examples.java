@@ -48,7 +48,7 @@ public class Examples {
     config.put("connection_string", "mongodb://localhost:27017");
     config.put("db_name", "PojongoTestDatabase");
     MongoClient mongoClient = MongoClient.createNonShared(vertx, config);
-    MongoDataStore mongoDataStore = new MongoDataStore(mongoClient, config);
+    MongoDataStore mongoDataStore = new MongoDataStore(vertx, mongoClient, config);
   }
 
   /**

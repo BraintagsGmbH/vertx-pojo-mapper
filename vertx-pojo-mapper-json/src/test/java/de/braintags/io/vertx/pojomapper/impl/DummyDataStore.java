@@ -32,6 +32,7 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -226,6 +227,16 @@ public class DummyDataStore implements IDataStore {
    */
   @Override
   public IKeyGenerator getDefaultKeyGenerator() {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getVertx()
+   */
+  @Override
+  public Vertx getVertx() {
     return null;
   }
 }

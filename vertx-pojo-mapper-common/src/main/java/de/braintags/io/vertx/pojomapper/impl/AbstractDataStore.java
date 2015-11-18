@@ -26,6 +26,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -36,6 +37,7 @@ import io.vertx.core.json.JsonObject;
  */
 
 public abstract class AbstractDataStore implements IDataStore {
+  private Vertx vertx;
   private JsonObject properties;
   private IMapperFactory mapperFactory;
   private IPropertyMapperFactory propertyMapperFactory;
@@ -48,7 +50,8 @@ public abstract class AbstractDataStore implements IDataStore {
   /**
    * 
    */
-  public AbstractDataStore(JsonObject properties) {
+  public AbstractDataStore(Vertx vertx, JsonObject properties) {
+    this.vertx = vertx;
     this.properties = properties;
     initSupportedKeyGenerators();
   }
@@ -197,8 +200,13 @@ public abstract class AbstractDataStore implements IDataStore {
    */
   @Override
   public IKeyGenerator getDefaultKeyGenerator() {
-    String genName = getProperties().getString(IKeyGenerator.DEFAULT_KEY_GERNERATOR);
+    String genName = getProperties().getString(IKeyGenerator.DEFAULT_KEY_GENERATOR);
     return genName == null ? null : getKeyGenerator(genName);
+  }
+
+  @Override
+  public Vertx getVertx() {
+    return vertx;
   }
 
 }

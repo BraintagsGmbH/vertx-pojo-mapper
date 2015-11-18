@@ -19,7 +19,7 @@ import java.util.Map;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
-import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DebugGenerator;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.FileKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.BooleanTypeHandler;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.JsonTypeHandler;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlArrayTypeHandlerEmbedded;
@@ -76,7 +76,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   private AsyncSQLClient mySQLClient;
   private Map<String, String> thMap = new HashMap<String, String>();
   private static boolean handleReferencedRecursive = true;
-  private static final String DEFAULT_KEY_GENERATOR = DebugGenerator.NAME;
+  private static final String DEFAULT_KEY_GENERATOR = FileKeyGenerator.NAME; // DebugGenerator.NAME;
 
   /**
    * 
@@ -117,10 +117,10 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
       JsonObject mySQLClientConfig = new JsonObject().put("host", "localhost").put("username", username)
           .put(IDataStore.HANDLE_REFERENCED_RECURSIVE, handleReferencedRecursive).put("password", password)
           .put("database", database).put("port", 3306).put("initial_pool_size", 10)
-          .put(IKeyGenerator.DEFAULT_KEY_GERNERATOR, DEFAULT_KEY_GENERATOR);
+          .put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
 
       mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
-      datastore = new MySqlDataStore(mySQLClient, mySQLClientConfig);
+      datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig);
       handler.handle(Future.succeededFuture());
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));

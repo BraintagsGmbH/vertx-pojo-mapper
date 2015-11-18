@@ -26,6 +26,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -43,6 +44,13 @@ public interface IDataStore {
    * 
    */
   public static final String HANDLE_REFERENCED_RECURSIVE = "handleReferencedRecursive";
+
+  /**
+   * Get the instance of {@link Vertx} where the current instance is belonging to
+   * 
+   * @return the instance of Vertx where inside the current instance was created
+   */
+  public Vertx getVertx();
 
   /**
    * Returns a new {@link IQuery} bound to the given mapper

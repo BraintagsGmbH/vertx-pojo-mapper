@@ -13,9 +13,13 @@
 package de.braintags.io.vertx.pojomapper.mapping.impl.keygen;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
- * The {@link DebugGenerator} is reset to 0 by each program start and can be used for testing. It generates an
+ * The {@link DebugGenerator} is reset to 0 by each start of an IDataStore and can be used for testing. It generates an
  * identifyer as long
  * 
  * @author Michael Remme
@@ -39,8 +43,8 @@ public class DebugGenerator extends AbstractKeyGenerator {
    * @see de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator#generateKey()
    */
   @Override
-  public Object generateKey() {
-    return ++counter;
+  public void generateKey(IMapper mapper, Handler<AsyncResult<Key>> handler) {
+    handler.handle(Future.succeededFuture(new Key(++counter)));
   }
 
 }
