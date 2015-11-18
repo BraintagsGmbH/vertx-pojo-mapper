@@ -17,26 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.datastoretest.IDatastoreContainer;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.AbstractTypeHandlerTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.ArrayTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.BooleanTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.CalendarTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.CollectionTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.DateTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.EmbeddedArrayTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.EmbeddedListTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.EmbeddedMapTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.EmbeddedSingleTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.EmbeddedSingleTest_Null;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.JsonTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.MapTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.PropertiesTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.ReferencedArrayTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.ReferencedListTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.ReferencedMapTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.typehandler.ReferencedSingleTest;
 import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
+import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DebugGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.BooleanTypeHandler;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.JsonTypeHandler;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlArrayTypeHandlerEmbedded;
@@ -52,6 +35,25 @@ import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlMapTypeHandlerEmbed
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlMapTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlObjectTypehandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlObjectTypehandlerReferenced;
+import de.braintags.io.vertx.pojomapper.testdatastore.IDatastoreContainer;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.AbstractTypeHandlerTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.ArrayTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.BooleanTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.CalendarTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.CollectionTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.DateTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.EmbeddedArrayTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.EmbeddedListTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.EmbeddedMapTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.EmbeddedSingleTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.EmbeddedSingleTest_Null;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.JsonTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.MapTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.PropertiesTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.ReferencedArrayTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.ReferencedListTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.ReferencedMapTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.ReferencedSingleTest;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -74,6 +76,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   private AsyncSQLClient mySQLClient;
   private Map<String, String> thMap = new HashMap<String, String>();
   private static boolean handleReferencedRecursive = true;
+  private static final String DEFAULT_KEY_GENERATOR = DebugGenerator.NAME;
 
   /**
    * 
@@ -113,7 +116,8 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
       String database = "test";
       JsonObject mySQLClientConfig = new JsonObject().put("host", "localhost").put("username", username)
           .put(IDataStore.HANDLE_REFERENCED_RECURSIVE, handleReferencedRecursive).put("password", password)
-          .put("database", database).put("port", 3306).put("initial_pool_size", 10);
+          .put("database", database).put("port", 3306).put("initial_pool_size", 10)
+          .put(IKeyGenerator.DEFAULT_KEY_GERNERATOR, DEFAULT_KEY_GENERATOR);
 
       mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
       datastore = new MySqlDataStore(mySQLClient, mySQLClientConfig);

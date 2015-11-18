@@ -173,7 +173,7 @@ public abstract class DatastoreBaseTest {
     IWriteEntry entry = result.result().iterator().next();
     context.assertNotNull(entry);
     context.assertNotNull(entry.getStoreObject());
-    context.assertNotNull(entry.getId());
+    context.assertNotNull(entry.getId(), "the id of an IWriteEntry must be defined");
     if (expectedNumberOfRecords >= 0) {
       context.assertEquals(expectedNumberOfRecords, result.result().size());
     }

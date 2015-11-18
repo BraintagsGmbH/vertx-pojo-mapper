@@ -16,7 +16,6 @@ import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
-import de.braintags.io.vertx.pojomapper.datastoretest.mapper.typehandler.BaseRecord;
 
 /**
  * A simple mapper with some beans properties

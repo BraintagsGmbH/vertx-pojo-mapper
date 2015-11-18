@@ -12,10 +12,13 @@
  */
 package de.braintags.io.vertx.pojomapper;
 
+import de.braintags.io.vertx.pojomapper.annotation.KeyGenerator;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
+import de.braintags.io.vertx.pojomapper.exception.UnsupportedKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
+import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
@@ -130,5 +133,27 @@ public interface IDataStore {
    * @return the properties set for the current instance
    */
   public JsonObject getProperties();
+
+  /**
+   * Request an {@link IKeyGenerator} with the given name. This method is called by IMapper, when the mapping is
+   * processed and an annotation {@link KeyGenerator} was found. The {@link IDataStore} will check for a supported
+   * {@link IKeyGenerator} and return it. If there is no {@link IKeyGenerator} supported by this {@link IDataStore}, an
+   * {@link UnsupportedKeyGenerator} is thrown
+   * 
+   * @param generatorName
+   *          the name of the requested generator
+   * @return an instance of {@link IKeyGenerator}
+   * @throws UnsupportedKeyGenerator
+   *           when the requested generator is not supported by the current instance
+   */
+  public IKeyGenerator getKeyGenerator(String generatorName);
+
+  /**
+   * If for an IMapper the annotation {@link KeyGenerator} is undefined, then the default instance is requested here.
+   * 
+   * @return the default instance of {@link IKeyGenerator} or null, if the current instance does not need or support
+   *         {@link IKeyGenerator}
+   */
+  public IKeyGenerator getDefaultKeyGenerator();
 
 }

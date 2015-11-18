@@ -20,6 +20,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DebugGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlDelete;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQuery;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObjectFactory;
@@ -35,7 +36,6 @@ import io.vertx.ext.asyncsql.AsyncSQLClient;
  * @author Michael Remme
  * 
  */
-
 public class MySqlDataStore extends AbstractDataStore {
   /**
    * The name of the property, which describes the database to be used
@@ -115,6 +115,16 @@ public class MySqlDataStore extends AbstractDataStore {
   @Override
   public final String getDatabase() {
     return getProperties().getString(DATABASE_NAME);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.impl.AbstractDataStore#initSupportedKeyGenerators()
+   */
+  @Override
+  protected void initSupportedKeyGenerators() {
+    addSupportedKeyGenerator(new DebugGenerator(this));
   }
 
 }

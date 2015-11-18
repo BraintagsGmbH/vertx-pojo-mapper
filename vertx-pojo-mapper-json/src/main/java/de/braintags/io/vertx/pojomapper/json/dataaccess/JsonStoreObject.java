@@ -92,6 +92,18 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   /*
    * (non-Javadoc)
    * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.mapping.IStoreObject#hasProperty(de.braintags.io.vertx.pojomapper.mapping.IField)
+   */
+  @Override
+  public boolean hasProperty(IField field) {
+    String colName = mapper.getTableInfo().getColumnInfo(field).getName();
+    return jsonObject.containsKey(colName);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#put(de.braintags.io.vertx.pojomapper.mapping.IField,
    * java.lang.Object)
    */

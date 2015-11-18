@@ -13,16 +13,15 @@
 
 package de.braintags.io.vertx.pojomapper.mysql;
 
-import java.util.concurrent.CountDownLatch;
-
 import org.junit.Test;
 
-import de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest;
-import de.braintags.io.vertx.pojomapper.datastoretest.mapper.RamblerMapper;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlExpression;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQuery;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQueryRambler;
-import io.vertx.core.VertxOptions;
+import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.RamblerMapper;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
 
 /**
  * testing of {@link SqlQueryRambler}
@@ -35,90 +34,74 @@ public class TestSqlQueryRambler extends DatastoreBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TestSqlQueryRambler.class);
 
-  @Override
-  protected VertxOptions getOptions() {
-    VertxOptions options = new VertxOptions();
-    options.setBlockedThreadCheckInterval(10000);
-    options.setWarningExceptionTime(10000);
-    return options;
-  }
-
   @Test
-  public void test_1() {
+  public void test_1(TestContext context) {
     SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
     query.field("name").is("name to find");
-    executeRambler(query, 1);
+    executeRambler(context, query, 1);
   }
 
   @Test
-  public void test_2() {
+  public void test_2(TestContext context) {
     SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
     query.field("name").is("name to find").field("name").isNot("unknown");
-    executeRambler(query, 2);
+    executeRambler(context, query, 2);
   }
 
   @Test
-  public void test_3() {
+  public void test_3(TestContext context) {
     SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
     query.or("name").is("name to find").field("name").isNot("unknown");
-    executeRambler(query, 2);
+    executeRambler(context, query, 2);
   }
 
   @Test
-  public void test_4() {
+  public void test_4(TestContext context) {
     SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
     query.or("name").is("name to find").field("name").isNot("unknown").and("age").less(15);
-    executeRambler(query, 3);
+    executeRambler(context, query, 3);
   }
 
   @Test
-  public void test_5() {
+  public void test_5(TestContext context) {
     SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
     query.or("name").is("name to find").field("name").isNot("unknown").and("age").in(4, 5, 7, 9);
-    executeRambler(query, 6);
+    executeRambler(context, query, 6);
   }
 
   @Test
-  public void test_6() {
+  public void test_6(TestContext context) {
     SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
     query.orOpen("name").is("name to find").field("name").isNot("unknown");
-    executeRambler(query, 2);
+    executeRambler(context, query, 2);
   }
 
   @Test
-  public void test_7() {
+  public void test_7(TestContext context) {
     SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
     query.orOpen("name").is("name to find").field("name").isNot("unknown").close().and("age").in(4, 5, 7, 9);
-    executeRambler(query, 6);
+    executeRambler(context, query, 6);
   }
 
-  private void executeRambler(SqlQuery<?> query, int expectedParameters) {
-    CountDownLatch latch = new CountDownLatch(1);
+  private void executeRambler(TestContext context, SqlQuery<?> query, int expectedParameters) {
+    Async async = context.async();
     SqlQueryRambler rambler = new SqlQueryRambler();
     query.executeQueryRambler(rambler, result -> {
       if (result.failed()) {
         LOGGER.error("", result.cause());
-        latch.countDown();
+        async.complete();
       } else {
         LOGGER.info("SELECT STATEMENT: " + ((SqlExpression) rambler.getQueryExpression()).getSelectExpression());
         LOGGER.info("DELETE STATEMENT: " + ((SqlExpression) rambler.getQueryExpression()).getDeleteExpression());
         LOGGER.info(((SqlExpression) rambler.getQueryExpression()).getParameters());
         try {
-          assertEquals("wrong number of parameters", expectedParameters,
-              ((SqlExpression) rambler.getQueryExpression()).getParameters().size());
+          context.assertEquals(expectedParameters,
+              ((SqlExpression) rambler.getQueryExpression()).getParameters().size(), "wrong number of parameters");
         } finally {
-          latch.countDown();
+          async.complete();
         }
       }
     });
-
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      LOGGER.error("", e);
-    } finally {
-      testComplete();
-    }
   }
 
 }

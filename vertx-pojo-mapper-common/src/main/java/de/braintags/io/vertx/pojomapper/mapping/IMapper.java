@@ -19,6 +19,7 @@ import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.annotation.KeyGenerator;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
@@ -158,4 +159,12 @@ public interface IMapper {
    *         used
    */
   public boolean handleReferencedRecursive();
+
+  /**
+   * Retrive the {@link IKeyGenerator} for the current mapper. This method reacts to the annotation {@link KeyGenerator}
+   * . If none is set, then the method {@link IDataStore#getDefaultKeyGenerator()} is requested
+   * 
+   * @return an instance of {@link IKeyGenerator} or null, if none defined or supported by {@link IDataStore}
+   */
+  public IKeyGenerator getKeyGenerator();
 }

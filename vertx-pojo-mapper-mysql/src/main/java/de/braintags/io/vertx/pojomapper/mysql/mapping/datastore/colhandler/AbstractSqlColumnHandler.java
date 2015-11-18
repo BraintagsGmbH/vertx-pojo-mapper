@@ -29,7 +29,7 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
  */
 
 public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
-  private static final String ID_COLUMN_STRING = "%s %s (%d) NOT NULL auto_increment";
+  private static final String ID_COLUMN_STRING = "%s %s (%d) NOT NULL";
 
   /**
    * @param classesToDeal

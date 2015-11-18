@@ -13,18 +13,18 @@
 package de.braintags.io.vertx.pojomapper.mysql;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
 
-import de.braintags.io.vertx.pojomapper.datastoretest.DatastoreBaseTest;
-import io.vertx.core.VertxOptions;
+import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.UpdateResult;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
 
 /**
  * 
@@ -36,52 +36,33 @@ import io.vertx.ext.sql.UpdateResult;
 public class TestSqlExpressions extends DatastoreBaseTest {
   private static final Logger log = LoggerFactory.getLogger(TestSqlExpressions.class);
 
-  /**
-   * 
-   */
-  public TestSqlExpressions() {
-  }
-
-  @Override
-  protected VertxOptions getOptions() {
-    return super.getOptions();
-  }
   // SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='test' AND TABLE_NAME='SimpleMapper'
 
   @Test
-  public void testQuerySchema() {
-    CountDownLatch latch = new CountDownLatch(1);
+  public void testQuerySchema(TestContext context) {
+    Async async = context.async();
     String queryExpression = "SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='test' AND TABLE_NAME='SimpleMapper'; ";
     SqlUtil.query((MySqlDataStore) getDataStore(), queryExpression, ur -> {
       if (ur.failed()) {
-        fail(ur.cause().toString());
-        latch.countDown();
+        context.fail(ur.cause().toString());
+        async.complete();
       } else {
         ResultSet res = ur.result();
         log.info("found records: " + res.getNumRows());
-
-        latch.countDown();
+        async.complete();
       }
     });
-
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      log.error("", e);
-    } finally {
-      testComplete();
-    }
   }
 
   @Test
-  public void testTimeField() {
+  public void testTimeField(TestContext context) {
     String createTableString = "Create TABLE IF NOT EXISTS  timetable (id INT NOT NULL AUTO_INCREMENT, myTime TIMESTAMP, PRIMARY KEY(id))";
-    CountDownLatch latch = new CountDownLatch(1);
+    Async async = context.async();
     SqlUtil.execute((MySqlDataStore) getDataStore(), createTableString, createTableResult -> {
       if (createTableResult.failed()) {
         log.error("", createTableResult.cause());
-        fail();
-        latch.countDown();
+        context.fail(createTableResult.cause());
+        async.complete();
       } else {
         String insertExpression = "insert into timetable set myTime=?; ";
         JsonArray array = new JsonArray().add("2015-10-13 18:45:22");
@@ -89,7 +70,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
         SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), insertExpression, array, ur -> {
           if (ur.failed()) {
             log.error("", ur.cause());
-            latch.countDown();
+            async.complete();
           } else {
             UpdateResult res = ur.result();
             log.info(res.toJson());
@@ -99,40 +80,32 @@ public class TestSqlExpressions extends DatastoreBaseTest {
             SqlUtil.query((MySqlDataStore) getDataStore(), allRecords, idResult -> {
               if (idResult.failed()) {
                 log.error("", idResult.cause());
-                fail(idResult.cause().toString());
-                latch.countDown();
+                context.fail(idResult.cause());
+                async.complete();
               } else {
                 List<JsonObject> ids = idResult.result().getRows();
                 for (JsonObject row : ids) {
                   log.info(row);
                 }
-                latch.countDown();
+                async.complete();
               }
             });
           }
         });
       }
     });
-
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      log.error("", e);
-    } finally {
-      testComplete();
-    }
   }
 
   @Test
-  public void simpleTest() {
-    CountDownLatch latch = new CountDownLatch(1);
+  public void simpleTest(TestContext context) {
+    Async async = context.async();
     JsonArray array = new JsonArray().add("new name");
     String insertExpression = "insert into MiniMapper set name=?; ";
 
     SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), insertExpression, array, ur -> {
       if (ur.failed()) {
         log.error("", ur.cause());
-        latch.countDown();
+        async.complete();
       } else {
         UpdateResult res = ur.result();
         log.info(res.toJson());
@@ -142,31 +115,24 @@ public class TestSqlExpressions extends DatastoreBaseTest {
         SqlUtil.query((MySqlDataStore) getDataStore(), lastInsertIdCmd, idResult -> {
           if (idResult.failed()) {
             log.error("", ur.cause());
-            fail(ur.cause().toString());
-            latch.countDown();
+            context.fail(ur.cause());
+            async.complete();
           } else {
             List<JsonObject> ids = idResult.result().getRows();
             for (JsonObject row : ids) {
               log.info(row);
             }
-            latch.countDown();
+            async.complete();
           }
         });
 
       }
     });
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      log.error("", e);
-    } finally {
-      testComplete();
-    }
   }
 
   @Test
-  public void testQueryIN() {
-    CountDownLatch latch = new CountDownLatch(1);
+  public void testQueryIN(TestContext context) {
+    Async async = context.async();
 
     JsonArray array = new JsonArray().add("1").add("2").add("3");
     String insertExpression = "SELECT * from MiniMapper where id IN ( ?, ?, ?); ";
@@ -174,48 +140,32 @@ public class TestSqlExpressions extends DatastoreBaseTest {
     SqlUtil.queryWithParams((MySqlDataStore) getDataStore(), insertExpression, array, ur -> {
       if (ur.failed()) {
         log.error("ERror searching", ur.cause());
-        fail(ur.cause().toString());
-        latch.countDown();
+        context.fail(ur.cause());
+        async.complete();
       } else {
         ResultSet res = ur.result();
         log.info("found records: " + res.getNumRows());
-        latch.countDown();
+        async.complete();
       }
     });
-
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      log.error("", e);
-    } finally {
-      testComplete();
-    }
   }
 
   @Test
-  public void testDeleteIN() {
-    CountDownLatch latch = new CountDownLatch(1);
+  public void testDeleteIN(TestContext context) {
+    Async async = context.async();
     JsonArray array = new JsonArray().add("1").add("2").add("3");
     String insertExpression = "Delete from MiniMapper where id IN ( ?, ?, ?); ";
 
     SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), insertExpression, array, ur -> {
       if (ur.failed()) {
         log.error("Error deleting", ur.cause());
-        latch.countDown();
+        async.complete();
       } else {
         UpdateResult res = ur.result();
         log.info("deleted: " + res.getUpdated());
-        latch.countDown();
+        async.complete();
       }
     });
-
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      log.error("", e);
-    } finally {
-      testComplete();
-    }
   }
 
 }

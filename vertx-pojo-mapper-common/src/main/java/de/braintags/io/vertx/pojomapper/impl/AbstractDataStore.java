@@ -14,8 +14,13 @@
 
 package de.braintags.io.vertx.pojomapper.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.exception.UnsupportedKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
+import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
@@ -38,13 +43,21 @@ public abstract class AbstractDataStore implements IDataStore {
   private IStoreObjectFactory storeObjectFactory;
   private ITableGenerator tableGenerator;
   private IDataStoreSynchronizer dataStoreSynchronizer;
+  private Map<String, IKeyGenerator> keyGeneratorMap = new HashMap<>();
 
   /**
    * 
    */
   public AbstractDataStore(JsonObject properties) {
     this.properties = properties;
+    initSupportedKeyGenerators();
   }
+
+  /**
+   * Define all {@link IKeyGenerator}, which are supported by the current instance by using the method
+   * {@link #addSupportedKeyGenerator(IKeyGenerator)}
+   */
+  protected abstract void initSupportedKeyGenerators();
 
   /*
    * (non-Javadoc)
@@ -153,6 +166,39 @@ public abstract class AbstractDataStore implements IDataStore {
   @Override
   public JsonObject getProperties() {
     return properties;
+  }
+
+  /**
+   * Add an {@link IKeyGenerator} supported by the current instance
+   * 
+   * @param generator
+   */
+  protected void addSupportedKeyGenerator(IKeyGenerator generator) {
+    keyGeneratorMap.put(generator.getName(), generator);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getKeyGenerator(java.lang.String)
+   */
+  @Override
+  public final IKeyGenerator getKeyGenerator(String generatorName) {
+    if (keyGeneratorMap.containsKey(generatorName)) {
+      return keyGeneratorMap.get(generatorName);
+    }
+    throw new UnsupportedKeyGenerator("This generator is not supported by the current datastore: " + generatorName);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()
+   */
+  @Override
+  public IKeyGenerator getDefaultKeyGenerator() {
+    String genName = getProperties().getString(IKeyGenerator.DEFAULT_KEY_GERNERATOR);
+    return genName == null ? null : getKeyGenerator(genName);
   }
 
 }

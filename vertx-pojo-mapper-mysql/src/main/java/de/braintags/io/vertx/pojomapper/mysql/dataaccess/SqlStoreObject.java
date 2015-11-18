@@ -17,10 +17,14 @@ import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.json.dataaccess.JsonStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -58,18 +62,42 @@ public class SqlStoreObject extends JsonStoreObject {
    * 
    * @return the sql statement to be executed
    */
-  public SqlSequence generateSqlInsertStatement() {
-    ITableInfo tInfo = getMapper().getTableInfo();
-    SqlSequence sequence = new SqlSequence(tInfo.getName());
-
-    Set<String> fieldNames = getMapper().getFieldNames();
-    for (String fieldName : fieldNames) {
-      IField field = getMapper().getField(fieldName);
-      if (field != getMapper().getIdField()) {
-        sequence.addEntry(tInfo.getColumnInfo(field).getName(), get(field));
+  public void generateSqlInsertStatement(Handler<AsyncResult<SqlSequence>> resultHandler) {
+    try {
+      ITableInfo tInfo = getMapper().getTableInfo();
+      SqlSequence sequence = new SqlSequence(tInfo.getName());
+      Set<String> fieldNames = getMapper().getFieldNames();
+      for (String fieldName : fieldNames) {
+        IField field = getMapper().getField(fieldName);
+        if (field != getMapper().getIdField()) {
+          sequence.addEntry(field.getColumnInfo().getName(), get(field));
+        }
       }
+      getNextId(tInfo, sequence, resultHandler);
+    } catch (Exception e) {
+      resultHandler.handle(Future.failedFuture(e));
     }
-    return sequence;
+  }
+
+  private void getNextId(ITableInfo tInfo, SqlSequence sequence, Handler<AsyncResult<SqlSequence>> resultHandler) {
+    IKeyGenerator gen = this.getMapper().getKeyGenerator();
+    if (gen == null) {
+      throw new UnsupportedOperationException(String.format(
+          "No keygenerator defined for mapper %s. Did you set the property IKeyGenerator.DEFAULT_KEY_GERNERATOR for your datastore? ",
+          getMapper().getMapperClass().getName()));
+    }
+    Object genKey = gen.generateKey();
+    IField idField = getMapper().getIdField();
+    idField.getTypeHandler().intoStore(genKey, idField, thResult -> {
+      if (thResult.failed()) {
+        resultHandler.handle(Future.failedFuture(thResult.cause()));
+      } else {
+        Object idValue = thResult.result().getResult();
+        sequence.addEntry(idField.getColumnInfo().getName(), idValue);
+        put(idField, idValue);
+        resultHandler.handle(Future.succeededFuture(sequence));
+      }
+    });
   }
 
   /**

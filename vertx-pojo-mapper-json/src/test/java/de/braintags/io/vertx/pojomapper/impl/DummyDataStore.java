@@ -23,6 +23,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
+import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
@@ -206,5 +207,25 @@ public class DummyDataStore implements IDataStore {
   @Override
   public JsonObject getProperties() {
     return properties;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getKeyGenerator(java.lang.String)
+   */
+  @Override
+  public IKeyGenerator getKeyGenerator(String generatorName) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()
+   */
+  @Override
+  public IKeyGenerator getDefaultKeyGenerator() {
+    return null;
   }
 }

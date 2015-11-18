@@ -29,6 +29,15 @@ import io.vertx.codegen.annotations.Fluent;
 public interface IStoreObject<T> {
 
   /**
+   * Checks wether for the given IField an entry is defined inside the current instance
+   * 
+   * @param field
+   *          the {@link IField} to be checked
+   * @return true, if property is defined
+   */
+  public boolean hasProperty(IField field);
+
+  /**
    * Get the defined property in the propriate format of the current driver
    * 
    * @param property

@@ -66,7 +66,8 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
   @Test
   public void testSaveAndReadRecord(TestContext context) {
     BaseRecord record = createInstance(context);
-    dropTable(context, record.getClass().getSimpleName());
+    dropTables(context, record);
+
     ResultContainer resultContainer = saveRecord(context, record);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
@@ -91,6 +92,11 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
       }
     });
 
+  }
+
+  protected void dropTables(TestContext context, BaseRecord record) {
+    dropTable(context, record.getClass().getSimpleName());
+    dropTable(context, "SimpleMapper");
   }
 
   /**

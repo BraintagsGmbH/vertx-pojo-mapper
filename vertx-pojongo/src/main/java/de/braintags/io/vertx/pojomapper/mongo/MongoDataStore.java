@@ -20,6 +20,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoDelete;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoQuery;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoWrite;
@@ -117,6 +118,26 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
   @Override
   public final String getDatabase() {
     return getProperties().getString(DATABASE_NAME);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()
+   */
+  @Override
+  public IKeyGenerator getDefaultKeyGenerator() {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.impl.AbstractDataStore#initSupportedKeyGenerators()
+   */
+  @Override
+  protected void initSupportedKeyGenerators() {
+    // mongo does not support or need any key generator currently
   }
 
 }

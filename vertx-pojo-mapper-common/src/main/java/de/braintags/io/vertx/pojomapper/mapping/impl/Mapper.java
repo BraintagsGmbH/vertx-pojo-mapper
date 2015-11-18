@@ -31,6 +31,7 @@ import java.util.Set;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.Indexes;
+import de.braintags.io.vertx.pojomapper.annotation.KeyGenerator;
 import de.braintags.io.vertx.pojomapper.annotation.ObjectFactory;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete;
@@ -43,6 +44,7 @@ import de.braintags.io.vertx.pojomapper.exception.ClassAccessException;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.exception.MethodAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
@@ -74,6 +76,7 @@ public class Mapper implements IMapper {
   private Map<Class<? extends Annotation>, IField[]> fieldCache = new HashMap<Class<? extends Annotation>, IField[]>();
   private ITableInfo tableInfo;
   private boolean syncNeeded = true;
+  private IKeyGenerator keyGenerator;
 
   /**
    * all annotations which shall be examined for the mapper class itself
@@ -124,8 +127,19 @@ public class Mapper implements IMapper {
     computeClassAnnotations();
     computeEntity();
     computeObjectFactory();
+    computeKeyGenerator();
     generateTableInfo();
     validate();
+  }
+
+  private void computeKeyGenerator() {
+    KeyGenerator gen = (KeyGenerator) getAnnotation(KeyGenerator.class);
+    if (gen != null) {
+      String name = gen.value();
+      keyGenerator = getMapperFactory().getDataStore().getKeyGenerator(name);
+    } else {
+      keyGenerator = getMapperFactory().getDataStore().getDefaultKeyGenerator();
+    }
   }
 
   private void generateTableInfo() {
@@ -446,5 +460,15 @@ public class Mapper implements IMapper {
   public boolean handleReferencedRecursive() {
     return this.getMapperFactory().getDataStore().getProperties().getBoolean(IDataStore.HANDLE_REFERENCED_RECURSIVE,
         false);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getKeyGenerator()
+   */
+  @Override
+  public IKeyGenerator getKeyGenerator() {
+    return keyGenerator;
   }
 }

@@ -14,6 +14,7 @@
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
@@ -22,6 +23,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
 import de.braintags.io.vertx.pojomapper.exception.InsertException;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
 import de.braintags.io.vertx.pojomapper.mysql.SqlUtil;
@@ -31,7 +33,6 @@ import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.UpdateResult;
@@ -167,12 +168,18 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   private void handleInsert(SqlStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
-    SqlSequence seq = storeObject.generateSqlInsertStatement();
-    if (seq.getParameters().isEmpty()) {
-      insertWithoutParameters(storeObject, writeResult, seq, resultHandler);
-    } else {
-      insertWithParameters(storeObject, writeResult, seq, resultHandler);
-    }
+    storeObject.generateSqlInsertStatement(isr -> {
+      if (isr.failed()) {
+        resultHandler.handle(Future.failedFuture(isr.cause()));
+      } else {
+        SqlSequence seq = isr.result();
+        if (seq.getParameters().isEmpty()) {
+          insertWithoutParameters(storeObject, writeResult, seq, resultHandler);
+        } else {
+          insertWithParameters(storeObject, writeResult, seq, resultHandler);
+        }
+      }
+    });
   }
 
   /**
@@ -190,11 +197,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       if (!checkUpdateResult(seq, updateResult, resultHandler))
         return;
       UpdateResult res = updateResult.result();
-      if (res.getKeys() != null && res.getKeys().size() == 1) {
-        finishInsert(storeObject, writeResult, res.getKeys().getValue(0), resultHandler);
-        return;
-      }
-      loadLastInsertedId(storeObject, writeResult, resultHandler);
+      finishInsert(storeObject, writeResult, resultHandler);
     });
   }
 
@@ -205,29 +208,8 @@ public class SqlWrite<T> extends AbstractWrite<T> {
           if (!checkUpdateResult(seq, updateResult, resultHandler))
             return;
           UpdateResult res = updateResult.result();
-          if (res.getKeys() != null && res.getKeys().size() == 1) {
-            finishInsert(storeObject, writeResult, res.getKeys().getValue(0), resultHandler);
-            return;
-          }
-          loadLastInsertedId(storeObject, writeResult, resultHandler);
+          finishInsert(storeObject, writeResult, resultHandler);
         });
-  }
-
-  private void loadLastInsertedId(SqlStoreObject storeObject, IWriteResult writeResult,
-      Handler<AsyncResult<Void>> resultHandler) {
-    SqlUtil.query((MySqlDataStore) getDataStore(), LAST_INSERT_ID_COMMAND, idResult -> {
-      if (idResult.failed()) {
-        resultHandler.handle(Future.failedFuture(idResult.cause()));
-        return;
-      }
-      List<JsonObject> ids = idResult.result().getRows();
-      if (ids.size() != 1) {
-        resultHandler.handle(Future.failedFuture(new InsertException("Error reading last inserted id")));
-        return;
-      }
-      finishInsert(storeObject, writeResult, ids.get(0).getValue("LAST_INSERT_ID()"), resultHandler);
-      return;
-    });
   }
 
   /**
@@ -257,23 +239,35 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   }
 
   @SuppressWarnings("unchecked")
-  private void finishInsert(SqlStoreObject storeObject, IWriteResult writeResult, Object id,
+  private void finishInsert(SqlStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
-    LOGGER.debug("==>>>> inserted record " + storeObject.getMapper().getTableInfo().getName() + " with id " + id);
     try {
+      Object id = storeObject.get(getMapper().getIdField());
+      Objects.requireNonNull(id, "Undefined ID when storing record");
+      LOGGER.debug("==>>>> inserted record " + storeObject.getMapper().getTableInfo().getName() + " with id " + id);
       executePostSave((T) storeObject.getEntity());
       setIdValue(id, storeObject, result -> {
         if (result.failed()) {
           resultHandler.handle(result);
-          return;
+        } else {
+          writeResult.addEntry(storeObject, id, WriteAction.INSERT);
+          resultHandler.handle(Future.succeededFuture());
         }
-        writeResult.addEntry(storeObject, id, WriteAction.INSERT);
-        resultHandler.handle(Future.succeededFuture());
       });
     } catch (Exception e) {
       LOGGER.error("", e);
       resultHandler.handle(Future.failedFuture(e));
     }
+  }
+
+  /**
+   * With mysql the id is generated before, so there is no need to use the super method, where the id is filled into the
+   * {@link IStoreObject}
+   */
+  @Override
+  protected void setIdValue(Object id, IStoreObject<?> storeObject, Handler<AsyncResult<Void>> resultHandler) {
+    IField idField = getMapper().getIdField();
+    idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
   }
 
   /*

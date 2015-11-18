@@ -18,7 +18,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import de.braintags.io.vertx.pojomapper.AllTestsPojoJson;
-import de.braintags.io.vertx.pojomapper.datastoretest.AllTestsCommon;
+import de.braintags.io.vertx.pojomapper.testdatastore.AllTestsCommon;
 
 /**
  * 
