@@ -2,5 +2,8 @@
 
 implementation of vertx-pojo-mapper for MongoDB
 
+MySql is using the vertx-async driver ...
+
+
 See the documentation under link:src/main/asciidoc/java/index.adoc[Example to use pojongo]
 

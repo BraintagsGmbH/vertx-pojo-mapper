@@ -12,11 +12,6 @@
  */
 package examples;
 
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.docgen.Source;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
@@ -24,7 +19,12 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
-import examples.mapper.SimpleMapper;
+import examples.mapper.MiniMapper;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import io.vertx.docgen.Source;
 
 /**
  * Simple example to write and read Pojos
@@ -54,9 +54,9 @@ public class Examples {
    * Create the object to be saved into the datastore
    */
   public void example2() {
-    SimpleMapper dm = new SimpleMapper();
-    dm.setName("SimpleMapper");
-    dm.number = 20;
+    MiniMapper miniMapper = new MiniMapper();
+    miniMapper.name = "my mini mapper";
+    miniMapper.number = 20;
   }
 
   /**
@@ -65,9 +65,9 @@ public class Examples {
    * @param dataStore
    * @param dm
    */
-  public void example3(IDataStore dataStore, SimpleMapper dm) {
-    IWrite<SimpleMapper> write = dataStore.createWrite(SimpleMapper.class);
-    write.add(dm);
+  public void example3(IDataStore dataStore, MiniMapper miniMapper) {
+    IWrite<MiniMapper> write = dataStore.createWrite(MiniMapper.class);
+    write.add(miniMapper);
     write.save(result -> {
       if (result.failed()) {
         logger.error(result.cause());
@@ -87,18 +87,18 @@ public class Examples {
    * @param dataStore
    */
   public void example4(IDataStore dataStore) {
-    IQuery<SimpleMapper> query = dataStore.createQuery(SimpleMapper.class);
-    query.field("name").is("SimpleMapper");
+    IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
+    query.field("name").is("my mini mapper");
     query.execute(rResult -> {
       if (rResult.failed()) {
         logger.error(rResult.cause());
       } else {
-        IQueryResult<SimpleMapper> qr = rResult.result();
+        IQueryResult<MiniMapper> qr = rResult.result();
         qr.iterator().next(itResult -> {
           if (itResult.failed()) {
             logger.error(itResult.cause());
           } else {
-            SimpleMapper readMapper = itResult.result();
+            MiniMapper readMapper = itResult.result();
             logger.info("Query found id " + readMapper.id);
           }
         });
@@ -112,8 +112,8 @@ public class Examples {
    * @param dataStore
    * @param mapper
    */
-  public void example5(IDataStore dataStore, SimpleMapper mapper) {
-    IDelete<SimpleMapper> delete = dataStore.createDelete(SimpleMapper.class);
+  public void example5(IDataStore dataStore, MiniMapper mapper) {
+    IDelete<MiniMapper> delete = dataStore.createDelete(MiniMapper.class);
     delete.add(mapper);
     delete.delete(deleteResult -> {
       if (deleteResult.failed()) {
@@ -125,9 +125,9 @@ public class Examples {
   }
 
   public void example6(IDataStore dataStore) {
-    IQuery<SimpleMapper> query = dataStore.createQuery(SimpleMapper.class);
+    IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
     query.field("name").is("test");
-    IDelete<SimpleMapper> delete = dataStore.createDelete(SimpleMapper.class);
+    IDelete<MiniMapper> delete = dataStore.createDelete(MiniMapper.class);
     delete.setQuery(query);
     delete.delete(deleteResult -> {
       if (deleteResult.failed()) {

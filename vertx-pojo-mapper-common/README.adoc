@@ -3,6 +3,8 @@
 This module contains common interfaces and default implementations for vertx-pojo-mapper.
 Particular implementations are stored in other submodules of the main project.
 
+README 
+
 See the documentation under
 
 * link:src/main/asciidoc/java/index.adoc[ java ]
