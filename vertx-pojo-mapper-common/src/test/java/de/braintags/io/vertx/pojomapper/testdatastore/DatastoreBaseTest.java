@@ -16,8 +16,6 @@ package de.braintags.io.vertx.pojomapper.testdatastore;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 
@@ -30,13 +28,10 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
-import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ExceptionUtil;
 import de.braintags.io.vertx.util.IteratorAsync;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.Async;
@@ -54,71 +49,12 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public abstract class DatastoreBaseTest {
   private static final Logger logger = LoggerFactory.getLogger(DatastoreBaseTest.class);
-  protected static Vertx vertx;
-  public static IDatastoreContainer datastoreContainer;
 
   @Rule
   public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "5")));
 
-  @AfterClass
-  public static void tearDown(TestContext context) {
-    datastoreContainer.shutdown(result -> {
-      if (result.failed()) {
-        context.fail(result.cause());
-      }
-      vertx.close(vr -> {
-        if (vr.failed()) {
-          context.fail(vr.cause());
-        }
-      });
-    });
-  }
-
   public static IDataStore getDataStore() {
-    return datastoreContainer.getDataStore();
-  }
-
-  protected static VertxOptions getOptions() {
-    VertxOptions options = new VertxOptions();
-    String blockedThreadCheckInterval = System.getProperty("BlockedThreadCheckInterval");
-    if (blockedThreadCheckInterval != null) {
-      logger.info("setting setBlockedThreadCheckInterval to " + blockedThreadCheckInterval);
-      options.setBlockedThreadCheckInterval(Long.parseLong(blockedThreadCheckInterval));
-    }
-    String warningExceptionTime = System.getProperty("WarningExceptionTime");
-    if (warningExceptionTime != null) {
-      logger.info("setting setWarningExceptionTime to " + warningExceptionTime);
-      options.setWarningExceptionTime(Long.parseLong(warningExceptionTime));
-    }
-    return options;
-  }
-
-  @BeforeClass
-  public static void setUp(TestContext context) throws Exception {
-    logger.info("setup");
-    Async async = context.async();
-    vertx = Vertx.vertx(getOptions());
-    String property = System.getProperty(IDatastoreContainer.PROPERTY);
-    if (property == null) {
-      throw new ParameterRequiredException("Need the parameter " + IDatastoreContainer.PROPERTY
-          + ". Start the test with -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer for instance");
-    }
-    datastoreContainer = (IDatastoreContainer) Class.forName(property).newInstance();
-    ErrorObject<Void> err = new ErrorObject<Void>(null);
-    logger.info("wait for startup of datastore");
-    datastoreContainer.startup(vertx, result -> {
-      if (result.failed()) {
-        err.setThrowable(result.cause());
-      }
-      logger.info("datastore started");
-      context.assertNotNull(getDataStore());
-      async.complete();
-      ;
-    });
-
-    async.await();
-    if (err.isError())
-      throw err.getRuntimeException();
+    return TestHelper.getDatastoreContainer().getDataStore();
   }
 
   public ResultContainer saveRecords(TestContext context, List<?> records) {
@@ -349,10 +285,31 @@ public abstract class DatastoreBaseTest {
     async.await();
   }
 
+  /**
+   * Calls {@link IDatastoreContainer#clearTable(String, io.vertx.core.Handler)} and waits for it.
+   * 
+   * @param context
+   * @param tableName
+   */
+  public void clearTable(TestContext context, String tableName) {
+    Async async = context.async();
+    ErrorObject<Void> err = new ErrorObject<Void>(null);
+    TestHelper.getDatastoreContainer().clearTable(tableName, result -> {
+      if (result.failed()) {
+        err.setThrowable(result.cause());
+      }
+      async.complete();
+    });
+
+    async.await();
+    if (err.isError())
+      throw err.getRuntimeException();
+  }
+
   public void dropTable(TestContext context, String tableName) {
     Async async = context.async();
     ErrorObject<Void> err = new ErrorObject<Void>(null);
-    datastoreContainer.dropTable(tableName, result -> {
+    TestHelper.getDatastoreContainer().dropTable(tableName, result -> {
       if (result.failed()) {
         err.setThrowable(result.cause());
       }

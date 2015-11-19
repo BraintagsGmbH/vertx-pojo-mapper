@@ -23,6 +23,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
+import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import io.vertx.ext.unit.TestContext;
@@ -44,7 +45,7 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
     IField field = mapper.getField(getTestFieldName());
     ITypeHandler th = field.getTypeHandler();
     context.assertNotNull(th);
-    String typeHandlerName = datastoreContainer.getExpectedTypehandlerName(getClass(),
+    String typeHandlerName = TestHelper.getDatastoreContainer().getExpectedTypehandlerName(getClass(),
         getExpectedTypeHandlerClassName());
     context.assertEquals(typeHandlerName, th.getClass().getName());
   }
@@ -95,16 +96,15 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
   }
 
   protected void dropTables(TestContext context, BaseRecord record) {
-    dropTable(context, record.getClass().getSimpleName());
-    dropTable(context, "SimpleMapper");
+    clearTable(context, record.getClass().getSimpleName());
+    clearTable(context, "SimpleMapper");
   }
 
   /**
-   * Create the instance of
+   * Create a record to be used to test the {@link ITypeHandler}
    * 
    * @param context
-   *          TODO
-   * 
+   *          the {@link TestContext}
    * @return
    */
   public abstract BaseRecord createInstance(TestContext context);

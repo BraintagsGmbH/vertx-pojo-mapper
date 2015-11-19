@@ -12,12 +12,15 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.vertxunit;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import de.braintags.io.vertx.pojomapper.AllTestsPojoJson;
 import de.braintags.io.vertx.pojomapper.testdatastore.AllTestsCommon;
+import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 
 /**
  * 
@@ -27,14 +30,29 @@ import de.braintags.io.vertx.pojomapper.testdatastore.AllTestsCommon;
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ AllTestsPojoJson.class, TestMongoMapper.class, TestMongoQueryRambler.class, AllTestsCommon.class })
-public class AllTestsMongoVertxUnit {
+@SuiteClasses({ AllTestsPojoJson.class, TMongoMapper.class, TMongoQueryRambler.class, AllTestsCommon.class })
+public class TestAllMongo {
   // -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mongo.vertxunit.MongoDataStoreContainer
   // -DBlockedThreadCheckInterval=10000000 -DWarningExceptionTime=10000000
   // -Ddb_name=PojongoTestDatabase
   // -DstartMongoLocal=true
   // -DtestTimeout=5
-  public AllTestsMongoVertxUnit() {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(TestAllMongo.class);
+
+  public TestAllMongo() {
+  }
+
+  @BeforeClass
+  public static void startup() throws Exception {
+    LOGGER.info("STARTING SUITE");
+    TestHelper.startup();
+  }
+
+  @AfterClass
+  public static void shutdown() throws Exception {
+    LOGGER.info("STOPPING SUITE");
+    TestHelper.shutdown();
   }
 
 }

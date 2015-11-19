@@ -31,7 +31,7 @@ public class ReferencedListTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    BaseRecord mapper = new ReferenceMapper_List(50);
+    BaseRecord mapper = new ReferenceMapper_List(5);
     return mapper;
   }
 

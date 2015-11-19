@@ -35,7 +35,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
 
   @Test
   public void testSimpleMapper(TestContext context) {
-    dropTable(context, "SimpleMapper");
+    clearTable(context, "SimpleMapper");
     SimpleMapper sm = new SimpleMapper();
     sm.name = "testName";
     sm.setSecondProperty("my second property");

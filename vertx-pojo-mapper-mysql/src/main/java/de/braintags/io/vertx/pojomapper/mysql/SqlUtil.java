@@ -35,13 +35,21 @@ import io.vertx.ext.sql.UpdateResult;
  */
 
 public class SqlUtil {
+  private static final String GAINED_SUCCESSFULLY_A_CONNECTION = "gained successfully a connection";
+  private static final String ERROR_EXECUTING_COMMAND_STATEMENT = "error executing command. Statement: ";
+  private static final String ERROR_GAINING_CONNECTION = "error gaining connection";
+  private static final String CONNECTION_CLOSED = "connection closed";
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(SqlUtil.class);
+  private static final String COMMAND_SUCCESS = "command successful executed";
 
   private static final List<String> NUMBERIC_TYPES = Arrays.asList("INT", "INTEGER", "TINYINT", "DOUBLE", "BIGINT",
       "SMALLINT", "MEDIUMINT", "FLOAT", "REAL", "DECIMAL", "NUMERIC");
   private static final List<String> CHARACTER_TYPES = Arrays.asList("CHAR", "VARCHAR", "LONGTEXT", "TEXT");
   private static final List<String> DATE_TYPES = Arrays.asList("DATE", "DATETIME", "TIMESTAMP", "TIME", "YEAR");
+
+  private SqlUtil() {
+  }
 
   /**
    * Returns true if the type of the {@link IColumnInfo} is numeric
@@ -101,32 +109,39 @@ public class SqlUtil {
    *          a resulthandler to be informed
    */
   public static void query(AsyncSQLClient sqlClient, String command, Handler<AsyncResult<ResultSet>> resultHandler) {
-    // Thread.currentThread().setName("SQL Thread");
-
     LOGGER.debug("query: " + command);
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
-        Exception sqlEx = new SqlException("error gaining connection", cr.cause());
+        Exception sqlEx = new SqlException(ERROR_GAINING_CONNECTION, cr.cause());
         LOGGER.error("", sqlEx);
         resultHandler.handle(Future.failedFuture(sqlEx));
         return;
       }
       SQLConnection connection = cr.result();
-      LOGGER.debug("gained successfully a connection");
-      connection.query(command, qr -> {
-        if (qr.failed()) {
-          Exception sqlEx = new SqlException("error executing command. Statement: " + command, qr.cause());
-          LOGGER.error("", sqlEx);
-          connection.close();
-          resultHandler.handle(Future.failedFuture(sqlEx));
-          return;
-        }
-        ResultSet res = qr.result();
-        LOGGER.debug("command successful executed");
+      LOGGER.debug(GAINED_SUCCESSFULLY_A_CONNECTION);
+      doQuery(command, resultHandler, connection);
+    });
+  }
+
+  /**
+   * @param command
+   * @param resultHandler
+   * @param connection
+   */
+  private static void doQuery(String command, Handler<AsyncResult<ResultSet>> resultHandler, SQLConnection connection) {
+    connection.query(command, qr -> {
+      if (qr.failed()) {
+        Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command, qr.cause());
+        LOGGER.error("", sqlEx);
         connection.close();
-        LOGGER.debug("connection closed");
-        resultHandler.handle(Future.succeededFuture(res));
-      });
+        resultHandler.handle(Future.failedFuture(sqlEx));
+        return;
+      }
+      ResultSet res = qr.result();
+      LOGGER.debug(COMMAND_SUCCESS);
+      connection.close();
+      LOGGER.debug(CONNECTION_CLOSED);
+      resultHandler.handle(Future.succeededFuture(res));
     });
   }
 
@@ -160,28 +175,38 @@ public class SqlUtil {
     LOGGER.debug("queryWithParams: " + command + " | " + params);
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
-        Exception sqlEx = new SqlException("error gaining connection", cr.cause());
+        Exception sqlEx = new SqlException(ERROR_GAINING_CONNECTION, cr.cause());
         LOGGER.error("", sqlEx);
         resultHandler.handle(Future.failedFuture(sqlEx));
         return;
       }
       SQLConnection connection = cr.result();
-      LOGGER.debug("gained successfully a connection");
-      connection.queryWithParams(command, params, qr -> {
-        if (qr.failed()) {
-          Exception sqlEx = new SqlException("error executing command. Statement: " + command + " | " + params,
-              qr.cause());
-          LOGGER.error("", sqlEx);
-          connection.close();
-          resultHandler.handle(Future.failedFuture(sqlEx));
-          return;
-        }
-        ResultSet res = qr.result();
-        LOGGER.debug("command successful executed");
+      LOGGER.debug(GAINED_SUCCESSFULLY_A_CONNECTION);
+      doQueryWithParams(command, params, resultHandler, connection);
+    });
+  }
+
+  /**
+   * @param command
+   * @param params
+   * @param resultHandler
+   * @param connection
+   */
+  private static void doQueryWithParams(String command, JsonArray params, Handler<AsyncResult<ResultSet>> resultHandler,
+      SQLConnection connection) {
+    connection.queryWithParams(command, params, qr -> {
+      if (qr.failed()) {
+        Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command + " | " + params, qr.cause());
+        LOGGER.error("", sqlEx);
         connection.close();
-        LOGGER.debug("connection closed");
-        resultHandler.handle(Future.succeededFuture(res));
-      });
+        resultHandler.handle(Future.failedFuture(sqlEx));
+        return;
+      }
+      ResultSet res = qr.result();
+      LOGGER.debug(COMMAND_SUCCESS);
+      connection.close();
+      LOGGER.debug(CONNECTION_CLOSED);
+      resultHandler.handle(Future.succeededFuture(res));
     });
   }
 
@@ -213,27 +238,40 @@ public class SqlUtil {
     LOGGER.debug("execute: " + command);
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
-        Exception sqlEx = new SqlException("error gaining connection", cr.cause());
+        Exception sqlEx = new SqlException(ERROR_GAINING_CONNECTION, cr.cause());
         LOGGER.error("", sqlEx);
         resultHandler.handle(Future.failedFuture(sqlEx));
         return;
       }
 
       SQLConnection connection = cr.result();
-      LOGGER.debug("gained successfully a connection");
-      connection.execute(command, qr -> {
-        if (qr.failed()) {
-          Exception sqlEx = new SqlException("error executing command. Statement: " + command, qr.cause());
+      LOGGER.debug(GAINED_SUCCESSFULLY_A_CONNECTION);
+      doExecute(command, resultHandler, connection);
+    });
+  }
+
+  /**
+   * @param command
+   * @param resultHandler
+   * @param connection
+   */
+  private static void doExecute(String command, Handler<AsyncResult<Void>> resultHandler, SQLConnection connection) {
+    connection.execute(command, qr -> {
+      if (qr.failed()) {
+        if (qr.cause().getMessage().contains("doesn't exist")) {
+          // nothing to delete, no error
+        } else {
+          Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command, qr.cause());
           LOGGER.error("", sqlEx);
           connection.close();
           resultHandler.handle(Future.failedFuture(sqlEx));
           return;
         }
-        LOGGER.debug("command successful executed");
-        connection.close();
-        LOGGER.debug("connection closed");
-        resultHandler.handle(Future.succeededFuture());
-      });
+      }
+      LOGGER.debug(COMMAND_SUCCESS);
+      connection.close();
+      LOGGER.debug(CONNECTION_CLOSED);
+      resultHandler.handle(Future.succeededFuture());
     });
   }
 
@@ -267,26 +305,14 @@ public class SqlUtil {
     LOGGER.debug("update: " + command);
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
-        Exception sqlEx = new SqlException("error gaining connection", cr.cause());
+        Exception sqlEx = new SqlException(ERROR_GAINING_CONNECTION, cr.cause());
         LOGGER.error("", sqlEx);
         resultHandler.handle(Future.failedFuture(sqlEx));
         return;
       }
       SQLConnection connection = cr.result();
-      LOGGER.debug("gained successfully a connection");
-      connection.update(command, qr -> {
-        if (qr.failed()) {
-          Exception sqlEx = new SqlException("error executing command. Statement: " + command, qr.cause());
-          LOGGER.error("", sqlEx);
-          connection.close();
-          resultHandler.handle(Future.failedFuture(sqlEx));
-          return;
-        }
-        LOGGER.debug("command successful executed");
-        connection.close();
-        LOGGER.debug("connection closed");
-        resultHandler.handle(Future.succeededFuture(qr.result()));
-      });
+      LOGGER.debug(GAINED_SUCCESSFULLY_A_CONNECTION);
+      executeUpdate(connection, command, resultHandler);
     });
   }
 
@@ -320,28 +346,48 @@ public class SqlUtil {
     LOGGER.debug("updateWithParams: " + command + " | " + params);
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
-        Exception sqlEx = new SqlException("error gaining connection", cr.cause());
+        Exception sqlEx = new SqlException(ERROR_GAINING_CONNECTION, cr.cause());
         LOGGER.error("", sqlEx);
         resultHandler.handle(Future.failedFuture(sqlEx));
-        return;
+      } else {
+        SQLConnection connection = cr.result();
+        LOGGER.debug(GAINED_SUCCESSFULLY_A_CONNECTION);
+        executeUpdateWithParams(connection, command, params, resultHandler);
       }
-      SQLConnection connection = cr.result();
-      LOGGER.debug("gained successfully a connection");
-      connection.updateWithParams(command, params, qr -> {
-        if (qr.failed()) {
-          Exception sqlEx = new SqlException("error executing command. Statement: " + command + " | " + params,
-              qr.cause());
-          LOGGER.error("", sqlEx);
-          connection.close();
-          resultHandler.handle(Future.failedFuture(sqlEx));
-          return;
-        }
-        LOGGER.debug("command successful executed");
-        connection.close();
-        LOGGER.debug("connection closed");
-        resultHandler.handle(Future.succeededFuture(qr.result()));
-      });
     });
   }
 
+  private static void executeUpdate(SQLConnection connection, String command,
+      Handler<AsyncResult<UpdateResult>> resultHandler) {
+    connection.update(command, qr -> {
+      if (qr.failed()) {
+        Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command, qr.cause());
+        LOGGER.error("", sqlEx);
+        connection.close();
+        resultHandler.handle(Future.failedFuture(sqlEx));
+        return;
+      }
+      LOGGER.debug(COMMAND_SUCCESS);
+      connection.close();
+      LOGGER.debug(CONNECTION_CLOSED);
+      resultHandler.handle(Future.succeededFuture(qr.result()));
+    });
+  }
+
+  private static void executeUpdateWithParams(SQLConnection connection, String command, JsonArray params,
+      Handler<AsyncResult<UpdateResult>> resultHandler) {
+    connection.updateWithParams(command, params, qr -> {
+      if (qr.failed()) {
+        Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command + " | " + params, qr.cause());
+        LOGGER.error("", sqlEx);
+        connection.close();
+        resultHandler.handle(Future.failedFuture(sqlEx));
+      } else {
+        LOGGER.debug(COMMAND_SUCCESS);
+        connection.close();
+        LOGGER.debug(CONNECTION_CLOSED);
+        resultHandler.handle(Future.succeededFuture(qr.result()));
+      }
+    });
+  }
 }

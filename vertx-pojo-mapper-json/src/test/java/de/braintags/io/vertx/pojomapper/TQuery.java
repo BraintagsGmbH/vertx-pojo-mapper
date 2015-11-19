@@ -26,8 +26,8 @@ import de.braintags.io.vertx.pojomapper.mapper.Person;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
-public class TestQuery {
-  private static Logger logger = LoggerFactory.getLogger(TestQuery.class);
+public class TQuery {
+  private static Logger logger = LoggerFactory.getLogger(TQuery.class);
   private static IDataStore dataStore = new DummyDataStore();
 
   @Before

@@ -13,12 +13,16 @@
 
 package de.braintags.io.vertx.pojomapper.mysql;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import de.braintags.io.vertx.pojomapper.AllTestsPojoJson;
+import de.braintags.io.vertx.pojomapper.TMapperFactory;
 import de.braintags.io.vertx.pojomapper.testdatastore.AllTestsCommon;
+import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 
 /**
  * 
@@ -28,13 +32,22 @@ import de.braintags.io.vertx.pojomapper.testdatastore.AllTestsCommon;
 
 @RunWith(Suite.class)
 @SuiteClasses({ AllTestsPojoJson.class, TestMapper.class, TestSqlQueryRambler.class, AllTestsCommon.class })
-public class AllTestsMySql {
+public class TestAllMySql {
   // -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(TestAllMySql.class);
 
-  /**
-   * 
-   */
-  public AllTestsMySql() {
+  @BeforeClass
+  public static void startup() throws Exception {
+    LOGGER.info("STARTING SUITE");
+    TMapperFactory.supportsColumnHandler = true;
+    TestHelper.startup();
+  }
+
+  @AfterClass
+  public static void shutdown() throws Exception {
+    LOGGER.info("STOPPING SUITE");
+    TestHelper.shutdown();
   }
 
 }

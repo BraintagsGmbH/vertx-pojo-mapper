@@ -28,9 +28,9 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 
-public class TestMongoQueryRambler extends DatastoreBaseTest {
+public class TMongoQueryRambler extends DatastoreBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
-      .getLogger(TestMongoQueryRambler.class);
+      .getLogger(TMongoQueryRambler.class);
 
   @Test
   public void test_1(TestContext context) {

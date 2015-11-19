@@ -33,7 +33,7 @@ import de.braintags.io.vertx.util.ClassUtil;
  * 
  */
 
-public class TestReflection {
+public class TReflection {
 
   /**
    * @throws java.lang.Exception

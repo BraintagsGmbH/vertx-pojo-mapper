@@ -23,6 +23,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -35,13 +36,13 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 
-public class TestMongoMapper extends DatastoreBaseTest {
-  private static Logger log = LoggerFactory.getLogger(TestMongoMapper.class);
+public class TMongoMapper extends DatastoreBaseTest {
+  private static Logger log = LoggerFactory.getLogger(TMongoMapper.class);
 
   @Test
   public void simpleTest(TestContext context) {
     log.info("-->>test");
-    context.assertNotNull(datastoreContainer);
+    context.assertNotNull(TestHelper.getDatastoreContainer());
   }
 
   @Test

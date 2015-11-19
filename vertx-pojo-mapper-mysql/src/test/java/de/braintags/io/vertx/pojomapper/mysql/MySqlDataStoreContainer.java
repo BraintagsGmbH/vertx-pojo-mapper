@@ -163,4 +163,24 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
     return defaultName;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.testdatastore.IDatastoreContainer#clearTable(java.lang.String,
+   * io.vertx.core.Handler)
+   */
+  @Override
+  public void clearTable(String tableName, Handler<AsyncResult<Void>> handler) {
+    String command = "DELETE from " + tableName;
+    SqlUtil.execute(datastore, command, dr -> {
+      if (dr.failed()) {
+        LOGGER.error("error deleting records", dr.cause());
+        handler.handle(Future.failedFuture(dr.cause()));
+        return;
+      }
+      LOGGER.info("Deleted records " + tableName);
+      handler.handle(Future.succeededFuture());
+    });
+  }
+
 }

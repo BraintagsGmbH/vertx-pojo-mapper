@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
  */
 
 public class CharColumnHandler extends AbstractSqlColumnHandler {
+  public static final String CHAR_TYPE = "CHAR";
 
   /**
    * Constructor for a ByteColumnHandler
@@ -40,7 +41,20 @@ public class CharColumnHandler extends AbstractSqlColumnHandler {
 
   @Override
   public void applyMetaData(SqlColumnInfo column) {
-    // nothing to do here
+    column.setType(CHAR_TYPE);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#checkColumnModified(de
+   * .braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo,
+   * de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo)
+   */
+  @Override
+  protected boolean checkColumnModified(IColumnInfo plannedCi, IColumnInfo existingCi) {
+    return super.checkColumnModified(plannedCi, existingCi);
   }
 
 }

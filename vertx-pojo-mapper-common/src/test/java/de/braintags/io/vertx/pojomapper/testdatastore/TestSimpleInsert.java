@@ -36,12 +36,12 @@ import io.vertx.ext.unit.TestContext;
 
 public class TestSimpleInsert extends DatastoreBaseTest {
   private static Logger logger = LoggerFactory.getLogger(TestSimpleInsert.class);
-  private static final int LOOP = 100;
+  private static final int LOOP = 5;
 
   @Test
   public void testRoundtrip(TestContext context) {
     Async async = context.async();
-    dropTable(context, "MiniMapper");
+    clearTable(context, "MiniMapper");
 
     MiniMapper sm = new MiniMapper();
     ResultContainer resultContainer = saveRecord(context, sm);

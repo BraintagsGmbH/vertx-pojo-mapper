@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.util.CounterObject;
 
-public class AsyncHandlerTest {
+public class TAsyncHandler {
   List<String> stringList = new ArrayList<String>();
 
   @Before

@@ -42,4 +42,18 @@ public class BooleanColumnHandler extends AbstractSqlColumnHandler {
     return new StringBuilder(String.format("%s %s ", ci.getName(), ci.getType()));
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#checkColumnModified(de
+   * .braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo,
+   * de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo)
+   */
+  @Override
+  protected boolean checkColumnModified(IColumnInfo plannedCi, IColumnInfo existingCi) {
+    return super.checkColumnModified(plannedCi, existingCi)
+        && !existingCi.getType().equalsIgnoreCase(ByteColumnHandler.TINYINT_TYPE);
+  }
+
 }

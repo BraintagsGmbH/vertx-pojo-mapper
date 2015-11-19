@@ -44,6 +44,13 @@ public interface IDatastoreContainer {
   public void dropTable(String tablename, Handler<AsyncResult<Void>> handler);
 
   /**
+   * Delete all records from the given table WITHOUT mapping!
+   * 
+   * @param handler
+   */
+  public void clearTable(String tablename, Handler<AsyncResult<Void>> handler);
+
+  /**
    * Get the expected ITypeHandler for the given test class. With this method the expected {@link ITypeHandler} can be
    * overwritten per datastore driver
    * 

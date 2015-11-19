@@ -164,6 +164,17 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
     });
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.testdatastore.IDatastoreContainer#clearTable(java.lang.String,
+   * io.vertx.core.Handler)
+   */
+  @Override
+  public void clearTable(String tablename, Handler<AsyncResult<Void>> handler) {
+    dropTable(tablename, handler);
+  }
+
   /**
    * Creates a config file for a mongo db
    * 

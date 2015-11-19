@@ -26,6 +26,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.StringColumnHandler;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -44,7 +45,7 @@ public class TestMapper extends DatastoreBaseTest {
   @Test
   public void simpleTest(TestContext context) {
     log.info("-->>test");
-    context.assertNotNull(datastoreContainer);
+    context.assertNotNull(TestHelper.getDatastoreContainer());
   }
 
   @Test

@@ -27,10 +27,14 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.18</version>
 					<configuration>
+						<!-- Testing shall be executed by one Suites, which are calling each other test class -->
+						<includes>
+							<include>**/TestAll*.java</include>
+						</includes>
 						<failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
 						<systemPropertyVariables>
 							<io.netty.leakDetectionLevel>PARANOID</io.netty.leakDetectionLevel>
-							<IDatastoreContainer>de.braintags.io.vertx.pojomapper.mongo.testNew.MongoDataStoreContainer</IDatastoreContainer>
+							<IDatastoreContainer>de.braintags.io.vertx.pojomapper.mongo.vertxunit.MongoDataStoreContainer</IDatastoreContainer>
 							<startMongoLocal>true</startMongoLocal>
 							<db_name>PojongoTestDatabase</db_name>
 						</systemPropertyVariables>
@@ -61,11 +65,11 @@
 			<classifier>tests</classifier>
 			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
-		
+
 		<dependency>
-		  <groupId>io.vertx</groupId>
-		  <artifactId>vertx-unit</artifactId>
-		  <version>3.2.0-SNAPSHOT</version>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-unit</artifactId>
+			<version>3.2.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>

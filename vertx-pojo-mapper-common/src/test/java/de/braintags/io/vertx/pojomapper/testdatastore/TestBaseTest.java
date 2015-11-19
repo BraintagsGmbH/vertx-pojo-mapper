@@ -38,7 +38,7 @@ public class TestBaseTest extends DatastoreBaseTest {
   @Test
   public void simpleTest(TestContext context) {
     log.info("-->>test");
-    context.assertNotNull(datastoreContainer);
+    context.assertNotNull(TestHelper.getDatastoreContainer());
   }
 
   @Test

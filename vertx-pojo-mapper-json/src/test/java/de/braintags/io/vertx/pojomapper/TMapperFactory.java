@@ -69,10 +69,11 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  * 
  */
 
-public class TestMapperFactory {
+public class TMapperFactory {
   public static final int NUMBER_OF_PROPERTIES = Person.NUMBER_OF_PROPERTIES;
   private static IDataStore dataStore = new DummyDataStore();
   private static IMapper mapperDef = null;
+  public static boolean supportsColumnHandler = false;
 
   /**
    * @throws java.lang.Exception
@@ -84,10 +85,13 @@ public class TestMapperFactory {
 
   @Test
   public void testColumnHandler() {
-
     IColumnInfo ci = mapperDef.getTableInfo().getColumnInfo(mapperDef.getField("weight"));
     assertNotNull(ci);
-    assertNull(ci.getColumnHandler());
+    if (supportsColumnHandler) {
+      assertNotNull(ci.getColumnHandler());
+    } else {
+      assertNull(ci.getColumnHandler());
+    }
   }
 
   @Test
