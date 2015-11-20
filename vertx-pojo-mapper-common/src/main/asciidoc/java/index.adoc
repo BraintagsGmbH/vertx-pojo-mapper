@@ -581,7 +581,7 @@ The process of creation and synchronization is performed by
 `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IDataStoreSynchronizer.html[IDataStoreSynchronizer]`
 Michael Remme
 
-=== The `link:../../apidocs/de/braintags/io/vertx/pojomapper/typehandler/ITypeHandler.html[ITypeHandler]`
+=== TypeHandlers
 
 Michael Remme
 

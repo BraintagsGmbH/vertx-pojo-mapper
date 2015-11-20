@@ -581,7 +581,7 @@ The process of creation and synchronization is performed by
 `IDataStoreSynchronizer`
 Michael Remme
 
-=== The `ITypeHandler`
+=== TypeHandlers
 
 Michael Remme
 

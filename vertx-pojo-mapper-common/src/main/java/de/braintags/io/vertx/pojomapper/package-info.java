@@ -328,7 +328,7 @@
  * === Mapping of Java classes
  * {@link de.braintags.io.vertx.pojomapper.mapping}
  * 
- * === The {@link de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler}
+ * === TypeHandlers
  * {@link de.braintags.io.vertx.pojomapper.typehandler}
  * 
  * 

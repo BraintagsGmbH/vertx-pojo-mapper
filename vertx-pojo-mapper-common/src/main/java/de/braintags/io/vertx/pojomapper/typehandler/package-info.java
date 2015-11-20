@@ -11,10 +11,13 @@
  * #L%
  */
 /**
+ * When objects shall be stored into a datastore or reread from the datastore, the values must be in many cases
+ * converted.
+ * 
+ * {@link de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler}
  * 
  * 
  * @author Michael Remme
  * 
  */
-
 package de.braintags.io.vertx.pojomapper.typehandler;

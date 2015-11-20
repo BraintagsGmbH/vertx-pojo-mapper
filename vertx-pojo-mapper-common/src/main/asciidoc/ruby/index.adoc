@@ -581,7 +581,7 @@ The process of creation and synchronization is performed by
 `link:unavailable[IDataStoreSynchronizer]`
 Michael Remme
 
-=== The `link:unavailable[ITypeHandler]`
+=== TypeHandlers
 
 Michael Remme
 
