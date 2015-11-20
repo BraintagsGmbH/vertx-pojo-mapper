@@ -12,10 +12,12 @@
  */
 package examples.mapper;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import io.vertx.docgen.Source;
 
 @Source(translate = false)
+@Entity
 public class SimpleMapper {
   @Id
   public String id;
@@ -28,17 +30,10 @@ public class SimpleMapper {
   public SimpleMapper() {
   }
 
-  /**
-   * @return the name
-   */
   public String getName() {
     return name;
   }
 
-  /**
-   * @param name
-   *          the name to set
-   */
   public void setName(String name) {
     this.name = name;
   }

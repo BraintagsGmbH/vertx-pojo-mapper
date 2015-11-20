@@ -1,7 +1,9 @@
 :numbered:
+:toc: left
+:toclevels: 3
 
 = vertx pojo mapper common
-=== Map Java objects into datastores and back
+Map Java objects into datastores and back
 
 == Quick-Start
 Although this library will deal with completely different types of datastores like SQL, NoSQL etc., we are using some
@@ -31,7 +33,7 @@ To use this project, add the following dependency to the _dependencies_ section 
 compile "de.braintags:{maven.artifactId}:{maven.version}"
 ----
 
-replace maven-artifactId against
+replace maven-artifactId against one of
 
 * *vertx-pojongo* the mongo driver
 * *vertx-pojo-mapper-mysql* the MySql driver
@@ -134,144 +136,460 @@ include the type of action performed ( insert / update ), the id
 of the instance ( especially for new instances ) and the native format of the instance, like it was translated to fit
 the requirements of the connected datastore.
 
-You may have noticed that up to here we did not have to execute any intialization of the mapper inside the datastore.
-This, because the vertx-pojo-mapper is taking care about that completely automatic exactly then, when it is needed.
+NOTE: You may have noticed, that up to here we did not have to execute any intialization of the mapper inside the
+datastore. This is, because the vertx-pojo-mapper is taking care about that completely automatic exactly then, when
+it is
+needed.
 When you are creating an insert like above, or a query like later, the system checks, wether the mapper was
-initialized already. If not, then the initialization is performed. Its that, why the vertx-pojo-mapper has only a
-very little overhead on startup!
+initialized already. If not, then the initialization is performed, which implements the automatic creation and update
+of tables, collections etc. inside the connected datastore - so you don't have to care about that, either.
+Its this behaviour, why the vertx-pojo-mapper has only a very little overhead on startup!
 
 
-By creating the IWrite the system will
-automatically perform the mapping process, if not done already. After adding the instance into the IWrite, we are
-able to execute the action, which will return an
-`IWriteResult`, by which we are getting further
-information
-about the action, like the generated id of the record and wether it was inserted or updated, for instance.
+=== Searching data in a datastore
 
-=== Searching data
+To search inside the connected datastore, we are creating first an instance of
+`IQuery`, then we are adding the query arguments on it.
 
 [source,java]
 ----
-link examples.Examples#example4(de.braintags.io.vertx.pojomapper.IDataStore )}
+IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
+query.field("name").is("my mini mapper");
+query.execute(rResult -> {
+  if (rResult.failed()) {
+    logger.error(rResult.cause());
+  } else {
+    IQueryResult<MiniMapper> qr = rResult.result();
+    qr.iterator().next(itResult -> {
+      if (itResult.failed()) {
+        logger.error(itResult.cause());
+      } else {
+        MiniMapper readMapper = itResult.result();
+        logger.info("Query found id " + readMapper.id);
+      }
+    });
+  }
+});
 ----
 
-To search in the datastore, we are creating first an instance of
-`IQuery` and define the query arguments. In the current
-example we are only searching for the name, but cause IQuery supports a fluent api we could simply and quickly
-add
-further arguments. Again - with the creation of the IQuery - the system checks wether the class was mapped
-already
-and performs the mapping if not. The query is processed by calling the execute method, which in turn will deliver
-an
-`IQueryResult`, which contains several information like
-the
-native query and a reference to found records. The found records can be requested step by step by an Iterator or
-once
-as Array by requesting the method toArray. Both methods are requiring a Handler, since only during this request
-the
-Java object is created if not done already. For complexer objects this can mean, that further informations must
-be
-loaded from the IDataStore.
+In the current example we are only searching for the name, but as IQuery supports a fluent api
+we could simply and quickly add further arguments. Again - with the creation of the IQuery - the system checks wether
+the mapper class was mapped already and performs the mapping if not. +
+The query is processed by calling the execute method, which in turn will deliver an
+`IQueryResult`. The IQueryResult contains several
+information like the native query and a reference to found records. The found records can be requested step by step
+by an Iterator or once as Array by requesting the method toArray.
+
+NOTE: To return as fast as possible and to produce the least overhead, in the first step the query only stores the
+native result of the query inside the IQueryResult together with some meta information. Only when you are accessing
+concrete objects by using the iterator of the IQueryResult or the method toArray, the needed java objects are
+created, if not done already.
 
 
 === Deleting data
 
+To delete instanced from the datastore, we are using
+`IDelete`, where
+we can add some concrete objects to be deleted or add an
+`IQuery`, which defines
+the criteria for a deletion. Mixing both isn't possible.
+
 [source,java]
 ----
-examples.Examples#example5(de.braintags.io.vertx.pojomapper.IDataStore, examples.mapper.SimpleMapper )
+IDelete<MiniMapper> delete = dataStore.createDelete(MiniMapper.class);
+delete.add(mapper);
+delete.delete(deleteResult -> {
+  if (deleteResult.failed()) {
+    logger.error("", deleteResult.cause());
+  } else {
+    logger.info(deleteResult.result().getOriginalCommand());
+  }
+});
 ----
 
-Deletion is processed either by deleting concrete objects or by using an
-`IQuery` as argument. Mixing of both is not possible. In
-the
-current example we are deleting an object, which we are expecting to exist in the datastore. First we are
-creating an
-`IDelete` and add the instance to be deleted. The
-execution
-od mthe delete is processed by calling method delete, which will return an instance of
+In the current example we are deleting an object, which we are expecting to exist in the datastore. First we are
+creating an `IDelete` and add the instance to be deleted.
+The execution of the delete is processed by calling the method delete, which will return an instance of
 `IDeleteResult`. The method
 `getOriginalCommand` returns the native
 arguments which were used to perform the delete action
 
+[source,java]
 ----
-examples.Examples#example6(de.braintags.io.vertx.pojomapper.IDataStore )
+IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
+query.field("name").is("test");
+IDelete<MiniMapper> delete = dataStore.createDelete(MiniMapper.class);
+delete.setQuery(query);
+delete.delete(deleteResult -> {
+  if (deleteResult.failed()) {
+    logger.error("", deleteResult.cause());
+  } else {
+    logger.info(deleteResult.result().getOriginalCommand());
+  }
+});
 ----
 
 This example shows how to perform a delete action by using an
-`IQuery`. All records, which are fitting the arguments of
-the
-query are deleted.
+`IQuery`.
+All records, which are fitting the arguments of the query are deleted.
 
+=== Complexer mapper definitions
 
-== Working with vertx-pojo-mapper
+The example above was very simple and straightforward, just to explain the basics of vertx-pojo-mapper. But of course
+there are
+existing much more possibilities to define mappers, where from we are listing some here ( the complete list of
+annotations you will find below).
 
-=== Mapping of Java classes There is no need to start a special mapping process in your application. The mapping
-of
-Java classes is automatically performed at the moment, when it is needed. During the mapping process the class is
-inspected for several information. The persistent fields of a mapper are generated by inspecting public fields
-and
-BeanProperties. The rest of the configuration of a mapper is done by using annotations. Annotations are always
-added
-to a field or the Class itself. Even annotations for those properties, which aree defined as getter /
-setter-method
-are added to the underlaying field of the property.
+==== Handling of subobjects
+Often you will have to define some mappers, where inside you are placing one or more properties, which are not of a
+simple type like int, String, boolean etc., but which are based upon a complexer type. Think about a scenario, where
+a person has one or more animals. +
+For those relations you can define two ways, how the data are stored into the datastore:
 
-You will find some mapper definitions in the example package, for instance:
+* embedded +
+the subobjects ( animals ) are stored inside the same table than the main object ( person )
+* referenced +
+the subobjects ( animals ) are saved inside an own table; inside the main object ( person ) is saved a reference to
+the subobjects, typically the key of the subobjects
 
-* /*
- * #%L
- * vertx-pojongo
- * %%
- * Copyright (C) 2015 Braintags GmbH
- * %%
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * #L%
- */
+===== Storing subobjects embedded
+
+To define, that a subobject shall be saved embedded is simply done by adding the annotation
+`@Embedded` to the appropriate field
+
+[source,java]
+----
 package examples.mapper;
 
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import io.vertx.docgen.Source;
 
 @Source(translate = false)
-public class SimpleMapper {
+@Entity
+public class PersonEmbed {
   @Id
   public String id;
-  private String name;
-  public int number;
+  public String name;
+  @Embedded
+  public Animal animal;
 
-  /**
-   * 
-   */
-  public SimpleMapper() {
-  }
-
-  /**
-   * @return the name
-   */
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * @param name
-   *          the name to set
-   */
-  public void setName(String name) {
-    this.name = name;
+  public PersonEmbed() {
   }
 
 }
- as a very simple mapper * `DemoMapper` as an example
-for
-referenced and embedded usage
+
+----
+
+How the embedding is technically processed, is decided by the `IDataStore`. In
+the same way you are storing simple child objects, you are able to integrate lists, maps and arrays.
+
+Subobjects as array of Animal:
+
+[source,java]
+----
+package examples.mapper;
+
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import io.vertx.docgen.Source;
+
+@Source(translate = false)
+@Entity
+public class PersonEmbedArray {
+  @Id
+  public String id;
+  public String name;
+  @Embedded
+  public Animal[] animals;
+
+  public PersonEmbedArray() {
+  }
+
+}
+
+----
+
+Subobjects as List of Animal:
+
+[source,java]
+----
+package examples.mapper;
+
+import java.util.List;
+
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import io.vertx.docgen.Source;
+
+@Source(translate = false)
+@Entity
+public class PersonEmbedList {
+  @Id
+  public String id;
+  public String name;
+  @Embedded
+  public List<Animal> animals;
+
+  public PersonEmbedList() {
+  }
+
+}
+
+----
+
+Subobjects as Map of Animal:
+
+[source,java]
+----
+package examples.mapper;
+
+import java.util.Map;
+
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import io.vertx.docgen.Source;
+
+@Source(translate = false)
+@Entity
+public class PersonEmbedMap {
+  @Id
+  public String id;
+  public String name;
+  @Embedded
+  public Map<String, Animal> animals;
+
+  public PersonEmbedMap() {
+  }
+
+}
+
+----
+
+===== Storing subobjects referenced
+
+According the previous description, storing subobjects referenced is done by adding the annotation
+`@Referenced` to the appropriate fields of the
+mapper. Of course here, too, you are able to store lists, maps and arrays either.
+
+[source,java]
+----
+package examples.mapper;
+
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
+import io.vertx.docgen.Source;
+
+@Source(translate = false)
+@Entity
+public class PersonRef {
+  @Id
+  public String id;
+  public String name;
+  @Referenced
+  public Animal animal;
+
+  public PersonRef() {
+  }
+
+}
+
+----
+
+==== Lifecycle methods
+
+In vertx-pojo-mapper are existing a series of lifecycle annotations, by which you can modify the content
+of objects as a function of its lifecycle. If you are annotating one or more methods of a mapper class with
+one of the lifecycle annotations, then those method(s) are executed inside the suitable situation
+
+[source,java]
+----
+package examples.mapper;
+
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeDelete;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
+import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
+import io.vertx.docgen.Source;
+
+@Source(translate = false)
+@Entity
+public class LifecycleMapper {
+  @Id
+  public String id;
+  public String name;
+
+  public LifecycleMapper() {
+  }
+
+  @BeforeLoad
+  public void beforeLoad() {
+    name = "just before load";
+  }
+
+  @AfterLoad
+  public void afterLoad() {
+    name = "just after load";
+  }
+
+  @BeforeSave
+  public void beforeSave() {
+    name = "just before save";
+  }
+
+  @AfterSave
+  public void afterSave() {
+    name = "just after save";
+  }
+
+  @BeforeDelete
+  public void beforeDelete() {
+    name = "just before deletion";
+  }
+
+  @AfterDelete
+  public void afterDelete() {
+    name = "just after deletion";
+  }
+
+}
+
+----
+
+Currently are existing 6 lifecycle annotations
+
+* `@BeforeSave` +
+methods annotated with this, will be executed just before saving an instance into the datastore
+* `@AfterSave` +
+methods annotated with this, will be executed just after saving an instance into the datastore
+* `@BeforeLoad` +
+methods annotated with this, will be executed just before loading an instance from the datastore
+* `@AfterLoad` +
+methods annotated with this, will be executed just after loading an instance from the datastore
+* `@BeforeDelete` +
+methods annotated with this, will be executed just before deleting an instance from the datastore
+* `@AfterDelete` +
+methods annotated with this, will be executed just after deleting an instance from the datastore
+
+For more infos on how you can influence the mapping process, see the further descriptions above.
+
+== More details about vertx-pojo-mapper
+
+=== IDataStore
+`IDataStore` is the startpoint and the center of vertx-pojo-mapper.
+By IDataStore you will access all the main instances you need, to deal with the underlaying datastore.
+To instantiate a certain implementation of IDataStore, it should be the only time, where you are directly referencing
+to a certain datastore or database. The way, how an implementation is instantiated, is depending on the
+implementation itself:
+
+Currently there are existing 2 implementations of IDataStore
+
+* MongoDataStore +
+in the sub project link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojongo[vertx-pojongo],
+is an implementation which deals with Mongo-DB. Go
+link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojongo[here] to get more informations on
+how to create an instance of MongoDataStore
+* MySqlDataStore +
+in the sub project
+link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojo-mapper-mysql[vertx-pojo-mapper-mysql]
+is an implementation which deals with MySql or MariaDb. Go
+link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojo-mapper-mysql[here] to get more
+information on how to create an instance of MySqlDataStore
+* more implementations will follow soon
+
+Where by using the links above you will get some specific information how to initialize one of those implementations,
+in the following parts we will go into the detail for some concepts of the api.
+
+=== KeyGenerator
+
+If you are inserting new records into a database, those records normally need to get a unique identifyer, typically a
+primary key. All databases can generate such a key in an automatic manner, but not every database is returning the
+generated key. For those databases, which don't return the generated key, like MySql, the concept of
+`IKeyGenerator` was implemented to allow a key generation with local
+access before a new instance is saved into the datastore.
+
+[source,java]
+----
+JsonObject datastoreConfig = new JsonObject().put("database", database)
+.put(IKeyGenerator.DEFAULT_KEY_GENERATOR, FileKeyGenerator.NAME);
+IDataStore datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig);
+...
+----
+
+Currently there are existing two implementations:
+
+* `DebugGenerator` +
+pure in memory counter, which starts at zero with every new `IDataStore`,
+should be only used for testing
+* `FileKeyGenerator` +
+an implementation which stores the keys per mapper inside a hidden, local directory
+* hopefully more will follow, hazelcast is planned
+
+An `IDataStore` implementation might contain a set of
+`IKeyGenerator`, which are supported by this implementation.
+KeyGenerators are stored inside a map by their name and an instance. When initializing an
+`IDataStore` you can add the property
+`link:todo[IKeyGenerator.DEFAULT_KEY_GENERATOR]` together
+with the name of the KeyGenerator, which shall be used as default. Additionally you can add the annotation
+`@KeyGenerator` to a mapper, where you are specifying the name of
+the KeyGenerator, which shall be used for this mapper.
 
 
+=== Mapping of Java classes
+The mapping of vertx-pojo-mapper defines the bases and the rules on how POJOs are stored into and read from
+the underlaying database and includes the automatic table creation and synchronization.
+
+The mapping process
+in vertx-pojo-mapper is performed exactly then, when it is needed.
+
+When you are creating an `IQuery` for instance, the system
+checks, wether the mapper was initialized already. If not, then the initialization is performed, which implements
+the automatic creation and update of tables, collections etc. inside the connected datastore - so you don’t have
+to care about that, either. Its this behaviour, why the vertx-pojo-mapper has only a very little overhead on startup!
+
+During the mapping process the class is inspected for several information. The persistent fields of a mapper are
+generated by inspecting public fields and BeanProperties. The rest of the configuration of a mapper is done by using
+annotations. Annotations are always added to a field or the Class itself. Even annotations for those properties,
+which are defined as getter / setter-method must be added to the underlaying field of the methods. For example mapper
+definitions check the QuickStart.
+
+==== Mapper
+The result of the mapping process is an `IMapper`, which is created by
+and stored inside the `IMapperFactory` implementation, which fits the
+needs of the underlaying datastore or database. The IMapper contains general information about the mapped class and
+the generated, respectively connected table in the datastore. Additionally it contains per property of the mapper an
+instance of `IField`, where the field and its behaviour regarding the
+mapping are desribed. Additionally per field the information about the connected column inside the datastore are kept
+inside an instance of `IColumnInfo`
+
+==== TableGenerator and ColumnHandler
+As explained above, vertx-pojo-mapper is able to generate needed structures in the underlaying datastore, like tables
+for sql databases. Base for the generation is the
+`IColumnHandler`, from which the suitable instance is stored
+inside the IField. The IColumnHandler is detected during the mapping process by requesting a suitable one from the
+`ITableGenerator` used by a datastore implementation.
+The process of creation and synchronization is performed by
+`IDataStoreSynchronizer`
+Michael Remme
+
+=== The `ITypeHandler`
+
+Michael Remme
+
+
+==== Existing annotations
 Existing annotations are:
 
-==== @Entity
+===== @Entity
 
 ( name = "tableName" ) By annotating a class with de.braintags.io.vertx.pojomapper.annotation.Entity you are able to
 set the name of the table which is used to store the information in the
@@ -280,68 +598,72 @@ set the name of the table which is used to store the information in the
 By default the system will use the short classname of the
 mapper.
 
-==== @Id
+===== @Id
 
 One field of the mapper must be annotated by de.braintags.io.vertx.pojomapper.annotation.field.Id, which will mark
 the annotated field as primary key
 
-==== @Property
+===== @Property
 
 Properties of a mapper are stored inside the `IDataStore` by using the
 fieldname by default. By annotating a field with de.braintags.io.vertx.pojomapper.annotation.field.Property you are
 able to modify the name of the column in the table.
 
-==== @Referenced
+===== @Referenced
 
 This annotation is used to mark a field, so that values of this field are stored inside a separate table and that
 those values are referenced by their id inside the stored result.
 
-==== @Embedded
+===== @Embedded
 
 This annotation is used to mark a field, so that values of that field are stored directly as content of the given
 field.
 
-==== @ObjectFactory
+===== @ObjectFactory
 
 By default the `IObjectFactory` is defined inside each
 `IMapper` by using a default implementation. If you need another
 implementation you are able to set it by adding this annotation to the mapper class and reference the class of the
 `IObjectFactory` you want to use.
 
-==== @AfterLoad
+===== @AfterLoad
 
 All methods, which are annotated by this annotation are executed after an instance was loaded from the
 `IDataStore`
 
-==== @BeforeSave
+===== @BeforeSave
 
 All methods, which are annotated by this annotation are executed before an instance is saved into the
 `IDataStore`
 
-==== @AfterSave
+===== @AfterSave
 
 All methods, which are annotated by this annotation are executed after an instance was saved into the
 `IDataStore`
 
-==== @BeforeDelete
+===== @BeforeDelete
 
 All methods, which are annotated by this annotation are executed before an instance is deleted from the
 `IDataStore`
 
-==== @AfterDelete
+===== @AfterDelete
 
 All methods, which are annotated by this annotation are executed after an instance was deleted from the
 `IDataStore`
 
 
-==== @ConcreteClass not yet supported
+===== @ConcreteClass not yet supported
 
-==== @ConstructorArguments to be tested
+===== @ConstructorArguments to be tested
 
-==== @Indexes not yet implemented
+===== @Indexes not yet implemented
+
+`@KeyGenerator`
 Michael Remme
 
-Init process beschreiben
+== Init process beschreiben
+
+== dynamic loading beschreiben
 
 == Creating a new implementation tbd
 

@@ -19,7 +19,7 @@ import io.vertx.core.Handler;
 
 /**
  * An IDataStoreSynchronizer is used during the mapping process to check, wether the underlaying table / collection
- * should be modified
+ * should be created or modified
  * 
  * @author Michael Remme
  * 

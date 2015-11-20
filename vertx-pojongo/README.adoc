@@ -4,6 +4,9 @@ implementation of vertx-pojo-mapper for MongoDB
 
 MySql is using the vertx-async driver ...
 
+DESCRIBE INIT OF MONGO DATASTORE HERE
 
 See the documentation under link:src/main/asciidoc/java/index.adoc[Example to use pojongo]
 
+supported KeyGenerators:
+none

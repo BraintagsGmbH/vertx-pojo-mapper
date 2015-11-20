@@ -12,18 +12,18 @@
  */
 package de.braintags.io.vertx.util;
 
+import java.util.Collection;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-
-import java.util.Collection;
 
 /**
  * A collection, which integrates {@link Handler} callbacks in certain methods
  * 
  * @author Michael Remme
- * 
+ * @param E
+ *          the underlaying class to be used
  */
-
 public interface CollectionAsync<E> {
 
   /**

@@ -20,6 +20,8 @@ import io.vertx.core.Handler;
  * Carrier for a result handler
  * 
  * @author Michael Remme
+ * @param E
+ *          the underlaying class, which shall be delivered to the Handler as {@link AsyncResult}
  * 
  */
 

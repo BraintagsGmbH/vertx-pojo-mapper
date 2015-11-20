@@ -25,9 +25,9 @@ import io.vertx.core.Handler;
  * throwing an {@link UnsupportedOperationException}
  * 
  * @author Michael Remme
- * 
+ * @param E
+ *          the underlaying class to be used
  */
-
 public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
 
   /**
