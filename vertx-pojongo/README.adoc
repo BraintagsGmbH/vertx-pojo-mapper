@@ -1,12 +1,23 @@
 = vertx-pojongo
 
-implementation of vertx-pojo-mapper for MongoDB
+An implementation of vertx-pojo-mapper for MongoDB
 
-MySql is using the vertx-async driver ...
+vertx-pojongo uses the link:https://github.com/vert-x3/vertx-mongo-client[vertx-mongo-client]
 
-DESCRIBE INIT OF MONGO DATASTORE HERE
+Example initialization for the IDataStore for MongoDB:
+ 
+[source, java]
+----
 
-See the documentation under link:src/main/asciidoc/java/index.adoc[Example to use pojongo]
+  public void initMongoDatastore(Vertx vertx, String database) {
+    Objects.requireNonNull(database, "database is required");
+    JsonObject config = new JsonObject();
+    config.put("connection_string", "mongodb://localhost:27017");
+    config.put("db_name", database);
+    MongoClient mongoClient = MongoClient.createNonShared(vertx, config);
+    MongoDataStore mongoDataStore = new MongoDataStore(vertx, mongoClient, config);
+  }
 
-supported KeyGenerators:
-none
+----
+
+link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[*Quickstart and documentation*]

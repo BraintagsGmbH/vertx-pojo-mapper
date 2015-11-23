@@ -1,10 +1,34 @@
 = vertx-pojo-mapper-mysql
 
-implementation of vertx-pojo-mapper for MySql
+An implementation of vertx-pojo-mapper for MySql and Maria-DB
 
-MySql is using the vertx-async driver ...
+vertx-pojo-mapper-mysql uses the link:https://github.com/vert-x3/vertx-mysql-postgresql-client[vertx-mysql-postgresql-client]
 
-DESCRIBE INIT OF MYSQLDATASTORE HERE
+Example initialization for the IDataStore for MySql:
+   
+[source, java]
+----
 
-See the documentation under link:src/main/asciidoc/java/index.adoc[Example to use vertx-pojo-mapper-mysql]
+  public void initMySqlClient(Vertx vertx, String username, String password, String database) {
+    Objects.requireNonNull(username, "Username is required");
+    Objects.requireNonNull(password, "Password is required");
+    Objects.requireNonNull(database, "database is required");
 
+    JsonObject mySQLClientConfig = new JsonObject();
+    mySQLClientConfig.put("host", "localhost");
+    mySQLClientConfig.put("username", username);
+    mySQLClientConfig.put("password", password);
+    mySQLClientConfig.put("database", database);
+    mySQLClientConfig.put("port", 3306);
+    mySQLClientConfig.put(IKeyGenerator.DEFAULT_KEY_GENERATOR, FileKeyGenerator.NAME);
+
+    mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
+    datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig);
+  }
+
+----
+    
+link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[*Quickstart and documentation*]
+
+    
+    
