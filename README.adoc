@@ -1,4 +1,4 @@
-= vertx-pojo-mapper 
+== vertx-pojo-mapper +
 ====asynchronously map java objects into datastores and back
 
 vertx-pojo-mapper is a framework for nonblocking pojo mapping for different datasources.
