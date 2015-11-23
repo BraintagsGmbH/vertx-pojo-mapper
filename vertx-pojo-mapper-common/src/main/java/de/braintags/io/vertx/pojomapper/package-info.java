@@ -324,28 +324,28 @@
  * {@link de.braintags.io.vertx.pojomapper.annotation.KeyGenerator} to a mapper, where you are specifying the name of
  * the KeyGenerator, which shall be used for this mapper.
  * 
- * 
  * === Mapping of Java classes
  * {@link de.braintags.io.vertx.pojomapper.mapping}
  * 
  * === TypeHandlers
  * {@link de.braintags.io.vertx.pojomapper.typehandler}
  * 
- * 
- * ==== Existing annotations
+ * === Existing annotations
  * {@link de.braintags.io.vertx.pojomapper.annotation}
  * 
- * == Init process beschreiben
+ * == Creating a new implementation
  * 
- * == dynamic loading beschreiben
- * 
- * == Creating a new implementation tbd
+ * tbd
  * 
  * == Further links
- * MySql driver
- * MongoDriver
+ * To get specific information about the concrete implementation of an
+ * {@link de.braintags.io.vertx.pojomapper.IDataStore}, especially the initialization, go to:
+ * 
+ * * link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojo-mapper-mysql[implementation for
+ * MySql]
+ * * link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojongo[implementation for Mongo-DB]
  *
- * @author Michael Remme
+ *
  */
 @Document(fileName = "index.adoc")
 package de.braintags.io.vertx.pojomapper;

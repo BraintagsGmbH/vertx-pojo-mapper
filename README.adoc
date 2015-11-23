@@ -1,24 +1,24 @@
-= vertx-pojo-mapper - nonblocking java to document mapping
+= vertx-pojo-mapper 
+asynchronously map java objects into datastores and back
 
-vertx-pojo-mapper is a framework for nonblocking pojo mapping for different datasources
+vertx-pojo-mapper is a framework for nonblocking pojo mapping for different datasources.
+It is styled to master ORM ( object relational mapping ) as well as ODM ( object document mapping ) 
 
 Key features
 
 * nonblocking as far as possible
-* map your Java entities to different datasources like MongoDB, MySql etc. and back
+* mapping java objects into different datasources like Mongo-DB, MySql etc.
 * transparent and flexible markup for POJOs
 * extensible type conversion
 * fluent api
 * very fast initialization
 
-*Documentation*
-
-* Quick-Start and general information about the api link:vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[ here ]
-* How to use it based on link:vertx-pojongo/src/main/asciidoc/java/index.adoc[vertx-pojongo]
+*link:vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[Quickstart and documentation]*
 
 *List of supported datasources*
 
-* link:vertx-pojongo/README.adoc[implementation for mongo]
+* link:vertx-pojo-mapper-mysql/README.adoc[implementation for Mongo-DB]
+* link:vertx-pojongo/README.adoc[implementation for MySql / MariaDb]
 
 
 *Modules inside this project*
