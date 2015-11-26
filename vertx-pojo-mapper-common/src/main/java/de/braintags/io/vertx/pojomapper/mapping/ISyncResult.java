@@ -23,6 +23,9 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
  * 
  * @author Michael Remme
  * 
+ * @param T
+ *          the dataformat which is used as sync command
+ * 
  */
 
 public interface ISyncResult<T> {

@@ -36,12 +36,6 @@ public class DefaultPropertyMapper implements IPropertyMapper {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(DefaultPropertyMapper.class);
 
-  /**
-   * 
-   */
-  public DefaultPropertyMapper() {
-  }
-
   @Override
   public void intoStoreObject(Object mapper, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {

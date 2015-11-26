@@ -23,6 +23,8 @@ import io.vertx.core.Handler;
  * 
  * @author Michael Remme
  * 
+ * @param T
+ *          the dataformat which is used as sync command
  */
 
 public interface IDataStoreSynchronizer<T> {
