@@ -118,7 +118,8 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
     Map<String, SyncAction> syncMap = currentDbTable.compareColumns(mapper);
     if (!syncMap.isEmpty()) {
       logSyncMap(syncMap);
-      throw new UnsupportedOperationException("Implement update of table structure");
+      throw new UnsupportedOperationException("Implement update of table structure in mapper "
+          + mapper.getMapperClass().getName() + ": " + syncMap.toString());
     } else {
       resultHandler.handle(Future.succeededFuture(new DefaultSyncResult(SyncAction.NO_ACTION)));
     }
