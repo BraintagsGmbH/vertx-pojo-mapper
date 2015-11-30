@@ -43,7 +43,9 @@ public interface IKeyGenerator {
    * Generates a key and returns it
    * 
    * @param mapper
-   * @param idResult
+   *          the mapper to generate a key for
+   * @param handler
+   *          the handler to deliver the key to
    */
   void generateKey(IMapper mapper, Handler<AsyncResult<Key>> handler);
 

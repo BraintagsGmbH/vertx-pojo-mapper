@@ -21,7 +21,8 @@ import io.vertx.core.Handler;
  * Define and execute queries inside the connected {@link IDataStore}
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the underlaying mapper class
  */
 
 public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {

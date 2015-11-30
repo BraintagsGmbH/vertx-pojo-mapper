@@ -26,10 +26,11 @@ import io.vertx.core.Handler;
  * An abstract implementation of IQueryResult. Extensions must implement one method to generate single pojos
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the class of the mapper, which builds the result
  */
 
-public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> implements IQueryResult<T> {
+public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T>implements IQueryResult<T> {
   private IMapper mapper;
   private IDataStore datastore;
   private T[] pojoResult;
@@ -44,6 +45,8 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
    *          the mapper which was used
    * @param resultSize
    *          the size of the resulting query
+   * @param originalQuery
+   *          the original query which was processed to create the current result
    */
   @SuppressWarnings("unchecked")
   public AbstractQueryResult(IDataStore datastore, IMapper mapper, int resultSize, IQueryExpression originalQuery) {

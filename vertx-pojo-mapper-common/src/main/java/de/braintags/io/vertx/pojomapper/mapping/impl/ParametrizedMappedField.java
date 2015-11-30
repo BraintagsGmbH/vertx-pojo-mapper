@@ -19,20 +19,21 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 
+ * A ParametrizedMappedField describes a field with type paramters
  * 
  * @author Michael Remme
  * 
  */
-
 public class ParametrizedMappedField extends MappedField {
   private MappedField parent;
   private ParameterizedType pType;
 
   /**
-   * @param field
-   * @param accessor
-   * @param mapper
+   * 
+   * @param type
+   *          the {@link ParameterizedType} to be used here
+   * @param parent
+   *          the main definition of the field
    */
   public ParametrizedMappedField(final ParameterizedType type, final MappedField parent) {
     super(type, (Mapper) parent.getMapper());
@@ -45,6 +46,12 @@ public class ParametrizedMappedField extends MappedField {
     setSubType(getSubType());
   }
 
+  /**
+   * @param type
+   *          the {@link Type} to be used
+   * @param parent
+   *          the main definition of the field
+   */
   public ParametrizedMappedField(final Type type, final MappedField parent) {
     super(type, (Mapper) parent.getMapper());
     this.parent = parent;

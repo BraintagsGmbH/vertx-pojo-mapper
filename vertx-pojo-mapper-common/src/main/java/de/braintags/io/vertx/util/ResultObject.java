@@ -20,7 +20,7 @@ import io.vertx.core.Handler;
  * Carrier for a result handler
  * 
  * @author Michael Remme
- * @param E
+ * @param <E>
  *          the underlaying class, which shall be delivered to the Handler as {@link AsyncResult}
  * 
  */
@@ -30,7 +30,11 @@ public class ResultObject<E> extends ErrorObject<E> {
   private E result;
 
   /**
+   * Constructor with a {@link Handler}, which will be informed about the result, when the
+   * method {@link #setResult(Object)} is called
    * 
+   * @param handler
+   *          the handler to be informed
    */
   public ResultObject(Handler<AsyncResult<E>> handler) {
     super(handler);

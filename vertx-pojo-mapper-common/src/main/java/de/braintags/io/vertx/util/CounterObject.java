@@ -24,6 +24,8 @@ public class CounterObject extends Object {
 
   /**
    * 
+   * @param count
+   *          the count to be used for countdown
    */
   public CounterObject(int count) {
     this.count = count;

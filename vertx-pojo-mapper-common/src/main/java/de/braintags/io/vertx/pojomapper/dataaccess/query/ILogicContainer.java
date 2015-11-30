@@ -16,7 +16,8 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query;
  * a container to define AND / OR sequences
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the type of the parent container
  */
 
 public interface ILogicContainer<T extends IQueryContainer> extends IQueryContainer {

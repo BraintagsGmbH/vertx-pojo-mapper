@@ -27,6 +27,10 @@ public abstract class AbstractKeyGenerator implements IKeyGenerator {
 
   /**
    * 
+   * @param name
+   *          the name of the generator
+   * @param datastore
+   *          the datastore to be used
    */
   public AbstractKeyGenerator(String name, IDataStore datastore) {
     this.name = name;

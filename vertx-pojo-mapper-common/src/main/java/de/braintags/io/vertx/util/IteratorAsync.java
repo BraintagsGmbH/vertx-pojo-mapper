@@ -19,7 +19,7 @@ import io.vertx.core.Handler;
  * An interface which describes an Iterator with integrated {@link Handler} callbacks
  * 
  * @author Michael Remme
- * @param E
+ * @param <E>
  *          the underlaying class to be used
  * 
  */

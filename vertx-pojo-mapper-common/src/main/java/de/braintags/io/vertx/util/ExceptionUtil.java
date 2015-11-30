@@ -20,11 +20,16 @@ package de.braintags.io.vertx.util;
  */
 public class ExceptionUtil {
 
+  private ExceptionUtil() {
+  }
+
   /**
    * This method creates a RuntimeException from the given Throwable or casts the Throwable as RuntimeException
    * 
    * @param e
    *          the {@link Throwable} to be examined
+   * @return the exception itself, if it was a {@link RuntimeException} or a RuntimeException, which encapsulates the
+   *         oroginal exception
    */
   public static RuntimeException createRuntimeException(Throwable e) {
     if (e instanceof RuntimeException)

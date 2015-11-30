@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.mapping.impl;
 import java.lang.reflect.Field;
 
 import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 
 /**
@@ -30,6 +31,8 @@ public class JavaFieldAccessor implements IPropertyAccessor {
 
   /**
    * 
+   * @param field
+   *          the underlaying {@link IField}
    */
   public JavaFieldAccessor(Field field) {
     this.name = field.getName();

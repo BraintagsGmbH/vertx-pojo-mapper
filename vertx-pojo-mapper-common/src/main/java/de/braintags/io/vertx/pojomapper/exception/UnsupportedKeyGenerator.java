@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 public class UnsupportedKeyGenerator extends RuntimeException {
 
   /**
+   * Create a new Exception
    * 
    * @param name
    *          the requested name of the {@link IKeyGenerator}
@@ -34,9 +35,10 @@ public class UnsupportedKeyGenerator extends RuntimeException {
   }
 
   /**
+   * Create a new Exception
    * 
-   * @param the
-   *          requested name of the {@link IKeyGenerator}
+   * @param name
+   *          the requested name of the {@link IKeyGenerator}
    * @param cause
    */
   public UnsupportedKeyGenerator(String name, Throwable cause) {

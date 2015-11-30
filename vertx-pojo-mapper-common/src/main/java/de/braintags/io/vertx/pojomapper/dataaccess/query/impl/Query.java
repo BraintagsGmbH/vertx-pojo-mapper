@@ -34,7 +34,8 @@ import io.vertx.core.Handler;
  * An abstract implementation of {@link IQuery}
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the underlaying mapper to be used
  */
 
 public abstract class Query<T> extends AbstractDataAccessObject<T>implements IQuery<T> {
@@ -97,6 +98,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T>implements IQu
    * 
    * @param rambler
    *          the rambler to be filled
+   * @param resulthandler
+   *          the handler to be informed about the result
    */
   public void executeQueryRambler(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     rambler.start(this);

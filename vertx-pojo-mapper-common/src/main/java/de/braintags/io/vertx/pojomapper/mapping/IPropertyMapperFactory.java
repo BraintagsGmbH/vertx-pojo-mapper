@@ -26,6 +26,7 @@ public interface IPropertyMapperFactory {
    * 
    * @param field
    *          the field to request a property mapper for
+   * @return the generated {@link IPropertyMapper} for the given field
    */
   public IPropertyMapper getPropertyMapper(IField field);
 }

@@ -18,7 +18,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
  * Defines the logic of the field arguments of a query
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the type of the parent container
  */
 
 public interface IFieldParameter<T extends IQueryContainer> {
@@ -109,7 +110,7 @@ public interface IFieldParameter<T extends IQueryContainer> {
   /**
    * Defines a query argument where the value is in the values in the given field
    * 
-   * @param value
+   * @param values
    *          values to be checked as array
    * @return the parent {@link IQueryContainer} to enable chaining of commands
    */
@@ -127,7 +128,7 @@ public interface IFieldParameter<T extends IQueryContainer> {
   /**
    * Defines a query argument where the value is not in the values
    * 
-   * @param value
+   * @param values
    *          values to be checked as array
    * @return the parent {@link IQueryContainer} to enable chaining of commands
    */

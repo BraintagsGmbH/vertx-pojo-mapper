@@ -23,7 +23,8 @@ import io.vertx.codegen.annotations.Fluent;
  * instance
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the type, which is used internally as format, like Json for instance
  */
 
 public interface IStoreObject<T> {
@@ -40,7 +41,7 @@ public interface IStoreObject<T> {
   /**
    * Get the defined property in the propriate format of the current driver
    * 
-   * @param property
+   * @param field
    *          the {@link IField} describing the property
    * @return the value of the property in the propriate format of the current implementation of the {@link IDataStore}
    */

@@ -26,10 +26,11 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 /**
- * 
+ * Abstract implementation of {@link IWrite}
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the underlaying mapper to be used
  */
 
 public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T>implements IWrite<T> {

@@ -22,13 +22,9 @@ package de.braintags.io.vertx.pojomapper.exception;
 public class ParameterRequiredException extends RuntimeException {
 
   /**
+   * Create a new exception for a missing parameter
    * 
-   */
-  public ParameterRequiredException() {
-  }
-
-  /**
-   * @param message
+   * @param parameterName
    */
   public ParameterRequiredException(String parameterName) {
     super("Missing parameter: " + parameterName);

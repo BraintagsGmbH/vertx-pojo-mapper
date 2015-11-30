@@ -33,6 +33,8 @@ public class MapperFactory implements IMapperFactory {
 
   /**
    * 
+   * @param dataStore
+   *          the {@link IDataStore} to be used
    */
   public MapperFactory(IDataStore dataStore) {
     this.dataStore = dataStore;

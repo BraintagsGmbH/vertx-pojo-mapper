@@ -31,6 +31,8 @@ public class ObjectTypeHandler extends AbstractTypeHandler {
 
   /**
    * 
+   * @param typeHandlerFactory
+   *          th eparent {@link ITypeHandlerFactory}
    */
   public ObjectTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory, handleClass);

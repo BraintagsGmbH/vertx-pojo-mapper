@@ -25,6 +25,8 @@ public class Key {
 
   /**
    * 
+   * @param key
+   *          the native value of the key
    */
   public Key(Object key) {
     this.generatedKey = key;

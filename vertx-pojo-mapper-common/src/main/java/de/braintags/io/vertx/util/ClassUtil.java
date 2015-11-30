@@ -39,6 +39,12 @@ import io.vertx.core.logging.LoggerFactory;
  * 
  */
 
+/**
+ * 
+ * 
+ * @author Michael Remme
+ * 
+ */
 public class ClassUtil {
   private static final Logger log = LoggerFactory.getLogger(ClassUtil.class);
 
@@ -94,6 +100,11 @@ public class ClassUtil {
     return list;
   }
 
+  /**
+   * @param clazz
+   * @param tv
+   * @return
+   */
   public static <T> Class<?> getTypeArgument(final Class<? extends T> clazz,
       final TypeVariable<? extends GenericDeclaration> tv) {
     final Map<Type, Type> resolvedTypes = new HashMap<Type, Type>();
@@ -196,6 +207,15 @@ public class ClassUtil {
     return returnClass;
   }
 
+  /**
+   * Tries to get the class of a paramtrization like List<String>
+   * 
+   * @param field
+   *          the field to be exmined
+   * @param index
+   *          the position to examine
+   * @return a {@link Type} definition for the given {@link Type}
+   */
   public static Type getParameterizedType(final Field field, final int index) {
     if (field != null) {
       if (field.getGenericType() instanceof ParameterizedType) {
@@ -233,10 +253,26 @@ public class ClassUtil {
     return null;
   }
 
+  /**
+   * Tries to get the class of a paramtrization like List<String>
+   * 
+   * @param c
+   *          the class to be examined
+   * @return the parametrization or null, if impossible
+   */
   public static Class<?> getParameterizedClass(final Class<?> c) {
     return getParameterizedClass(c, 0);
   }
 
+  /**
+   * Tries to get the class of a paramtrization like List<String>
+   * 
+   * @param c
+   *          the class to be examined
+   * @param index
+   *          the position to read,
+   * @return the parametrization or null, if impossible
+   */
   public static Class<?> getParameterizedClass(final Class<?> c, final int index) {
     final TypeVariable<?>[] typeVars = c.getTypeParameters();
     if (typeVars.length > 0) {

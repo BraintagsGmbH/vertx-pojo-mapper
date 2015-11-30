@@ -29,7 +29,9 @@ public class DefaultSyncResult implements ISyncResult<String> {
   private SyncAction action;
 
   /**
+   * Creates a new instance with the given {@link SyncAction}
    * 
+   * @action the type od {@link SyncAction}
    */
   public DefaultSyncResult(SyncAction action) {
     this.action = action;
@@ -38,6 +40,7 @@ public class DefaultSyncResult implements ISyncResult<String> {
   /**
    * Creates a new instance with the given command
    * 
+   * @action the type od {@link SyncAction}
    * @param syncCommand
    *          the command to be set
    */

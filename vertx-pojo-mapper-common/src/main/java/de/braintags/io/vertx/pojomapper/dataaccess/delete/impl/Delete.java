@@ -36,7 +36,8 @@ import io.vertx.core.Handler;
  * Abstract implementation of {@link IDelete}
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the underlaying mapper to be used
  */
 
 public abstract class Delete<T> extends AbstractDataAccessObject<T>implements IDelete<T> {
@@ -194,9 +195,9 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T>implements ID
    */
   protected void deleteRecordsById(IField idField, List<Object> objectIds,
       Handler<AsyncResult<IDeleteResult>> resultHandler) {
-    IQuery<T> query = getDataStore().createQuery(getMapperClass());
-    query.field(idField.getName()).in(objectIds);
-    deleteQuery(query, dr -> {
+    IQuery<T> q = getDataStore().createQuery(getMapperClass());
+    q.field(idField.getName()).in(objectIds);
+    deleteQuery(q, dr -> {
       if (dr.failed()) {
         resultHandler.handle(dr);
         return;

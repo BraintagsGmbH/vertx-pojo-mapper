@@ -16,17 +16,21 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 
 /**
- * 
+ * An abstract implementation of {@link IQueryContainer}
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          defines the class of the parent instance, which is an instance of IQueryContainer
  */
 
 public abstract class AbstractQueryContainer<T extends IQueryContainer> implements IQueryContainer {
   private T parent;
 
   /**
+   * Create an instance with the parent container, where this instance is belonging to
    * 
+   * @param parent
+   *          the parent container
    */
   public AbstractQueryContainer(T parent) {
     this.parent = parent;

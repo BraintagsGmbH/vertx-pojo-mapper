@@ -21,7 +21,7 @@ import io.vertx.core.Handler;
  * A collection, which integrates {@link Handler} callbacks in certain methods
  * 
  * @author Michael Remme
- * @param E
+ * @param <E>
  *          the underlaying class to be used
  */
 public interface CollectionAsync<E> {
@@ -79,6 +79,8 @@ public interface CollectionAsync<E> {
    * <p>
    * This method acts as bridge between array-based and collection-based APIs.
    *
+   * @param handler
+   *          the handler, which will receive the resulting array
    * @return an array containing all of the elements in this collection
    */
   void toArray(Handler<AsyncResult<Object[]>> handler);
@@ -95,7 +97,7 @@ public interface CollectionAsync<E> {
   /**
    * Removes an instance
    * 
-   * @param e
+   * @param o
    *          the instance to be removed
    * @return true, if successfully removed
    */

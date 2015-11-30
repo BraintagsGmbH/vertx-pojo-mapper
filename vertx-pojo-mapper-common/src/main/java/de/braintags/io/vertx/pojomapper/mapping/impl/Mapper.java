@@ -100,8 +100,12 @@ public class Mapper implements IMapper {
   private final Map<Class<? extends Annotation>, List<Method>> lifecycleMethods = new HashMap<Class<? extends Annotation>, List<Method>>();
 
   /**
-   * @throws Exception
+   * Creates a new definition for the given mapper class
    * 
+   * @param mapperClass
+   *          the mapper class to be handled
+   * @param mapperFactory
+   *          the parent {@link MapperFactory}
    */
   public Mapper(Class<?> mapperClass, MapperFactory mapperFactory) {
     this.mapperFactory = mapperFactory;
@@ -423,7 +427,7 @@ public class Mapper implements IMapper {
    * @return
    */
   private Object[] createMethodArgs(Method method, Object entity) {
-    throw new UnsupportedOperationException("Not yet supported, dynamic generation of arguments");
+    throw new UnsupportedOperationException("Not yet supported, dynamic generation of arguments: " + method + entity);
   }
 
   @Override

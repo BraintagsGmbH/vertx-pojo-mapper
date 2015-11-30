@@ -22,7 +22,7 @@ import de.braintags.io.vertx.util.CollectionAsync;
  * can decide to perform a lazy load of found results
  * 
  * @author Michael Remme
- * @param E
+ * @param <E>
  *          the underlaying mapper class
  * 
  */

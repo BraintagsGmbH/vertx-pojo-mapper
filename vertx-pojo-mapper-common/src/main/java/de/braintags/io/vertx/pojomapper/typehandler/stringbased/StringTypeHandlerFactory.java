@@ -33,7 +33,7 @@ public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
   private final List<ITypeHandler> definedTypeHandlers = new ArrayList<ITypeHandler>();
 
   /**
-   * 
+   * The default constructor for a String base factory
    */
   public StringTypeHandlerFactory() {
     init();

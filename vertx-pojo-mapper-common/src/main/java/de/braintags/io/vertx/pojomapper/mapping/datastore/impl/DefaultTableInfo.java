@@ -26,7 +26,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 
 /**
- * 
+ * A default implementation for {@link ITableInfo}
  * 
  * @author Michael Remme
  * 
@@ -39,6 +39,8 @@ public class DefaultTableInfo implements ITableInfo {
 
   /**
    * 
+   * @param mapper
+   *          the mapper to be used to create the instance
    */
   public DefaultTableInfo(IMapper mapper) {
     if (mapper.getEntity() == null || mapper.getEntity().name().equals(Entity.UNDEFINED_NAME))

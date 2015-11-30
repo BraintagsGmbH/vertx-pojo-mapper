@@ -31,6 +31,8 @@ public abstract class AbstractColumnHandler implements IColumnHandler {
 
   /**
    * 
+   * @param classesToDeal
+   *          the classes to be handled by the current instance
    */
   public AbstractColumnHandler(Class<?>... classesToDeal) {
     classesToHandle = Arrays.asList(classesToDeal);

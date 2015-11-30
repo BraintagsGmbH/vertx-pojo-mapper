@@ -23,7 +23,7 @@ import io.vertx.core.Handler;
  * 
  * @author Michael Remme
  * 
- * @param T
+ * @param <T>
  *          the dataformat which is used as sync command
  */
 

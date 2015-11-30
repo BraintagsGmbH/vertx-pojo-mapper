@@ -48,7 +48,12 @@ public abstract class AbstractDataStore implements IDataStore {
   private Map<String, IKeyGenerator> keyGeneratorMap = new HashMap<>();
 
   /**
+   * Create a new instance. The possible properties are defined by its concete implementation
    * 
+   * @param vertx
+   *          the instance if {@link Vertx} used
+   * @param properties
+   *          the properties by which the new instance is created
    */
   public AbstractDataStore(Vertx vertx, JsonObject properties) {
     this.vertx = vertx;

@@ -105,6 +105,8 @@ public interface IField {
   /**
    * Get the constructor with the given parameters
    * 
+   * @param parameters
+   *          the parameters of the required Constructor
    * @return a constructor with the arguments or null
    */
   @SuppressWarnings("rawtypes")

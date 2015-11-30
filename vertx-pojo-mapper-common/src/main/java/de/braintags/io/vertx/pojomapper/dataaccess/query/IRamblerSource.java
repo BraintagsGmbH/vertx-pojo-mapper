@@ -27,7 +27,10 @@ public interface IRamblerSource {
   /**
    * apply the current instance to the {@link IQueryRambler}
    * 
-   * @param rambler
+   * @param ramblerHandler
+   *          the instance of {@link IQueryRambler} to be used
+   * @param resultHandler
+   *          the handler to be informed
    */
   void applyTo(IQueryRambler ramblerHandler, Handler<AsyncResult<Void>> resultHandler);
 }

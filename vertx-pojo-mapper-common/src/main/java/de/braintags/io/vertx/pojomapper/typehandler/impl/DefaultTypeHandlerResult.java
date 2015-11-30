@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.typehandler.impl;
 
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 
 /**
@@ -28,10 +29,13 @@ public class DefaultTypeHandlerResult implements ITypeHandlerResult {
    * 
    */
   public DefaultTypeHandlerResult() {
+    // empty
   }
 
   /**
    * 
+   * @param result
+   *          the result which was created by an {@link ITypeHandler}
    */
   public DefaultTypeHandlerResult(Object result) {
     this.thResult = result;

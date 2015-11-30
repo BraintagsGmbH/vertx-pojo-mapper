@@ -14,11 +14,12 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.delete.impl;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 
 /**
- * 
+ * The result of the execution of an {@link IDelete}
  * 
  * @author Michael Remme
  * 
@@ -31,6 +32,12 @@ public abstract class DeleteResult implements IDeleteResult {
 
   /**
    * 
+   * @param datastore
+   *          the parent datastore by which the delete was executed
+   * @param mapper
+   *          the underlaying mapper
+   * @param command
+   *          the native command executed
    */
   public DeleteResult(IDataStore datastore, IMapper mapper, Object command) {
     this.datastore = datastore;

@@ -25,10 +25,11 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 /**
- * 
+ * IMplementation of {@link IFieldParameter}
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the type of the parent container as extension of {@link IQueryContainer}
  */
 
 public class FieldParameter<T extends IQueryContainer> implements IFieldParameter<T>, IRamblerSource {
@@ -39,7 +40,12 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   private boolean closeParenthesis = false;
 
   /**
+   * Create an instance with the given container for the given field
    * 
+   * @param container
+   *          the parent container
+   * @param field
+   *          the underlaying field
    */
   public FieldParameter(T container, IField field) {
     this.container = container;

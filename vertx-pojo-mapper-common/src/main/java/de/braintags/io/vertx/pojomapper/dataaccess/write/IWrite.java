@@ -12,15 +12,16 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.write;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject;
 
 /**
  * IWrite is responsible for all write actions into the connected datasource. It performs inserts and updates.
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the unt´derlaing mapper class
  */
 
 public interface IWrite<T> extends IDataAccessObject<T> {

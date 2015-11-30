@@ -13,17 +13,18 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.delete;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * IDelete is responsible for the deletion of instances from the connected datastore
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the underlaying mapper to be handled
  */
 
 public interface IDelete<T> extends IDataAccessObject<T> {

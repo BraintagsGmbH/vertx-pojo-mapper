@@ -22,18 +22,21 @@ import io.vertx.core.logging.LoggerFactory;
  * A simple instance to transfer error information in an event queue
  * 
  * @author Michael Remme
- * @param E
+ * @param <E>
  *          the underlaying class, which shall be delivered to the Handler as {@link AsyncResult}
  * 
  */
 public class ErrorObject<E> {
-  private static Logger logger = LoggerFactory.getLogger(ErrorObject.class);
+  private static final Logger logger = LoggerFactory.getLogger(ErrorObject.class);
   private Throwable throwable;
   private boolean errorHandled = false;
   private Handler<AsyncResult<E>> handler;
 
   /**
+   * Creates an instance with a handler, which will be informed, when an Exception is added
+   * into the current instance
    * 
+   * @handler the handler to be informed about errors
    */
   public ErrorObject(Handler<AsyncResult<E>> handler) {
     this.handler = handler;

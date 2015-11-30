@@ -46,6 +46,12 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
 
   /**
    * 
+   * @param queryExpression
+   *          the {@link IQueryExpression} to be used
+   * @param logicTranslator
+   *          responsible to translate logic idioms for the current implementation
+   * @param queryOperatorTranslator
+   *          responsible to translate query operators for the current implementation
    */
   public AbstractQueryRambler(IQueryExpression queryExpression, IQueryLogicTranslator logicTranslator,
       IQueryOperatorTranslator queryOperatorTranslator) {

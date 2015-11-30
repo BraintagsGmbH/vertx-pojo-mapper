@@ -19,7 +19,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
  * describes common methods for all dataaccess objects
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the mapper class which is dealed by the current instance
  */
 
 public interface IDataAccessObject<T> {

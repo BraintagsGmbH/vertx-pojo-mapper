@@ -28,10 +28,11 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 /**
- * 
+ * The LogicContainer defines the {@link QueryLogic} of a query
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the parent container of the current instance
  */
 
 public class LogicContainer<T extends IQueryContainer> extends AbstractQueryContainer<IQueryContainer>
@@ -40,7 +41,10 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   private QueryLogic logic;
 
   /**
+   * Creates a new instance with the given parent container and the defined logic
    * 
+   * @param parent
+   * @param logic
    */
   public LogicContainer(T parent, QueryLogic logic) {
     super(parent);

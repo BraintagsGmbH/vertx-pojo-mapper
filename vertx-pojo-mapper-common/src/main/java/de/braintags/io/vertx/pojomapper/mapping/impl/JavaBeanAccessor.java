@@ -32,6 +32,8 @@ public class JavaBeanAccessor implements IPropertyAccessor {
 
   /**
    * 
+   * @param beanDescriptor
+   *          the underlaying {@link PropertyDescriptor}
    */
   public JavaBeanAccessor(PropertyDescriptor beanDescriptor) {
     this.name = beanDescriptor.getName();
@@ -53,8 +55,8 @@ public class JavaBeanAccessor implements IPropertyAccessor {
     try {
       this.getWriteMethod().invoke(record, new Object[] { data });
     } catch (Exception e) {
-      throw new PropertyAccessException("Cannot write data from property " + this.name, e.getCause() == null ? e
-          : e.getCause());
+      throw new PropertyAccessException("Cannot write data from property " + this.name,
+          e.getCause() == null ? e : e.getCause());
     }
   }
 

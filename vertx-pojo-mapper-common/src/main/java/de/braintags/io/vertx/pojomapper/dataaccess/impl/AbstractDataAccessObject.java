@@ -22,10 +22,11 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 /**
- * 
+ * Abstract implementation of {@link IDataAccessObject}
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the mapper class which is dealed by the current instance
  */
 
 public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T> {
@@ -35,7 +36,13 @@ public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T
   private IMapper mapper;
 
   /**
+   * Creates an instance for the given mapper class and requests an {@link IMapper} definition from
+   * the {@link IDataStore}
    * 
+   * @param mapperClass
+   *          the class to deal with
+   * @param datastore
+   *          the datastore to be used for all actions of the current instance
    */
   public AbstractDataAccessObject(final Class<T> mapperClass, IDataStore datastore) {
     this.mapperClass = mapperClass;
