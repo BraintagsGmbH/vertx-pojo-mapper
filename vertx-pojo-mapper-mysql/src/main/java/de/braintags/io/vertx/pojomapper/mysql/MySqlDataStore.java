@@ -29,6 +29,8 @@ import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlWrite;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlTableGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlTypeHandlerFactory;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
@@ -128,6 +130,16 @@ public class MySqlDataStore extends AbstractDataStore {
   @Override
   public final String getDatabase() {
     return getProperties().getString(DATABASE_NAME);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#shutdown(io.vertx.core.Handler)
+   */
+  @Override
+  public void shutdown(Handler<AsyncResult<Void>> resultHandler) {
+    sqlClient.close(resultHandler);
   }
 
 }

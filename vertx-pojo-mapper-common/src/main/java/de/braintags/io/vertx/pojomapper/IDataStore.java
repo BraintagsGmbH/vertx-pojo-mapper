@@ -26,6 +26,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
@@ -163,5 +165,12 @@ public interface IDataStore {
    *         {@link IKeyGenerator}
    */
   public IKeyGenerator getDefaultKeyGenerator();
+
+  /**
+   * Shutdown the current instance and their used resources
+   * 
+   * @param resultHandler
+   */
+  public void shutdown(Handler<AsyncResult<Void>> resultHandler);
 
 }

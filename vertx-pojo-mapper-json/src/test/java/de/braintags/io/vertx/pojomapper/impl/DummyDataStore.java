@@ -239,4 +239,13 @@ public class DummyDataStore implements IDataStore {
   public Vertx getVertx() {
     return null;
   }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#shutdown(io.vertx.core.Handler)
+   */
+  @Override
+  public void shutdown(Handler<AsyncResult<Void>> resultHandler) {
+  }
 }

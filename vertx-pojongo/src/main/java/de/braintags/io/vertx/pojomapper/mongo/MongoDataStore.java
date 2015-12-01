@@ -26,6 +26,9 @@ import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoQuery;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoWrite;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapperFactory;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.datastore.MongoTableGenerator;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
@@ -139,6 +142,21 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
   @Override
   protected void initSupportedKeyGenerators() {
     // mongo does not support or need any key generator currently
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#shutdown(io.vertx.core.Handler)
+   */
+  @Override
+  public void shutdown(Handler<AsyncResult<Void>> resultHandler) {
+    try {
+      client.close();
+      resultHandler.handle(Future.succeededFuture());
+    } catch (Exception e) {
+      resultHandler.handle(Future.failedFuture(e));
+    }
   }
 
 }

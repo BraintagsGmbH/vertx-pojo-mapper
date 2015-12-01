@@ -12,26 +12,19 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.vertxunit;
 
-import java.io.IOException;
-
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.exception.InitException;
+import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
+import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
+import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.io.vertx.pojomapper.testdatastore.IDatastoreContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.AbstractTypeHandlerTest;
 import de.flapdoodle.embed.mongo.MongodExecutable;
-import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.IMongodConfig;
-import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
-import de.flapdoodle.embed.mongo.config.Net;
-import de.flapdoodle.embed.mongo.distribution.Version;
-import de.flapdoodle.embed.process.runtime.Network;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.mongo.MongoClient;
 
 /**
  * 
@@ -52,7 +45,6 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   private static boolean startMongoLocal = true;
 
   private static MongodExecutable exe;
-  private static MongoClient mongoClient;
   private MongoDataStore mongoDataStore;
 
   /*
@@ -63,20 +55,18 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
    */
   @Override
   public void startup(Vertx vertx, Handler<AsyncResult<Void>> handler) {
-    checkMongoLocal();
-    startMongoExe();
     try {
       if (mongoDataStore == null) {
-        logger.info("starting mongo datastore");
-        initMongoClient(vertx, initResult -> {
+        DataStoreSettings settings = createSettings();
+        IDataStoreInit dsInit = settings.getDatastoreInit().newInstance();
+        dsInit.initDataStore(vertx, settings, initResult -> {
           if (initResult.failed()) {
             logger.error("could not start mongo client", initResult.cause());
             handler.handle(Future.failedFuture(new InitException(initResult.cause())));
-            return;
+          } else {
+            mongoDataStore = (MongoDataStore) initResult.result();
+            handler.handle(Future.succeededFuture());
           }
-          mongoDataStore = new MongoDataStore(vertx, mongoClient, getConfig());
-          handler.handle(Future.succeededFuture());
-          return;
         });
       } else {
         handler.handle(Future.succeededFuture());
@@ -84,6 +74,20 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }
+  }
+
+  private DataStoreSettings createSettings() {
+    DataStoreSettings settings = new DataStoreSettings();
+    settings.setDatastoreInit(MongoDataStoreInit.class);
+    settings.getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY,
+        getProperty(CONNECTION_STRING_PROPERTY, DEFAULT_CONNECTION));
+    settings.getProperties().put(MongoDataStoreInit.START_MONGO_LOCAL_PROP,
+        Boolean.parseBoolean(System.getProperty(START_MONGO_LOCAL_PROP, "false")));
+    settings.getProperties().put(MongoDataStoreInit.LOCAL_PORT_PROP, "27018");
+    settings.getProperties().put(MongoDataStoreInit.DBNAME_PROP, getProperty("db_name", "PojongoTestDatabase"));
+    settings.getProperties().put(MongoDataStoreInit.SHARED_PROP, "false");
+    settings.getProperties().put(MongoDataStoreInit.HANDLE_REFERENCED_RECURSIVE_PROP, handleReferencedRecursive);
+    return settings;
   }
 
   /*
@@ -96,37 +100,6 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
     return mongoDataStore;
   }
 
-  private void initMongoClient(Vertx vertx, Handler<AsyncResult<Void>> handler) {
-    if (mongoClient != null) {
-      logger.info("MongoClient already initialized ");
-      handler.handle(Future.succeededFuture());
-      return;
-    }
-
-    try {
-      JsonObject config = getConfig();
-      logger.info("init MongoClient with " + config);
-      mongoClient = MongoClient.createNonShared(vertx, config);
-      if (mongoClient == null) {
-        handler.handle(Future.failedFuture(new InitException("No MongoClient created")));
-        return;
-      }
-    } catch (Exception e) {
-      handler.handle(Future.failedFuture(new InitException(e)));
-      return;
-    }
-
-    mongoClient.getCollections(resultHandler -> {
-      if (resultHandler.failed()) {
-        logger.error("", resultHandler.cause());
-        handler.handle(Future.failedFuture(resultHandler.cause()));
-      } else {
-        logger.info(String.format("found %d collections", resultHandler.result().size()));
-        handler.handle(Future.succeededFuture());
-      }
-    });
-  }
-
   /*
    * (non-Javadoc)
    * 
@@ -135,14 +108,17 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   @Override
   public void shutdown(Handler<AsyncResult<Void>> handler) {
     logger.info("shutdown performed");
-    mongoClient.close();
-    mongoClient = null;
-    mongoDataStore = null;
-    if (exe != null) {
-      exe.stop();
-    }
+    mongoDataStore.shutdown(result -> {
+      if (result.failed()) {
+        logger.error("", result.cause());
+      }
+      mongoDataStore = null;
+      if (exe != null) {
+        exe.stop();
+      }
+      handler.handle(Future.succeededFuture());
 
-    handler.handle(Future.succeededFuture());
+    });
   }
 
   /*
@@ -154,7 +130,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   @Override
   public void dropTable(String collection, Handler<AsyncResult<Void>> handler) {
     logger.info("DROPPING: " + collection);
-    mongoClient.dropCollection(collection, dropResult -> {
+    mongoDataStore.getMongoClient().dropCollection(collection, dropResult -> {
       if (dropResult.failed()) {
         logger.error("", dropResult.cause());
         handler.handle(dropResult);
@@ -176,57 +152,13 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   }
 
   /**
-   * Creates a config file for a mongo db
-   * 
-   * @return the prepared config file with the connection string and the database name to be used
-   */
-  protected static JsonObject getConfig() {
-    JsonObject config = new JsonObject();
-    config.put("connection_string", getConnectionString());
-    config.put("db_name", getDatabaseName());
-    config.put(IDataStore.HANDLE_REFERENCED_RECURSIVE, handleReferencedRecursive);
-    return config;
-  }
-
-  /**
-   * returns true if a local instance of Mongo shall be started
-   * 
-   * @return
-   */
-  protected static void checkMongoLocal() {
-    startMongoLocal = Boolean.parseBoolean(System.getProperty(START_MONGO_LOCAL_PROP, "false"));
-  }
-
-  /**
-   * Get the connection String for the mongo db
-   * 
-   * @return
-   */
-  protected static String getConnectionString() {
-    if (startMongoLocal) {
-      return "mongodb://localhost:" + LOCAL_PORT;
-    } else {
-      return getProperty(CONNECTION_STRING_PROPERTY, DEFAULT_CONNECTION);
-    }
-  }
-
-  /**
-   * Get the name of the database to be used
-   * 
-   * @return
-   */
-  protected static String getDatabaseName() {
-    return getProperty("db_name", "PojongoTestDatabase");
-  }
-
-  /**
    * Get a property with the given key
    * 
    * @param name
    *          the key of the property to be fetched
    * @return a valid value or null
    */
-  protected static String getProperty(String name, String defaultValue) {
+  private static String getProperty(String name, String defaultValue) {
     String s = System.getProperty(name);
     if (s != null) {
       s = s.trim();
@@ -235,20 +167,6 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
       }
     }
     return defaultValue;
-  }
-
-  public static void startMongoExe() {
-    logger.info("STARTING MONGO");
-    if (startMongoLocal) {
-      try {
-        IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
-            .net(new Net(LOCAL_PORT, Network.localhostIsIPv6())).build();
-        exe = MongodStarter.getDefaultInstance().prepare(config);
-        exe.start();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
   }
 
   @Override

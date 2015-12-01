@@ -106,7 +106,7 @@ public class TestHelper {
 
   }
 
-  private static VertxOptions getOptions() {
+  public static VertxOptions getOptions() {
     VertxOptions options = new VertxOptions();
     String blockedThreadCheckInterval = System.getProperty("BlockedThreadCheckInterval");
     if (blockedThreadCheckInterval != null) {

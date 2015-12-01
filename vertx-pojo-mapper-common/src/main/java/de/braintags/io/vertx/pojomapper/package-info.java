@@ -60,6 +60,9 @@
  * are defining the location of the running Mongo-DB and the database to be used.
  * With this MongoClient we are then able to create a MongoDataStore, which will be the base for all the followings.
  * 
+ * ==== Initialize by DataStoreSettings
+ * {@link de.braintags.io.vertx.pojomapper.init}
+ * 
  * === Creating a mapper
  * Creating a mapper is very simple:
  * 

@@ -26,13 +26,6 @@ import io.vertx.ext.mongo.MongoClient;
  * @author Michael Remme
  * 
  */
-
-/**
- * 
- * 
- * @author Michael Remme
- * 
- */
 public class MongoMetaData implements IDataStoreMetaData {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(MongoMetaData.class);
