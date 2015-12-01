@@ -63,6 +63,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
             handler.handle(Future.failedFuture(new InitException(initResult.cause())));
           } else {
             mongoDataStore = (MongoDataStore) initResult.result();
+            exe = ((MongoDataStoreInit) dsInit).getMongodExecutable();
             handler.handle(Future.succeededFuture());
           }
         });
@@ -80,11 +81,12 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
     settings.getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY,
         getProperty(CONNECTION_STRING_PROPERTY, DEFAULT_CONNECTION));
     settings.getProperties().put(MongoDataStoreInit.START_MONGO_LOCAL_PROP,
-        Boolean.parseBoolean(System.getProperty(START_MONGO_LOCAL_PROP, "false")));
+        getProperty(START_MONGO_LOCAL_PROP, "false"));
     settings.getProperties().put(MongoDataStoreInit.LOCAL_PORT_PROP, String.valueOf(LOCAL_PORT));
     settings.getProperties().put(MongoDataStoreInit.DBNAME_PROP, getProperty("db_name", "PojongoTestDatabase"));
     settings.getProperties().put(MongoDataStoreInit.SHARED_PROP, "false");
-    settings.getProperties().put(MongoDataStoreInit.HANDLE_REFERENCED_RECURSIVE_PROP, handleReferencedRecursive);
+    settings.getProperties().put(MongoDataStoreInit.HANDLE_REFERENCED_RECURSIVE_PROP,
+        String.valueOf(handleReferencedRecursive));
     return settings;
   }
 

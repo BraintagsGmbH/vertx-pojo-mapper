@@ -13,6 +13,7 @@
 package de.braintags.io.vertx.pojomapper.mongo.init;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.exception.InitException;
@@ -120,6 +121,7 @@ public class MongoDataStoreInit implements IDataStoreInit {
       this.vertx = vertx;
       this.settings = settings;
       checkMongoLocal();
+      checkShared();
       startMongoExe(startMongoLocal, localPort);
       initMongoClient(initResult -> {
         if (initResult.failed()) {
@@ -142,6 +144,15 @@ public class MongoDataStoreInit implements IDataStoreInit {
    */
   public MongoClient getMongoClient() {
     return mongoClient;
+  }
+
+  /**
+   * If for debugging purpose an internal MongodExecutable was started, it is returned here
+   * 
+   * @return the instance of MongodExecutable or null, if not used
+   */
+  public MongodExecutable getMongodExecutable() {
+    return exe;
   }
 
   private void initMongoClient(Handler<AsyncResult<Void>> handler) {
@@ -246,7 +257,8 @@ public class MongoDataStoreInit implements IDataStoreInit {
    * @return a valid value or null
    */
   private String getProperty(String name, String defaultValue) {
-    String s = settings.getProperties().getProperty(name);
+    Properties props = this.settings.getProperties();
+    String s = (String) props.get(name);
     if (s != null) {
       s = s.trim();
       if (s.length() > 0) {
