@@ -75,7 +75,6 @@
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mongo-embedded-db</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
