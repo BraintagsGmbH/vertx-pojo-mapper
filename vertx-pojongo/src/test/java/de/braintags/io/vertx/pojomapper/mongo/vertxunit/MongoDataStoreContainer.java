@@ -42,8 +42,6 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   public static final String DEFAULT_CONNECTION = "mongodb://localhost:27017";
   private static boolean handleReferencedRecursive = true;
 
-  private static boolean startMongoLocal = true;
-
   private static MongodExecutable exe;
   private MongoDataStore mongoDataStore;
 
@@ -83,7 +81,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
         getProperty(CONNECTION_STRING_PROPERTY, DEFAULT_CONNECTION));
     settings.getProperties().put(MongoDataStoreInit.START_MONGO_LOCAL_PROP,
         Boolean.parseBoolean(System.getProperty(START_MONGO_LOCAL_PROP, "false")));
-    settings.getProperties().put(MongoDataStoreInit.LOCAL_PORT_PROP, "27018");
+    settings.getProperties().put(MongoDataStoreInit.LOCAL_PORT_PROP, String.valueOf(LOCAL_PORT));
     settings.getProperties().put(MongoDataStoreInit.DBNAME_PROP, getProperty("db_name", "PojongoTestDatabase"));
     settings.getProperties().put(MongoDataStoreInit.SHARED_PROP, "false");
     settings.getProperties().put(MongoDataStoreInit.HANDLE_REFERENCED_RECURSIVE_PROP, handleReferencedRecursive);
