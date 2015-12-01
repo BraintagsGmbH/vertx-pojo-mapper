@@ -56,6 +56,55 @@ To create an instance we define the properties with the minimum definition conne
 are defining the location of the running Mongo-DB and the database to be used.
 With this MongoClient we are then able to create a MongoDataStore, which will be the base for all the followings.
 
+==== Initialize by DataStoreSettings
+In contrast to a programmatical initialization of an IDataStore, you may initialize by using
+`link:unavailable[DataStoreSettings]`, which you can simply store as
+a local file.
+
+[source, java]
+----
+try {
+ DataStoreSettings settings = loadDataStoreSettings(vertx, "/some/path/to/settings.json");
+ IDataStoreInit dsInit = settings.getDatastoreInit().newInstance();
+ dsInit.initDataStore(vertx, settings, initResult -> {
+   if (initResult.failed()) {
+     logger.error("could not start mongo client", initResult.cause());
+     handler.handle(Future.failedFuture(new InitException(initResult.cause())));
+   } else {
+     handler.handle(Future.succeededFuture(initResult.result()));
+   }
+ });
+} catch (Exception e) {
+ handler.handle(Future.failedFuture(e));
+}
+----
+In this example first the `link:unavailable[DataStoreSettings]` are loaded from a local
+file. Afterwards the `link:unavailable[IDataStoreInit]` is instantiated and then the
+method IDataStoreInit#initDataStore is called.
+This method uses the `link:unavailable[Properties]`, which are defined inside the
+`link:unavailable#get_properties-instance_method[getProperties]` to create a suitable IDataStore.
+The possible properties to be set are defined inside the appropriate implementation of
+`link:unavailable[IDataStoreInit]`, please refer to the documentation there.
+
+
+[source, java]
+----
+FileSystem fs = vertx.fileSystem();
+if (fs.existsBlocking(path)) {
+ Buffer buffer = fs.readFileBlocking(path);
+ DataStoreSettings settings = Json.decodeValue(buffer.toString(), DataStoreSettings.class);
+ return settings;
+} else {
+ DataStoreSettings settings = new DataStoreSettings();
+ // fill the settings like you need
+ fs.writeFileBlocking(path, Buffer.buffer(Json.encode(settings)));
+ throw new FileSystemException("File did not exist and was created new in path " + path);
+}
+----
+This method loads the `link:unavailable[DataStoreSettings]` from a local file from a Json
+format directly
+Michael Remme
+
 === Creating a mapper
 Creating a mapper is very simple:
 

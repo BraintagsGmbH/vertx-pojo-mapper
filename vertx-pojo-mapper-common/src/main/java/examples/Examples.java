@@ -19,8 +19,18 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
+import de.braintags.io.vertx.pojomapper.exception.InitException;
+import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
+import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import examples.mapper.MiniMapper;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.file.FileSystem;
+import io.vertx.core.file.FileSystemException;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -137,6 +147,40 @@ public class Examples {
       }
     });
 
+  }
+
+  /**
+   * Init a datastore by using DataStoreSettings
+   */
+  public void example7(Vertx vertx, Handler<AsyncResult<IDataStore>> handler) {
+    try {
+      DataStoreSettings settings = loadDataStoreSettings(vertx, "/some/path/to/settings.json");
+      IDataStoreInit dsInit = settings.getDatastoreInit().newInstance();
+      dsInit.initDataStore(vertx, settings, initResult -> {
+        if (initResult.failed()) {
+          logger.error("could not start mongo client", initResult.cause());
+          handler.handle(Future.failedFuture(new InitException(initResult.cause())));
+        } else {
+          handler.handle(Future.succeededFuture(initResult.result()));
+        }
+      });
+    } catch (Exception e) {
+      handler.handle(Future.failedFuture(e));
+    }
+  }
+
+  public DataStoreSettings loadDataStoreSettings(Vertx vertx, String path) {
+    FileSystem fs = vertx.fileSystem();
+    if (fs.existsBlocking(path)) {
+      Buffer buffer = fs.readFileBlocking(path);
+      DataStoreSettings settings = Json.decodeValue(buffer.toString(), DataStoreSettings.class);
+      return settings;
+    } else {
+      DataStoreSettings settings = new DataStoreSettings();
+      // fill the settings like you need
+      fs.writeFileBlocking(path, Buffer.buffer(Json.encode(settings)));
+      throw new FileSystemException("File did not exist and was created new in path " + path);
+    }
   }
 
 }

@@ -25,6 +25,19 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
  * 
  */
 public class DataStoreSettings {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(DataStoreSettings.class);
+
+  /**
+   * The property which can be used to set the location of the stored file with Settings information
+   */
+  public static final String SETTINGS_LOCATION_PROPERTY = "de.braintags.netrelay.settings.path";
+
+  /**
+   * The local directory for NetRelay
+   */
+  public static final String LOCAL_USER_DIRECTORY = System.getProperty("user.home") + "/" + ".netrelay";
+
   private Class<? extends IDataStoreInit> datastoreInit;
   private Properties properties = new Properties();
 

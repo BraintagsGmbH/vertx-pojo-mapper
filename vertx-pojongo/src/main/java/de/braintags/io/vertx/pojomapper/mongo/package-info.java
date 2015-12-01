@@ -16,7 +16,14 @@
  * Once you've got one, you can create an instance of {@link de.braintags.io.vertx.pojomapper.IDataStore}, which deals
  * with MongoDB, as follows:
  *
- * [source,java] ---- {@link examples.Examples#example1(io.vertx.core.Vertx )} ----
+ * [source,java]
+ * ----
+ * {@link examples.Examples#example1(io.vertx.core.Vertx )}
+ * ----
+ * 
+ * === Initialize by DataStoreSettings
+ * {@link de.braintags.io.vertx.pojomapper.mongo.init}
+ * 
  * 
  * The rest of the usage is the same than described in the documentation of
  * https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.
