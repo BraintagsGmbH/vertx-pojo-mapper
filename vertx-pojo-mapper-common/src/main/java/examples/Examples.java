@@ -176,8 +176,8 @@ public class Examples {
       DataStoreSettings settings = Json.decodeValue(buffer.toString(), DataStoreSettings.class);
       return settings;
     } else {
-      DataStoreSettings settings = new DataStoreSettings();
-      // fill the settings like you need
+      DataStoreSettings settings = new DataStoreSettings(IDataStoreInit.class, "testdatabase");
+      // fill the settings like you need, REPLACE IDataStoreInit with a real implementation
       fs.writeFileBlocking(path, Buffer.buffer(Json.encode(settings)));
       throw new FileSystemException("File did not exist and was created new in path " + path);
     }

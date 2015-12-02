@@ -106,6 +106,9 @@ public class TestHelper {
 
   }
 
+  /**
+   * Creates the VertxOptions by checking System variables BlockedThreadCheckInterval and WarningExceptionTime
+   */
   public static VertxOptions getOptions() {
     VertxOptions options = new VertxOptions();
     String blockedThreadCheckInterval = System.getProperty("BlockedThreadCheckInterval");

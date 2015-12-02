@@ -17,7 +17,6 @@ import java.util.Properties;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.exception.InitException;
-import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
 import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
@@ -67,7 +66,7 @@ public class MongoDataStoreInit implements IDataStoreInit {
   public static final String DEFAULT_CONNECTION = "mongodb://localhost:27017";
 
   /**
-   * The name of the property, which defines the database name
+   * The name of the property in the config, which defines the database name
    */
   public static final String DBNAME_PROP = "db_name";
 
@@ -98,12 +97,10 @@ public class MongoDataStoreInit implements IDataStoreInit {
    * @return default instance of {@link DataStoreSettings} to init a {@link MongoDataStore}
    */
   public static final DataStoreSettings createDefaultSettings() {
-    DataStoreSettings settings = new DataStoreSettings();
-    settings.setDatastoreInit(MongoDataStoreInit.class);
+    DataStoreSettings settings = new DataStoreSettings(MongoDataStoreInit.class, "testdatabase");
     settings.getProperties().put(CONNECTION_STRING_PROPERTY, DEFAULT_CONNECTION);
     settings.getProperties().put(START_MONGO_LOCAL_PROP, "false");
     settings.getProperties().put(LOCAL_PORT_PROP, "27018");
-    settings.getProperties().put(DBNAME_PROP, "testdatabase");
     settings.getProperties().put(SHARED_PROP, "false");
     settings.getProperties().put(HANDLE_REFERENCED_RECURSIVE_PROP, "true");
     return settings;
@@ -182,7 +179,7 @@ public class MongoDataStoreInit implements IDataStoreInit {
     if (config == null) {
       config = new JsonObject();
       config.put("connection_string", getConnectionString());
-      config.put("db_name", getDatabaseName());
+      config.put(DBNAME_PROP, getDatabaseName());
       config.put(IDataStore.HANDLE_REFERENCED_RECURSIVE, handleReferencedRecursive);
     }
     return config;
@@ -221,10 +218,7 @@ public class MongoDataStoreInit implements IDataStoreInit {
    * @return
    */
   private String getDatabaseName() {
-    if (!settings.getProperties().containsKey(DBNAME_PROP)) {
-      throw new PropertyAccessException("Undefined Property: " + DBNAME_PROP);
-    }
-    return getProperty("db_name", null);
+    return settings.getDatabaseName();
   }
 
   /**

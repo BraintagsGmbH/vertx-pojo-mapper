@@ -76,14 +76,13 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   }
 
   private DataStoreSettings createSettings() {
-    DataStoreSettings settings = new DataStoreSettings();
-    settings.setDatastoreInit(MongoDataStoreInit.class);
+    DataStoreSettings settings = new DataStoreSettings(MongoDataStoreInit.class,
+        getProperty("db_name", "PojongoTestDatabase"));
     settings.getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY,
         getProperty(CONNECTION_STRING_PROPERTY, DEFAULT_CONNECTION));
     settings.getProperties().put(MongoDataStoreInit.START_MONGO_LOCAL_PROP,
         getProperty(START_MONGO_LOCAL_PROP, "false"));
     settings.getProperties().put(MongoDataStoreInit.LOCAL_PORT_PROP, String.valueOf(LOCAL_PORT));
-    settings.getProperties().put(MongoDataStoreInit.DBNAME_PROP, getProperty("db_name", "PojongoTestDatabase"));
     settings.getProperties().put(MongoDataStoreInit.SHARED_PROP, "false");
     settings.getProperties().put(MongoDataStoreInit.HANDLE_REFERENCED_RECURSIVE_PROP,
         String.valueOf(handleReferencedRecursive));

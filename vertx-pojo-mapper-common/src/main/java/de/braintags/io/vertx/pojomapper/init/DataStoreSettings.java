@@ -25,21 +25,29 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
  * 
  */
 public class DataStoreSettings {
-  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
-      .getLogger(DataStoreSettings.class);
-
-  /**
-   * The property which can be used to set the location of the stored file with Settings information
-   */
-  public static final String SETTINGS_LOCATION_PROPERTY = "de.braintags.netrelay.settings.path";
-
-  /**
-   * The local directory for NetRelay
-   */
-  public static final String LOCAL_USER_DIRECTORY = System.getProperty("user.home") + "/" + ".netrelay";
-
   private Class<? extends IDataStoreInit> datastoreInit;
   private Properties properties = new Properties();
+  private String databaseName;
+
+  /**
+   * Standard constructor needed for saving as local file
+   */
+  public DataStoreSettings() {
+
+  }
+
+  /**
+   * Constructor which takes an appropriate instance of {@link IDataStoreInit} and database name
+   * 
+   * @param datastoreInit
+   *          the {@link IDataStoreInit} to be used
+   * @param databaseName
+   *          the database used
+   */
+  public DataStoreSettings(Class<? extends IDataStoreInit> datastoreInit, String databaseName) {
+    this.datastoreInit = datastoreInit;
+    this.databaseName = databaseName;
+  }
 
   /**
    * The implementation of {@link IDataStoreInit} to be used. This implementation will create the
@@ -81,6 +89,25 @@ public class DataStoreSettings {
    */
   public final void setProperties(Properties properties) {
     this.properties = properties;
+  }
+
+  /**
+   * Defines the name of the database to use
+   * 
+   * @return the databaseName
+   */
+  public final String getDatabaseName() {
+    return databaseName;
+  }
+
+  /**
+   * Defines the name of the database to use
+   * 
+   * @param databaseName
+   *          the databaseName to set
+   */
+  public final void setDatabaseName(String databaseName) {
+    this.databaseName = databaseName;
   }
 
 }
