@@ -13,6 +13,7 @@
 package de.braintags.io.vertx.pojomapper.mongo.mapper;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.Mapper;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
@@ -29,8 +30,9 @@ public class MongoMapperFactory extends MapperFactory {
   /**
    * @param dataStore
    */
-  public MongoMapperFactory(IDataStore dataStore, ITypeHandlerFactory typehandlerFactory) {
-    super(dataStore, typehandlerFactory);
+  public MongoMapperFactory(IDataStore dataStore, ITypeHandlerFactory typehandlerFactory,
+      IPropertyMapperFactory propertyMapperFactory) {
+    super(dataStore, typehandlerFactory, propertyMapperFactory);
   }
 
   /*

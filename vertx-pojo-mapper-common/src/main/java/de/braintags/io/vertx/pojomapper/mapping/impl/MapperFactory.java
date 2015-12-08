@@ -19,6 +19,7 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 /**
@@ -32,15 +33,18 @@ public class MapperFactory implements IMapperFactory {
   private IDataStore dataStore;
   private final Map<String, IMapper> mappedClasses = new HashMap<String, IMapper>();
   private ITypeHandlerFactory typeHandlerFactory;
+  private IPropertyMapperFactory propertyMapperFactory;
 
   /**
    * 
    * @param dataStore
    *          the {@link IDataStore} to be used
    */
-  public MapperFactory(IDataStore dataStore, ITypeHandlerFactory typeHandlerFactory) {
+  public MapperFactory(IDataStore dataStore, ITypeHandlerFactory typeHandlerFactory,
+      IPropertyMapperFactory propertyMapperFactory) {
     this.dataStore = dataStore;
     this.typeHandlerFactory = typeHandlerFactory;
+    this.propertyMapperFactory = propertyMapperFactory;
   }
 
   /*
@@ -107,6 +111,24 @@ public class MapperFactory implements IMapperFactory {
    */
   protected final void setTypeHandlerFactory(ITypeHandlerFactory typeHandlerFactory) {
     this.typeHandlerFactory = typeHandlerFactory;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getPropertyMapperFactory()
+   */
+  @Override
+  public final IPropertyMapperFactory getPropertyMapperFactory() {
+    return propertyMapperFactory;
+  }
+
+  /**
+   * @param propertyMapperFactory
+   *          the propertyMapperFactory to set
+   */
+  protected final void setPropertyMapperFactory(IPropertyMapperFactory propertyMapperFactory) {
+    this.propertyMapperFactory = propertyMapperFactory;
   }
 
 }

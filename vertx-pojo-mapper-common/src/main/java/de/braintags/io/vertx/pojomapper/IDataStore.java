@@ -21,8 +21,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
-import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
-import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import io.vertx.core.AsyncResult;
@@ -86,13 +84,6 @@ public interface IDataStore {
    * @return
    */
   IMapperFactory getMapperFactory();
-
-  /**
-   * Get the instance of {@link IPropertyMapperFactory} which is used by the current implementation
-   * 
-   * @return the {@link IPropertyMapperFactory} to retrieve new instances of {@link IPropertyMapper}
-   */
-  public IPropertyMapperFactory getPropertyMapperFactory();
 
   /**
    * Get the {@link IStoreObjectFactory} suitable for the current datastore

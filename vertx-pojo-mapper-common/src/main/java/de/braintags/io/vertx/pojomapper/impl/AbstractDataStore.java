@@ -22,7 +22,6 @@ import de.braintags.io.vertx.pojomapper.exception.UnsupportedKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
-import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import io.vertx.core.Vertx;
@@ -39,7 +38,6 @@ public abstract class AbstractDataStore implements IDataStore {
   private Vertx vertx;
   private JsonObject properties;
   private IMapperFactory mapperFactory;
-  private IPropertyMapperFactory propertyMapperFactory;
   private IStoreObjectFactory storeObjectFactory;
   private ITableGenerator tableGenerator;
   private IDataStoreSynchronizer dataStoreSynchronizer;
@@ -81,24 +79,6 @@ public abstract class AbstractDataStore implements IDataStore {
    */
   protected final void setMapperFactory(IMapperFactory mapperFactory) {
     this.mapperFactory = mapperFactory;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getPropertyMapperFactory()
-   */
-  @Override
-  public final IPropertyMapperFactory getPropertyMapperFactory() {
-    return propertyMapperFactory;
-  }
-
-  /**
-   * @param propertyMapperFactory
-   *          the propertyMapperFactory to set
-   */
-  protected final void setPropertyMapperFactory(IPropertyMapperFactory propertyMapperFactory) {
-    this.propertyMapperFactory = propertyMapperFactory;
   }
 
   @Override

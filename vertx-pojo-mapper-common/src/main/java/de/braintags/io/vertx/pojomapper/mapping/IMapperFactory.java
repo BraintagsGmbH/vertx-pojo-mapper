@@ -59,4 +59,11 @@ public interface IMapperFactory {
    */
   ITypeHandlerFactory getTypeHandlerFactory();
 
+  /**
+   * Get the instance of {@link IPropertyMapperFactory} which is used by the current implementation
+   * 
+   * @return the {@link IPropertyMapperFactory} to retrieve new instances of {@link IPropertyMapper}
+   */
+  IPropertyMapperFactory getPropertyMapperFactory();
+
 }

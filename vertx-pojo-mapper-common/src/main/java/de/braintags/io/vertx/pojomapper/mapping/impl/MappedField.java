@@ -149,8 +149,7 @@ public class MappedField implements IField {
   }
 
   protected final IPropertyMapper computePropertyMapper() {
-    IDataStore store = mapper.getMapperFactory().getDataStore();
-    return store.getPropertyMapperFactory().getPropertyMapper(this);
+    return mapper.getMapperFactory().getPropertyMapperFactory().getPropertyMapper(this);
   }
 
   // TODO Yet needed?
