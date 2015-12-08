@@ -305,7 +305,7 @@ public class MappedField implements IField {
   @Override
   public ITypeHandler getTypeHandler() {
     if (typeHandler == null)
-      typeHandler = mapper.getMapperFactory().getDataStore().getTypeHandlerFactory().getTypeHandler(this);
+      typeHandler = mapper.getMapperFactory().getTypeHandlerFactory().getTypeHandler(this);
     return typeHandler;
   }
 

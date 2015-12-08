@@ -53,16 +53,24 @@
 			<artifactId>vertx-pojo-mapper-json</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
+	  	<dependency>
+	  		<groupId>de.braintags</groupId>
+	  		<artifactId>vertx-pojo-mapper-common</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+	  	</dependency>
+		
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-common</artifactId>
 			<classifier>tests</classifier>
+			<scope>>test</scope>
 			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-json</artifactId>
 			<classifier>tests</classifier>
+			<scope>>test</scope>
 			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
 

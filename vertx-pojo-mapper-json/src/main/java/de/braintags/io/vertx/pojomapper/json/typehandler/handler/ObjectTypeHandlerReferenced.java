@@ -151,7 +151,8 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
 
   private void storeId(IDataStore store, IField field, Object id,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    ITypeHandler th = store.getTypeHandlerFactory().getTypeHandler(id.getClass(), field.getEmbedRef());
+    ITypeHandler th = store.getMapperFactory().getTypeHandlerFactory().getTypeHandler(id.getClass(),
+        field.getEmbedRef());
     th.intoStore(id, field, tmpResult -> {
       if (tmpResult.failed()) {
         resultHandler.handle(tmpResult);

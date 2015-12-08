@@ -33,7 +33,14 @@ import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 @RunWith(Suite.class)
 @SuiteClasses({ AllTestsPojoJson.class, TestMapper.class, TestSqlQueryRambler.class, AllTestsCommon.class })
 public class TestAllMySql {
-  // -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer
+  /*
+   * -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer
+   * -DMySqlDataStoreContainer.username=root -DMySqlDataStoreContainer.password=qdmaha3t
+   * -Djava.util.logging.config.file=src/main/resources/logging.properties
+   * -DBlockedThreadCheckInterval=100000 -DWarningExceptionTime=100000 -DtestTimeout=200
+   * 
+   */
+
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TestAllMySql.class);
 

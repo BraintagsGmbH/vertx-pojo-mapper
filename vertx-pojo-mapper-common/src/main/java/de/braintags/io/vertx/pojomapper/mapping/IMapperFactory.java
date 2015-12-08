@@ -14,6 +14,7 @@ package de.braintags.io.vertx.pojomapper.mapping;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 /**
  * IMapperFactory is responsible to create and store instances of {@link IMapper} for all classes, which shall be
@@ -50,5 +51,12 @@ public interface IMapperFactory {
    * @return
    */
   IDataStore getDataStore();
+
+  /**
+   * Get the propriate {@link ITypeHandlerFactory} for the current implementation
+   * 
+   * @return the {@link ITypeHandlerFactory}
+   */
+  ITypeHandlerFactory getTypeHandlerFactory();
 
 }

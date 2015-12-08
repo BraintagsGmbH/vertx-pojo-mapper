@@ -111,7 +111,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
       Handler<AsyncResult<Void>> resultHandler) {
     Object keyIn = ((JsonArray) cc.value).getValue(0);
 
-    ITypeHandler keyTypehandler = field.getMapper().getMapperFactory().getDataStore().getTypeHandlerFactory()
+    ITypeHandler keyTypehandler = field.getMapper().getMapperFactory().getTypeHandlerFactory()
         .getTypeHandler(field.getMapKeyClass(), null);
     keyTypehandler.fromStore(keyIn, field, field.getMapKeyClass(), keyResult -> {
       if (keyResult.failed()) {

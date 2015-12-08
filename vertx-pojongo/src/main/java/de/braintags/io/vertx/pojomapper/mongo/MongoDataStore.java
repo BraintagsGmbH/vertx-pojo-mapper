@@ -60,9 +60,9 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
     super(vertx, properties);
     this.client = client;
     metaData = new MongoMetaData(client);
-    setMapperFactory(new MongoMapperFactory(this));
+    MongoMapperFactory mf = new MongoMapperFactory(this, new JsonTypeHandlerFactory());
+    setMapperFactory(mf);
     setPropertyMapperFactory(new JsonPropertyMapperFactory());
-    setTypeHandlerFactory(new JsonTypeHandlerFactory());
     setStoreObjectFactory(new MongoStoreObjectFactory());
     setTableGenerator(new MongoTableGenerator());
   }

@@ -29,7 +29,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -43,8 +42,7 @@ import io.vertx.core.json.JsonObject;
  */
 
 public class DummyDataStore implements IDataStore {
-  IMapperFactory mf = new MapperFactory(this);
-  ITypeHandlerFactory tf = new JsonTypeHandlerFactory();
+  IMapperFactory mf = new MapperFactory(this, new JsonTypeHandlerFactory());
   IPropertyMapperFactory pmf = new JsonPropertyMapperFactory();
   ITableGenerator tg = new DummyTableGenerator();
   String database;
@@ -91,16 +89,6 @@ public class DummyDataStore implements IDataStore {
   @Override
   public IMapperFactory getMapperFactory() {
     return mf;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getTypeHandlerFactory()
-   */
-  @Override
-  public ITypeHandlerFactory getTypeHandlerFactory() {
-    return tf;
   }
 
   /*

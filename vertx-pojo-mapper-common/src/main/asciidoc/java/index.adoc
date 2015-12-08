@@ -95,15 +95,15 @@ if (fs.existsBlocking(path)) {
  DataStoreSettings settings = Json.decodeValue(buffer.toString(), DataStoreSettings.class);
  return settings;
 } else {
- DataStoreSettings settings = new DataStoreSettings();
- // fill the settings like you need
+ DataStoreSettings settings = new DataStoreSettings(IDataStoreInit.class, "testdatabase");
+ // fill the settings like you need, REPLACE IDataStoreInit with a real implementation
  fs.writeFileBlocking(path, Buffer.buffer(Json.encode(settings)));
  throw new FileSystemException("File did not exist and was created new in path " + path);
 }
 ----
 This method loads the `link:../../apidocs/de/braintags/io/vertx/pojomapper/init/DataStoreSettings.html[DataStoreSettings]` from a local file from a Json
-format directly
-Michael Remme
+format directly. If they are't existing, they are created and saved as needed. For the properties to be set, refer to
+the appropriate implementation of IDataStore.
 
 === Creating a mapper
 Creating a mapper is very simple:

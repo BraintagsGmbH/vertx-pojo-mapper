@@ -19,6 +19,7 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 
 /**
  * Default implementation of {@link IMapperFactory}
@@ -30,14 +31,16 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 public class MapperFactory implements IMapperFactory {
   private IDataStore dataStore;
   private final Map<String, IMapper> mappedClasses = new HashMap<String, IMapper>();
+  private ITypeHandlerFactory typeHandlerFactory;
 
   /**
    * 
    * @param dataStore
    *          the {@link IDataStore} to be used
    */
-  public MapperFactory(IDataStore dataStore) {
+  public MapperFactory(IDataStore dataStore, ITypeHandlerFactory typeHandlerFactory) {
     this.dataStore = dataStore;
+    this.typeHandlerFactory = typeHandlerFactory;
   }
 
   /*
@@ -85,4 +88,25 @@ public class MapperFactory implements IMapperFactory {
       return true;
     return false;
   }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IMapperFactory#getTypeHandlerFactory()
+   */
+  @Override
+  public final ITypeHandlerFactory getTypeHandlerFactory() {
+    return typeHandlerFactory;
+  }
+
+  /**
+   * Set the {@link ITypeHandlerFactory} which shall be used by the current implementation
+   * 
+   * @param typeHandlerFactory
+   *          the typeHandlerFactory to set
+   */
+  protected final void setTypeHandlerFactory(ITypeHandlerFactory typeHandlerFactory) {
+    this.typeHandlerFactory = typeHandlerFactory;
+  }
+
 }

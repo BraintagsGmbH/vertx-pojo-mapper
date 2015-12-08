@@ -25,7 +25,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -87,13 +86,6 @@ public interface IDataStore {
    * @return
    */
   IMapperFactory getMapperFactory();
-
-  /**
-   * Get the propriate {@link ITypeHandlerFactory} for the current implementation
-   * 
-   * @return the {@link ITypeHandlerFactory}
-   */
-  ITypeHandlerFactory getTypeHandlerFactory();
 
   /**
    * Get the instance of {@link IPropertyMapperFactory} which is used by the current implementation

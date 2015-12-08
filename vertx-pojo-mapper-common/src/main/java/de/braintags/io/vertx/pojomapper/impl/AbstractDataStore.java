@@ -25,7 +25,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
@@ -41,7 +40,6 @@ public abstract class AbstractDataStore implements IDataStore {
   private JsonObject properties;
   private IMapperFactory mapperFactory;
   private IPropertyMapperFactory propertyMapperFactory;
-  private ITypeHandlerFactory typeHandlerFactory;
   private IStoreObjectFactory storeObjectFactory;
   private ITableGenerator tableGenerator;
   private IDataStoreSynchronizer dataStoreSynchronizer;
@@ -101,24 +99,6 @@ public abstract class AbstractDataStore implements IDataStore {
    */
   protected final void setPropertyMapperFactory(IPropertyMapperFactory propertyMapperFactory) {
     this.propertyMapperFactory = propertyMapperFactory;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getTypeHandlerFactory()
-   */
-  @Override
-  public final ITypeHandlerFactory getTypeHandlerFactory() {
-    return typeHandlerFactory;
-  }
-
-  /**
-   * @param typeHandlerFactory
-   *          the typeHandlerFactory to set
-   */
-  protected final void setTypeHandlerFactory(ITypeHandlerFactory typeHandlerFactory) {
-    this.typeHandlerFactory = typeHandlerFactory;
   }
 
   @Override
