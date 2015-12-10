@@ -110,4 +110,8 @@ public class DataStoreSettings {
     this.databaseName = databaseName;
   }
 
+  @Override
+  public String toString() {
+    return "database: " + databaseName + "\n " + String.valueOf(properties);
+  }
 }

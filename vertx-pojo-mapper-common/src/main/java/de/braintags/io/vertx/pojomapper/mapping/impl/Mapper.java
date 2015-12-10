@@ -137,22 +137,26 @@ public class Mapper implements IMapper {
   }
 
   private void computeKeyGenerator() {
-    KeyGenerator gen = (KeyGenerator) getAnnotation(KeyGenerator.class);
-    if (gen != null) {
-      String name = gen.value();
-      keyGenerator = getMapperFactory().getDataStore().getKeyGenerator(name);
-    } else {
-      keyGenerator = getMapperFactory().getDataStore().getDefaultKeyGenerator();
+    if (getMapperFactory().getDataStore() != null) {
+      KeyGenerator gen = (KeyGenerator) getAnnotation(KeyGenerator.class);
+      if (gen != null) {
+        String name = gen.value();
+        keyGenerator = getMapperFactory().getDataStore().getKeyGenerator(name);
+      } else {
+        keyGenerator = getMapperFactory().getDataStore().getDefaultKeyGenerator();
+      }
     }
   }
 
   private void generateTableInfo() {
-    ITableGenerator tg = mapperFactory.getDataStore().getTableGenerator();
-    this.tableInfo = tg.createTableInfo(this);
-    for (String fn : getFieldNames()) {
-      IField field = getField(fn);
-      IColumnHandler ch = tg.getColumnHandler(field);
-      this.tableInfo.createColumnInfo(field, ch);
+    if (mapperFactory.getDataStore() != null) {
+      ITableGenerator tg = mapperFactory.getDataStore().getTableGenerator();
+      this.tableInfo = tg.createTableInfo(this);
+      for (String fn : getFieldNames()) {
+        IField field = getField(fn);
+        IColumnHandler ch = tg.getColumnHandler(field);
+        this.tableInfo.createColumnInfo(field, ch);
+      }
     }
   }
 

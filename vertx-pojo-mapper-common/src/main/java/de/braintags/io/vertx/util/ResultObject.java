@@ -73,8 +73,10 @@ public class ResultObject<E> extends ErrorObject<E> {
     if (super.handleError()) {
       return true;
     } else if (isResultDefined()) {
-      getHandler().handle(Future.succeededFuture(result));
-      return true;
+      if (getHandler() != null) {
+        getHandler().handle(Future.succeededFuture(result));
+        return true;
+      }
     }
     return false;
   }
