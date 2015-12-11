@@ -154,7 +154,7 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
       client.close();
       resultHandler.handle(Future.succeededFuture());
     } catch (Exception e) {
-      resultHandler.handle(Future.failedFuture(e));
+      resultHandler.handle(Future.failedFuture(new RuntimeException(e)));
     }
   }
 
