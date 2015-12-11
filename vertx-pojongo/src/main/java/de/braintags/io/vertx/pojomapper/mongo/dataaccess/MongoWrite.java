@@ -75,7 +75,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   }
 
   private void save(T entity, IWriteResult writeResult, Handler<AsyncResult<Void>> resultHandler) {
-    getDataStore().getStoreObjectFactory().createStoreObject(getMapper(), entity, result -> {
+    getDataStore().getMapperFactory().getStoreObjectFactory().createStoreObject(getMapper(), entity, result -> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {

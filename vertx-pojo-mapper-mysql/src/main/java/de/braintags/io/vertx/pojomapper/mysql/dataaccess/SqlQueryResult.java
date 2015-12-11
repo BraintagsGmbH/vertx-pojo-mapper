@@ -53,7 +53,7 @@ public class SqlQueryResult<T> extends AbstractQueryResult<T> {
   @Override
   protected void generatePojo(int i, Handler<AsyncResult<T>> handler) {
     JsonObject sourceObject = resultSet.getRows().get(i);
-    getDataStore().getStoreObjectFactory().createStoreObject(sourceObject, getMapper(), result -> {
+    getDataStore().getMapperFactory().getStoreObjectFactory().createStoreObject(sourceObject, getMapper(), result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {

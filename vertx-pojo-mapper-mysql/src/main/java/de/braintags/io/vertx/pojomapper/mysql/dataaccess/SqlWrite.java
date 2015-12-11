@@ -70,7 +70,8 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         resultHandler.handle(Future.succeededFuture(new WriteResult()));
         return;
       }
-      getDataStore().getStoreObjectFactory().createStoreObjects(getMapper(), getObjectsToSave(), stoResult -> {
+      getDataStore().getMapperFactory().getStoreObjectFactory().createStoreObjects(getMapper(), getObjectsToSave(),
+          stoResult -> {
         if (stoResult.failed()) {
           resultHandler.handle(Future.failedFuture(stoResult.cause()));
           return;

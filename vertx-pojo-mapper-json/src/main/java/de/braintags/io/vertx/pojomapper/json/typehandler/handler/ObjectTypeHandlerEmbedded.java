@@ -73,7 +73,7 @@ public class ObjectTypeHandlerEmbedded extends ObjectTypeHandler {
   protected void readSingleValueAsMapper(IDataStore store, Class<?> internalMapperClass, Object dbValue,
       Handler<AsyncResult<ITypeHandlerResult>> handler) {
     IMapper mapper = store.getMapperFactory().getMapper(internalMapperClass);
-    store.getStoreObjectFactory().createStoreObject(dbValue, mapper, result -> {
+    store.getMapperFactory().getStoreObjectFactory().createStoreObject(dbValue, mapper, result -> {
       if (result.failed()) {
         fail(result.cause(), handler);
       } else {
@@ -102,7 +102,7 @@ public class ObjectTypeHandlerEmbedded extends ObjectTypeHandler {
   protected void writeSingleValueAsMapper(IDataStore store, Object embeddedObject, IField field,
       Handler<AsyncResult<ITypeHandlerResult>> handler) {
     IMapper mapper = store.getMapperFactory().getMapper(embeddedObject.getClass());
-    store.getStoreObjectFactory().createStoreObject(mapper, embeddedObject, result -> {
+    store.getMapperFactory().getStoreObjectFactory().createStoreObject(mapper, embeddedObject, result -> {
       if (result.failed()) {
         fail(result.cause(), handler);
       } else {

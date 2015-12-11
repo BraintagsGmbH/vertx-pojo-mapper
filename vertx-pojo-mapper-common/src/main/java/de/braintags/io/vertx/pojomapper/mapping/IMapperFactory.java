@@ -66,4 +66,11 @@ public interface IMapperFactory {
    */
   IPropertyMapperFactory getPropertyMapperFactory();
 
+  /**
+   * Get the {@link IStoreObjectFactory} suitable for the current instance
+   * 
+   * @return the instance of {@link IStoreObjectFactory}
+   */
+  public IStoreObjectFactory getStoreObjectFactory();
+
 }

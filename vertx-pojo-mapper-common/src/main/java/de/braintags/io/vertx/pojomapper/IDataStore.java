@@ -21,7 +21,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
-import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -49,7 +48,7 @@ public interface IDataStore {
    * 
    * @return the instance of Vertx where inside the current instance was created
    */
-  public Vertx getVertx();
+  Vertx getVertx();
 
   /**
    * Returns a new {@link IQuery} bound to the given mapper
@@ -86,46 +85,39 @@ public interface IDataStore {
   IMapperFactory getMapperFactory();
 
   /**
-   * Get the {@link IStoreObjectFactory} suitable for the current datastore
-   * 
-   * @return the instance of {@link IStoreObjectFactory}
-   */
-  public IStoreObjectFactory getStoreObjectFactory();
-
-  /**
    * Get the instance of {@link IDataStoreSynchronizer} suitable for the current datastore
    * 
    * @return the instance of {@link IDataStoreSynchronizer} for the current datastore or null, if no synchronizer needed
    */
-  public IDataStoreSynchronizer getDataStoreSynchronizer();
+  IDataStoreSynchronizer getDataStoreSynchronizer();
 
   /**
    * Get the instance of {@link ITableGenerator} suitable for the given datastore
    * 
    * @return
    */
-  public ITableGenerator getTableGenerator();
+  ITableGenerator getTableGenerator();
 
   /**
    * Get the name of the database, the current instance is using
    * 
    * @return the name of the schema or database
    */
-  public String getDatabase();
+  String getDatabase();
 
   /**
    * Get the instance of {@link IDataStoreMetaData}.
    * 
    * @return
    */
-  public IDataStoreMetaData getMetaData();
+  IDataStoreMetaData getMetaData();
 
   /**
    * The properties by which the current instance was initialized
    * 
    * @return the properties set for the current instance
    */
-  public JsonObject getProperties();
+  JsonObject getProperties();
 
   /**
    * Request an {@link IKeyGenerator} with the given name. This method is called by IMapper, when the mapping is
@@ -139,7 +131,7 @@ public interface IDataStore {
    * @throws UnsupportedKeyGenerator
    *           when the requested generator is not supported by the current instance
    */
-  public IKeyGenerator getKeyGenerator(String generatorName);
+  IKeyGenerator getKeyGenerator(String generatorName);
 
   /**
    * If for an IMapper the annotation {@link KeyGenerator} is undefined, then the default instance is requested here.
@@ -147,13 +139,13 @@ public interface IDataStore {
    * @return the default instance of {@link IKeyGenerator} or null, if the current instance does not need or support
    *         {@link IKeyGenerator}
    */
-  public IKeyGenerator getDefaultKeyGenerator();
+  IKeyGenerator getDefaultKeyGenerator();
 
   /**
    * Shutdown the current instance and their used resources
    * 
    * @param resultHandler
    */
-  public void shutdown(Handler<AsyncResult<Void>> resultHandler);
+  void shutdown(Handler<AsyncResult<Void>> resultHandler);
 
 }

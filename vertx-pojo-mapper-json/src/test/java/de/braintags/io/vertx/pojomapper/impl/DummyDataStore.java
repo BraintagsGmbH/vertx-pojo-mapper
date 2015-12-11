@@ -25,7 +25,6 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
-import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import io.vertx.core.AsyncResult;
@@ -41,7 +40,7 @@ import io.vertx.core.json.JsonObject;
  */
 
 public class DummyDataStore implements IDataStore {
-  IMapperFactory mf = new MapperFactory(this, new JsonTypeHandlerFactory(), new JsonPropertyMapperFactory());
+  IMapperFactory mf = new MapperFactory(this, new JsonTypeHandlerFactory(), new JsonPropertyMapperFactory(), null);
   ITableGenerator tg = new DummyTableGenerator();
   String database;
   private JsonObject properties;
@@ -139,11 +138,6 @@ public class DummyDataStore implements IDataStore {
       throw new UnsupportedOperationException();
     }
 
-  }
-
-  @Override
-  public IStoreObjectFactory getStoreObjectFactory() {
-    throw new UnsupportedOperationException();
   }
 
   @Override

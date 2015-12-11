@@ -22,7 +22,6 @@ import de.braintags.io.vertx.pojomapper.exception.UnsupportedKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
-import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -38,7 +37,6 @@ public abstract class AbstractDataStore implements IDataStore {
   private Vertx vertx;
   private JsonObject properties;
   private IMapperFactory mapperFactory;
-  private IStoreObjectFactory storeObjectFactory;
   private ITableGenerator tableGenerator;
   private IDataStoreSynchronizer dataStoreSynchronizer;
   private Map<String, IKeyGenerator> keyGeneratorMap = new HashMap<>();
@@ -79,19 +77,6 @@ public abstract class AbstractDataStore implements IDataStore {
    */
   protected final void setMapperFactory(IMapperFactory mapperFactory) {
     this.mapperFactory = mapperFactory;
-  }
-
-  @Override
-  public final IStoreObjectFactory getStoreObjectFactory() {
-    return storeObjectFactory;
-  }
-
-  /**
-   * @param storeObjectFactory
-   *          the storeObjectFactory to set
-   */
-  protected final void setStoreObjectFactory(IStoreObjectFactory storeObjectFactory) {
-    this.storeObjectFactory = storeObjectFactory;
   }
 
   /**
