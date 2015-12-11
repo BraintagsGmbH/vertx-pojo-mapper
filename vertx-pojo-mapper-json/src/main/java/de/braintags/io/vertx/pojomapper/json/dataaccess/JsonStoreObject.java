@@ -132,8 +132,9 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   @Override
   public Object getEntity() {
     if (entity == null) {
-      throw new NullPointerException(
-          "Internal Entity is not initialized; call method MongoStoreObject.initToEntity first ");
+      String message = String.format("Internal Entity is not initialized; call method %s.initToEntity first ",
+          getClass().getName());
+      throw new NullPointerException(message);
     }
     return entity;
   }

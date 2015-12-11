@@ -60,13 +60,15 @@ public abstract class AbstractStoreObjectFactory implements IStoreObjectFactory 
           err.setThrowable(result.cause());
         } else {
           returnList.add(result.result());
-          if (co.reduce())
+          if (co.reduce()) {
             handler.handle(Future.succeededFuture(returnList));
+          }
         }
 
       });
-      if (err.isError())
+      if (err.isError()) {
         return;
+      }
     }
 
   }

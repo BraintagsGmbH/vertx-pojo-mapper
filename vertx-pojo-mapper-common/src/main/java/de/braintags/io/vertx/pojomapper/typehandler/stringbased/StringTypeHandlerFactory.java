@@ -20,6 +20,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.BigDecimalTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.BigIntegerTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.BooleanTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ByteTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.CalendarTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.CharSequenceTypeHandler;
@@ -29,6 +30,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.DateTyp
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.EnumTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.FloatTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.IntegerTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.JsonTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.LocaleTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.LongTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ObjectTypeHandler;
@@ -55,6 +57,8 @@ public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
   }
 
   private void init() {
+    definedTypeHandlers.add(new BooleanTypeHandler(this));
+    definedTypeHandlers.add(new JsonTypeHandler(this));
     definedTypeHandlers.add(new CharacterTypeHandler(this));
     definedTypeHandlers.add(new BigDecimalTypeHandler(this));
     definedTypeHandlers.add(new BigIntegerTypeHandler(this));
