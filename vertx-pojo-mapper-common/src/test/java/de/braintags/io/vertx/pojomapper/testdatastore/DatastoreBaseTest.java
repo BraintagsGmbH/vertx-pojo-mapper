@@ -57,7 +57,7 @@ public abstract class DatastoreBaseTest {
     return TestHelper.getDatastoreContainer().getDataStore();
   }
 
-  public ResultContainer saveRecords(TestContext context, List<?> records) {
+  public static ResultContainer saveRecords(TestContext context, List<?> records) {
     return saveRecords(context, records, 0);
   }
 
@@ -71,7 +71,7 @@ public abstract class DatastoreBaseTest {
    * @return the result
    */
   @SuppressWarnings("unchecked")
-  public ResultContainer saveRecords(TestContext context, List<?> records, int waittime) {
+  public static ResultContainer saveRecords(TestContext context, List<?> records, int waittime) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
     IWrite<Object> write = (IWrite<Object>) getDataStore().createWrite(records.get(0).getClass());
@@ -99,11 +99,12 @@ public abstract class DatastoreBaseTest {
     return resultContainer;
   }
 
-  public ResultContainer saveRecord(TestContext context, Object sm) {
+  public static ResultContainer saveRecord(TestContext context, Object sm) {
     return saveRecords(context, Arrays.asList(sm));
   }
 
-  public void checkWriteResult(TestContext context, AsyncResult<IWriteResult> result, int expectedNumberOfRecords) {
+  public static void checkWriteResult(TestContext context, AsyncResult<IWriteResult> result,
+      int expectedNumberOfRecords) {
     resultFine(result);
     context.assertNotNull(result.result());
     IWriteEntry entry = result.result().iterator().next();
@@ -115,7 +116,7 @@ public abstract class DatastoreBaseTest {
     }
   }
 
-  public void resultFine(AsyncResult<?> result) {
+  public static void resultFine(AsyncResult<?> result) {
     if (result.failed()) {
       logger.error("", result.cause());
       throw new AssertionError("result failed", result.cause());
@@ -131,7 +132,7 @@ public abstract class DatastoreBaseTest {
    *          the expected number of records
    * @return ResultContainer with certain informations
    */
-  public ResultContainer find(TestContext context, IQuery<?> query, int expectedResult) {
+  public static ResultContainer find(TestContext context, IQuery<?> query, int expectedResult) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
     query.execute(result -> {
@@ -163,7 +164,7 @@ public abstract class DatastoreBaseTest {
    *          the expected number of records
    * @return ResultContainer with certain informations
    */
-  public ResultContainer findCount(TestContext context, IQuery<?> query, int expectedResult) {
+  public static ResultContainer findCount(TestContext context, IQuery<?> query, int expectedResult) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
     query.executeCount(result -> {
@@ -196,7 +197,8 @@ public abstract class DatastoreBaseTest {
    *          the expected result of checkQuery
    * @return {@link ResultContainer} with deleteResult and queryResult
    */
-  public ResultContainer delete(TestContext context, IDelete<?> delete, IQuery<?> checkQuery, int expectedResult) {
+  public static ResultContainer delete(TestContext context, IDelete<?> delete, IQuery<?> checkQuery,
+      int expectedResult) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
     delete.delete(result -> {
@@ -222,7 +224,7 @@ public abstract class DatastoreBaseTest {
     return resultContainer;
   }
 
-  public void checkDeleteResult(TestContext context, AsyncResult<? extends IDeleteResult> dResult) {
+  public static void checkDeleteResult(TestContext context, AsyncResult<? extends IDeleteResult> dResult) {
     resultFine(dResult);
     IDeleteResult dr = dResult.result();
     context.assertNotNull(dr);
@@ -230,7 +232,7 @@ public abstract class DatastoreBaseTest {
     logger.info(dr.getOriginalCommand());
   }
 
-  public void checkQueryResultCount(TestContext context, AsyncResult<? extends IQueryCountResult> qResult,
+  public static void checkQueryResultCount(TestContext context, AsyncResult<? extends IQueryCountResult> qResult,
       int expectedResult) {
     resultFine(qResult);
     IQueryCountResult qr = qResult.result();
@@ -239,7 +241,7 @@ public abstract class DatastoreBaseTest {
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  public void checkQueryResult(TestContext context, IQueryResult qr, int expectedResult) {
+  public static void checkQueryResult(TestContext context, IQueryResult qr, int expectedResult) {
     Async async = context.async();
     try {
       context.assertNotNull(qr);
@@ -291,7 +293,7 @@ public abstract class DatastoreBaseTest {
    * @param context
    * @param tableName
    */
-  public void clearTable(TestContext context, String tableName) {
+  public static void clearTable(TestContext context, String tableName) {
     Async async = context.async();
     ErrorObject<Void> err = new ErrorObject<Void>(null);
     TestHelper.getDatastoreContainer().clearTable(tableName, result -> {
@@ -306,7 +308,7 @@ public abstract class DatastoreBaseTest {
       throw err.getRuntimeException();
   }
 
-  public void dropTable(TestContext context, String tableName) {
+  public static void dropTable(TestContext context, String tableName) {
     Async async = context.async();
     ErrorObject<Void> err = new ErrorObject<Void>(null);
     TestHelper.getDatastoreContainer().dropTable(tableName, result -> {
