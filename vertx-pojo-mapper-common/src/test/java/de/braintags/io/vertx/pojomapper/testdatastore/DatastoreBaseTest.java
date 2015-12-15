@@ -50,11 +50,16 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 public abstract class DatastoreBaseTest {
   private static final Logger logger = LoggerFactory.getLogger(DatastoreBaseTest.class);
 
+  /**
+   * Set the datastore from external to use the helper methods
+   */
+  public static IDataStore EXTERNAL_DATASTORE;
+
   @Rule
   public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "5")));
 
   public static IDataStore getDataStore() {
-    return TestHelper.getDatastoreContainer().getDataStore();
+    return EXTERNAL_DATASTORE == null ? TestHelper.getDatastoreContainer().getDataStore() : EXTERNAL_DATASTORE;
   }
 
   public static ResultContainer saveRecords(TestContext context, List<?> records) {
