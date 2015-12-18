@@ -51,4 +51,19 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    */
   public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
 
+  /**
+   * Set the maximum number of records to be returned
+   * 
+   * @param limit
+   * @return the query itself for fluent access
+   */
+  public IQuery<T> setLimit(int limit);
+
+  /**
+   * Set the first record to be returned
+   * 
+   * @param start
+   * @return the query itself for fluent access
+   */
+  public IQuery<T> setStart(int start);
 }

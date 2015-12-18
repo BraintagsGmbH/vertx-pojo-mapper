@@ -35,6 +35,10 @@ public class QueryOperatorTranslator implements IQueryOperatorTranslator {
     switch (op) {
     case EQUALS:
       return "$eq";
+    case CONTAINS:
+    case STARTS:
+    case ENDS:
+      return "$regex";
     case NOT_EQUALS:
       return "$ne";
     case LARGER:

@@ -18,6 +18,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.exception.QueryParameterException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -205,7 +206,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
       return;
     }
     String operator = queryOperatorTranslator.translate(fieldParameter.getOperator());
-    Object value = fieldParameter.getValue();
+    Object value = translateValue(fieldParameter.getOperator(), fieldParameter.getValue());
 
     field.getTypeHandler().intoStore(value, field, result -> {
       if (result.failed()) {
@@ -216,6 +217,10 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
         resultHandler.handle(Future.succeededFuture());
       }
     });
+  }
+
+  protected Object translateValue(QueryOperator operator, Object value) {
+    return value;
   }
 
   private final void add(String colName, String operator, Object objectToAdd) {

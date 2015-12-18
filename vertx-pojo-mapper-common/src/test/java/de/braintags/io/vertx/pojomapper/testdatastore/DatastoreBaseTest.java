@@ -269,7 +269,7 @@ public abstract class DatastoreBaseTest {
     } else {
       IteratorAsync<?> itr = qr.iterator();
       try {
-        context.assertTrue(itr.hasNext());
+        context.assertTrue(itr.hasNext(), "No record in selection");
       } catch (Exception e) {
         logger.error("", e);
         async.complete();

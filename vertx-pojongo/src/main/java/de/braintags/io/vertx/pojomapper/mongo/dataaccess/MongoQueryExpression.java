@@ -105,8 +105,12 @@ public class MongoQueryExpression implements IQueryExpression {
    */
   @Override
   public IQueryExpression addQuery(String fieldName, String logic, Object value) {
-    JsonObject arg = new JsonObject().put(logic, value);
-    add(fieldName, arg);
+    if (logic == null) {
+      add(fieldName, value);
+    } else {
+      JsonObject arg = new JsonObject().put(logic, value);
+      add(fieldName, arg);
+    }
     return this;
   }
 

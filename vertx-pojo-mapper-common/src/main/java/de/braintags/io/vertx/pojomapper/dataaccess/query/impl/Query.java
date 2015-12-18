@@ -38,10 +38,12 @@ import io.vertx.core.Handler;
  *          the underlaying mapper to be used
  */
 
-public abstract class Query<T> extends AbstractDataAccessObject<T>implements IQuery<T> {
+public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQuery<T> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory.getLogger(Query.class);
 
   private List<Object> filters = new ArrayList<Object>();
+  private int limit = 500;
+  private int start = 0;
 
   /**
    * @param mapperClass
@@ -149,6 +151,40 @@ public abstract class Query<T> extends AbstractDataAccessObject<T>implements IQu
   @Override
   public List<Object> getChildren() {
     return filters;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setLimit(int)
+   */
+  @Override
+  public IQuery<T> setLimit(int limit) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setStart(int)
+   */
+  @Override
+  public IQuery<T> setStart(int start) {
+    return null;
+  }
+
+  /**
+   * @return the limit
+   */
+  public final int getLimit() {
+    return limit;
+  }
+
+  /**
+   * @return the start
+   */
+  public final int getStart() {
+    return start;
   }
 
 }

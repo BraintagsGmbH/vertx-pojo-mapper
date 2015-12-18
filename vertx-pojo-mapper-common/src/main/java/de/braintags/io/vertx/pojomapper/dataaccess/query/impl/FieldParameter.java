@@ -148,6 +148,36 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#starts(java.lang.Object)
+   */
+  @Override
+  public T starts(Object value) {
+    return addValue(QueryOperator.STARTS, value);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#ends(java.lang.Object)
+   */
+  @Override
+  public T ends(Object value) {
+    return addValue(QueryOperator.ENDS, value);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#contains(java.lang.Object)
+   */
+  @Override
+  public T contains(Object value) {
+    return addValue(QueryOperator.CONTAINS, value);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IRamblerSource#applyTo(de.braintags.io.vertx.pojomapper.
    * dataaccess.query.impl.IQueryRambler)

@@ -27,7 +27,10 @@ public enum QueryOperator {
   LARGER_EQUAL,
   SMALLER_EQUAL,
   IN,
-  NOT_IN;
+  NOT_IN,
+  STARTS,
+  ENDS,
+  CONTAINS;
 
 }
 

@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryRambler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
@@ -37,6 +38,31 @@ public class MongoQueryRambler extends AbstractQueryRambler {
 
   public MongoQueryRambler() {
     super(new MongoQueryExpression(), new QueryLogicTranslator(), new QueryOperatorTranslator());
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryRambler#translateValue(de.braintags.io.vertx.
+   * pojomapper.dataaccess.query.QueryOperator, java.lang.Object)
+   */
+  @Override
+  protected Object translateValue(QueryOperator operator, Object value) {
+    switch (operator) {
+    case CONTAINS:
+      return ".*" + value + ".*";
+
+    case STARTS:
+      return ".*" + value;
+
+    case ENDS:
+      return value + ".*";
+
+    default:
+      return super.translateValue(operator, value);
+    }
+
   }
 
   // /*

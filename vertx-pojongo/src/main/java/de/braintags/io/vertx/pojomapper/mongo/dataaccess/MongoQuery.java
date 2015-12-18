@@ -26,6 +26,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
 
 /**
@@ -110,16 +111,20 @@ public class MongoQuery<T> extends Query<T> {
   private void doFind(MongoQueryRambler rambler, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
     String column = getMapper().getTableInfo().getName();
-    mongoClient.find(column, ((MongoQueryExpression) rambler.getQueryExpression()).getQueryDefinition(), qResult -> {
-      if (qResult.failed()) {
-        Future<IQueryResult<T>> future = Future.failedFuture(qResult.cause());
-        resultHandler.handle(future);
-      } else {
-        IQueryResult<T> qR = createQueryResult(qResult.result(), rambler);
-        Future<IQueryResult<T>> future = Future.succeededFuture(qR);
-        resultHandler.handle(future);
-      }
-    });
+    FindOptions fo = new FindOptions();
+    fo.setSkip(getStart());
+    fo.setLimit(getLimit());
+    mongoClient.findWithOptions(column, ((MongoQueryExpression) rambler.getQueryExpression()).getQueryDefinition(), fo,
+        qResult -> {
+          if (qResult.failed()) {
+            Future<IQueryResult<T>> future = Future.failedFuture(qResult.cause());
+            resultHandler.handle(future);
+          } else {
+            IQueryResult<T> qR = createQueryResult(qResult.result(), rambler);
+            Future<IQueryResult<T>> future = Future.succeededFuture(qR);
+            resultHandler.handle(future);
+          }
+        });
   }
 
   private IQueryResult<T> createQueryResult(List<JsonObject> findList, MongoQueryRambler rambler) {

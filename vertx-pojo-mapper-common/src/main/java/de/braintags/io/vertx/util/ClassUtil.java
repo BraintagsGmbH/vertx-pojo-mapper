@@ -299,4 +299,17 @@ public class ClassUtil {
     }
   }
 
+  public static final Field getDeclaredField(final Class<?> c, final String fieldName) {
+    Field[] df = c.getDeclaredFields();
+    for (Field field : df) {
+      if (field.getName().equals(fieldName))
+        return field;
+    }
+    Class sc = c.getSuperclass();
+    if (!sc.isInterface() && sc != Object.class) {
+      return getDeclaredField(sc, fieldName);
+    }
+    return null;
+  }
+
 }

@@ -148,6 +148,57 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
       throw resultContainer.assertionError;
   }
 
+  /**
+   * Search:
+   */
+  @Test
+  public void testContains(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    query.field("secondProperty").contains("ab");
+
+    ResultContainer resultContainer = find(context, query, 3);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
+  /**
+   * Search:
+   */
+  @Test
+  public void testStartsWith(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    query.field("secondProperty").contains("aa");
+
+    ResultContainer resultContainer = find(context, query, 3);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
+  @Test
+  public void testEndsWith(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    query.field("secondProperty").contains("cc");
+
+    ResultContainer resultContainer = find(context, query, 3);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
+  @Test
+  public void testFindLimit(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    query.field("secondProperty").contains("cc");
+    query.setLimit(2);
+
+    ResultContainer resultContainer = find(context, query, 2);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
   /*
    * **************************************************** Helper Part
    */
@@ -182,6 +233,30 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
         if (resultContainer.assertionError != null)
           throw resultContainer.assertionError;
       }
+
+      sm = new SimpleMapper();
+      sm.name = "startswith";
+      sm.setSecondProperty("aabbcc");
+      sm.intValue = 11;
+      resultContainer = saveRecord(context, sm);
+      if (resultContainer.assertionError != null)
+        throw resultContainer.assertionError;
+
+      sm = new SimpleMapper();
+      sm.name = "startswith";
+      sm.setSecondProperty("aabbcc");
+      sm.intValue = 11;
+      resultContainer = saveRecord(context, sm);
+      if (resultContainer.assertionError != null)
+        throw resultContainer.assertionError;
+
+      sm = new SimpleMapper();
+      sm.name = "startswith";
+      sm.setSecondProperty("aabbcc");
+      sm.intValue = 11;
+      resultContainer = saveRecord(context, sm);
+      if (resultContainer.assertionError != null)
+        throw resultContainer.assertionError;
 
     }
 
