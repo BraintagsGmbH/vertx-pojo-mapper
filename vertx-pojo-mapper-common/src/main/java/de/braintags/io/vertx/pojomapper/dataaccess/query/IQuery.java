@@ -66,4 +66,14 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * @return the query itself for fluent access
    */
   public IQuery<T> setStart(int start);
+
+  /**
+   * If {@link #setLimit(int)} is defined with a value > 0 and this value is set to true, then the
+   * {@link IQueryResult#getCompleteResult()} will return the fitting value
+   * 
+   * @param start
+   * @return the query itself for fluent access
+   */
+  public IQuery<T> setReturnCompleteCount(boolean ret);
+
 }

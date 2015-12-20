@@ -298,6 +298,49 @@ public abstract class DatastoreBaseTest {
    * @param context
    * @param tableName
    */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public static void clearTable(TestContext context, Class mapperClass) {
+    if (EXTERNAL_DATASTORE != null) {
+      Async async = context.async();
+      ErrorObject<Void> err = new ErrorObject<Void>(null);
+      IQuery q = EXTERNAL_DATASTORE.createQuery(mapperClass);
+      find(context, q, -1).queryResult.toArray(result -> {
+        if (result.failed()) {
+          err.setThrowable(result.cause());
+          async.complete();
+        } else {
+          if (result.result().length > 0) {
+            IDelete delete = EXTERNAL_DATASTORE.createDelete(mapperClass);
+            delete.add(result.result());
+            delete.delete(delResult -> {
+              AsyncResult<IDeleteResult> dr = (AsyncResult<IDeleteResult>) delResult;
+              if (dr.failed()) {
+                err.setThrowable(dr.cause());
+                async.complete();
+              } else {
+                async.complete();
+              }
+            });
+          } else {
+            async.complete();
+          }
+        }
+      });
+      async.await();
+      if (err.isError())
+        throw err.getRuntimeException();
+    } else {
+      clearTable(context, mapperClass.getSimpleName());
+    }
+
+  }
+
+  /**
+   * Calls {@link IDatastoreContainer#clearTable(String, io.vertx.core.Handler)} and waits for it.
+   * 
+   * @param context
+   * @param tableName
+   */
   public static void clearTable(TestContext context, String tableName) {
     Async async = context.async();
     ErrorObject<Void> err = new ErrorObject<Void>(null);

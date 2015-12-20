@@ -30,11 +30,12 @@ import io.vertx.core.Handler;
  *          the class of the mapper, which builds the result
  */
 
-public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T>implements IQueryResult<T> {
+public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> implements IQueryResult<T> {
   private IMapper mapper;
   private IDataStore datastore;
   private T[] pojoResult;
   private IQueryExpression originalQuery;
+  private long completeResult;
 
   /**
    * Constructor
@@ -135,6 +136,22 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T>i
       }
     }
 
+  }
+
+  /**
+   * @return the completeResult
+   */
+  @Override
+  public final long getCompleteResult() {
+    return completeResult;
+  }
+
+  /**
+   * @param completeResult
+   *          the completeResult to set
+   */
+  public final void setCompleteResult(long completeResult) {
+    this.completeResult = completeResult;
   }
 
 }

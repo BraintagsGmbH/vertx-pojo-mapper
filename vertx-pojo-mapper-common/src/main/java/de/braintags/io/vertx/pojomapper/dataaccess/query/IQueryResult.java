@@ -50,4 +50,13 @@ public interface IQueryResult<E> extends CollectionAsync<E> {
    */
   public IQueryExpression getOriginalQuery();
 
+  /**
+   * If the {@link IQuery#setReturnCompleteCount(boolean)} is set to true and {@link IQuery#setLimit(int)} is set with a
+   * value > 0, then here will be returned the complete number of fitting records
+   * Otherwise the length of the current selection is returned
+   * 
+   * @return the complete number of records
+   */
+  public long getCompleteResult();
+
 }

@@ -120,15 +120,42 @@ public class MongoQuery<T> extends Query<T> {
             Future<IQueryResult<T>> future = Future.failedFuture(qResult.cause());
             resultHandler.handle(future);
           } else {
-            IQueryResult<T> qR = createQueryResult(qResult.result(), rambler);
-            Future<IQueryResult<T>> future = Future.succeededFuture(qR);
-            resultHandler.handle(future);
+            createQueryResult(qResult.result(), rambler, resultHandler);
           }
         });
   }
 
-  private IQueryResult<T> createQueryResult(List<JsonObject> findList, MongoQueryRambler rambler) {
-    return new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(), (MongoMapper) getMapper(), rambler);
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private void createQueryResult(List<JsonObject> findList, MongoQueryRambler rambler,
+      Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    MongoQueryResult qR = new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(), (MongoMapper) getMapper(),
+        rambler);
+    long size = qR.size();
+    long limit = getLimit();
+    if (getLimit() > 0 && isReturnCompleteCount() && qR.size() == getLimit()) {
+      fetchCompleteCount(qR, resultHandler);
+    } else {
+      qR.setCompleteResult(qR.size());
+      resultHandler.handle(Future.succeededFuture(qR));
+    }
+  }
+
+  private void fetchCompleteCount(MongoQueryResult qR, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    int bLimit = getLimit();
+    int bStart = getStart();
+    setLimit(0);
+    setStart(0);
+    executeCount(cr -> {
+      if (cr.failed()) {
+        resultHandler.handle(Future.failedFuture(cr.cause()));
+      } else {
+        long count = cr.result().getCount();
+        qR.setCompleteResult(count);
+        setLimit(bLimit);
+        setStart(bStart);
+        resultHandler.handle(Future.succeededFuture(qR));
+      }
+    });
   }
 
   /**

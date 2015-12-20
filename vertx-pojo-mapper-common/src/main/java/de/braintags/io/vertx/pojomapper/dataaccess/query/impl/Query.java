@@ -44,6 +44,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   private List<Object> filters = new ArrayList<Object>();
   private int limit = 500;
   private int start = 0;
+  private boolean returnCompleteCount = false;
 
   /**
    * @param mapperClass
@@ -160,7 +161,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IQuery<T> setLimit(int limit) {
-    return null;
+    this.limit = limit;
+    return this;
   }
 
   /*
@@ -170,7 +172,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IQuery<T> setStart(int start) {
-    return null;
+    this.start = start;
+    return this;
   }
 
   /**
@@ -185,6 +188,23 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   public final int getStart() {
     return start;
+  }
+
+  /**
+   * @return the returnCompleteCount
+   */
+  public final boolean isReturnCompleteCount() {
+    return returnCompleteCount;
+  }
+
+  /**
+   * @param returnCompleteCount
+   *          the returnCompleteCount to set
+   */
+  @Override
+  public final IQuery<T> setReturnCompleteCount(boolean returnCompleteCount) {
+    this.returnCompleteCount = returnCompleteCount;
+    return this;
   }
 
 }
