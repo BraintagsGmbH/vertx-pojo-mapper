@@ -13,6 +13,7 @@
 package de.braintags.io.vertx.pojomapper.typehandler;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
    * If for a class a {@link ITypeHandler} was requested and found, it is cached by here with the class to handle as key
    */
   private final Map<TypeHandlerCacheKey, ITypeHandler> cachedTypeHandler = new HashMap<TypeHandlerCacheKey, ITypeHandler>();
+  private final List<ITypeHandler> definedTypeHandlers = new ArrayList<ITypeHandler>();
 
   /**
    * 
@@ -80,7 +82,7 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
    */
   private ITypeHandler examineMatch(Class<?> cls, Annotation annotation) {
     ITypeHandler returnHandler = null;
-    for (ITypeHandler th : getDefinedTypehandlers()) {
+    for (ITypeHandler th : getDefinedTypeHandlers()) {
       short matchResult = th.matches(cls, annotation);
       switch (matchResult) {
       case ITypeHandler.MATCH_MAJOR:
@@ -105,7 +107,7 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
    */
   private ITypeHandler examineMatch(IField field) {
     ITypeHandler returnHandler = null;
-    List<ITypeHandler> ths = getDefinedTypehandlers();
+    List<ITypeHandler> ths = getDefinedTypeHandlers();
     for (ITypeHandler th : ths) {
       short matchResult = th.matches(field);
       switch (matchResult) {
@@ -128,7 +130,9 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
    * 
    * @return list of {@link ITypeHandler}
    */
-  public abstract List<ITypeHandler> getDefinedTypehandlers();
+  public List<ITypeHandler> getDefinedTypeHandlers() {
+    return definedTypeHandlers;
+  }
 
   /**
    * Get the default {@link ITypeHandler}
@@ -153,4 +157,18 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
       return cacheKey;
     }
   }
+
+  /**
+   * Remove the typehandler specified by the given class
+   * 
+   * @param typeHandlerClass
+   *          the class of the typehandler, which shall be removed
+   */
+  public void remove(Class typeHandlerClass) {
+    for (int i = definedTypeHandlers.size() - 1; i >= 0; i--) {
+      if (definedTypeHandlers.get(i).getClass() == typeHandlerClass)
+        definedTypeHandlers.remove(i);
+    }
+  }
+
 }

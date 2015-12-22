@@ -56,40 +56,40 @@ public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
   protected void init() {
     super.init();
     remove(IdTypeHandler.class);
-    getDefinedTypehandlers().add(0, new SqlIdTypeHandler(this));
-    getDefinedTypehandlers().add(1, new BooleanTypeHandler(this));
+    getDefinedTypeHandlers().add(0, new SqlIdTypeHandler(this));
+    getDefinedTypeHandlers().add(1, new BooleanTypeHandler(this));
 
     remove(DateTypeHandler.class);
-    getDefinedTypehandlers().add(new SqlDateTypeHandler(this));
+    getDefinedTypeHandlers().add(new SqlDateTypeHandler(this));
 
     remove(CalendarTypeHandler.class);
-    getDefinedTypehandlers().add(new SqlCalendarTypehandler(this));
+    getDefinedTypeHandlers().add(new SqlCalendarTypehandler(this));
 
     remove(ByteTypeHandler.class);
-    getDefinedTypehandlers().add(new SqlByteTypeHandler(this));
+    getDefinedTypeHandlers().add(new SqlByteTypeHandler(this));
 
-    getDefinedTypehandlers().add(new JsonTypeHandler(this));
+    getDefinedTypeHandlers().add(new JsonTypeHandler(this));
 
     remove(ArrayTypeHandler.class);
-    getDefinedTypehandlers().add(new SqlArrayTypehandler(this));
+    getDefinedTypeHandlers().add(new SqlArrayTypehandler(this));
     remove(ArrayTypeHandlerEmbedded.class);
-    getDefinedTypehandlers().add(new SqlArrayTypeHandlerEmbedded(this));
+    getDefinedTypeHandlers().add(new SqlArrayTypeHandlerEmbedded(this));
     remove(ArrayTypeHandlerReferenced.class);
-    getDefinedTypehandlers().add(new SqlArrayTypeHandlerReferenced(this));
+    getDefinedTypeHandlers().add(new SqlArrayTypeHandlerReferenced(this));
 
     remove(MapTypeHandler.class);
-    getDefinedTypehandlers().add(new SqlMapTypeHandler(this));
+    getDefinedTypeHandlers().add(new SqlMapTypeHandler(this));
     remove(MapTypeHandlerEmbedded.class);
-    getDefinedTypehandlers().add(new SqlMapTypeHandlerEmbedded(this));
+    getDefinedTypeHandlers().add(new SqlMapTypeHandlerEmbedded(this));
     remove(MapTypeHandlerReferenced.class);
-    getDefinedTypehandlers().add(new SqlMapTypeHandlerReferenced(this));
+    getDefinedTypeHandlers().add(new SqlMapTypeHandlerReferenced(this));
 
     remove(CollectionTypeHandler.class);
-    getDefinedTypehandlers().add(new SqlCollectionTypeHandler(this));
+    getDefinedTypeHandlers().add(new SqlCollectionTypeHandler(this));
     remove(CollectionTypeHandlerEmbedded.class);
-    getDefinedTypehandlers().add(new SqlCollectionTypeHandlerEmbedded(this));
+    getDefinedTypeHandlers().add(new SqlCollectionTypeHandlerEmbedded(this));
     remove(CollectionTypeHandlerReferenced.class);
-    getDefinedTypehandlers().add(new SqlCollectionTypeHandlerReferenced(this));
+    getDefinedTypeHandlers().add(new SqlCollectionTypeHandlerReferenced(this));
 
   }
 

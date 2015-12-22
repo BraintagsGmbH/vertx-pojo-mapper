@@ -13,8 +13,6 @@
 package de.braintags.io.vertx.pojomapper.typehandler.stringbased;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -47,7 +45,6 @@ import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.URLType
 
 public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
   private final ITypeHandler defaultHandler = new ObjectTypeHandler(this);
-  private final List<ITypeHandler> definedTypeHandlers = new ArrayList<ITypeHandler>();
 
   /**
    * The default constructor for a String base factory
@@ -56,38 +53,28 @@ public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
     init();
   }
 
-  private void init() {
-    definedTypeHandlers.add(new BooleanTypeHandler(this));
-    definedTypeHandlers.add(new JsonTypeHandler(this));
-    definedTypeHandlers.add(new CharacterTypeHandler(this));
-    definedTypeHandlers.add(new BigDecimalTypeHandler(this));
-    definedTypeHandlers.add(new BigIntegerTypeHandler(this));
-    definedTypeHandlers.add(new FloatTypeHandler(this));
-    definedTypeHandlers.add(new DateTypeHandler(this));
-    definedTypeHandlers.add(new ShortTypeHandler(this));
-    definedTypeHandlers.add(new IntegerTypeHandler(this));
-    definedTypeHandlers.add(new LongTypeHandler(this));
-    definedTypeHandlers.add(new CalendarTypeHandler(this));
-    definedTypeHandlers.add(new BigDecimalTypeHandler(this));
-    definedTypeHandlers.add(new BigIntegerTypeHandler(this));
-    definedTypeHandlers.add(new CharSequenceTypeHandler(this));
-    definedTypeHandlers.add(new CharacterTypeHandler(this));
-    definedTypeHandlers.add(new ByteTypeHandler(this));
-    definedTypeHandlers.add(new URITypeHandler(this));
-    definedTypeHandlers.add(new URLTypeHandler(this));
-    definedTypeHandlers.add(new ClassTypeHandler(this));
-    definedTypeHandlers.add(new LocaleTypeHandler(this));
-    definedTypeHandlers.add(new EnumTypeHandler(this));
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandlerFactory#getDefinedTypehandlers()
-   */
-  @Override
-  public List<ITypeHandler> getDefinedTypehandlers() {
-    return definedTypeHandlers;
+  protected void init() {
+    getDefinedTypeHandlers().add(new BooleanTypeHandler(this));
+    getDefinedTypeHandlers().add(new JsonTypeHandler(this));
+    getDefinedTypeHandlers().add(new CharacterTypeHandler(this));
+    getDefinedTypeHandlers().add(new BigDecimalTypeHandler(this));
+    getDefinedTypeHandlers().add(new BigIntegerTypeHandler(this));
+    getDefinedTypeHandlers().add(new FloatTypeHandler(this));
+    getDefinedTypeHandlers().add(new DateTypeHandler(this));
+    getDefinedTypeHandlers().add(new ShortTypeHandler(this));
+    getDefinedTypeHandlers().add(new IntegerTypeHandler(this));
+    getDefinedTypeHandlers().add(new LongTypeHandler(this));
+    getDefinedTypeHandlers().add(new CalendarTypeHandler(this));
+    getDefinedTypeHandlers().add(new BigDecimalTypeHandler(this));
+    getDefinedTypeHandlers().add(new BigIntegerTypeHandler(this));
+    getDefinedTypeHandlers().add(new CharSequenceTypeHandler(this));
+    getDefinedTypeHandlers().add(new CharacterTypeHandler(this));
+    getDefinedTypeHandlers().add(new ByteTypeHandler(this));
+    getDefinedTypeHandlers().add(new URITypeHandler(this));
+    getDefinedTypeHandlers().add(new URLTypeHandler(this));
+    getDefinedTypeHandlers().add(new ClassTypeHandler(this));
+    getDefinedTypeHandlers().add(new LocaleTypeHandler(this));
+    getDefinedTypeHandlers().add(new EnumTypeHandler(this));
   }
 
   /*
