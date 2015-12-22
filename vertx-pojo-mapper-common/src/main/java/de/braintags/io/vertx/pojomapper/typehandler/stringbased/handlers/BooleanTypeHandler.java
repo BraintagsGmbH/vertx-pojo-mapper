@@ -40,7 +40,9 @@ public class BooleanTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? false : Boolean.valueOf((String) source), resultHandler);
+    String bv = source == null ? "false" : source.toString();
+    bv = bv.equalsIgnoreCase("on") ? "true" : bv;
+    success(Boolean.valueOf(bv), resultHandler);
   }
 
   @Override
