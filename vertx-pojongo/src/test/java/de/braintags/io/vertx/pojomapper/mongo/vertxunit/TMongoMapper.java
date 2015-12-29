@@ -77,6 +77,19 @@ public class TMongoMapper extends DatastoreBaseTest {
   }
 
   @Test
+  public void testTransient(TestContext context) {
+    IMapper mapper = getDataStore().getMapperFactory().getMapper(MiniMapper.class);
+
+    try {
+      IField trField = mapper.getField("transientString");
+      context.fail("transient fields should be mapped");
+    } catch (MappingException e) {
+      // this is the expected result
+    }
+
+  }
+
+  @Test
   public void testMetaData(TestContext context) {
     log.info("-->> testMetaData");
     IMapper mapper = getDataStore().getMapperFactory().getMapper(MiniMapper.class);

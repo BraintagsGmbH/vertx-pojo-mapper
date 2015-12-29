@@ -30,6 +30,8 @@ public class MiniMapper {
   public String id = null;
   public String name = "testName";
 
+  public transient String transientString;
+
   public MiniMapper() {
   }
 
