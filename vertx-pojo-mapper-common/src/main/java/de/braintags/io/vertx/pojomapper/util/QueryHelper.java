@@ -16,6 +16,7 @@ import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.util.IteratorAsync;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -30,6 +31,36 @@ import io.vertx.core.Handler;
 public class QueryHelper {
 
   private QueryHelper() {
+  }
+
+  /**
+   * Executes the given {@link IQuery} and returns teh first record directly to the handler. This method can be used,
+   * when only one record is expected to be found, like an ID query, for instance
+   * 
+   * @param query
+   *          the query to be executed
+   * @param handler
+   *          the handler, which will receive the first object
+   */
+  public static void executeToFirstRecord(IQuery<?> query, Handler<AsyncResult<?>> handler) {
+    query.execute(result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        IteratorAsync<?> it = result.result().iterator();
+        if (it.hasNext()) {
+          it.next(itResult -> {
+            if (itResult.failed()) {
+              handler.handle(Future.failedFuture(itResult.cause()));
+            } else {
+              handler.handle(Future.succeededFuture(itResult.result()));
+            }
+          });
+        } else {
+          handler.handle(Future.succeededFuture(null));
+        }
+      }
+    });
   }
 
   /**
