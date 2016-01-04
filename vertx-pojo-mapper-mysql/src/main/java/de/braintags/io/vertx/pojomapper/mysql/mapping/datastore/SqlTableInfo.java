@@ -124,6 +124,7 @@ public class SqlTableInfo extends DefaultTableInfo {
       boolean modified = newCol.getColumnHandler().isColumnModified(newCol, currCol);
       if (modified)
         modCols.add(colName);
+      String test = "";
     }
     return modCols;
   }

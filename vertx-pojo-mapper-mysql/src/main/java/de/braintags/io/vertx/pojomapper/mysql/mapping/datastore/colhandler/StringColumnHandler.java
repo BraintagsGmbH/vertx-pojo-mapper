@@ -79,6 +79,14 @@ public class StringColumnHandler extends AbstractSqlColumnHandler {
   }
 
   @Override
+  protected boolean checkColumnModified(IColumnInfo plannedCi, IColumnInfo existingCi) {
+    String plannedType = plannedCi.getType();
+    boolean ret = !(plannedType.equalsIgnoreCase(CHAR_TYPE) || plannedType.equalsIgnoreCase(VARCHAR_TYPE)
+        || plannedType.equalsIgnoreCase(LONGTEXT_TYPE));
+    return ret;
+  }
+
+  @Override
   protected StringBuilder generateColumn(IField field, IColumnInfo ci) {
     StringBuilder result = new StringBuilder();
     if (ci.getType().equalsIgnoreCase(CHAR_TYPE) || ci.getType().equals(VARCHAR_TYPE))
