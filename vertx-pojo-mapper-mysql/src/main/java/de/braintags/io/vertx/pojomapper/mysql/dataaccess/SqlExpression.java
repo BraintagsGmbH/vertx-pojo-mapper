@@ -37,6 +37,8 @@ public class SqlExpression implements IQueryExpression {
   private StringBuilder select = new StringBuilder();
   private StringBuilder delete = new StringBuilder();
   private StringBuilder count = new StringBuilder();
+  private int limit;
+  private int offset;
 
   private StringBuilder whereClause = new StringBuilder();
   private JsonArray parameters = new JsonArray();
@@ -198,6 +200,7 @@ public class SqlExpression implements IQueryExpression {
   public String getSelectExpression() {
     StringBuilder complete = new StringBuilder(select);
     appendWhereClause(complete);
+    appendLimitClause(complete);
     return complete.toString();
   }
 
@@ -212,6 +215,17 @@ public class SqlExpression implements IQueryExpression {
     return complete.toString();
   }
 
+  private void appendLimitClause(StringBuilder complete) {
+    if (whereClause.length() > 0) {
+      if (limit > 0) {
+        complete.append(" LIMIT ").append(limit);
+      }
+      if (offset > 0) {
+        complete.append(" OFFSET ").append(offset);
+      }
+    }
+  }
+
   private void appendWhereClause(StringBuilder complete) {
     if (whereClause.length() > 0) {
       complete.append(" WHERE").append(whereClause);
@@ -219,6 +233,20 @@ public class SqlExpression implements IQueryExpression {
       while (parCount-- > 0)
         complete.append(" )");
     }
+  }
+
+  /**
+   * Set the limit and the offset ( start ) of a selection
+   * 
+   * @param limit
+   *          the limit of the selection
+   * @param offset
+   *          the first record
+   */
+  public void setLimit(int limit, int offset) {
+    this.limit = limit;
+    this.offset = offset;
+
   }
 
   class Connector {

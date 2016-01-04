@@ -84,7 +84,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    * query.IQuery)
    */
   @Override
-  public final void stop(IQuery<?> query) {
+  public void stop(IQuery<?> query) {
     // nothing to do here
   }
 

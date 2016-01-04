@@ -22,7 +22,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTran
  * 
  */
 
-public class QueryOperatorTranslator implements IQueryOperatorTranslator {
+public class SqlQueryOperatorTranslator implements IQueryOperatorTranslator {
 
   /**
    * Translate the given {@link QueryOperator} into an expression fitting for sql
@@ -50,6 +50,10 @@ public class QueryOperatorTranslator implements IQueryOperatorTranslator {
       return "IN";
     case NOT_IN:
       return "NOT IN";
+    case CONTAINS:
+    case STARTS:
+    case ENDS:
+      return "LIKE";
 
     default:
       throw new UnsupportedOperationException("No translator for " + op);

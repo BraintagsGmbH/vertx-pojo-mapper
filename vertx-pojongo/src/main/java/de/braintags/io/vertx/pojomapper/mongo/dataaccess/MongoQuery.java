@@ -125,13 +125,10 @@ public class MongoQuery<T> extends Query<T> {
         });
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
   private void createQueryResult(List<JsonObject> findList, MongoQueryRambler rambler,
       Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    MongoQueryResult qR = new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(), (MongoMapper) getMapper(),
-        rambler);
-    long size = qR.size();
-    long limit = getLimit();
+    MongoQueryResult<T> qR = new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(),
+        (MongoMapper) getMapper(), rambler);
     if (getLimit() > 0 && isReturnCompleteCount() && qR.size() == getLimit()) {
       fetchCompleteCount(qR, resultHandler);
     } else {
@@ -140,7 +137,7 @@ public class MongoQuery<T> extends Query<T> {
     }
   }
 
-  private void fetchCompleteCount(MongoQueryResult qR, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  private void fetchCompleteCount(MongoQueryResult<T> qR, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     int bLimit = getLimit();
     int bStart = getStart();
     setLimit(0);

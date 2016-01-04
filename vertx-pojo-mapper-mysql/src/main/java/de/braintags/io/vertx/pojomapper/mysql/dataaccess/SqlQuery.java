@@ -185,12 +185,36 @@ public class SqlQuery<T> extends Query<T> {
       resultHandler.handle(Future.failedFuture(new SqlException(message, qRes.cause())));
       return;
     }
-    SqlQueryResult<T> qr = createQueryResult(qRes.result(), query);
-    resultHandler.handle(Future.succeededFuture(qr));
-
+    createQueryResult(qRes.result(), query, resultHandler);
   }
 
-  private SqlQueryResult<T> createQueryResult(ResultSet resultSet, SqlQueryRambler query) {
-    return new SqlQueryResult<T>(resultSet, (MySqlDataStore) getDataStore(), getMapper(), query);
+  private void createQueryResult(ResultSet resultSet, SqlQueryRambler query,
+      Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    SqlQueryResult<T> qR = new SqlQueryResult<T>(resultSet, (MySqlDataStore) getDataStore(), getMapper(), query);
+    if (getLimit() > 0 && isReturnCompleteCount() && qR.size() == getLimit()) {
+      fetchCompleteCount(qR, resultHandler);
+    } else {
+      qR.setCompleteResult(qR.size());
+      resultHandler.handle(Future.succeededFuture(qR));
+    }
   }
+
+  private void fetchCompleteCount(SqlQueryResult<T> qR, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    int bLimit = getLimit();
+    int bStart = getStart();
+    setLimit(0);
+    setStart(0);
+    executeCount(cr -> {
+      if (cr.failed()) {
+        resultHandler.handle(Future.failedFuture(cr.cause()));
+      } else {
+        long count = cr.result().getCount();
+        qR.setCompleteResult(count);
+        setLimit(bLimit);
+        setStart(bStart);
+        resultHandler.handle(Future.succeededFuture(qR));
+      }
+    });
+  }
+
 }

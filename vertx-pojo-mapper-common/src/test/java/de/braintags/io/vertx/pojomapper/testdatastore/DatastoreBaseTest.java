@@ -155,8 +155,9 @@ public abstract class DatastoreBaseTest {
     });
 
     async.await();
-
-    checkQueryResult(context, resultContainer.queryResult, expectedResult);
+    if (resultContainer.assertionError == null) {
+      checkQueryResult(context, resultContainer.queryResult, expectedResult);
+    }
     return resultContainer;
   }
 
@@ -248,6 +249,7 @@ public abstract class DatastoreBaseTest {
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public static void checkQueryResult(TestContext context, IQueryResult qr, int expectedResult) {
     Async async = context.async();
+
     try {
       context.assertNotNull(qr);
     } catch (Exception e) {
