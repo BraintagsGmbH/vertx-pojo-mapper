@@ -13,6 +13,7 @@
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
 import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
@@ -100,14 +101,19 @@ public class DefaultPropertyMapper implements IPropertyMapper {
       handler.handle(Future.succeededFuture());
     } else {
       LOGGER.debug("fetching result from typehandler");
-      th.fromStore(dbValue, field, null, result -> {
-        if (result.failed()) {
-          handler.handle(Future.failedFuture(result.cause()));
-          return;
-        }
-        Object javaValue = result.result().getResult();
-        handleInstanceFromStore(storeObject, mapper, javaValue, dbValue, field, handler);
-      });
+      try {
+        th.fromStore(dbValue, field, null, result -> {
+          if (result.failed()) {
+            handler.handle(Future.failedFuture(result.cause()));
+            return;
+          }
+          Object javaValue = result.result().getResult();
+          handleInstanceFromStore(storeObject, mapper, javaValue, dbValue, field, handler);
+        });
+      } catch (Exception e) {
+        handler.handle(Future.failedFuture(
+            new PropertyAccessException("Error with reading from store in field " + field.getFullName(), e)));
+      }
     }
   }
 

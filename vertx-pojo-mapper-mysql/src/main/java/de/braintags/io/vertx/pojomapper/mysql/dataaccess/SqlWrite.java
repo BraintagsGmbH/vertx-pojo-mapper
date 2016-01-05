@@ -50,6 +50,7 @@ import io.vertx.ext.sql.UpdateResult;
 public class SqlWrite<T> extends AbstractWrite<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SqlWrite.class);
   private static final String LAST_INSERT_ID_COMMAND = "SELECT LAST_INSERT_ID();";
+  private int saveSize;
 
   /**
    * @param mapperClass
@@ -61,6 +62,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   @Override
   public void save(Handler<AsyncResult<IWriteResult>> resultHandler) {
+    saveSize = getObjectsToSave().size();
     sync(syncResult -> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
@@ -76,9 +78,13 @@ public class SqlWrite<T> extends AbstractWrite<T> {
           resultHandler.handle(Future.failedFuture(stoResult.cause()));
           return;
         }
+        if (stoResult.result().size() != saveSize) {
+          String message = String.format("Wrong number of StoreObjects created. Expected %d - created: %d", saveSize,
+              stoResult.result().size());
+          LOGGER.error(message);
+        }
         save(stoResult.result(), resultHandler);
       });
-
     });
   }
 
@@ -94,6 +100,11 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         }
 
         if (co.reduce()) {
+          if (rr.size() != saveSize) {
+            String message = String.format("Wrong number of saved instances in WriteResult. Expected %d - created: %d",
+                saveSize, rr.size());
+            LOGGER.error(message);
+          }
           resultHandler.handle(Future.succeededFuture(rr));
           return;
         }
@@ -114,13 +125,9 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       Handler<AsyncResult<Void>> resultHandler) {
     Object currentId = storeObject.get(getMapper().getIdField());
     if (currentId == null || (currentId instanceof Number && ((Number) currentId).intValue() == 0)) {
-      handleInsert(storeObject, writeResult, ir -> {
-        resultHandler.handle(ir);
-      });
+      handleInsert(storeObject, writeResult, resultHandler);
     } else {
-      handleUpdate(storeObject, writeResult, ir -> {
-        resultHandler.handle(ir);
-      });
+      handleUpdate(storeObject, writeResult, resultHandler);
     }
 
   }

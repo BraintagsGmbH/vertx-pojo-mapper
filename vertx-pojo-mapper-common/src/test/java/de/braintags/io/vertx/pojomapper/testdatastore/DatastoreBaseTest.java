@@ -84,15 +84,20 @@ public abstract class DatastoreBaseTest {
       write.add(record);
     }
     write.save(result -> {
-      try {
-        resultContainer.writeResult = result.result();
-        checkWriteResult(context, result, records.size());
-      } catch (AssertionError e) {
-        resultContainer.assertionError = e;
-      } catch (Throwable e) {
-        resultContainer.assertionError = new AssertionError(e);
-      } finally {
+      if (result.failed()) {
+        resultContainer.assertionError = resultContainer.assertionError = new AssertionError(result.cause());
         async.complete();
+      } else {
+        try {
+          resultContainer.writeResult = result.result();
+          checkWriteResult(context, result, records.size());
+        } catch (AssertionError e) {
+          resultContainer.assertionError = e;
+        } catch (Throwable e) {
+          resultContainer.assertionError = new AssertionError(e);
+        } finally {
+          async.complete();
+        }
       }
     });
 

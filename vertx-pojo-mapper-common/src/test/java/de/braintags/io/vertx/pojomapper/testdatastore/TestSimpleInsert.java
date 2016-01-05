@@ -36,7 +36,7 @@ import io.vertx.ext.unit.TestContext;
 
 public class TestSimpleInsert extends DatastoreBaseTest {
   private static Logger logger = LoggerFactory.getLogger(TestSimpleInsert.class);
-  private static final int LOOP = 5;
+  private static final int LOOP = 500;
 
   @Test
   public void testRoundtrip(TestContext context) {
@@ -52,7 +52,7 @@ public class TestSimpleInsert extends DatastoreBaseTest {
     for (int i = 0; i < LOOP; i++) {
       mapperList.add(new MiniMapper("looper"));
     }
-    resultContainer = saveRecords(context, mapperList, 10000);
+    resultContainer = saveRecords(context, mapperList, 0);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
 
