@@ -96,22 +96,18 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       saveStoreObject((SqlStoreObject) sto, rr, saveResult -> {
         if (saveResult.failed()) {
           err.setThrowable(saveResult.cause());
-          return;
-        }
-
-        if (co.reduce()) {
+        } else if (co.reduce()) {
           if (rr.size() != saveSize) {
             String message = String.format("Wrong number of saved instances in WriteResult. Expected %d - created: %d",
                 saveSize, rr.size());
             LOGGER.error(message);
           }
           resultHandler.handle(Future.succeededFuture(rr));
-          return;
         }
-
       });
-      if (err.isError())
-        return;
+      if (err.isError()) {
+        break;
+      }
     }
   }
 
@@ -152,9 +148,14 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     } else {
       SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), seq.getSqlStatement(), seq.getParameters(),
           updateResult -> {
-            if (!checkUpdateResult(seq, updateResult, resultHandler))
-              return;
-            finishUpdate(storeObject, writeResult, resultHandler);
+
+            checkUpdateResult(seq, updateResult, checkResult -> {
+              if (checkResult.failed()) {
+                resultHandler.handle(checkResult);
+              } else {
+                finishUpdate(storeObject, writeResult, resultHandler);
+              }
+            });
           });
     }
 
@@ -202,10 +203,13 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   private void insertWithoutParameters(SqlStoreObject storeObject, IWriteResult writeResult, SqlSequence seq,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlUtil.update((MySqlDataStore) getDataStore(), seq.getSqlStatement(), updateResult -> {
-      if (!checkUpdateResult(seq, updateResult, resultHandler))
-        return;
-      UpdateResult res = updateResult.result();
-      finishInsert(storeObject, writeResult, resultHandler);
+      checkUpdateResult(seq, updateResult, checkResult -> {
+        if (checkResult.failed()) {
+          resultHandler.handle(checkResult);
+        } else {
+          finishInsert(storeObject, writeResult, resultHandler);
+        }
+      });
     });
   }
 
@@ -213,10 +217,13 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       Handler<AsyncResult<Void>> resultHandler) {
     SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), seq.getSqlStatement(), seq.getParameters(),
         updateResult -> {
-          if (!checkUpdateResult(seq, updateResult, resultHandler))
-            return;
-          UpdateResult res = updateResult.result();
-          finishInsert(storeObject, writeResult, resultHandler);
+          checkUpdateResult(seq, updateResult, checkResult -> {
+            if (checkResult.failed()) {
+              resultHandler.handle(checkResult);
+            } else {
+              finishInsert(storeObject, writeResult, resultHandler);
+            }
+          });
         });
   }
 
@@ -227,22 +234,21 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    *          the result to be checked
    * @param resultHandler
    *          the {@link Handler} to be informed
-   * @return false, if an error occured and handler was sent an error, otherwise true
    */
-  private boolean checkUpdateResult(SqlSequence seq, AsyncResult<UpdateResult> updateResult,
+  private void checkUpdateResult(SqlSequence seq, AsyncResult<UpdateResult> updateResult,
       Handler<AsyncResult<Void>> resultHandler) {
     if (updateResult.failed()) {
       resultHandler.handle(Future.failedFuture(updateResult.cause()));
-      return false;
+    } else {
+      UpdateResult res = updateResult.result();
+      if (res.getUpdated() != 1) {
+        String message = String.format("Error inserting a record, expected %d records saved, but was %d", 1,
+            res.getUpdated());
+        resultHandler.handle(Future.failedFuture(new InsertException(message)));
+      } else {
+        resultHandler.handle(Future.succeededFuture());
+      }
     }
-    UpdateResult res = updateResult.result();
-    if (res.getUpdated() != 1) {
-      String message = String.format("Error inserting a record, expected %d records saved, but was %d", 1,
-          res.getUpdated());
-      resultHandler.handle(Future.failedFuture(new InsertException(message)));
-      return false;
-    }
-    return true;
 
   }
 
