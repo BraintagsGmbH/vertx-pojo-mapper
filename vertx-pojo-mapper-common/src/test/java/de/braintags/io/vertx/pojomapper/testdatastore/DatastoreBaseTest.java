@@ -56,7 +56,7 @@ public abstract class DatastoreBaseTest {
   public static IDataStore EXTERNAL_DATASTORE;
 
   @Rule
-  public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "5")));
+  public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "20")));
 
   public static IDataStore getDataStore() {
     return EXTERNAL_DATASTORE == null ? TestHelper.getDatastoreContainer().getDataStore() : EXTERNAL_DATASTORE;

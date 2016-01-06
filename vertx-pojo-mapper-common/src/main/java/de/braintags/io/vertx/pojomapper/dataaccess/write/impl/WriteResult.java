@@ -34,6 +34,7 @@ import io.vertx.core.logging.LoggerFactory;
 public class WriteResult implements IWriteResult {
   private static final Logger logger = LoggerFactory.getLogger(WriteResult.class);
   private List<IWriteEntry> resultList = new ArrayList<IWriteEntry>();
+  @SuppressWarnings("rawtypes")
   private List insertedIds = new ArrayList();
 
   /*
@@ -52,7 +53,8 @@ public class WriteResult implements IWriteResult {
    * @param entry
    *          the entry to be added
    */
-  private void addEntry(IWriteEntry entry) {
+  @SuppressWarnings("unchecked")
+  private synchronized void addEntry(IWriteEntry entry) {
     resultList.add(entry);
     logger.info(resultList.size());
     if (entry.getAction().equals(WriteAction.INSERT)) {
