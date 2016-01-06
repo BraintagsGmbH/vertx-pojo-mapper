@@ -33,7 +33,7 @@ import io.vertx.core.Handler;
  *          the underlaying mapper to be used
  */
 
-public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T>implements IWrite<T> {
+public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> implements IWrite<T> {
   private List<T> objectsToSave = new ArrayList<T>();
 
   /**
@@ -56,6 +56,18 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T>implem
   @Override
   public final void add(T mapper) {
     objectsToSave.add(mapper);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite#add(java.util.List)
+   */
+  @Override
+  public void addAll(List<T> mapperList) {
+    for (T mapper : mapperList) {
+      add(mapper);
+    }
   }
 
   /**

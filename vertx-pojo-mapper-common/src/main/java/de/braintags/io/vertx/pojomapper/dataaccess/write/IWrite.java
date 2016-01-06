@@ -12,6 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.write;
 
+import java.util.List;
+
 import de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -33,6 +35,14 @@ public interface IWrite<T> extends IDataAccessObject<T> {
    *          the mapper to be saved
    */
   public void add(T mapper);
+
+  /**
+   * Add a list of entities to be saved
+   * 
+   * @param mapperList
+   *          the objects to be saved
+   */
+  public void addAll(List<T> mapperList);
 
   /**
    * Save the entities inside the current instance
