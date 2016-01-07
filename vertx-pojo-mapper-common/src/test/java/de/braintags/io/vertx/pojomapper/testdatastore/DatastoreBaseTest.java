@@ -28,9 +28,11 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
+import de.braintags.io.vertx.pojomapper.util.QueryHelper;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ExceptionUtil;
 import de.braintags.io.vertx.util.IteratorAsync;
+import de.braintags.io.vertx.util.ResultObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -164,6 +166,36 @@ public abstract class DatastoreBaseTest {
       checkQueryResult(context, resultContainer.queryResult, expectedResult);
     }
     return resultContainer;
+  }
+
+  /**
+   * Executes a query and returns directly the first record
+   * 
+   * @param context
+   *          the context to be used
+   * @param query
+   *          the query to be executed
+   * @return Object the first instance found or null if none
+   */
+  public static Object findFirst(TestContext context, IQuery<?> query) {
+    Async async = context.async();
+    ResultObject res = new ResultObject(null);
+    QueryHelper.executeToFirstRecord(query, result -> {
+      if (result.failed()) {
+        res.setThrowable(result.cause());
+        async.complete();
+      } else {
+        res.setResult(result.result());
+        async.complete();
+      }
+    });
+
+    async.await();
+    if (res.isError()) {
+      throw res.getRuntimeException();
+    } else {
+      return res.getResult();
+    }
   }
 
   /**
