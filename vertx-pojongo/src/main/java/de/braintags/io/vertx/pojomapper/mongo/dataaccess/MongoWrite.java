@@ -20,7 +20,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.util.CounterObject;
-import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -58,18 +57,17 @@ public class MongoWrite<T> extends AbstractWrite<T> {
       return;
     }
 
-    ErrorObject<IWriteResult> ro = new ErrorObject<IWriteResult>(resultHandler);
-    CounterObject counter = new CounterObject(getObjectsToSave().size());
+    CounterObject<IWriteResult> counter = new CounterObject<>(getObjectsToSave().size(), resultHandler);
     for (T entity : getObjectsToSave()) {
       save(entity, rr, result -> {
         if (result.failed()) {
-          ro.setThrowable(result.cause());
+          counter.setThrowable(result.cause());
         } else {
           if (counter.reduce())
             resultHandler.handle(Future.succeededFuture(rr));
         }
       });
-      if (ro.isError())
+      if (counter.isError())
         return;
     }
   }

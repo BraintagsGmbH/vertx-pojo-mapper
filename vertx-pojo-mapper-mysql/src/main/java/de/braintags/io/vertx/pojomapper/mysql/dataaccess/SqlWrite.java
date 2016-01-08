@@ -29,7 +29,6 @@ import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
 import de.braintags.io.vertx.pojomapper.mysql.SqlUtil;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObject.SqlSequence;
 import de.braintags.io.vertx.util.CounterObject;
-import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -89,13 +88,12 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   }
 
   private void save(List<IStoreObject<?>> storeObjects, Handler<AsyncResult<IWriteResult>> resultHandler) {
-    CounterObject co = new CounterObject(storeObjects.size());
-    ErrorObject<IWriteResult> err = new ErrorObject<>(resultHandler);
+    CounterObject<IWriteResult> co = new CounterObject<>(storeObjects.size(), resultHandler);
     WriteResult rr = new WriteResult();
     for (IStoreObject<?> sto : storeObjects) {
       saveStoreObject((SqlStoreObject) sto, rr, saveResult -> {
         if (saveResult.failed()) {
-          err.setThrowable(saveResult.cause());
+          co.setThrowable(saveResult.cause());
         } else if (co.reduce()) {
           if (rr.size() != saveSize) {
             String message = String.format("Wrong number of saved instances in WriteResult. Expected %d - created: %d",
@@ -105,7 +103,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
           resultHandler.handle(Future.succeededFuture(rr));
         }
       });
-      if (err.isError()) {
+      if (co.isError()) {
         break;
       }
     }

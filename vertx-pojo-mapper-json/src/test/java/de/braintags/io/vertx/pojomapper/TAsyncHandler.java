@@ -12,10 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.braintags.io.vertx.util.CounterObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 public class TAsyncHandler {
   List<String> stringList = new ArrayList<String>();
@@ -39,7 +38,7 @@ public class TAsyncHandler {
   @Test
   public void test() {
     List<String> secondList = new ArrayList<String>();
-    CounterObject co = new CounterObject(stringList.size());
+    CounterObject co = new CounterObject(stringList.size(), null);
     int counter = 0;
     for (String string : stringList) {
       handleOneString(counter++, string, result -> {

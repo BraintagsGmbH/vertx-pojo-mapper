@@ -25,7 +25,6 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import de.braintags.io.vertx.util.CounterObject;
-import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -76,21 +75,20 @@ public class MapTypeHandler extends AbstractTypeHandler {
     if (jsonArray == null || jsonArray.isEmpty())
       resultHandler.handle(Future.succeededFuture());
 
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(resultHandler);
-    CounterObject co = new CounterObject(jsonArray.size());
+    CounterObject<ITypeHandlerResult> co = new CounterObject<>(jsonArray.size(), resultHandler);
     final MapEntry[] resultArray = new MapEntry[jsonArray.size()];
     int counter = 0;
     for (Object jo : jsonArray) {
       CurrentCounter cc = new CurrentCounter(counter++, jo);
       handleOneEntryFromStore(field, cc, resultArray, result -> {
         if (result.failed()) {
-          errorObject.setThrowable(result.cause());
+          co.setThrowable(result.cause());
           return;
         } else {
           checkSuccessFromStore(field, co, resultArray, resultHandler);
         }
       });
-      if (errorObject.isError())
+      if (co.isError())
         return;
     }
   }
@@ -175,19 +173,18 @@ public class MapTypeHandler extends AbstractTypeHandler {
     int size = map == null ? 0 : map.size();
     if (size == 0)
       resultHandler.handle(Future.succeededFuture());
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(resultHandler);
-    CounterObject co = new CounterObject(size);
+    CounterObject<ITypeHandlerResult> co = new CounterObject<>(size, resultHandler);
     JsonArray[] resultArray = new JsonArray[size];
     Iterator<?> it = map.entrySet().iterator();
     int counter = 0;
-    while (it.hasNext() && !errorObject.isError()) {
+    while (it.hasNext() && !co.isError()) {
       // trying to write the array in the order like it is
       Entry entry = (Entry) it.next();
       CurrentCounter cc = new CurrentCounter(counter++, entry);
 
       valueIntoStore(field, cc, resultArray, result -> {
         if (result.failed()) {
-          errorObject.setThrowable(result.cause());
+          co.setThrowable(result.cause());
           return;
         } else {
           checkSuccessIntoStore(co, resultArray, resultHandler);

@@ -25,7 +25,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IRamblerSource;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.util.CounterObject;
-import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -110,27 +109,26 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
       finishCounter(rambler, resultHandler);
       return;
     }
-    ErrorObject<Void> error = new ErrorObject<Void>(resultHandler);
-    CounterObject co = new CounterObject(filters.size());
+    CounterObject<Void> co = new CounterObject<Void>(filters.size(), resultHandler);
     for (Object filter : filters) {
-      handleFilter(rambler, resultHandler, filter, error, co);
-      if (error.isError()) {
+      handleFilter(rambler, resultHandler, filter, co);
+      if (co.isError()) {
         return;
       }
     }
   }
 
   private void handleFilter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler, Object filter,
-      ErrorObject<Void> error, CounterObject co) {
+      CounterObject<Void> co) {
     if (!(filter instanceof IRamblerSource)) {
-      error.setThrowable(
+      co.setThrowable(
           new UnsupportedOperationException("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName()));
       return;
     }
 
     ((IRamblerSource) filter).applyTo(rambler, result -> {
       if (result.failed()) {
-        error.setThrowable(result.cause());
+        co.setThrowable(result.cause());
         return;
       }
       if (co.reduce()) { // last element in the list

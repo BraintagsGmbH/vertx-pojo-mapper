@@ -24,7 +24,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.util.CounterObject;
-import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -175,15 +174,14 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
 
   protected final void iterateFields(Object tmpObject, Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start iterateFields");
-    ErrorObject<Void> error = new ErrorObject<Void>(handler);
     Set<String> fieldNames = getMapper().getFieldNames();
-    CounterObject co = new CounterObject(fieldNames.size());
+    CounterObject<Void> co = new CounterObject<>(fieldNames.size(), handler);
     for (String fieldName : fieldNames) {
       IField field = getMapper().getField(fieldName);
       LOGGER.debug("handling field " + field.getFullName());
       field.getPropertyMapper().fromStoreObject(tmpObject, this, field, result -> {
         if (result.failed()) {
-          error.setThrowable(result.cause());
+          co.setThrowable(result.cause());
           return;
         }
         if (co.reduce()) {
@@ -201,14 +199,13 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
       handler.handle(Future.succeededFuture());
       return;
     }
-    ErrorObject<Void> error = new ErrorObject<Void>(handler);
     Collection<IObjectReference> refs = getObjectReferences();
-    CounterObject co = new CounterObject(refs.size());
+    CounterObject<Void> co = new CounterObject<>(refs.size(), handler);
     for (IObjectReference ref : refs) {
       LOGGER.debug("handling object reference " + ref.getField().getFullName());
       ref.getField().getPropertyMapper().fromObjectReference(tmpObject, ref, result -> {
         if (result.failed()) {
-          error.setThrowable(result.cause());
+          co.setThrowable(result.cause());
           return;
         }
         if (co.reduce()) {
@@ -226,19 +223,18 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    * @param handler
    */
   public void initFromEntity(Handler<AsyncResult<Void>> handler) {
-    ErrorObject<Void> error = new ErrorObject<Void>(handler);
-    CounterObject co = new CounterObject(mapper.getFieldNames().size());
+    CounterObject<Void> co = new CounterObject<>(mapper.getFieldNames().size(), handler);
     for (String fieldName : mapper.getFieldNames()) {
       IField field = mapper.getField(fieldName);
       field.getPropertyMapper().intoStoreObject(entity, this, field, result -> {
         if (result.failed()) {
-          error.setThrowable(result.cause());
+          co.setThrowable(result.cause());
         } else {
           if (co.reduce())
             handler.handle(Future.succeededFuture());
         }
       });
-      if (error.isError()) {
+      if (co.isError()) {
         return;
       }
     }

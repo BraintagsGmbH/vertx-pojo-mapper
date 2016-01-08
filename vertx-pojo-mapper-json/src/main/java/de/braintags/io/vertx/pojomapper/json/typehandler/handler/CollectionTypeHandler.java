@@ -24,7 +24,6 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import de.braintags.io.vertx.util.CounterObject;
-import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -75,17 +74,16 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
       return;
     }
 
-    CounterObject co = new CounterObject(((JsonArray) source).size());
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(resultHandler);
+    CounterObject<ITypeHandlerResult> co = new CounterObject<>(((JsonArray) source).size(), resultHandler);
     @SuppressWarnings("rawtypes")
     Collection coll = field.getMapper().getObjectFactory().createCollection(field);
     Iterator<?> ji = ((JsonArray) source).iterator();
     ITypeHandler subHandler = field.getSubTypeHandler();
-    while (ji.hasNext() && !errorObject.isError()) {
+    while (ji.hasNext() && !co.isError()) {
       Object o = ji.next();
       handleObjectFromStore(o, subHandler, coll, field, result -> {
         if (result.failed()) {
-          errorObject.setThrowable(result.cause());
+          co.setThrowable(result.cause());
           return;
         } else {
           if (co.reduce()) {
@@ -145,14 +143,13 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
     }
 
     JsonArray jsonArray = new JsonArray();
-    CounterObject co = new CounterObject(((Collection<?>) source).size());
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(resultHandler);
+    CounterObject<ITypeHandlerResult> co = new CounterObject<>(((Collection<?>) source).size(), resultHandler);
     Iterator<?> sourceIt = ((Collection<?>) source).iterator();
     ITypeHandler subHandler = field.getSubTypeHandler();
     // no generics were defined, so that subhandler could not be defined from mapping
     boolean determineSubhandler = subHandler == null;
     Class<?> valueClass = null;
-    while (sourceIt.hasNext() && !errorObject.isError()) {
+    while (sourceIt.hasNext() && !co.isError()) {
       Object value = sourceIt.next();
 
       if (determineSubhandler) {
@@ -166,7 +163,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
       }
       subHandler.intoStore(value, field, tmpResult -> {
         if (tmpResult.failed()) {
-          errorObject.setThrowable(tmpResult.cause());
+          co.setThrowable(tmpResult.cause());
           return;
         } else {
           ITypeHandlerResult thResult = tmpResult.result();

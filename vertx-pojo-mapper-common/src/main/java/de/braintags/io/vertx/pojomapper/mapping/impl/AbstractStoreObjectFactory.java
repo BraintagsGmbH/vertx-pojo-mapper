@@ -21,7 +21,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.util.CounterObject;
-import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -51,13 +50,12 @@ public abstract class AbstractStoreObjectFactory implements IStoreObjectFactory 
   @Override
   public void createStoreObjects(IMapper mapper, List<?> entities,
       Handler<AsyncResult<List<IStoreObject<?>>>> handler) {
-    ErrorObject<List<IStoreObject<?>>> err = new ErrorObject<List<IStoreObject<?>>>(handler);
-    CounterObject co = new CounterObject(entities.size());
+    CounterObject<List<IStoreObject<?>>> co = new CounterObject<>(entities.size(), handler);
     List<IStoreObject<?>> returnList = new ArrayList<IStoreObject<?>>();
     for (Object entity : entities) {
       createStoreObject(mapper, entity, result -> {
         if (result.failed()) {
-          err.setThrowable(result.cause());
+          co.setThrowable(result.cause());
         } else {
           returnList.add(result.result());
           if (co.reduce()) {
@@ -66,7 +64,7 @@ public abstract class AbstractStoreObjectFactory implements IStoreObjectFactory 
         }
 
       });
-      if (err.isError()) {
+      if (co.isError()) {
         return;
       }
     }

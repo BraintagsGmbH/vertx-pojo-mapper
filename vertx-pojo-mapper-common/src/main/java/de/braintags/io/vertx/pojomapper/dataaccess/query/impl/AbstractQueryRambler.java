@@ -25,7 +25,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.util.CounterObject;
-import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.Size;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -167,16 +166,15 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
 
   private final void iterateMultipleValues(IField field, IColumnInfo ci, String operator, int count,
       Iterable<?> valueIterable, Handler<AsyncResult<Void>> resultHandler) {
-    CounterObject co = new CounterObject(count);
+    CounterObject<Void> co = new CounterObject<>(count, resultHandler);
     Iterator<?> values = valueIterable.iterator();
-    ErrorObject<Void> errorObject = new ErrorObject<Void>(resultHandler);
     JsonArray resultArray = new JsonArray();
 
-    while (values.hasNext() && !errorObject.isError()) {
+    while (values.hasNext() && !co.isError()) {
       Object value = values.next();
       field.getTypeHandler().intoStore(value, field, result -> {
         if (result.failed()) {
-          errorObject.setThrowable(result.cause());
+          co.setThrowable(result.cause());
           return;
         } else {
           resultArray.add(result.result().getResult());

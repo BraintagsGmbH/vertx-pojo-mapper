@@ -27,7 +27,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.util.CounterObject;
-import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -40,7 +39,7 @@ import io.vertx.core.Handler;
  *          the underlaying mapper to be used
  */
 
-public abstract class Delete<T> extends AbstractDataAccessObject<T>implements IDelete<T> {
+public abstract class Delete<T> extends AbstractDataAccessObject<T> implements IDelete<T> {
   private static final String ERROR_MESSAGE = "You can only use ONE source for deletion, either an IQuery or a list of instances";
   private IQuery<T> query;
   private List<T> recordList = new ArrayList<T>();
@@ -163,13 +162,12 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T>implements ID
    * @param resultHandler
    */
   protected void getRecordIds(IField idField, Handler<AsyncResult<List<Object>>> resultHandler) {
-    CounterObject co = new CounterObject(getRecordList().size());
-    ErrorObject<List<Object>> err = new ErrorObject<List<Object>>(resultHandler);
+    CounterObject<List<Object>> co = new CounterObject<>(getRecordList().size(), resultHandler);
     List<Object> values = new ArrayList<Object>();
     for (T record : getRecordList()) {
       idField.getPropertyMapper().readForStore(record, idField, vr -> {
         if (vr.failed()) {
-          err.setThrowable(vr.cause());
+          co.setThrowable(vr.cause());
           return;
         }
         values.add(vr.result());
@@ -178,7 +176,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T>implements ID
           return;
         }
       });
-      if (err.isError())
+      if (co.isError())
         return;
     }
   }

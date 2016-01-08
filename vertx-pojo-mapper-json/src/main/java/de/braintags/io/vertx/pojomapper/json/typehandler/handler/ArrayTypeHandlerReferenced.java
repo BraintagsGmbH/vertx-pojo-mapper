@@ -27,7 +27,6 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import de.braintags.io.vertx.util.CounterObject;
-import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -95,8 +94,7 @@ public class ArrayTypeHandlerReferenced extends ArrayTypeHandler implements ITyp
     JsonArray jsonArray = (JsonArray) reference.getDbSource();
     if (jsonArray == null || jsonArray.isEmpty())
       handler.handle(Future.succeededFuture());
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(handler);
-    CounterObject co = new CounterObject(jsonArray.size());
+    CounterObject<ITypeHandlerResult> co = new CounterObject<>(jsonArray.size(), handler);
     final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
     int counter = 0;
     for (Object jo : jsonArray) {
@@ -104,7 +102,7 @@ public class ArrayTypeHandlerReferenced extends ArrayTypeHandler implements ITyp
       ObjectTypeHandlerReferenced subTypehandler = (ObjectTypeHandlerReferenced) field.getSubTypeHandler();
       subTypehandler.getReferencedObjectById(store, subMapper, jo, result -> {
         if (result.failed()) {
-          errorObject.setThrowable(result.cause());
+          co.setThrowable(result.cause());
           return;
         }
         Object javaValue = result.result().getResult();

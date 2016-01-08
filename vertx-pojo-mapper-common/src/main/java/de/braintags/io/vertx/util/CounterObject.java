@@ -12,14 +12,19 @@
  */
 package de.braintags.io.vertx.util;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
 /**
- * A helper to count loops inside an asynchron call
+ * A helper to count loops inside an asynchron call. It extends {@link ResultObject} to enable error and result handling
+ * inside a
+ * loop directly
  * 
  * @author Michael Remme
  * 
  */
 
-public class CounterObject extends Object {
+public class CounterObject<E> extends ResultObject<E> {
   private int count;
 
   /**
@@ -27,7 +32,8 @@ public class CounterObject extends Object {
    * @param count
    *          the count to be used for countdown
    */
-  public CounterObject(int count) {
+  public CounterObject(int count, Handler<AsyncResult<E>> handler) {
+    super(handler);
     this.count = count;
     if (count == 0)
       throw new UnsupportedOperationException("handle zero elements");

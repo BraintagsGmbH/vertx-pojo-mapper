@@ -81,8 +81,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
     JsonArray jsonArray = (JsonArray) source;
     if (jsonArray == null || jsonArray.isEmpty())
       handler.handle(Future.succeededFuture());
-    ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(handler);
-    CounterObject co = new CounterObject(jsonArray.size());
+    CounterObject<ITypeHandlerResult> co = new CounterObject<ITypeHandlerResult>(jsonArray.size(), handler);
     final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
     int counter = 0;
     for (Object jo : jsonArray) {
@@ -90,7 +89,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
       ITypeHandler subTypehandler = field.getSubTypeHandler();
       subTypehandler.fromStore(cc.value, field, field.getSubClass(), result -> {
         if (result.failed()) {
-          errorObject.setThrowable(result.cause());
+          co.setThrowable(result.cause());
           return;
         }
         Object javaValue = result.result().getResult();
@@ -116,32 +115,30 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
     if (length == 0) {
       handler.handle(Future.succeededFuture());
     } else {
-      ErrorObject<ITypeHandlerResult> errorObject = new ErrorObject<ITypeHandlerResult>(handler);
       ITypeHandler subTypehandler = field.getSubTypeHandler();
-      CounterObject co = new CounterObject(length);
+      CounterObject<ITypeHandlerResult> co = new CounterObject<>(length, handler);
       ResultArray resultArray = new ResultArray(length);
       for (int i = 0; i < length; i++) {
         // trying to write the array in the order like it is
         final CurrentCounter cc = new CurrentCounter(i, Array.get(javaValues, i));
-        writeEntry(cc, co, resultArray, subTypehandler, field, errorObject, handler);
-        if (errorObject.isError()) {
+        writeEntry(cc, co, resultArray, subTypehandler, field, handler);
+        if (co.isError()) {
           return;
         }
       }
     }
   }
 
-  private void writeEntry(final CurrentCounter cc, CounterObject co, ResultArray resultArray,
-      ITypeHandler subTypehandler, IField field, ErrorObject<ITypeHandlerResult> errorObject,
-      Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  private void writeEntry(final CurrentCounter cc, CounterObject<ITypeHandlerResult> co, ResultArray resultArray,
+      ITypeHandler subTypehandler, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     subTypehandler.intoStore(cc.value, field, subResult -> {
       if (subResult.failed()) {
-        errorObject.setThrowable(subResult.cause());
+        co.setThrowable(subResult.cause());
       } else {
-        resultArray.add(cc.i, subResult.result().getResult(), errorObject);
+        resultArray.add(cc.i, subResult.result().getResult(), co);
         if (co.reduce()) {
-          JsonArray arr = resultArray.toJsonArray(errorObject);
-          if (!errorObject.isError()) {
+          JsonArray arr = resultArray.toJsonArray(co);
+          if (!co.isError()) {
             success(arr, handler);
           }
         }
