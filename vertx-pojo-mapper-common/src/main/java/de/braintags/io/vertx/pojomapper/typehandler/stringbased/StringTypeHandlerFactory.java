@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.CharSeq
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.CharacterTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ClassTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.DateTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.DoubleTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.EnumTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.FloatTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.IntegerTypeHandler;
@@ -60,6 +61,7 @@ public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
     getDefinedTypeHandlers().add(new BigDecimalTypeHandler(this));
     getDefinedTypeHandlers().add(new BigIntegerTypeHandler(this));
     getDefinedTypeHandlers().add(new FloatTypeHandler(this));
+    getDefinedTypeHandlers().add(new DoubleTypeHandler(this));
     getDefinedTypeHandlers().add(new DateTypeHandler(this));
     getDefinedTypeHandlers().add(new ShortTypeHandler(this));
     getDefinedTypeHandlers().add(new IntegerTypeHandler(this));
