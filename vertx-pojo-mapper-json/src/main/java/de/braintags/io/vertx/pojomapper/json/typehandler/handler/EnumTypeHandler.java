@@ -50,15 +50,25 @@ public class EnumTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    List<IField> tp = field.getTypeParameters();
-    if (!tp.isEmpty()) {
-      Class enumClass = tp.get(0).getType();
+    try {
+      Class enumClass = getEnumClass(field);
       success(source == null ? source : Enum.valueOf(enumClass, source.toString()), resultHandler);
-    } else {
-      fail(new UnsupportedOperationException("Enum without generic are not supported in entity " + field.getFullName()),
-          resultHandler);
+    } catch (Exception e) {
+      fail(e, resultHandler);
+    }
+  }
+
+  private Class getEnumClass(IField field) {
+    Class enClass = field.getType();
+    if (enClass.isEnum()) {
+      return enClass;
     }
 
+    List<IField> tp = field.getTypeParameters();
+    if (!tp.isEmpty()) {
+      return tp.get(0).getType();
+    }
+    throw new UnsupportedOperationException("Enum without generic are not supported in entity " + field.getFullName());
   }
 
   /*
