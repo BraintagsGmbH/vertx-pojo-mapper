@@ -45,7 +45,7 @@ public abstract class AbstractDecimalTypeHandler extends AbstractNumericTypeHand
   @Override
   public final void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    String s = source == null || source.hashCode() == 0 ? "0" : (String) source;
+    String s = source == null || ((String) source).trim().hashCode() == 0 ? "0" : ((String) source).trim();
     try {
       success(createInstance(s), resultHandler);
     } catch (NumberFormatException e) {
