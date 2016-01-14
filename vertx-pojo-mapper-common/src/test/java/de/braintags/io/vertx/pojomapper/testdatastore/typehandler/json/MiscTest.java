@@ -10,19 +10,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EmbeddedListMapper;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.MiscMapper;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * Mapper for testing boolean values
+ * 
  * 
  * @author Michael Remme
  * 
  */
-public class EmbeddedListTest extends AbstractTypeHandlerTest {
+public class MiscTest extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -31,18 +31,18 @@ public class EmbeddedListTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    BaseRecord mapper = new EmbeddedListMapper();
+    MiscMapper mapper = new MiscMapper();
     return mapper;
   }
 
   @Override
   protected String getTestFieldName() {
-    return "stringTestList";
+    return "myCharacter";
   }
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandlerEmbedded";
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.CharacterTypeHandler";
   }
 
 }

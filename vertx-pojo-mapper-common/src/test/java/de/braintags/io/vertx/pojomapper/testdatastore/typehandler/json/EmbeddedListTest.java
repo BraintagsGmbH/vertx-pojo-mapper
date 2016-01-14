@@ -10,21 +10,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
-
-import java.util.Calendar;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.CalendarMapper;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EmbeddedListMapper;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * Mapper for testing {@link Calendar} values
+ * Mapper for testing boolean values
  * 
  * @author Michael Remme
  * 
  */
-public class CalendarTest extends AbstractTypeHandlerTest {
+public class EmbeddedListTest extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -33,18 +31,18 @@ public class CalendarTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    CalendarMapper mapper = new CalendarMapper();
+    BaseRecord mapper = new EmbeddedListMapper();
     return mapper;
   }
 
   @Override
   protected String getTestFieldName() {
-    return "myCal";
+    return "stringTestList";
   }
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.CalendarTypeHandler";
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandlerEmbedded";
   }
 
 }

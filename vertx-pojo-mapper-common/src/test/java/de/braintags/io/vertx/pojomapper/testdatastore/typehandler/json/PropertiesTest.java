@@ -10,10 +10,10 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.CollectionRecord;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.PropertiesRecord;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -22,7 +22,7 @@ import io.vertx.ext.unit.TestContext;
  * @author Michael Remme
  * 
  */
-public class CollectionTest extends AbstractTypeHandlerTest {
+public class PropertiesTest extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -31,17 +31,17 @@ public class CollectionTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    return new CollectionRecord();
+    return new PropertiesRecord();
   }
 
   @Override
   protected String getTestFieldName() {
-    return "collection";
+    return "properties";
   }
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler";
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler";
   }
 
 }

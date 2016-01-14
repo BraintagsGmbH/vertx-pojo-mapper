@@ -10,19 +10,21 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
+
+import java.util.Calendar;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.ReferenceMapper_Map;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.CalendarMapper;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * Tests for testing embedded Maps
+ * Mapper for testing {@link Calendar} values
  * 
  * @author Michael Remme
  * 
  */
-public class ReferencedMapTest extends AbstractTypeHandlerTest {
+public class CalendarTest extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -31,18 +33,18 @@ public class ReferencedMapTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    BaseRecord mapper = new ReferenceMapper_Map(5);
+    CalendarMapper mapper = new CalendarMapper();
     return mapper;
   }
 
   @Override
   protected String getTestFieldName() {
-    return "simpleMapper";
+    return "myCal";
   }
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerReferenced";
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.CalendarTypeHandler";
   }
 
 }

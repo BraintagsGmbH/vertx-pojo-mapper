@@ -10,19 +10,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.ArrayRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.ReferenceMapper_Array;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * 
+ * Tests for testing embedded Arrays
  * 
  * @author Michael Remme
  * 
  */
-public class ArrayTest extends AbstractTypeHandlerTest {
+public class ReferencedArrayTest extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -31,17 +31,18 @@ public class ArrayTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    return new ArrayRecord();
+    BaseRecord mapper = new ReferenceMapper_Array(5);
+    return mapper;
   }
 
   @Override
   protected String getTestFieldName() {
-    return "array";
+    return "simpleMapper";
   }
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler";
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandlerReferenced";
   }
 
 }

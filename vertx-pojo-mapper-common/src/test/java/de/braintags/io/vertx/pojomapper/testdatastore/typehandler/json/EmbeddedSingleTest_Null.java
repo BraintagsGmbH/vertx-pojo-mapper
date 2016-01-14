@@ -10,19 +10,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.ReferenceMapper_Single;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EmbeddedMapper_Single;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * Tests for testing embedded Arrays
+ * Tests for testing embedded Single instance, but instance is null
  * 
  * @author Michael Remme
  * 
  */
-public class ReferencedSingleTest extends AbstractTypeHandlerTest {
+public class EmbeddedSingleTest_Null extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -31,7 +31,7 @@ public class ReferencedSingleTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    BaseRecord mapper = new ReferenceMapper_Single();
+    BaseRecord mapper = new EmbeddedMapper_Single();
     return mapper;
   }
 
@@ -42,7 +42,7 @@ public class ReferencedSingleTest extends AbstractTypeHandlerTest {
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerReferenced";
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerEmbedded";
   }
 
 }

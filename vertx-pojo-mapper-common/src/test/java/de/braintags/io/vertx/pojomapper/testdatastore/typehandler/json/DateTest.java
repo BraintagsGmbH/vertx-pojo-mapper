@@ -10,25 +10,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.LocaleRecord;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.DateMapper;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * 
+ * Mapper for testing boolean values
  * 
  * @author Michael Remme
  * 
  */
-public class LocaleTest extends AbstractTypeHandlerTest {
-
-  /**
-   * 
-   */
-  public LocaleTest() {
-  }
+public class DateTest extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -37,17 +31,18 @@ public class LocaleTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    return new LocaleRecord();
+    DateMapper mapper = new DateMapper();
+    return mapper;
   }
 
   @Override
   protected String getTestFieldName() {
-    return "locale";
+    return "sqlDate";
   }
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.LocaleTypeHandler";
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler";
   }
 
 }

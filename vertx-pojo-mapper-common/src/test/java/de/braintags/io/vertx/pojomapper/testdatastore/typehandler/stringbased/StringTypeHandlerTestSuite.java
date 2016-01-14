@@ -10,13 +10,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.stringbased;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-
-import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.TypeHandlerTestSuite;
 
 /**
  * 
@@ -25,8 +23,7 @@ import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.TypeHandlerTes
  * 
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TestBaseTest.class, TestSimpleInsert.class, TestSimpleMapper.class, TestSimpleMapperQuery.class,
-    TestOnlyIdMapper.class, TypeHandlerTestSuite.class })
-public class AllTestsCommon {
+@SuiteClasses({})
+public class StringTypeHandlerTestSuite {
 
 }

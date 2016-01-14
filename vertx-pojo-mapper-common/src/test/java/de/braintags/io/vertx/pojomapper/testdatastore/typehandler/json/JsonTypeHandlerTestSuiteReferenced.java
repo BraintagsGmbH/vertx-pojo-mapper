@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -28,6 +28,6 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 @RunWith(Suite.class)
 @SuiteClasses({ ReferencedSingleTest.class, ReferencedArrayTest.class, ReferencedListTest.class,
     ReferencedMapTest.class })
-public class TypeHandlerTestSuiteReferenced {
+public class JsonTypeHandlerTestSuiteReferenced {
 
 }

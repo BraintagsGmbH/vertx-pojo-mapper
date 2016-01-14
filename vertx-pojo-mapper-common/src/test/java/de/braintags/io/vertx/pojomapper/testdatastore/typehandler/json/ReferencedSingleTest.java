@@ -10,26 +10,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleMapper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EmbeddedMapper_Single;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.ReferenceMapper_Single;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * 
+ * Tests for testing embedded Arrays
  * 
  * @author Michael Remme
  * 
  */
-public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
-
-  /**
-   * 
-   */
-  public EmbeddedSingleTest() {
-  }
+public class ReferencedSingleTest extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -38,8 +31,18 @@ public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    EmbeddedMapper_Single mapper = new EmbeddedMapper_Single();
-    mapper.simpleMapper = new SimpleMapper("testname", "secnd prop");
+    BaseRecord mapper = new ReferenceMapper_Single();
     return mapper;
   }
+
+  @Override
+  protected String getTestFieldName() {
+    return "simpleMapper";
+  }
+
+  @Override
+  protected String getExpectedTypeHandlerClassName() {
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerReferenced";
+  }
+
 }

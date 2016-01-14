@@ -10,10 +10,10 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.MapRecord;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EnumRecord;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -22,7 +22,13 @@ import io.vertx.ext.unit.TestContext;
  * @author Michael Remme
  * 
  */
-public class MapTest extends AbstractTypeHandlerTest {
+public class EnumTest extends AbstractTypeHandlerTest {
+
+  /**
+   * 
+   */
+  public EnumTest() {
+  }
 
   /*
    * (non-Javadoc)
@@ -31,17 +37,17 @@ public class MapTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    return new MapRecord();
+    return new EnumRecord();
   }
 
   @Override
   protected String getTestFieldName() {
-    return "map";
+    return "enumEnum";
   }
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler";
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.EnumTypeHandler";
   }
 
 }

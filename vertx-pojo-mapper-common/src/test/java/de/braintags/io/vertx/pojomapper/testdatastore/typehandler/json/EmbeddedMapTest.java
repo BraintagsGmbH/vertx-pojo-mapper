@@ -10,19 +10,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.StringTestMapper;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EmbeddedMapper_Map;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * 
+ * Tests for testing embedded Maps
  * 
  * @author Michael Remme
  * 
  */
-public class StringTest extends AbstractTypeHandlerTest {
+public class EmbeddedMapTest extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -31,19 +31,18 @@ public class StringTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    StringTestMapper mapper = new StringTestMapper();
-    mapper.stringField = "testcontent";
+    BaseRecord mapper = new EmbeddedMapper_Map();
     return mapper;
   }
 
   @Override
   protected String getTestFieldName() {
-    return "stringField";
+    return "simpleMapper";
   }
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.StringTypeHandler";
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerEmbedded";
   }
 
 }

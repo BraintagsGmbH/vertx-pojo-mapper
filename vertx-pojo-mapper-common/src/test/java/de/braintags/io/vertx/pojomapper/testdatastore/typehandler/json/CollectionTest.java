@@ -10,19 +10,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BooleanMapper;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.CollectionRecord;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * Mapper for testing boolean values
+ * 
  * 
  * @author Michael Remme
  * 
  */
-public class BooleanTest extends AbstractTypeHandlerTest {
+public class CollectionTest extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -31,20 +31,17 @@ public class BooleanTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    BooleanMapper mapper = new BooleanMapper();
-    mapper.myBool = false;
-    mapper.myBooloean = new Boolean(true);
-    return mapper;
+    return new CollectionRecord();
   }
 
   @Override
   protected String getTestFieldName() {
-    return "myBooloean";
+    return "collection";
   }
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler";
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler";
   }
 
 }

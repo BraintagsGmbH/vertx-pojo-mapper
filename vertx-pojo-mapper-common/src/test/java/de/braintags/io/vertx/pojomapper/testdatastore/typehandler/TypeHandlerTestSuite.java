@@ -16,20 +16,20 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.JsonTypeHandlerTestSuite;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.JsonTypeHandlerTestSuiteEmbedded;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.JsonTypeHandlerTestSuiteReferenced;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.stringbased.StringTypeHandlerTestSuite;
 
 /**
- * A suite which is testing {@link ITypeHandler} and {@link IColumnHandler} for various datatypes
+ * 
  * 
  * @author Michael Remme
  * 
  */
 @RunWith(Suite.class)
-@SuiteClasses({ StringTest.class, NumericTest.class, BooleanTest.class, DateTest.class, CalendarTest.class,
-    MiscTest.class, JsonTest.class, EnumTest.class, PropertiesTest.class, LocaleTest.class, MapTest.class,
-    ArrayTest.class, CollectionTest.class })
+@SuiteClasses({ StringTypeHandlerTestSuite.class, JsonTypeHandlerTestSuite.class,
+    JsonTypeHandlerTestSuiteEmbedded.class, JsonTypeHandlerTestSuiteReferenced.class })
 public class TypeHandlerTestSuite {
 
 }
-//

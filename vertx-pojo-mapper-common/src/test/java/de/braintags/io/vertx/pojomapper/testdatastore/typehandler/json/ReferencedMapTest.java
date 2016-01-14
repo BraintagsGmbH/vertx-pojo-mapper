@@ -10,19 +10,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.PropertiesRecord;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.ReferenceMapper_Map;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * 
+ * Tests for testing embedded Maps
  * 
  * @author Michael Remme
  * 
  */
-public class PropertiesTest extends AbstractTypeHandlerTest {
+public class ReferencedMapTest extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -31,17 +31,18 @@ public class PropertiesTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    return new PropertiesRecord();
+    BaseRecord mapper = new ReferenceMapper_Map(5);
+    return mapper;
   }
 
   @Override
   protected String getTestFieldName() {
-    return "properties";
+    return "simpleMapper";
   }
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler";
+    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerReferenced";
   }
 
 }

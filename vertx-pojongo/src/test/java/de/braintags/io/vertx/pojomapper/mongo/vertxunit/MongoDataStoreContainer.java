@@ -19,7 +19,7 @@ import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.io.vertx.pojomapper.testdatastore.IDatastoreContainer;
-import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.AbstractTypeHandlerTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.AbstractTypeHandlerTest;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;

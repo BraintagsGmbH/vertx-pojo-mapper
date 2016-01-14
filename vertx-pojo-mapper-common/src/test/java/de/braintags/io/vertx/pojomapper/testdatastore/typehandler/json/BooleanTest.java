@@ -10,10 +10,10 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.JsonMapper;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BooleanMapper;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -22,7 +22,7 @@ import io.vertx.ext.unit.TestContext;
  * @author Michael Remme
  * 
  */
-public class JsonTest extends AbstractTypeHandlerTest {
+public class BooleanTest extends AbstractTypeHandlerTest {
 
   /*
    * (non-Javadoc)
@@ -31,13 +31,15 @@ public class JsonTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    JsonMapper mapper = new JsonMapper();
+    BooleanMapper mapper = new BooleanMapper();
+    mapper.myBool = false;
+    mapper.myBooloean = new Boolean(true);
     return mapper;
   }
 
   @Override
   protected String getTestFieldName() {
-    return "json";
+    return "myBooloean";
   }
 
   @Override

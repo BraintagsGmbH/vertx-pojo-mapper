@@ -14,7 +14,7 @@
 package de.braintags.io.vertx.pojomapper.testdatastore;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.AbstractTypeHandlerTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.AbstractTypeHandlerTest;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;

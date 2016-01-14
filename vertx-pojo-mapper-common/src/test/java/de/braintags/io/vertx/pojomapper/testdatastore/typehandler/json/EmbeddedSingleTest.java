@@ -10,19 +10,26 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.testdatastore.typehandler;
+package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleMapper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.DateMapper;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EmbeddedMapper_Single;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * Mapper for testing boolean values
+ * 
  * 
  * @author Michael Remme
  * 
  */
-public class DateTest extends AbstractTypeHandlerTest {
+public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
+
+  /**
+   * 
+   */
+  public EmbeddedSingleTest() {
+  }
 
   /*
    * (non-Javadoc)
@@ -31,18 +38,8 @@ public class DateTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    DateMapper mapper = new DateMapper();
+    EmbeddedMapper_Single mapper = new EmbeddedMapper_Single();
+    mapper.simpleMapper = new SimpleMapper("testname", "secnd prop");
     return mapper;
   }
-
-  @Override
-  protected String getTestFieldName() {
-    return "sqlDate";
-  }
-
-  @Override
-  protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler";
-  }
-
 }
