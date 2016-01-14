@@ -58,7 +58,7 @@ public abstract class AbstractStringTypehandlerTest {
     });
     async.await();
     Object created = ro.getResult();
-    context.assertEquals(expected, created);
+    checkEquals(context, expected, created);
   }
 
   protected void fromString(TestContext context, String str, Object expected) {
@@ -76,7 +76,16 @@ public abstract class AbstractStringTypehandlerTest {
     });
     async.await();
     Object created = ro.getResult();
+    checkEquals(context, expected, created);
+  }
+
+  protected void checkEquals(TestContext context, Object expected, Object created) {
     context.assertEquals(expected, created);
+  }
+
+  protected void checkTypeHandler(TestContext context, Class handleClass, Class expectedTypehandlerClass) {
+    ITypeHandler th = thf.getTypeHandler(handleClass, null);
+    context.assertEquals(expectedTypehandlerClass, th.getClass());
   }
 
 }

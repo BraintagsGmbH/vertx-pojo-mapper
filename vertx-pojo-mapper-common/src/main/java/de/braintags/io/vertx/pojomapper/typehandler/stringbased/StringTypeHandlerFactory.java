@@ -34,6 +34,8 @@ import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.LocaleT
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.LongTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ObjectTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ShortTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.TimeTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.TimestampTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.URITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.URLTypeHandler;
 
@@ -62,10 +64,12 @@ public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
     getDefinedTypeHandlers().add(new BigIntegerTypeHandler(this));
     getDefinedTypeHandlers().add(new FloatTypeHandler(this));
     getDefinedTypeHandlers().add(new DoubleTypeHandler(this));
-    getDefinedTypeHandlers().add(new DateTypeHandler(this));
     getDefinedTypeHandlers().add(new ShortTypeHandler(this));
     getDefinedTypeHandlers().add(new IntegerTypeHandler(this));
     getDefinedTypeHandlers().add(new LongTypeHandler(this));
+    getDefinedTypeHandlers().add(new TimestampTypeHandler(this));
+    getDefinedTypeHandlers().add(new TimeTypeHandler(this));
+    getDefinedTypeHandlers().add(new DateTypeHandler(this));
     getDefinedTypeHandlers().add(new CalendarTypeHandler(this));
     getDefinedTypeHandlers().add(new CharSequenceTypeHandler(this));
     getDefinedTypeHandlers().add(new ByteTypeHandler(this));

@@ -13,6 +13,8 @@
 package de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -32,7 +34,7 @@ import io.vertx.core.Handler;
  * 
  */
 
-public class DateTypeHandler extends AbstractDateTypeHandler {
+public class TimeTypeHandler extends AbstractDateTypeHandler {
 
   /**
    * Constructor with parent {@link ITypeHandlerFactory}
@@ -40,8 +42,8 @@ public class DateTypeHandler extends AbstractDateTypeHandler {
    * @param typeHandlerFactory
    *          the parent {@link ITypeHandlerFactory}
    */
-  public DateTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
-    super(typeHandlerFactory, Date.class);
+  public TimeTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory, Time.class);
   }
 
   /*
@@ -56,9 +58,10 @@ public class DateTypeHandler extends AbstractDateTypeHandler {
     if (source != null) {
       try {
         Constructor constr = getConstructor(field, cls, long.class);
-        Calendar cal = parseDate((String) source);
+        Calendar cal = parseTime((String) source);
         result = constr.newInstance(cal.getTimeInMillis());
-      } catch (Exception e) {
+      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+          | InvocationTargetException e) {
         fail(e, resultHandler);
         return;
       }
@@ -76,7 +79,7 @@ public class DateTypeHandler extends AbstractDateTypeHandler {
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     Calendar cal = Calendar.getInstance();
     cal.setTime((Date) source);
-    success(source == null ? source : formatDate(cal), resultHandler);
+    success(source == null ? source : formatTime(cal), resultHandler);
   }
 
 }

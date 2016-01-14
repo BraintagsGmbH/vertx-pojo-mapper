@@ -16,14 +16,22 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.CalendarTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.DateTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.TimeTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.TimestampTypeHandler;
+import de.braintags.io.vertx.util.ResultObject;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -183,17 +191,94 @@ public class StringTest extends AbstractStringTypehandlerTest {
   @Test
   public void testCalendar(TestContext context) throws Exception {
     Calendar source = Calendar.getInstance();
-    String str = "TestKey";
+    source.set(2016, 0, 3, 14, 50, 22);
+    source.set(Calendar.MILLISECOND, 55);
+    checkTypeHandler(context, source.getClass(), CalendarTypeHandler.class);
+    String str = "2016-01-03 14:50:22.055";
     toString(context, str, source);
     fromString(context, str, source);
   }
 
   @Test
   public void testDate(TestContext context) throws Exception {
-    Timestamp source = new Timestamp(System.currentTimeMillis());
-    String str = "TestKey";
+    Calendar cal = Calendar.getInstance();
+    cal.set(2016, 0, 3, 14, 50, 22);
+    cal.set(Calendar.MILLISECOND, 55);
+    String str = "2016-01-03";
+    Date source = new Date(cal.getTimeInMillis());
+    checkTypeHandler(context, source.getClass(), DateTypeHandler.class);
+    toString(context, str, source);
+    fromStringDate(context, str, source);
+  }
+
+  @Test
+  public void testTime(TestContext context) throws Exception {
+    Calendar cal = Calendar.getInstance();
+    cal.set(2016, 0, 3, 14, 50, 22);
+    cal.set(Calendar.MILLISECOND, 55);
+    String str = "14:50:22";
+    Time source = new Time(cal.getTimeInMillis());
+    checkTypeHandler(context, source.getClass(), TimeTypeHandler.class);
+    toString(context, str, source);
+    fromStringTime(context, str, source);
+  }
+
+  @Test
+  public void testTimestamp(TestContext context) throws Exception {
+    Calendar cal = Calendar.getInstance();
+    cal.set(2016, 0, 3, 14, 50, 22);
+    cal.set(Calendar.MILLISECOND, 55);
+    String str = "2016-01-03 14:50:22.055";
+    Timestamp source = new Timestamp(cal.getTimeInMillis());
+    checkTypeHandler(context, source.getClass(), TimestampTypeHandler.class);
     toString(context, str, source);
     fromString(context, str, source);
+  }
+
+  protected void fromStringDate(TestContext context, String str, Object expected) {
+    Async async = context.async();
+    ITypeHandler th = thf.getTypeHandler(expected.getClass(), null);
+    ResultObject<Object> ro = new ResultObject<>(null);
+    th.fromStore(str, null, expected.getClass(), res -> {
+      if (res.failed()) {
+        context.fail(res.cause());
+        async.complete();
+      } else {
+        ro.setResult(res.result().getResult());
+        async.complete();
+      }
+    });
+    async.await();
+    Object created = ro.getResult();
+    checkEqualsDate(context, (Date) expected, (Date) created);
+  }
+
+  protected void checkEqualsDate(TestContext context, Date expected, Date created) {
+    context.assertEquals(expected.getYear(), created.getYear());
+    context.assertEquals(expected.getDate(), created.getDate());
+    context.assertEquals(expected.getMonth(), created.getMonth());
+  }
+
+  protected void fromStringTime(TestContext context, String str, Object expected) {
+    Async async = context.async();
+    ITypeHandler th = thf.getTypeHandler(expected.getClass(), null);
+    ResultObject<Object> ro = new ResultObject<>(null);
+    th.fromStore(str, null, expected.getClass(), res -> {
+      if (res.failed()) {
+        context.fail(res.cause());
+        async.complete();
+      } else {
+        ro.setResult(res.result().getResult());
+        async.complete();
+      }
+    });
+    async.await();
+    Object created = ro.getResult();
+    checkEqualsTime(context, expected, created);
+  }
+
+  protected void checkEqualsTime(TestContext context, Object expected, Object created) {
+    context.assertEquals(expected.toString(), created.toString());
   }
 
 }
