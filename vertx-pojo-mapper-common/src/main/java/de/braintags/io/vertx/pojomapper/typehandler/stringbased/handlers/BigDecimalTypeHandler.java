@@ -14,12 +14,7 @@ package de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers;
 
 import java.math.BigDecimal;
 
-import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 
 /**
  * 
@@ -28,7 +23,7 @@ import io.vertx.core.Handler;
  * 
  */
 
-public class BigDecimalTypeHandler extends AbstractTypeHandler {
+public class BigDecimalTypeHandler extends AbstractDecimalTypeHandler {
 
   /**
    * Constructor with parent {@link ITypeHandlerFactory}
@@ -43,24 +38,13 @@ public class BigDecimalTypeHandler extends AbstractTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField)
+   * @see
+   * de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.AbstractDecimalTypeHandler#createInstance(java.
+   * lang.String)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
-      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : new BigDecimal((String) source), resultHandler);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField)
-   */
-  @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : ((BigDecimal) source).toString(), resultHandler);
+  protected Object createInstance(String value) {
+    return new BigDecimal(value);
   }
 
 }

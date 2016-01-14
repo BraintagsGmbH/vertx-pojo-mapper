@@ -12,12 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers;
 
-import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 
 /**
  * 
@@ -26,7 +21,7 @@ import io.vertx.core.Handler;
  * 
  */
 
-public class FloatTypeHandler extends AbstractTypeHandler {
+public class FloatTypeHandler extends AbstractDecimalTypeHandler {
 
   /**
    * Constructor with parent {@link ITypeHandlerFactory}
@@ -41,22 +36,12 @@ public class FloatTypeHandler extends AbstractTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object)
+   * @see
+   * de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.AbstractDecimalTypeHandler#createInstance(java.
+   * lang.String)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
-      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : new Double((String) source).floatValue(), resultHandler);
+  protected Object createInstance(String value) {
+    return new Double(value).floatValue();
   }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object)
-   */
-  @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : ((Float) source).toString(), resultHandler);
-  }
-
 }
