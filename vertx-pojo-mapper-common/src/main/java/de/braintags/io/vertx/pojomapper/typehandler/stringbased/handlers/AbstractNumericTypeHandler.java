@@ -45,7 +45,18 @@ public abstract class AbstractNumericTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    String s = source == null || ((String) source).trim().hashCode() == 0 ? "0" : ((String) source).trim();
+    success(createInstance(s), resultHandler);
   }
+
+  /**
+   * Create the suitable instance from the given String
+   * 
+   * @param value
+   *          the value to be used. It is guarnteed, that this is not null
+   * @return the created, suitable instance
+   */
+  protected abstract Object createInstance(String value);
 
   /*
    * (non-Javadoc)

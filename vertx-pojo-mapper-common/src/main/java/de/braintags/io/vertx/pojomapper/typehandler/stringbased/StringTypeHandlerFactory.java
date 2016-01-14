@@ -67,10 +67,7 @@ public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
     getDefinedTypeHandlers().add(new IntegerTypeHandler(this));
     getDefinedTypeHandlers().add(new LongTypeHandler(this));
     getDefinedTypeHandlers().add(new CalendarTypeHandler(this));
-    getDefinedTypeHandlers().add(new BigDecimalTypeHandler(this));
-    getDefinedTypeHandlers().add(new BigIntegerTypeHandler(this));
     getDefinedTypeHandlers().add(new CharSequenceTypeHandler(this));
-    getDefinedTypeHandlers().add(new CharacterTypeHandler(this));
     getDefinedTypeHandlers().add(new ByteTypeHandler(this));
     getDefinedTypeHandlers().add(new URITypeHandler(this));
     getDefinedTypeHandlers().add(new URLTypeHandler(this));

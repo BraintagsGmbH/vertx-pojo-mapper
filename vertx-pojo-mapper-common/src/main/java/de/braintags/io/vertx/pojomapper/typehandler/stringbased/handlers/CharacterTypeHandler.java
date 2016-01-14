@@ -46,8 +46,8 @@ public class CharacterTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? null : ((String) source).toCharArray(), resultHandler);
-
+    success(source == null || source.hashCode() == 0 ? null : new Character(((String) source).charAt(0)),
+        resultHandler);
   }
 
   /*

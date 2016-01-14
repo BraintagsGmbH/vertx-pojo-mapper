@@ -51,7 +51,10 @@ public class EnumTypeHandler extends AbstractTypeHandler {
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     try {
-      Class enumClass = getEnumClass(field);
+      Class enumClass = field == null ? cls : getEnumClass(field);
+      if (enumClass == null) {
+        throw new IllegalArgumentException("could not get enum class");
+      }
       success(source == null ? source : Enum.valueOf(enumClass, source.toString()), resultHandler);
     } catch (Exception e) {
       fail(e, resultHandler);

@@ -12,18 +12,13 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.stringbased;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
 /**
  * 
  * 
  * @author Michael Remme
  * 
  */
-@RunWith(Suite.class)
-@SuiteClasses({ StringTest.class })
-public class StringTypeHandlerTestSuite {
-
+public enum TestEnum {
+  TestKey,
+  TestKey2;
 }

@@ -63,7 +63,7 @@ public abstract class AbstractDecimalTypeHandler extends AbstractNumericTypeHand
     String newValue = value.replaceAll(",", ".");
     final String oldValue = value;
 
-    String[] elements = newValue.split(".");
+    String[] elements = newValue.split("\\.");
     if (elements.length > 2) {
       Buffer buffer = Buffer.buffer();
       // Reassemble the value parts and position the dot where it belongs.
@@ -86,14 +86,5 @@ public abstract class AbstractDecimalTypeHandler extends AbstractNumericTypeHand
     }
     return newValue;
   }
-
-  /**
-   * Create the suitable instance from the given String
-   * 
-   * @param value
-   *          the value to be used. It is guarnteed, that this is not null
-   * @return the created, suitable instance
-   */
-  protected abstract Object createInstance(String value);
 
 }
