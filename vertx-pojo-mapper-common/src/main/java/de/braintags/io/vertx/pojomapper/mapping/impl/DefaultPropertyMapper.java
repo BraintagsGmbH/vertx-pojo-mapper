@@ -119,14 +119,6 @@ public class DefaultPropertyMapper implements IPropertyMapper {
 
   private void handleInstanceFromStore(IStoreObject<?> storeObject, Object mapper, Object javaValue, Object dbValue,
       IField field, Handler<AsyncResult<Void>> handler) {
-    if (javaValue == null && dbValue != null) {
-      Future<Void> future = Future.failedFuture(new TypeHandlerException(
-          String.format("Value conversion failed for field %s: original = %s, conversion = NULL", field.getFullName(),
-              String.valueOf(dbValue))));
-      handler.handle(future);
-      return;
-    }
-
     try {
       if (javaValue instanceof IObjectReference) {
         storeObject.getObjectReferences().add((IObjectReference) javaValue);
