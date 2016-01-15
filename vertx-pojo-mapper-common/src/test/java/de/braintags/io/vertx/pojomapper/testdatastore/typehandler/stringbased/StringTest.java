@@ -186,6 +186,11 @@ public class StringTest extends AbstractStringTypehandlerTest {
     String str = "TestKey";
     toString(context, str, source);
     fromString(context, str, source);
+
+    source = null;
+    str = "";
+    toString(context, null, source, TestEnum.class);
+    fromString(context, str, source, TestEnum.class);
   }
 
   @Test

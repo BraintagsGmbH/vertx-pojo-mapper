@@ -55,7 +55,8 @@ public class EnumTypeHandler extends AbstractTypeHandler {
       if (enumClass == null) {
         throw new IllegalArgumentException("could not get enum class");
       }
-      success(source == null ? source : Enum.valueOf(enumClass, source.toString()), resultHandler);
+      success(source == null || source.toString().trim().hashCode() == 0 ? null
+          : Enum.valueOf(enumClass, source.toString()), resultHandler);
     } catch (Exception e) {
       fail(e, resultHandler);
     }

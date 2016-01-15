@@ -44,8 +44,12 @@ public abstract class AbstractStringTypehandlerTest {
   }
 
   protected void toString(TestContext context, String expected, Object source) {
+    toString(context, expected, source, source.getClass());
+  }
+
+  protected void toString(TestContext context, String expected, Object source, Class checkClass) {
     Async async = context.async();
-    ITypeHandler th = thf.getTypeHandler(source.getClass(), null);
+    ITypeHandler th = thf.getTypeHandler(checkClass, null);
     ResultObject<Object> ro = new ResultObject<>(null);
     th.intoStore(source, null, res -> {
       if (res.failed()) {
@@ -62,10 +66,14 @@ public abstract class AbstractStringTypehandlerTest {
   }
 
   protected void fromString(TestContext context, String str, Object expected) {
+    fromString(context, str, expected, expected.getClass());
+  }
+
+  protected void fromString(TestContext context, String str, Object expected, Class checkClass) {
     Async async = context.async();
-    ITypeHandler th = thf.getTypeHandler(expected.getClass(), null);
+    ITypeHandler th = thf.getTypeHandler(checkClass, null);
     ResultObject<Object> ro = new ResultObject<>(null);
-    th.fromStore(str, null, expected.getClass(), res -> {
+    th.fromStore(str, null, checkClass, res -> {
       if (res.failed()) {
         context.fail(res.cause());
         async.complete();
