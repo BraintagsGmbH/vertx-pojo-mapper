@@ -24,6 +24,7 @@ import java.util.Locale;
 
 import org.junit.Test;
 
+import de.braintags.io.vertx.pojomapper.datatypes.Price;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.CalendarTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.DateTypeHandler;
@@ -70,6 +71,16 @@ public class StringTest extends AbstractStringTypehandlerTest {
     fromString(context, "12,88", new Double(12.88));
     fromString(context, "1.2,88", new Double(12.88));
     toString(context, "12.88", new Double(12.88));
+  }
+
+  @Test
+  public void testPrice(TestContext context) {
+    fromString(context, "", new Price("0"));
+    fromString(context, " ", new Price("0"));
+    fromString(context, "12.88", new Price("12.88"));
+    fromString(context, "12,88", new Price("12.88"));
+    fromString(context, "1.2,88", new Price("12.88"));
+    toString(context, "12.88", new Price("12.88"));
   }
 
   @Test

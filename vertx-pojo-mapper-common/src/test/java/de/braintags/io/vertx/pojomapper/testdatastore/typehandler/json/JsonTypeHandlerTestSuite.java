@@ -26,9 +26,9 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  * 
  */
 @RunWith(Suite.class)
-@SuiteClasses({ StringTest.class, NumericTest.class, BooleanTest.class, DateTest.class, CalendarTest.class,
-    MiscTest.class, JsonTest.class, EnumTest.class, PropertiesTest.class, LocaleTest.class, MapTest.class,
-    ArrayTest.class, CollectionTest.class })
+@SuiteClasses({ StringTest.class, NumericTest.class, PriceTest.class, BooleanTest.class, DateTest.class,
+    CalendarTest.class, MiscTest.class, JsonTest.class, EnumTest.class, PropertiesTest.class, LocaleTest.class,
+    MapTest.class, ArrayTest.class, CollectionTest.class })
 public class JsonTypeHandlerTestSuite {
 
 }

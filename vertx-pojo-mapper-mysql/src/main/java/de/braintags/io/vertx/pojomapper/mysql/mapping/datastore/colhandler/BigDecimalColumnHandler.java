@@ -29,4 +29,11 @@ public class BigDecimalColumnHandler extends DoubleColumnHandler {
     super(BigDecimal.class);
   }
 
+  /**
+   * @param clz
+   */
+  public BigDecimalColumnHandler(Class<? extends BigDecimal> clz) {
+    super(clz);
+  }
+
 }

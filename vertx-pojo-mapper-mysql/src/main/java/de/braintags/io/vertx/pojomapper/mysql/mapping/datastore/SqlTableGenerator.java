@@ -36,6 +36,7 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.JsonC
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.LocaleColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.LongColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.MapColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.PriceColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ReferencedColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ShortColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.StringColumnHandler;
@@ -59,6 +60,7 @@ public class SqlTableGenerator extends DefaultTableGenerator {
     definedColumnHandlers.add(new ShortColumnHandler());
     definedColumnHandlers.add(new BigIntegerColumnHandler());
     definedColumnHandlers.add(new BigDecimalColumnHandler());
+    definedColumnHandlers.add(new PriceColumnHandler());
     definedColumnHandlers.add(new BooleanColumnHandler());
     definedColumnHandlers.add(new DateColumnHandler());
     definedColumnHandlers.add(new CharColumnHandler());

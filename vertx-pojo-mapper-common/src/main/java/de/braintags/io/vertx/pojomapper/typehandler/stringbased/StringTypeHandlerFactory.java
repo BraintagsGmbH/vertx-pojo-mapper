@@ -33,6 +33,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.JsonTyp
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.LocaleTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.LongTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ObjectTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.PriceTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ShortTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.TimeTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.TimestampTypeHandler;
@@ -60,6 +61,7 @@ public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
     getDefinedTypeHandlers().add(new BooleanTypeHandler(this));
     getDefinedTypeHandlers().add(new JsonTypeHandler(this));
     getDefinedTypeHandlers().add(new CharacterTypeHandler(this));
+    getDefinedTypeHandlers().add(new PriceTypeHandler(this));
     getDefinedTypeHandlers().add(new BigDecimalTypeHandler(this));
     getDefinedTypeHandlers().add(new BigIntegerTypeHandler(this));
     getDefinedTypeHandlers().add(new FloatTypeHandler(this));
