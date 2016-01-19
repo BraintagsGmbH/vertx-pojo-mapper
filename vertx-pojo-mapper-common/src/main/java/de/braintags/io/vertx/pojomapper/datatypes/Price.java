@@ -25,6 +25,13 @@ import java.math.MathContext;
 public class Price extends BigDecimal {
 
   /**
+   * @param val
+   */
+  public Price(BigDecimal val) {
+    super(val.doubleValue());
+  }
+
+  /**
    * @param in
    */
   public Price(char[] in) {
