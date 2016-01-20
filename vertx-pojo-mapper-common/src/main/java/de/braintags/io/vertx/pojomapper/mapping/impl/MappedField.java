@@ -35,6 +35,7 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.field.ConcreteClass;
 import de.braintags.io.vertx.pojomapper.annotation.field.ConstructorArguments;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Function;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
@@ -72,7 +73,7 @@ public class MappedField implements IField {
    * Annotations which shall be checked for a field definition
    */
   private static final List<Class<? extends Annotation>> FIELD_ANNOTATIONS = Arrays.asList(Id.class, Property.class,
-      Referenced.class, Embedded.class, ConcreteClass.class);
+      Referenced.class, Embedded.class, ConcreteClass.class, Function.class);
   /**
    * If for the current field an Annotation {@link Embedded} or {@link Referenced} is defined, then it is stored in here
    */

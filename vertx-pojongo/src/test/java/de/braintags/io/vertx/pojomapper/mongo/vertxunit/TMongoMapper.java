@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.FieldState;
+import de.braintags.io.vertx.pojomapper.annotation.field.Function;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -24,6 +26,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.FunctionMapper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -74,6 +77,32 @@ public class TMongoMapper extends DatastoreBaseTest {
       // this is the expected result
     }
 
+  }
+
+  /**
+   * Testing two annotations on id field: ID and Function
+   * 
+   * @param context
+   */
+  @Test
+  public void testFunctionId(TestContext context) {
+    log.info("-->> testFunctionId");
+    IMapper mapper = getDataStore().getMapperFactory().getMapper(FunctionMapper.class);
+    IField idField = mapper.getField("id");
+    context.assertNotNull(idField); // "Improve that the name of the id field is 'id'",
+
+    Id ann = (Id) idField.getAnnotation(Id.class);
+    if (ann == null)
+      context.fail("Annotation Id must not be null");
+
+    Function func = (Function) idField.getAnnotation(Function.class);
+    if (func == null)
+      context.fail("Annotation Function must not be null");
+    String functionValue = func.value();
+    context.assertEquals(FunctionMapper.FUNCTION_VALUE, functionValue);
+
+    FieldState state = func.fieldState();
+    context.assertEquals(FieldState.EMPTY, state);
   }
 
   @Test

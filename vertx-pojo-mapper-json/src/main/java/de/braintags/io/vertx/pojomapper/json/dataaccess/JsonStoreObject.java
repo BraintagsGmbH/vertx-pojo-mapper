@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
+import de.braintags.io.vertx.pojomapper.annotation.field.Function;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -222,11 +223,10 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    * 
    * @param handler
    */
-  public void initFromEntity(Handler<AsyncResult<Void>> handler) {
+  public final void initFromEntity(Handler<AsyncResult<Void>> handler) {
     CounterObject<Void> co = new CounterObject<>(mapper.getFieldNames().size(), handler);
     for (String fieldName : mapper.getFieldNames()) {
-      IField field = mapper.getField(fieldName);
-      field.getPropertyMapper().intoStoreObject(entity, this, field, result -> {
+      initFieldFromEntity(fieldName, result -> {
         if (result.failed()) {
           co.setThrowable(result.cause());
         } else {
@@ -235,9 +235,24 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
         }
       });
       if (co.isError()) {
-        return;
+        break;
       }
     }
+  }
+
+  protected void initFieldFromEntity(String fieldName, Handler<AsyncResult<Void>> handler) {
+    IField field = mapper.getField(fieldName);
+    if (field.hasAnnotation(Function.class)) {
+      handleFunction(field, handler);
+    } else {
+      field.getPropertyMapper().intoStoreObject(entity, this, field, handler);
+    }
+  }
+
+  protected void handleFunction(IField field, Handler<AsyncResult<Void>> handler) {
+    Function function = (Function) field.getAnnotation(Function.class);
+    FunctionRuntime fr = new FunctionRuntime();
+    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
   }
 
   /*
