@@ -129,10 +129,15 @@ public class MongoQuery<T> extends Query<T> {
       Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     MongoQueryResult<T> qR = new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(),
         (MongoMapper) getMapper(), rambler);
-    if (getLimit() > 0 && isReturnCompleteCount() && qR.size() == getLimit()) {
-      fetchCompleteCount(qR, resultHandler);
+    if (isReturnCompleteCount()) {
+      if (getStart() == 0 && getLimit() > 0 && qR.size() < getLimit()) {
+        qR.setCompleteResult(qR.size());
+        resultHandler.handle(Future.succeededFuture(qR));
+      } else {
+        fetchCompleteCount(qR, resultHandler);
+      }
     } else {
-      qR.setCompleteResult(qR.size());
+      qR.setCompleteResult(-1);
       resultHandler.handle(Future.succeededFuture(qR));
     }
   }

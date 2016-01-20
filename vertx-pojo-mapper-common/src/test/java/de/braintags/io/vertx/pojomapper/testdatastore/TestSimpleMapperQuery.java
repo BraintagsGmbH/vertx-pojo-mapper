@@ -197,7 +197,8 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     ResultContainer resultContainer = find(context, query, 2);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
-    context.assertEquals((long) 2, resultContainer.queryResult.getCompleteResult());
+    context.assertEquals(2, resultContainer.queryResult.size());
+    context.assertEquals((long) -1, resultContainer.queryResult.getCompleteResult());
   }
 
   @Test
@@ -209,6 +210,21 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.setReturnCompleteCount(true);
 
     ResultContainer resultContainer = find(context, query, 2);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+    context.assertEquals((long) 3, resultContainer.queryResult.getCompleteResult());
+  }
+
+  @Test
+  public void testFindLimitGetCompleteCountQueryStart(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    query.field("secondProperty").contains("cc");
+    query.setLimit(2);
+    query.setStart(2);
+    query.setReturnCompleteCount(true);
+
+    ResultContainer resultContainer = find(context, query, 1);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
     context.assertEquals((long) 3, resultContainer.queryResult.getCompleteResult());
