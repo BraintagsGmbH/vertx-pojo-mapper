@@ -13,7 +13,6 @@
 package de.braintags.io.vertx.pojomapper.mapping;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
@@ -91,7 +90,7 @@ public interface IMapper {
    *          an annotation like defined above
    * @return a list of annotated methods or null, if no method was annotated
    */
-  public List<Method> getLifecycleMethods(Class<? extends Annotation> annotation);
+  public List<IMethodProxy> getLifecycleMethods(Class<? extends Annotation> annotation);
 
   /**
    * Get the definition of {@link Entity}, if it was defined for the current mapper

@@ -46,6 +46,7 @@ import de.braintags.io.vertx.pojomapper.exception.MethodAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IMethodProxy;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
@@ -97,7 +98,7 @@ public class Mapper implements IMapper {
   /**
    * Methods which are life-cycle events. Per event there can be several methods defined
    */
-  private final Map<Class<? extends Annotation>, List<Method>> lifecycleMethods = new HashMap<Class<? extends Annotation>, List<Method>>();
+  private final Map<Class<? extends Annotation>, List<IMethodProxy>> lifecycleMethods = new HashMap<Class<? extends Annotation>, List<IMethodProxy>>();
 
   /**
    * Creates a new definition for the given mapper class
@@ -211,13 +212,17 @@ public class Mapper implements IMapper {
   }
 
   private void addLifecycleAnnotationMethod(Class<? extends Annotation> ann, Method method) {
-    List<Method> lcMethods = lifecycleMethods.get(ann);
+    List<IMethodProxy> lcMethods = lifecycleMethods.get(ann);
     if (lcMethods == null) {
-      lcMethods = new ArrayList<Method>();
+      lcMethods = new ArrayList<IMethodProxy>();
       lifecycleMethods.put(ann, lcMethods);
     }
-    if (!lcMethods.contains(method))
-      lcMethods.add(method);
+
+    MethodProxy mp = new MethodProxy(method);
+    if (!lcMethods.contains(mp)) {
+      lcMethods.add(mp);
+      mp.computeParameterValues(this);
+    }
   }
 
   /**
@@ -333,7 +338,7 @@ public class Mapper implements IMapper {
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getLifecycleMethods(java.lang.Class)
    */
   @Override
-  public List<Method> getLifecycleMethods(Class<? extends Annotation> annotation) {
+  public List<IMethodProxy> getLifecycleMethods(Class<? extends Annotation> annotation) {
     return lifecycleMethods.get(annotation);
   }
 
@@ -400,18 +405,16 @@ public class Mapper implements IMapper {
   @Override
   public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity) {
     LOGGER.debug("start executing Lifecycle " + annotationClass.getSimpleName());
-    List<Method> methods = getLifecycleMethods(annotationClass);
+    List<IMethodProxy> methods = getLifecycleMethods(annotationClass);
     if (methods == null) {
       LOGGER.debug("nothing to execute");
       return;
     }
 
-    for (Method method : methods) {
+    for (IMethodProxy mp : methods) {
+      Method method = mp.getMethod();
       method.setAccessible(true);
-      Object[] args = null;
-      if (method.getParameterCount() > 0) {
-        args = createMethodArgs(method, entity);
-      }
+      Object[] args = mp.getParameterValues();
 
       try {
         Object result = method.invoke(entity, args);
@@ -433,6 +436,7 @@ public class Mapper implements IMapper {
    * @return
    */
   private Object[] createMethodArgs(Method method, Object entity) {
+    this.getMapperFactory().getDataStore();
     throw new UnsupportedOperationException("Not yet supported, dynamic generation of arguments: " + method + entity);
   }
 

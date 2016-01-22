@@ -20,7 +20,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -56,6 +55,7 @@ import de.braintags.io.vertx.pojomapper.mapper.Animal;
 import de.braintags.io.vertx.pojomapper.mapper.Person;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IMethodProxy;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
@@ -101,7 +101,7 @@ public class TMapperFactory {
 
   @Test
   public void testNumberOfBeforeLoadMethods() {
-    List<Method> beforeLoadMethods = mapperDef.getLifecycleMethods(BeforeLoad.class);
+    List<IMethodProxy> beforeLoadMethods = mapperDef.getLifecycleMethods(BeforeLoad.class);
     Assert.assertEquals("unexpected number of BeforeLoad-Methods", 2, beforeLoadMethods.size());
   }
 

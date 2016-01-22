@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import de.braintags.io.vertx.pojomapper.annotation.field.Function;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -44,6 +43,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   private IMapper mapper;
   private Object entity = null;
   private Collection<IObjectReference> objectReferences = new ArrayList<IObjectReference>();
+  private boolean newInstance = true;
 
   /**
    * Constructor
@@ -112,6 +112,9 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
     IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     if (ci == null) {
       throw new MappingException("Can't find columninfo for field " + field.getFullName());
+    }
+    if (field.isIdField() && value != null) {
+      newInstance = false;
     }
     jsonObject.put(ci.getName(), value);
     return this;
@@ -242,17 +245,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
 
   protected void initFieldFromEntity(String fieldName, Handler<AsyncResult<Void>> handler) {
     IField field = mapper.getField(fieldName);
-    if (field.hasAnnotation(Function.class)) {
-      handleFunction(field, handler);
-    } else {
-      field.getPropertyMapper().intoStoreObject(entity, this, field, handler);
-    }
-  }
-
-  protected void handleFunction(IField field, Handler<AsyncResult<Void>> handler) {
-    Function function = (Function) field.getAnnotation(Function.class);
-    FunctionRuntime fr = new FunctionRuntime();
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    field.getPropertyMapper().intoStoreObject(entity, this, field, handler);
   }
 
   /*
@@ -273,6 +266,16 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   @Override
   public String toString() {
     return mapper.getTableInfo().getName() + ": " + String.valueOf(jsonObject);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#isNewInstance()
+   */
+  @Override
+  public boolean isNewInstance() {
+    return newInstance;
   }
 
 }

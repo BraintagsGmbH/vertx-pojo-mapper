@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -203,4 +204,11 @@ public interface IField {
    * @return
    */
   public IColumnInfo getColumnInfo();
+
+  /**
+   * Returns true, if the current field is a field annotated with {@link Id}
+   * 
+   * @return
+   */
+  public boolean isIdField();
 }

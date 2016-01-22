@@ -254,17 +254,19 @@ public abstract class DatastoreBaseTest {
         resultContainer.assertionError = new AssertionError(e);
       } finally {
         async.complete();
-        ;
       }
     });
 
     async.await();
 
     // Now perform the query check
-    ResultContainer queryResult = find(context, checkQuery, expectedResult);
-    resultContainer.assertionError = queryResult.assertionError;
-    resultContainer.queryResult = queryResult.queryResult;
-    return resultContainer;
+    if (checkQuery != null) {
+      ResultContainer queryResult = find(context, checkQuery, expectedResult);
+      resultContainer.assertionError = queryResult.assertionError;
+      resultContainer.queryResult = queryResult.queryResult;
+      return resultContainer;
+    }
+    return null;
   }
 
   public static void checkDeleteResult(TestContext context, AsyncResult<? extends IDeleteResult> dResult) {

@@ -39,15 +39,19 @@ public class MongoStoreObjectFactory extends AbstractStoreObjectFactory {
 
   @Override
   public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler) {
-    mapper.executeLifecycle(BeforeSave.class, entity);
-    MongoStoreObject storeObject = new MongoStoreObject(mapper, entity);
-    storeObject.initFromEntity(initResult -> {
-      if (initResult.failed()) {
-        handler.handle(Future.failedFuture(initResult.cause()));
-      } else {
-        handler.handle(Future.succeededFuture(storeObject));
-      }
-    });
+    try {
+      mapper.executeLifecycle(BeforeSave.class, entity);
+      MongoStoreObject storeObject = new MongoStoreObject(mapper, entity);
+      storeObject.initFromEntity(initResult -> {
+        if (initResult.failed()) {
+          handler.handle(Future.failedFuture(initResult.cause()));
+        } else {
+          handler.handle(Future.succeededFuture(storeObject));
+        }
+      });
+    } catch (Exception e) {
+      handler.handle(Future.failedFuture(e));
+    }
   }
 
   @Override

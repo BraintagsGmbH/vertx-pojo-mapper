@@ -21,7 +21,6 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.FunctionMapper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -38,16 +37,6 @@ import io.vertx.ext.unit.TestContext;
 public class TestSimpleInsert extends DatastoreBaseTest {
   private static Logger logger = LoggerFactory.getLogger(TestSimpleInsert.class);
   private static final int LOOP = 50;
-
-  @Test
-  public void testFunctionMapper(TestContext context) {
-    clearTable(context, "FunctionMapper");
-    FunctionMapper fm = new FunctionMapper();
-    ResultContainer resultContainer = saveRecord(context, fm);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
-  }
 
   @Test
   public void testRoundtrip(TestContext context) {

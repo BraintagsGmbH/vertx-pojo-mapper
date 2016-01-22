@@ -23,6 +23,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 /**
@@ -91,9 +92,13 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    *          the handler to be informed
    */
   protected void setIdValue(Object id, IStoreObject<?> storeObject, Handler<AsyncResult<Void>> resultHandler) {
-    IField idField = getMapper().getIdField();
-    storeObject.put(idField, id);
-    idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
+    try {
+      IField idField = getMapper().getIdField();
+      storeObject.put(idField, id);
+      idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
+    } catch (Exception e) {
+      resultHandler.handle(Future.failedFuture(e));
+    }
   }
 
 }

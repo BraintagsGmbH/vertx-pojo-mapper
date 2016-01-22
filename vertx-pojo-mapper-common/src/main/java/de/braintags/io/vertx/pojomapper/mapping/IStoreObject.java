@@ -83,4 +83,12 @@ public interface IStoreObject<T> {
    * @return all instances of {@link IObjectReference}
    */
   Collection<IObjectReference> getObjectReferences();
+
+  /**
+   * Get the information, wether the current instance is existing in the datastore or not. By this information it is
+   * decided, wether the record is inserted or updated
+   * 
+   * @return true, if it exists already, false if not
+   */
+  boolean isNewInstance();
 }

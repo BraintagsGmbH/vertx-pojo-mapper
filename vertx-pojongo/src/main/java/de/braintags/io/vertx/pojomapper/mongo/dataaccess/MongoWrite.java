@@ -23,6 +23,7 @@ import de.braintags.io.vertx.util.CounterObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.MongoClient;
@@ -96,27 +97,51 @@ public class MongoWrite<T> extends AbstractWrite<T> {
    */
   private void doSave(T entity, MongoStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
+    LOG.info("now saving");
+    if (storeObject.isNewInstance()) {
+      doInsert(entity, storeObject, writeResult, resultHandler);
+    } else {
+      doUpdate(entity, storeObject, writeResult, resultHandler);
+    }
+
+  }
+
+  private void doInsert(T entity, MongoStoreObject storeObject, IWriteResult writeResult,
+      Handler<AsyncResult<Void>> resultHandler) {
     MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
     IMapper mapper = getMapper();
-    String column = mapper.getTableInfo().getName();
-    final Object currentId = storeObject.get(mapper.getIdField());
-    LOG.info("now saving");
-    mongoClient.save(column, storeObject.getContainer(), result -> {
+    String collection = mapper.getTableInfo().getName();
+    mongoClient.insert(collection, storeObject.getContainer(), result -> {
       if (result.failed()) {
         LOG.info("failed", result.cause());
-        Future<Void> future = Future.failedFuture(result.cause());
-        resultHandler.handle(future);
-        return;
-      }
-
-      LOG.info("saved");
-      String id = result.result();
-      if (id == null) {
-        finishUpdate(currentId, entity, storeObject, writeResult, resultHandler);
-      } else
+        resultHandler.handle(Future.failedFuture(result.cause()));
+      } else {
+        LOG.info("inserted");
+        String id = result.result();
         finishInsert(id, entity, storeObject, writeResult, resultHandler);
+      }
     });
+  }
 
+  private void doUpdate(T entity, MongoStoreObject storeObject, IWriteResult writeResult,
+      Handler<AsyncResult<Void>> resultHandler) {
+    MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
+    IMapper mapper = getMapper();
+    String collection = mapper.getTableInfo().getName();
+    final Object currentId = storeObject.get(mapper.getIdField());
+    String idFieldName = mapper.getIdField().getColumnInfo().getName();
+    JsonObject query = new JsonObject();
+    query.put(idFieldName, currentId);
+
+    mongoClient.save(collection, storeObject.getContainer(), result -> {
+      if (result.failed()) {
+        LOG.info("failed", result.cause());
+        resultHandler.handle(Future.failedFuture(result.cause()));
+      } else {
+        LOG.info("updated");
+        finishUpdate(currentId, entity, storeObject, writeResult, resultHandler);
+      }
+    });
   }
 
   private void finishInsert(Object id, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
