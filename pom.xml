@@ -34,7 +34,13 @@
 		<source.skip>true</source.skip>
 	</properties>
 
-
+	<dependencies>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-util</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 
 	<scm>
 		<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper.git</url>
