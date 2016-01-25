@@ -11,8 +11,8 @@
  * #L%
  */
 /**
- * This implementation of {@link de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory} produces a series of 
- * {@link de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler},
+ * This implementation of {@link de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandlerFactory} produces a series of 
+ * {@link de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler},
  * which are {@link io.vertx.core.json.JsonObject} based.  
  * 
  * 

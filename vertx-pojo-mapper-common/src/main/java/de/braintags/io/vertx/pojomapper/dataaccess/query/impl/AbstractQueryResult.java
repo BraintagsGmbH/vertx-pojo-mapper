@@ -60,7 +60,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.CollectionAsync#size()
+   * @see de.braintags.io.vertx.util.util.CollectionAsync#size()
    */
   @Override
   public final int size() {
@@ -80,7 +80,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult#getDataStore()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryResult#getDataStore()
    */
   @Override
   public IDataStore getDataStore() {
@@ -90,7 +90,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult#getMapper()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryResult#getMapper()
    */
   @Override
   public IMapper getMapper() {
@@ -100,7 +100,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult#getOriginalQuery()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryResult#getOriginalQuery()
    */
   @Override
   public IQueryExpression getOriginalQuery() {

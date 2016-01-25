@@ -13,13 +13,13 @@
 package de.braintags.io.vertx.pojomapper.mongo.vertxunit;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.io.vertx.pojomapper.testdatastore.IDatastoreContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.AbstractTypeHandlerTest;
+import de.braintags.io.vertx.util.exception.InitException;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -48,7 +48,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.datastoretest.IDatastoreContainer#startup(io.vertx.core.Vertx,
+   * @see de.braintags.io.vertx.util.pojomapper.datastoretest.IDatastoreContainer#startup(io.vertx.core.Vertx,
    * io.vertx.core.Handler)
    */
   @Override
@@ -92,7 +92,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.datastoretest.IDatastoreContainer#getDataStore()
+   * @see de.braintags.io.vertx.util.pojomapper.datastoretest.IDatastoreContainer#getDataStore()
    */
   @Override
   public IDataStore getDataStore() {
@@ -102,7 +102,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.datastoretest.IDatastoreContainer#shutdown(io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.util.pojomapper.datastoretest.IDatastoreContainer#shutdown(io.vertx.core.Handler)
    */
   @Override
   public void shutdown(Handler<AsyncResult<Void>> handler) {
@@ -123,7 +123,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.datastoretest.IDatastoreContainer#dropTable(java.lang.String,
+   * @see de.braintags.io.vertx.util.pojomapper.datastoretest.IDatastoreContainer#dropTable(java.lang.String,
    * io.vertx.core.Handler)
    */
   @Override
@@ -142,7 +142,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.testdatastore.IDatastoreContainer#clearTable(java.lang.String,
+   * @see de.braintags.io.vertx.util.pojomapper.testdatastore.IDatastoreContainer#clearTable(java.lang.String,
    * io.vertx.core.Handler)
    */
   @Override

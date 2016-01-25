@@ -47,7 +47,7 @@ public class SqlIdTypeHandler extends IdTypeHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.IdTypeHandler#isCharacterColumn(de.braintags.io.vertx.
+   * de.braintags.io.vertx.util.pojomapper.json.typehandler.handler.IdTypeHandler#isCharacterColumn(de.braintags.io.vertx.util.
    * pojomapper.mapping.IField)
    */
   @Override
@@ -58,7 +58,7 @@ public class SqlIdTypeHandler extends IdTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.IdTypeHandler#isNumericColumn(de.braintags.io.vertx.
+   * @see de.braintags.io.vertx.util.pojomapper.json.typehandler.handler.IdTypeHandler#isNumericColumn(de.braintags.io.vertx.util.
    * pojomapper.mapping.IField)
    */
   @Override

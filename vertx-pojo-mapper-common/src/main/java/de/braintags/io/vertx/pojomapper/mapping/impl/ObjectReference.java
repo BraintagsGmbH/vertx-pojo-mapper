@@ -43,7 +43,7 @@ public class ObjectReference implements IObjectReference {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.impl.IObjectReference#getField()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.impl.IObjectReference#getField()
    */
   @Override
   public IField getField() {

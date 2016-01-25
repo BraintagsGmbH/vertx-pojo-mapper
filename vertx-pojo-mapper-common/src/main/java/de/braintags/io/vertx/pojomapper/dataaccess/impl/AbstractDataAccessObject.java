@@ -53,7 +53,7 @@ public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject#getDataStore()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.IDataAccessObject#getDataStore()
    */
   @Override
   public IDataStore getDataStore() {
@@ -63,7 +63,7 @@ public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject#getMapperClass()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.IDataAccessObject#getMapperClass()
    */
   @Override
   public Class<T> getMapperClass() {
@@ -73,7 +73,7 @@ public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject#getMapper()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.IDataAccessObject#getMapper()
    */
   @Override
   public IMapper getMapper() {

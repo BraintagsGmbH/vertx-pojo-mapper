@@ -53,7 +53,7 @@ public class DummyDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#createQuery(java.lang.Class)
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#createQuery(java.lang.Class)
    */
   @Override
   public <T> IQuery<T> createQuery(Class<T> mapper) {
@@ -63,7 +63,7 @@ public class DummyDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#createWrite(java.lang.Class)
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#createWrite(java.lang.Class)
    */
   @Override
   public <T> IWrite<T> createWrite(Class<T> mapper) {
@@ -73,7 +73,7 @@ public class DummyDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#createDelete(java.lang.Class)
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#createDelete(java.lang.Class)
    */
   @Override
   public <T> IDelete<T> createDelete(Class<T> mapper) {
@@ -83,7 +83,7 @@ public class DummyDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getMapperFactory()
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#getMapperFactory()
    */
   @Override
   public IMapperFactory getMapperFactory() {
@@ -103,7 +103,7 @@ public class DummyDataStore implements IDataStore {
     /*
      * (non-Javadoc)
      * 
-     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
+     * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
      */
     @Override
     public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
@@ -113,7 +113,7 @@ public class DummyDataStore implements IDataStore {
     /*
      * (non-Javadoc)
      * 
-     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
+     * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
      */
     @Override
     public void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
@@ -123,7 +123,7 @@ public class DummyDataStore implements IDataStore {
     /*
      * (non-Javadoc)
      * 
-     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#parent()
+     * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryContainer#parent()
      */
     @Override
     public Object parent() {
@@ -133,7 +133,7 @@ public class DummyDataStore implements IDataStore {
     /*
      * (non-Javadoc)
      * 
-     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeExplain(io.vertx.core.Handler)
+     * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery#executeExplain(io.vertx.core.Handler)
      */
     @Override
     public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
@@ -155,7 +155,7 @@ public class DummyDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDatabase()
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#getDatabase()
    */
   @Override
   public String getDatabase() {
@@ -165,7 +165,7 @@ public class DummyDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getMetaData()
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#getMetaData()
    */
   @Override
   public IDataStoreMetaData getMetaData() {
@@ -175,7 +175,7 @@ public class DummyDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getProperties()
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#getProperties()
    */
   @Override
   public JsonObject getProperties() {
@@ -185,7 +185,7 @@ public class DummyDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getKeyGenerator(java.lang.String)
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#getKeyGenerator(java.lang.String)
    */
   @Override
   public IKeyGenerator getKeyGenerator(String generatorName) {
@@ -195,7 +195,7 @@ public class DummyDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#getDefaultKeyGenerator()
    */
   @Override
   public IKeyGenerator getDefaultKeyGenerator() {
@@ -205,7 +205,7 @@ public class DummyDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getVertx()
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#getVertx()
    */
   @Override
   public Vertx getVertx() {
@@ -215,7 +215,7 @@ public class DummyDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#shutdown(io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#shutdown(io.vertx.core.Handler)
    */
   @Override
   public void shutdown(Handler<AsyncResult<Void>> resultHandler) {

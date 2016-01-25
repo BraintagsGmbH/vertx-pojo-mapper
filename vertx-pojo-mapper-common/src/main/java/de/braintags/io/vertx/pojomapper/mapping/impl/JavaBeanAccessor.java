@@ -15,8 +15,8 @@ package de.braintags.io.vertx.pojomapper.mapping.impl;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 
-import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
+import de.braintags.io.vertx.util.exception.PropertyAccessException;
 
 /**
  * An accessor which is used on BeanMethods of an object
@@ -91,7 +91,7 @@ public class JavaBeanAccessor implements IPropertyAccessor {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor#getName()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IPropertyAccessor#getName()
    */
   @Override
   public String getName() {

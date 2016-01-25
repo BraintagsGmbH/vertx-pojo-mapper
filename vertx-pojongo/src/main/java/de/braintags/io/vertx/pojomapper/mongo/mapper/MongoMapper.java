@@ -40,8 +40,8 @@ public class MongoMapper extends Mapper {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.impl.Mapper#createMappedField(java.lang.reflect.Field,
-   * de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.impl.Mapper#createMappedField(java.lang.reflect.Field,
+   * de.braintags.io.vertx.util.pojomapper.mapping.IPropertyAccessor)
    */
   @Override
   protected MappedField createMappedField(Field field, IPropertyAccessor accessor) {

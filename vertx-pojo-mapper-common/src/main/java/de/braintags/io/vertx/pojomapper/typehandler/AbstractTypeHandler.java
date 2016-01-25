@@ -56,7 +56,7 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#matches(de.braintags.io.vertx.pojomapper.mapping.IField)
+   * de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler#matches(de.braintags.io.vertx.util.pojomapper.mapping.IField)
    */
   @Override
   public short matches(IField field) {
@@ -173,7 +173,7 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#getSubTypeHandler(java.lang.Class)
+   * @see de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler#getSubTypeHandler(java.lang.Class)
    */
   @Override
   public ITypeHandler getSubTypeHandler(Class<?> subClass, Annotation embedRef) {

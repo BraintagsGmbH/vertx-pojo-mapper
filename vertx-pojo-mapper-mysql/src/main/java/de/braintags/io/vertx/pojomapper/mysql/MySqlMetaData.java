@@ -44,7 +44,7 @@ public class MySqlMetaData implements IDataStoreMetaData {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStoreMetaData#getVersion(io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStoreMetaData#getVersion(io.vertx.core.Handler)
    */
   @Override
   public void getVersion(Handler<AsyncResult<String>> handler) {

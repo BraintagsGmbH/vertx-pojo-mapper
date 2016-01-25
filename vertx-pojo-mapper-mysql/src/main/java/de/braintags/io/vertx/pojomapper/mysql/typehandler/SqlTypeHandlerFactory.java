@@ -50,7 +50,7 @@ public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory#init()
+   * @see de.braintags.io.vertx.util.pojomapper.json.typehandler.JsonTypeHandlerFactory#init()
    */
   @Override
   protected void init() {
@@ -108,7 +108,7 @@ public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory#getDefaultTypeHandler(java.lang.annotation
+   * de.braintags.io.vertx.util.pojomapper.json.typehandler.JsonTypeHandlerFactory#getDefaultTypeHandler(java.lang.annotation
    * .Annotation)
    */
   @Override

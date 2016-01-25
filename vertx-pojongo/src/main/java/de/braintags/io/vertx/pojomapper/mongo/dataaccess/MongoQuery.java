@@ -69,7 +69,7 @@ public class MongoQuery<T> extends Query<T> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeExplain(io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery#executeExplain(io.vertx.core.Handler)
    */
   @Override
   public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
@@ -181,7 +181,7 @@ public class MongoQuery<T> extends Query<T> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#parent()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryContainer#parent()
    */
   @Override
   public Object parent() {

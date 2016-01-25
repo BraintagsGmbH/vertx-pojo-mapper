@@ -145,7 +145,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#getChildren()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryContainer#getChildren()
    */
   @Override
   public List<Object> getChildren() {
@@ -155,7 +155,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setLimit(int)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery#setLimit(int)
    */
   @Override
   public IQuery<T> setLimit(int limit) {
@@ -166,7 +166,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setStart(int)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery#setStart(int)
    */
   @Override
   public IQuery<T> setStart(int start) {

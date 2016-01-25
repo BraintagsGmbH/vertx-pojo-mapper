@@ -85,7 +85,7 @@ public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandlerFactory#getDefaultTypeHandler()
+   * @see de.braintags.io.vertx.util.pojomapper.typehandler.AbstractTypeHandlerFactory#getDefaultTypeHandler()
    */
   @Override
   public ITypeHandler getDefaultTypeHandler(Annotation embedRef) {

@@ -48,7 +48,7 @@ public class TestCollectionAsync<T> extends AbstractCollectionAsync<T> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.CollectionAsync#size()
+   * @see de.braintags.io.vertx.util.util.CollectionAsync#size()
    */
   @Override
   public int size() {
@@ -58,7 +58,7 @@ public class TestCollectionAsync<T> extends AbstractCollectionAsync<T> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.CollectionAsync#iterator()
+   * @see de.braintags.io.vertx.util.util.CollectionAsync#iterator()
    */
   @Override
   public IteratorAsync<T> iterator() {
@@ -78,7 +78,7 @@ public class TestCollectionAsync<T> extends AbstractCollectionAsync<T> {
     /*
      * (non-Javadoc)
      * 
-     * @see de.braintags.io.vertx.util.IteratorAsync#hasNext()
+     * @see de.braintags.io.vertx.util.util.IteratorAsync#hasNext()
      */
     @Override
     public boolean hasNext() {
@@ -88,7 +88,7 @@ public class TestCollectionAsync<T> extends AbstractCollectionAsync<T> {
     /*
      * (non-Javadoc)
      * 
-     * @see de.braintags.io.vertx.util.IteratorAsync#next(io.vertx.core.Handler)
+     * @see de.braintags.io.vertx.util.util.IteratorAsync#next(io.vertx.core.Handler)
      */
     @Override
     public void next(Handler<AsyncResult<T>> handler) {

@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.FileKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.BooleanTypeHandler;
@@ -54,6 +53,7 @@ import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.Reference
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.ReferencedListTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.ReferencedMapTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.ReferencedSingleTest;
+import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -130,7 +130,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.test.IDatastoreContainer#getDataStore()
+   * @see de.braintags.io.vertx.util.pojomapper.test.IDatastoreContainer#getDataStore()
    */
   @Override
   public IDataStore getDataStore() {
@@ -166,7 +166,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.testdatastore.IDatastoreContainer#clearTable(java.lang.String,
+   * @see de.braintags.io.vertx.util.pojomapper.testdatastore.IDatastoreContainer#clearTable(java.lang.String,
    * io.vertx.core.Handler)
    */
   @Override

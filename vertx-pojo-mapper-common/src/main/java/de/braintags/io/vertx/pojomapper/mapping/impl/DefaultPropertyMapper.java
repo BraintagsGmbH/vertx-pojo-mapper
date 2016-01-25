@@ -13,7 +13,6 @@
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
 import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
@@ -22,6 +21,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerReferenced;
+import de.braintags.io.vertx.util.exception.PropertyAccessException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;

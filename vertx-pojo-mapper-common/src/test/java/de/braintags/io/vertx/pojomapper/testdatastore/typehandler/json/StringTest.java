@@ -27,7 +27,7 @@ public class StringTest extends AbstractTypeHandlerTest {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.testdatastore.typehandler.AbstractTypeHandlerTest#createInstance()
+   * @see de.braintags.io.vertx.util.pojomapper.testdatastore.typehandler.AbstractTypeHandlerTest#createInstance()
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
@@ -43,7 +43,7 @@ public class StringTest extends AbstractTypeHandlerTest {
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.StringTypeHandler";
+    return "de.braintags.io.vertx.util.pojomapper.json.typehandler.handler.StringTypeHandler";
   }
 
 }

@@ -51,7 +51,7 @@ public class SqlQuery<T> extends Query<T> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
    */
   @Override
   public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
@@ -79,7 +79,7 @@ public class SqlQuery<T> extends Query<T> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
    */
   @Override
   public void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
@@ -106,7 +106,7 @@ public class SqlQuery<T> extends Query<T> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeExplain(io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery#executeExplain(io.vertx.core.Handler)
    */
   @Override
   public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
@@ -116,7 +116,7 @@ public class SqlQuery<T> extends Query<T> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#parent()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryContainer#parent()
    */
   @Override
   public Object parent() {

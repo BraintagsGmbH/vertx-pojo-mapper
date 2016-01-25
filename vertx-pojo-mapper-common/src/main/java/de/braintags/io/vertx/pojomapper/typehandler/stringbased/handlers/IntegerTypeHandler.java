@@ -39,7 +39,7 @@ public class IntegerTypeHandler extends AbstractNumericTypeHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.AbstractNumericTypeHandler#createInstance(java.
+   * de.braintags.io.vertx.util.pojomapper.typehandler.stringbased.handlers.AbstractNumericTypeHandler#createInstance(java.
    * lang.String)
    */
   @Override

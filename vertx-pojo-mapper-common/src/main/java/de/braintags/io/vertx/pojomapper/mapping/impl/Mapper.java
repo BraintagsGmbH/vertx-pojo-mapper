@@ -39,7 +39,6 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeDelete;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
-import de.braintags.io.vertx.pojomapper.exception.ClassAccessException;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
@@ -52,6 +51,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.util.ClassUtil;
 import de.braintags.io.vertx.util.CounterObject;
+import de.braintags.io.vertx.util.exception.ClassAccessException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -120,7 +120,7 @@ public class Mapper implements IMapper {
   /*
    * (non-Javadoc)
    *
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getObjectFactory()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapper#getObjectFactory()
    */
   @Override
   public IObjectFactory getObjectFactory() {
@@ -302,7 +302,7 @@ public class Mapper implements IMapper {
   /*
    * (non-Javadoc)
    *
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getFieldNames()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapper#getFieldNames()
    */
   @Override
   public Set<String> getFieldNames() {
@@ -312,7 +312,7 @@ public class Mapper implements IMapper {
   /*
    * (non-Javadoc)
    *
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getField(java.lang.String)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapper#getField(java.lang.String)
    */
   @Override
   public IField getField(String name) {
@@ -325,7 +325,7 @@ public class Mapper implements IMapper {
   /*
    * (non-Javadoc)
    *
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getMapperClass()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapper#getMapperClass()
    */
   @Override
   public Class<?> getMapperClass() {
@@ -335,7 +335,7 @@ public class Mapper implements IMapper {
   /*
    * (non-Javadoc)
    *
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getLifecycleMethods(java.lang.Class)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapper#getLifecycleMethods(java.lang.Class)
    */
   @Override
   public List<IMethodProxy> getLifecycleMethods(Class<? extends Annotation> annotation) {
@@ -345,7 +345,7 @@ public class Mapper implements IMapper {
   /*
    * (non-Javadoc)
    *
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getEntity()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapper#getEntity()
    */
   @Override
   public Entity getEntity() {
@@ -355,7 +355,7 @@ public class Mapper implements IMapper {
   /*
    * (non-Javadoc)
    *
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getAnnotation(java.lang.Class)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapper#getAnnotation(java.lang.Class)
    */
   @Override
   public Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
@@ -376,7 +376,7 @@ public class Mapper implements IMapper {
   /*
    * (non-Javadoc)
    *
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getAnnotatedFields(java.lang.Class)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapper#getAnnotatedFields(java.lang.Class)
    */
   @Override
   public IField[] getAnnotatedFields(Class<? extends Annotation> annotationClass) {
@@ -400,7 +400,7 @@ public class Mapper implements IMapper {
   /*
    * (non-Javadoc)
    *
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#executeLifecycle(java.lang.Class, java.lang.Object)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapper#executeLifecycle(java.lang.Class, java.lang.Object)
    */
   @Override
   public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity,
@@ -458,7 +458,7 @@ public class Mapper implements IMapper {
   /*
    * (non-Javadoc)
    *
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#isSyncNeeded()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapper#isSyncNeeded()
    */
   @Override
   public final boolean isSyncNeeded() {
@@ -468,7 +468,7 @@ public class Mapper implements IMapper {
   /*
    * (non-Javadoc)
    *
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#setSyncNeeded(boolean)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapper#setSyncNeeded(boolean)
    */
   @Override
   public final void setSyncNeeded(boolean syncNeeded) {
@@ -484,7 +484,7 @@ public class Mapper implements IMapper {
   /*
    * (non-Javadoc)
    *
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getKeyGenerator()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapper#getKeyGenerator()
    */
   @Override
   public IKeyGenerator getKeyGenerator() {

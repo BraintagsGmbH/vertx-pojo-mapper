@@ -39,7 +39,7 @@ public class DateColumnHandler extends AbstractSqlColumnHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#applyMetaData(de.
+   * @see de.braintags.io.vertx.util.pojomapper.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#applyMetaData(de.
    * braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo)
    */
   @Override
@@ -51,8 +51,8 @@ public class DateColumnHandler extends AbstractSqlColumnHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#generateColumn(de.
-   * braintags.io.vertx.pojomapper.mapping.IField, de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo)
+   * de.braintags.io.vertx.util.pojomapper.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#generateColumn(de.
+   * braintags.io.vertx.pojomapper.mapping.IField, de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnInfo)
    */
   @Override
   protected StringBuilder generateColumn(IField field, IColumnInfo ci) {

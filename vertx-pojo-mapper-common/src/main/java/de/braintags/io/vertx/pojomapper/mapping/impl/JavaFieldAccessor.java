@@ -14,9 +14,9 @@ package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import java.lang.reflect.Field;
 
-import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
+import de.braintags.io.vertx.util.exception.PropertyAccessException;
 
 /**
  * An accessor onto a public field of a java object
@@ -60,7 +60,7 @@ public class JavaFieldAccessor implements IPropertyAccessor {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor#getName()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IPropertyAccessor#getName()
    */
   @Override
   public String getName() {

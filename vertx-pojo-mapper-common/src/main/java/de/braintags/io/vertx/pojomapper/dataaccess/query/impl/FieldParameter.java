@@ -82,7 +82,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#larger(java.lang.Object)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#larger(java.lang.Object)
    */
   @Override
   public T larger(Object value) {
@@ -92,7 +92,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#largerEqual(java.lang.Object)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#largerEqual(java.lang.Object)
    */
   @Override
   public T largerEqual(Object value) {
@@ -102,7 +102,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#less(java.lang.Object)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#less(java.lang.Object)
    */
   @Override
   public T less(Object value) {
@@ -112,7 +112,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#lessEqual(java.lang.Object)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#lessEqual(java.lang.Object)
    */
   @Override
   public T lessEqual(Object value) {
@@ -122,7 +122,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#in(java.lang.Object)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#in(java.lang.Object)
    */
   @Override
   public T in(Iterable<?> value) {
@@ -132,7 +132,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#notIn(java.lang.Object)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#notIn(java.lang.Object)
    */
   @Override
   public T notIn(Iterable<?> value) {
@@ -148,7 +148,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#starts(java.lang.Object)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#starts(java.lang.Object)
    */
   @Override
   public T starts(Object value) {
@@ -158,7 +158,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#ends(java.lang.Object)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#ends(java.lang.Object)
    */
   @Override
   public T ends(Object value) {
@@ -168,7 +168,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#contains(java.lang.Object)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#contains(java.lang.Object)
    */
   @Override
   public T contains(Object value) {
@@ -179,7 +179,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IRamblerSource#applyTo(de.braintags.io.vertx.pojomapper.
+   * de.braintags.io.vertx.util.pojomapper.dataaccess.query.impl.IRamblerSource#applyTo(de.braintags.io.vertx.util.pojomapper.
    * dataaccess.query.impl.IQueryRambler)
    */
   @Override
@@ -197,7 +197,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#in(java.lang.Object[])
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#in(java.lang.Object[])
    */
   @Override
   public T in(Object... values) {
@@ -207,7 +207,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#notIn(java.lang.Object[])
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#notIn(java.lang.Object[])
    */
   @Override
   public T notIn(Object... values) {
@@ -217,7 +217,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#isCloseParenthesis()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#isCloseParenthesis()
    */
   @Override
   public boolean isCloseParenthesis() {
@@ -227,7 +227,7 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#setCloseParenthesis(boolean)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IFieldParameter#setCloseParenthesis(boolean)
    */
   @Override
   public void setCloseParenthesis(boolean doClose) {

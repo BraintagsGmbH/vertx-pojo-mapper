@@ -52,7 +52,7 @@ public class DefaultSyncResult implements ISyncResult<String> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.ISyncResult#getSyncCommand()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.ISyncResult#getSyncCommand()
    */
   @Override
   public String getSyncCommand() {
@@ -62,7 +62,7 @@ public class DefaultSyncResult implements ISyncResult<String> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.ISyncResult#getAction()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.ISyncResult#getAction()
    */
   @Override
   public SyncAction getAction() {

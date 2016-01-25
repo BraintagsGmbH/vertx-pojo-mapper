@@ -37,7 +37,7 @@ public class WriteEntry implements IWriteEntry {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry#getStoreObject()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.write.IWriteEntry#getStoreObject()
    */
   @Override
   public IStoreObject<?> getStoreObject() {
@@ -47,7 +47,7 @@ public class WriteEntry implements IWriteEntry {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry#getId()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.write.IWriteEntry#getId()
    */
   @Override
   public Object getId() {
@@ -57,7 +57,7 @@ public class WriteEntry implements IWriteEntry {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry#getAction()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.write.IWriteEntry#getAction()
    */
   @Override
   public WriteAction getAction() {

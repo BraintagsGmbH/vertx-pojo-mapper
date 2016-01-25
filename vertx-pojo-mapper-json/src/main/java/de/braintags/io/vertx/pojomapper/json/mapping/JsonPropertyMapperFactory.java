@@ -29,7 +29,7 @@ public class JsonPropertyMapperFactory implements IPropertyMapperFactory {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IPropertyMapperFactory#getPropertyMapper(java.lang.Class)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IPropertyMapperFactory#getPropertyMapper(java.lang.Class)
    */
   @Override
   public IPropertyMapper getPropertyMapper(IField field) {

@@ -42,7 +42,7 @@ public abstract class AbstractColumnHandler implements IColumnHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler#matches(de.braintags.io.vertx.pojomapper.mapping
+   * de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnHandler#matches(de.braintags.io.vertx.util.pojomapper.mapping
    * .IField)
    */
   @Override

@@ -55,7 +55,7 @@ public class CollectionAsyncTest {
 
   /**
    * Test method for
-   * {@link de.braintags.io.vertx.util.AbstractCollectionAsync#contains(java.lang.Object, io.vertx.core.Handler)}.
+   * {@link de.braintags.io.vertx.util.util.AbstractCollectionAsync#contains(java.lang.Object, io.vertx.core.Handler)}.
    */
   @Test
   public void testContainsTrue() {
@@ -78,7 +78,7 @@ public class CollectionAsyncTest {
 
   /**
    * Test method for
-   * {@link de.braintags.io.vertx.util.AbstractCollectionAsync#contains(java.lang.Object, io.vertx.core.Handler)}.
+   * {@link de.braintags.io.vertx.util.util.AbstractCollectionAsync#contains(java.lang.Object, io.vertx.core.Handler)}.
    */
   @Test
   public void testContainsFalse() {
@@ -101,7 +101,7 @@ public class CollectionAsyncTest {
 
   /**
    * Test method for
-   * {@link de.braintags.io.vertx.util.AbstractCollectionAsync#contains(java.lang.Object, io.vertx.core.Handler)}.
+   * {@link de.braintags.io.vertx.util.util.AbstractCollectionAsync#contains(java.lang.Object, io.vertx.core.Handler)}.
    */
   @Test
   public void testContainsEmptyList() {
@@ -123,7 +123,7 @@ public class CollectionAsyncTest {
   }
 
   /**
-   * Test method for {@link de.braintags.io.vertx.util.AbstractCollectionAsync#toArray(io.vertx.core.Handler)}.
+   * Test method for {@link de.braintags.io.vertx.util.util.AbstractCollectionAsync#toArray(io.vertx.core.Handler)}.
    */
   @Test
   public void testToArray() {
@@ -145,7 +145,7 @@ public class CollectionAsyncTest {
   }
 
   /**
-   * Test method for {@link de.braintags.io.vertx.util.AbstractCollectionAsync#toArray(io.vertx.core.Handler)}.
+   * Test method for {@link de.braintags.io.vertx.util.util.AbstractCollectionAsync#toArray(io.vertx.core.Handler)}.
    */
   @Test
   public void testToArrayEmpty() {
@@ -168,7 +168,7 @@ public class CollectionAsyncTest {
 
   /**
    * Test method for
-   * {@link de.braintags.io.vertx.util.AbstractCollectionAsync#containsAll(de.braintags.io.vertx.util.CollectionAsync, io.vertx.core.Handler)}
+   * {@link de.braintags.io.vertx.util.util.AbstractCollectionAsync#containsAll(de.braintags.io.vertx.util.util.CollectionAsync, io.vertx.core.Handler)}
    * .
    */
   @Test
@@ -192,7 +192,7 @@ public class CollectionAsyncTest {
 
   /**
    * Test method for
-   * {@link de.braintags.io.vertx.util.AbstractCollectionAsync#containsAll(de.braintags.io.vertx.util.CollectionAsync, io.vertx.core.Handler)}
+   * {@link de.braintags.io.vertx.util.util.AbstractCollectionAsync#containsAll(de.braintags.io.vertx.util.util.CollectionAsync, io.vertx.core.Handler)}
    * .
    */
   @Test
@@ -216,7 +216,7 @@ public class CollectionAsyncTest {
 
   /**
    * Test method for
-   * {@link de.braintags.io.vertx.util.AbstractCollectionAsync#containsAll(de.braintags.io.vertx.util.CollectionAsync, io.vertx.core.Handler)}
+   * {@link de.braintags.io.vertx.util.util.AbstractCollectionAsync#containsAll(de.braintags.io.vertx.util.util.CollectionAsync, io.vertx.core.Handler)}
    * .
    */
   @Test
@@ -240,7 +240,7 @@ public class CollectionAsyncTest {
 
   /**
    * Test method for
-   * {@link de.braintags.io.vertx.util.AbstractCollectionAsync#containsAll(de.braintags.io.vertx.util.CollectionAsync, io.vertx.core.Handler)}
+   * {@link de.braintags.io.vertx.util.util.AbstractCollectionAsync#containsAll(de.braintags.io.vertx.util.util.CollectionAsync, io.vertx.core.Handler)}
    * .
    */
   @Test
@@ -264,7 +264,7 @@ public class CollectionAsyncTest {
 
   /**
    * Test method for
-   * {@link de.braintags.io.vertx.util.AbstractCollectionAsync#containsAll(de.braintags.io.vertx.util.CollectionAsync, io.vertx.core.Handler)}
+   * {@link de.braintags.io.vertx.util.util.AbstractCollectionAsync#containsAll(de.braintags.io.vertx.util.util.CollectionAsync, io.vertx.core.Handler)}
    * .
    */
   @Test
@@ -288,7 +288,7 @@ public class CollectionAsyncTest {
 
   /**
    * Test method for
-   * {@link de.braintags.io.vertx.util.AbstractCollectionAsync#addAll(de.braintags.io.vertx.util.CollectionAsync)}.
+   * {@link de.braintags.io.vertx.util.util.AbstractCollectionAsync#addAll(de.braintags.io.vertx.util.util.CollectionAsync)}.
    */
   @Test
   public void testAddAll() {

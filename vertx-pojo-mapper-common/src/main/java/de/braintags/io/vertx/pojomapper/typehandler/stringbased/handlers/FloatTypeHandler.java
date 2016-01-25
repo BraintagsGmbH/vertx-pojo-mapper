@@ -37,7 +37,7 @@ public class FloatTypeHandler extends AbstractDecimalTypeHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.AbstractDecimalTypeHandler#createInstance(java.
+   * de.braintags.io.vertx.util.pojomapper.typehandler.stringbased.handlers.AbstractDecimalTypeHandler#createInstance(java.
    * lang.String)
    */
   @Override

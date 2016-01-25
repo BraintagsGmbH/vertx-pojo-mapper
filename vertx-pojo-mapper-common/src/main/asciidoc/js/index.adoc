@@ -718,6 +718,7 @@ All methods, which are annotated by this annotation are executed after an instan
 All methods, which are annotated by this annotation are executed before an instance is deleted from the
 `IDataStore`
 
+
 ===== `@KeyGenerator`
 With this annotation you may define the `IKeyGenerator`, which shall
 be used for the mapper. Normally the IKeyGenerator is used, which is defined as default by

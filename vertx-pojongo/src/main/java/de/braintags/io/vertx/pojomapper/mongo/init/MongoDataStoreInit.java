@@ -16,10 +16,10 @@ import java.io.IOException;
 import java.util.Properties;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
+import de.braintags.io.vertx.util.exception.InitException;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
 import de.flapdoodle.embed.mongo.config.IMongodConfig;
@@ -109,7 +109,7 @@ public class MongoDataStoreInit implements IDataStoreInit {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.init.IDataStoreInit#initDataStore(de.braintags.io.vertx.pojomapper.init.
+   * @see de.braintags.io.vertx.util.pojomapper.init.IDataStoreInit#initDataStore(de.braintags.io.vertx.util.pojomapper.init.
    * DataStoreSettings, io.vertx.core.Handler)
    */
   @Override

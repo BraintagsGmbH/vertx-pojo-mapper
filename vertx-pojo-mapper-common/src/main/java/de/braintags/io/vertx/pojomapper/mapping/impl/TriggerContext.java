@@ -12,11 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
-import de.braintags.io.vertx.FutureImpl;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.ITriggerContext;
+import de.braintags.io.vertx.util.FutureImpl;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 

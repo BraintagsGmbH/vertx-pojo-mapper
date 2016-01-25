@@ -67,7 +67,7 @@ public abstract class AbstractDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getMapperFactory()
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#getMapperFactory()
    */
   @Override
   public final IMapperFactory getMapperFactory() {
@@ -117,7 +117,7 @@ public abstract class AbstractDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getProperties()
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#getProperties()
    */
   @Override
   public JsonObject getProperties() {
@@ -136,7 +136,7 @@ public abstract class AbstractDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getKeyGenerator(java.lang.String)
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#getKeyGenerator(java.lang.String)
    */
   @Override
   public final IKeyGenerator getKeyGenerator(String generatorName) {
@@ -149,7 +149,7 @@ public abstract class AbstractDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()
+   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#getDefaultKeyGenerator()
    */
   @Override
   public IKeyGenerator getDefaultKeyGenerator() {

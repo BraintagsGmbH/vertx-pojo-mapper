@@ -62,7 +62,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite#add(java.util.List)
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.write.IWrite#add(java.util.List)
    */
   @Override
   public void addAll(List<T> mapperList) {

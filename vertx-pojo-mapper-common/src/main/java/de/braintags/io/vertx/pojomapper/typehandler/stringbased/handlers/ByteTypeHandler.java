@@ -42,8 +42,8 @@ public class ByteTypeHandler extends AbstractTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField)
+   * @see de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.util.pojomapper.mapping.IField)
    */
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
@@ -54,8 +54,8 @@ public class ByteTypeHandler extends AbstractTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField)
+   * @see de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.util.pojomapper.mapping.IField)
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {

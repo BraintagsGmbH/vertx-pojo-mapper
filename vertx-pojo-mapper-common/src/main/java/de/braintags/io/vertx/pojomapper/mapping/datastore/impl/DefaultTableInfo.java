@@ -52,7 +52,7 @@ public class DefaultTableInfo implements ITableInfo {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo#getName()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.datastore.ITableInfo#getName()
    */
   @Override
   public final String getName() {
@@ -63,8 +63,8 @@ public class DefaultTableInfo implements ITableInfo {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo#createColumn(de.braintags.io.vertx.pojomapper.mapping
-   * .IField, de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler)
+   * de.braintags.io.vertx.util.pojomapper.mapping.datastore.ITableInfo#createColumn(de.braintags.io.vertx.util.pojomapper.mapping
+   * .IField, de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnHandler)
    */
   @Override
   public final void createColumnInfo(IField field, IColumnHandler columnHandler) {
@@ -111,7 +111,7 @@ public class DefaultTableInfo implements ITableInfo {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo#getColumnInfo(java.lang.String)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.datastore.ITableInfo#getColumnInfo(java.lang.String)
    */
   @Override
   public final IColumnInfo getColumnInfo(IField field) {
@@ -121,7 +121,7 @@ public class DefaultTableInfo implements ITableInfo {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo#getColumnInfo(java.lang.String)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.datastore.ITableInfo#getColumnInfo(java.lang.String)
    */
   @Override
   public final IColumnInfo getColumnInfo(String columnName) {

@@ -34,7 +34,7 @@ public class SqlQueryRambler extends AbstractQueryRambler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryRambler#translateValue(de.braintags.io.vertx.
+   * de.braintags.io.vertx.util.pojomapper.dataaccess.query.impl.AbstractQueryRambler#translateValue(de.braintags.io.vertx.util.
    * pojomapper.dataaccess.query.QueryOperator, java.lang.Object)
    */
   @Override
@@ -58,7 +58,7 @@ public class SqlQueryRambler extends AbstractQueryRambler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess.
+   * de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.util.pojomapper.dataaccess.
    * query.IQuery)
    */
   @Override

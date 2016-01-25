@@ -11,7 +11,7 @@
  * #L%
  */
 /**
- * This implementation of {@link de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory} produces a series of {@link de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler},
+ * This implementation of {@link de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandlerFactory} produces a series of {@link de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler},
  * which are {@link java.lang.String} based.  
  * 
  * @author Michael Remme

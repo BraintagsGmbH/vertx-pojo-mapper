@@ -52,7 +52,7 @@ public class MapTypeHandlerReferenced extends MapTypeHandler implements ITypeHan
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
+   * de.braintags.io.vertx.util.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
    */
   @Override
   protected boolean matchesAnnotation(Annotation annotation) {
@@ -62,8 +62,8 @@ public class MapTypeHandlerReferenced extends MapTypeHandler implements ITypeHan
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.util.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
   public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
@@ -92,8 +92,8 @@ public class MapTypeHandlerReferenced extends MapTypeHandler implements ITypeHan
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler#convertValueFromStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
+   * de.braintags.io.vertx.util.pojomapper.json.typehandler.handler.MapTypeHandler#convertValueFromStore(java.lang.Object,
+   * de.braintags.io.vertx.util.pojomapper.mapping.IField, io.vertx.core.Handler)
    */
   @Override
   protected void convertValueFromStore(Object valueIn, IField field, Handler<AsyncResult<Object>> resultHandler) {

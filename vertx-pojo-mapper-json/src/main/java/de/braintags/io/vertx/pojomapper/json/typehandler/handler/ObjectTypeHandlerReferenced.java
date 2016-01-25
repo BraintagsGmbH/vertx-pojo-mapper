@@ -20,7 +20,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
-import de.braintags.io.vertx.pojomapper.exception.PropertyAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
@@ -30,6 +29,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import de.braintags.io.vertx.util.exception.PropertyAccessException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -56,7 +56,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
+   * de.braintags.io.vertx.util.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
    */
   @Override
   protected boolean matchesAnnotation(Annotation annotation) {
@@ -66,8 +66,8 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler#fromStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.util.pojomapper.json.typehandler.handler.ArrayTypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.util.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
   public void fromStore(Object id, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
@@ -134,8 +134,8 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.util.pojomapper.json.typehandler.handler.ArrayTypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.util.pojomapper.mapping.IField, io.vertx.core.Handler)
    */
   @Override
   public void intoStore(Object referencedObject, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {

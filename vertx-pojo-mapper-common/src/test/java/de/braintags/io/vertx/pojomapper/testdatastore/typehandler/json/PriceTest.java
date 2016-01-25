@@ -28,7 +28,7 @@ public class PriceTest extends AbstractTypeHandlerTest {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.testdatastore.typehandler.AbstractTypeHandlerTest#createInstance()
+   * @see de.braintags.io.vertx.util.pojomapper.testdatastore.typehandler.AbstractTypeHandlerTest#createInstance()
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
@@ -44,7 +44,7 @@ public class PriceTest extends AbstractTypeHandlerTest {
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.PriceTypeHandler";
+    return "de.braintags.io.vertx.util.pojomapper.json.typehandler.handler.PriceTypeHandler";
   }
 
 }

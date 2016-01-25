@@ -51,7 +51,7 @@ public class MongoQueryExpression implements IQueryExpression {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#startConnectorBlock(java.lang.String,
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.impl.IQueryExpression#startConnectorBlock(java.lang.String,
    * boolean)
    */
   @Override
@@ -69,7 +69,7 @@ public class MongoQueryExpression implements IQueryExpression {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#stopConnectorBlock()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.impl.IQueryExpression#stopConnectorBlock()
    */
   @Override
   public IQueryExpression stopConnectorBlock() {
@@ -80,7 +80,7 @@ public class MongoQueryExpression implements IQueryExpression {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#openParenthesis()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.impl.IQueryExpression#openParenthesis()
    */
   @Override
   public IQueryExpression openParenthesis() {
@@ -90,7 +90,7 @@ public class MongoQueryExpression implements IQueryExpression {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#closeParenthesis()
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.impl.IQueryExpression#closeParenthesis()
    */
   @Override
   public IQueryExpression closeParenthesis() {
@@ -100,7 +100,7 @@ public class MongoQueryExpression implements IQueryExpression {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#addQuery(java.lang.String,
+   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.impl.IQueryExpression#addQuery(java.lang.String,
    * java.lang.String, java.lang.Object)
    */
   @Override
@@ -118,7 +118,7 @@ public class MongoQueryExpression implements IQueryExpression {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#setMapper(de.braintags.io.vertx.pojomapper.
+   * de.braintags.io.vertx.util.pojomapper.dataaccess.query.impl.IQueryExpression#setMapper(de.braintags.io.vertx.util.pojomapper.
    * mapping.IMapper)
    */
   @Override

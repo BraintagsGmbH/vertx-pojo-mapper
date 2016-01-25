@@ -289,7 +289,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getPropertyDescriptor()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getPropertyDescriptor()
    */
   @Override
   public IPropertyAccessor getPropertyAccessor() {
@@ -299,7 +299,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getTypeHandler()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getTypeHandler()
    */
   @Override
   public ITypeHandler getTypeHandler() {
@@ -311,7 +311,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getAnnotation(java.lang.Class)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getAnnotation(java.lang.Class)
    */
   @Override
   public Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
@@ -332,7 +332,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getMapper()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getMapper()
    */
   @Override
   public IMapper getMapper() {
@@ -342,7 +342,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#isSet()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#isSet()
    */
   @Override
   public boolean isSet() {
@@ -352,7 +352,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#setIsSet(boolean)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#setIsSet(boolean)
    */
   public void setIsSet(final boolean isSet) {
     this.isSet = isSet;
@@ -361,7 +361,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getMapKeyClass()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getMapKeyClass()
    */
   @Override
   public Class<?> getMapKeyClass() {
@@ -375,7 +375,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#isMap()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#isMap()
    */
   @Override
   public boolean isMap() {
@@ -395,7 +395,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getType()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getType()
    */
   @Override
   public Class<?> getType() {
@@ -405,7 +405,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getSubClass()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getSubClass()
    */
   @Override
   public Class<?> getSubClass() {
@@ -425,7 +425,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getSubType()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getSubType()
    */
   @Override
   public Type getSubType() {
@@ -435,7 +435,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#isSingleValue()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#isSingleValue()
    */
   @Override
   public boolean isSingleValue() {
@@ -448,7 +448,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getField()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getField()
    */
   @Override
   public Field getField() {
@@ -458,7 +458,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getTypeParameters()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getTypeParameters()
    */
   @Override
   public List<IField> getTypeParameters() {
@@ -468,7 +468,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#isArray()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#isArray()
    */
   @Override
   public boolean isArray() {
@@ -478,7 +478,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#isCollection()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#isCollection()
    */
   @Override
   public boolean isCollection() {
@@ -488,7 +488,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#hasAnnotation(java.lang.Class)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#hasAnnotation(java.lang.Class)
    */
   @Override
   public boolean hasAnnotation(final Class<? extends Annotation> ann) {
@@ -528,7 +528,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getConstructor(java.lang.Class[])
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getConstructor(java.lang.Class[])
    */
   @Override
   public Constructor<?> getConstructor(Class<?>... parameters) {
@@ -560,7 +560,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getSubTypeHandler()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getSubTypeHandler()
    */
   @Override
   public ITypeHandler getSubTypeHandler() {
@@ -571,7 +571,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#getColumnInfo()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#getColumnInfo()
    */
   @Override
   public IColumnInfo getColumnInfo() {
@@ -581,7 +581,7 @@ public class MappedField implements IField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IField#isIdField()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IField#isIdField()
    */
   @Override
   public boolean isIdField() {

@@ -41,7 +41,7 @@ public class ArrayTypeHandlerEmbedded extends ArrayTypeHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
+   * de.braintags.io.vertx.util.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
    */
   @Override
   protected boolean matchesAnnotation(Annotation annotation) {

@@ -57,7 +57,7 @@ class MethodProxy implements IMethodProxy {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMethodProxy#getMethod()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMethodProxy#getMethod()
    */
   @Override
   public Method getMethod() {
@@ -97,7 +97,7 @@ class MethodProxy implements IMethodProxy {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMethodProxy#getParameterTypes()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMethodProxy#getParameterTypes()
    */
   @Override
   public Object[] getParameterTypes() {

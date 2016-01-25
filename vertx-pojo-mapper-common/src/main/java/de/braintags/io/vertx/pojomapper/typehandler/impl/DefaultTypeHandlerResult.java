@@ -44,7 +44,7 @@ public class DefaultTypeHandlerResult implements ITypeHandlerResult {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult#setResult(java.lang.Object)
+   * @see de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandlerResult#setResult(java.lang.Object)
    */
   @Override
   public void setResult(Object result) {
@@ -54,7 +54,7 @@ public class DefaultTypeHandlerResult implements ITypeHandlerResult {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult#getResult()
+   * @see de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandlerResult#getResult()
    */
   @Override
   public Object getResult() {

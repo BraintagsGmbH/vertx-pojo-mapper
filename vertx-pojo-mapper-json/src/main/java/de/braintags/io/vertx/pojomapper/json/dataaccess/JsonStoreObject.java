@@ -81,7 +81,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#get(de.braintags.io.vertx.pojomapper.mapping.IField)
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IStoreObject#get(de.braintags.io.vertx.util.pojomapper.mapping.IField)
    */
   @Override
   public Object get(IField field) {
@@ -93,7 +93,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.mapping.IStoreObject#hasProperty(de.braintags.io.vertx.pojomapper.mapping.IField)
+   * de.braintags.io.vertx.util.pojomapper.mapping.IStoreObject#hasProperty(de.braintags.io.vertx.util.pojomapper.mapping.IField)
    */
   @Override
   public boolean hasProperty(IField field) {
@@ -104,7 +104,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#put(de.braintags.io.vertx.pojomapper.mapping.IField,
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IStoreObject#put(de.braintags.io.vertx.util.pojomapper.mapping.IField,
    * java.lang.Object)
    */
   @Override
@@ -246,7 +246,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#getObjectReferences()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IStoreObject#getObjectReferences()
    */
   @Override
   public Collection<IObjectReference> getObjectReferences() {
@@ -266,7 +266,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#isNewInstance()
+   * @see de.braintags.io.vertx.util.pojomapper.mapping.IStoreObject#isNewInstance()
    */
   @Override
   public boolean isNewInstance() {
