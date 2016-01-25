@@ -5,11 +5,11 @@
  */
 /**
  * When objects shall be stored into or read from a datastore, the values must be converted in many
- * cases. This is the job of an {@link de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler}. During the mapping of
+ * cases. This is the job of an {@link de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler}. During the mapping of
  * a mapper property the suitable ITypeHandler is detected by requesting the
- * {@link de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandlerFactory} of the underlaying
- * {@link de.braintags.io.vertx.util.pojomapper.IDataStore}. The found ITypeHandler is stored inside the appropriate
- * {@link de.braintags.io.vertx.util.pojomapper.mapping.IField} and from there used, when a value is read from or shall be
+ * {@link de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory} of the underlaying
+ * {@link de.braintags.io.vertx.pojomapper.IDataStore}. The found ITypeHandler is stored inside the appropriate
+ * {@link de.braintags.io.vertx.pojomapper.mapping.IField} and from there used, when a value is read from or shall be
  * written into the datastore.
  * 
  * 

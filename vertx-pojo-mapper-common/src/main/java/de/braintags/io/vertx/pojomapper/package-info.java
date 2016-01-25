@@ -44,7 +44,7 @@
  * 
  *
  * === Initializing an IDataStore
- * The initialization of the {@link de.braintags.io.vertx.util.pojomapper.IDataStore} is the only action, where you are
+ * The initialization of the {@link de.braintags.io.vertx.pojomapper.IDataStore} is the only action, where you are
  * directly referring to a concrete implementation. In this example we will use a Mongo-DB as datastore:
  * 
  * [source, java]
@@ -61,7 +61,7 @@
  * With this MongoClient we are then able to create a MongoDataStore, which will be the base for all the followings.
  * 
  * ==== Initialize by DataStoreSettings
- * {@link de.braintags.io.vertx.util.pojomapper.init}
+ * {@link de.braintags.io.vertx.pojomapper.init}
  * 
  * === Creating a mapper
  * Creating a mapper is very simple:
@@ -72,9 +72,9 @@
  * ----
  * As you can see, you can specify any java class as a mapper by adding two annotations:
  * 
- * * {@link de.braintags.io.vertx.util.pojomapper.annotation.Entity}
+ * * {@link de.braintags.io.vertx.pojomapper.annotation.Entity}
  * is added at the class level and defines, that the class, where this annotation is added, is mappable by a datastore
- * * {@link de.braintags.io.vertx.util.pojomapper.annotation.field.Id}
+ * * {@link de.braintags.io.vertx.pojomapper.annotation.field.Id}
  * is added at one property field of the class and defines this field to be the key field, where inside the
  * identifyer of a record is generated and stored
  * 
@@ -99,14 +99,14 @@
  * ----
  * 
  * To save one or more instances inside the datastore, we are first creating an
- * {@link de.braintags.io.vertx.util.pojomapper.dataaccess.write.IWrite}. As soon as we added the instance
+ * {@link de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite}. As soon as we added the instance
  * into the IWrite, we are able to execute the save action on it and therefore save our MiniMapper into the
  * connected datastore.
  * In return we are receiving information about the action performed in an asynchrone way. The
- * {@link de.braintags.io.vertx.util.pojomapper.dataaccess.write.IWriteResult}, which was delivered to our
+ * {@link de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult}, which was delivered to our
  * handler contains general informations about the action and specific information about each object, which was
  * saved by the current action. These information - delivered as
- * {@link de.braintags.io.vertx.util.pojomapper.dataaccess.write.IWriteEntry} -
+ * {@link de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry} -
  * include the type of action performed ( insert / update ), the id
  * of the instance ( especially for new instances ) and the native format of the instance, like it was translated to fit
  * the requirements of the connected datastore.
@@ -124,7 +124,7 @@
  * === Searching data in a datastore
  * 
  * To search inside the connected datastore, we are creating first an instance of
- * {@link de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery}, then we are adding the query arguments on it.
+ * {@link de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery}, then we are adding the query arguments on it.
  * 
  * [source,java]
  * ----
@@ -135,7 +135,7 @@
  * we could simply and quickly add further arguments. Again - with the creation of the IQuery - the system checks wether
  * the mapper class was mapped already and performs the mapping if not. +
  * The query is processed by calling the execute method, which in turn will deliver an
- * {@link de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryResult}. The IQueryResult contains several
+ * {@link de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult}. The IQueryResult contains several
  * information like the native query and a reference to found records. The found records can be requested step by step
  * by an Iterator or once as Array by requesting the method toArray.
  * 
@@ -148,9 +148,9 @@
  * === Deleting data
  * 
  * To delete instanced from the datastore, we are using
- * {@link de.braintags.io.vertx.util.pojomapper.dataaccess.delete.IDelete}, where
+ * {@link de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete}, where
  * we can add some concrete objects to be deleted or add an
- * {@link de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery}, which defines
+ * {@link de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery}, which defines
  * the criteria for a deletion. Mixing both isn't possible.
  * 
  * [source,java]
@@ -159,10 +159,10 @@
  * ----
  * 
  * In the current example we are deleting an object, which we are expecting to exist in the datastore. First we are
- * creating an {@link de.braintags.io.vertx.util.pojomapper.dataaccess.delete.IDelete} and add the instance to be deleted.
+ * creating an {@link de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete} and add the instance to be deleted.
  * The execution of the delete is processed by calling the method delete, which will return an instance of
- * {@link de.braintags.io.vertx.util.pojomapper.dataaccess.delete.IDeleteResult}. The method
- * {@link de.braintags.io.vertx.util.pojomapper.dataaccess.delete.IDeleteResult#getOriginalCommand()} returns the native
+ * {@link de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult}. The method
+ * {@link de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult#getOriginalCommand()} returns the native
  * arguments which were used to perform the delete action
  * 
  * [source,java]
@@ -171,7 +171,7 @@
  * ----
  * 
  * This example shows how to perform a delete action by using an
- * {@link de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery}.
+ * {@link de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery}.
  * All records, which are fitting the arguments of the query are deleted.
  *
  * === Complexer mapper definitions
@@ -196,14 +196,14 @@
  * ===== Storing subobjects embedded
  * 
  * To define, that a subobject shall be saved embedded is simply done by adding the annotation
- * {@link de.braintags.io.vertx.util.pojomapper.annotation.field.Embedded} to the appropriate field
+ * {@link de.braintags.io.vertx.pojomapper.annotation.field.Embedded} to the appropriate field
  * 
  * [source,java]
  * ----
  * {@link examples.mapper.PersonEmbed}
  * ----
  * 
- * How the embedding is technically processed, is decided by the {@link de.braintags.io.vertx.util.pojomapper.IDataStore}. In
+ * How the embedding is technically processed, is decided by the {@link de.braintags.io.vertx.pojomapper.IDataStore}. In
  * the same way you are storing simple child objects, you are able to integrate lists, maps and arrays.
  * 
  * Subobjects as array of Animal:
@@ -230,7 +230,7 @@
  * ===== Storing subobjects referenced
  * 
  * According the previous description, storing subobjects referenced is done by adding the annotation
- * {@link de.braintags.io.vertx.util.pojomapper.annotation.field.Referenced} to the appropriate fields of the
+ * {@link de.braintags.io.vertx.pojomapper.annotation.field.Referenced} to the appropriate fields of the
  * mapper. Of course here, too, you are able to store lists, maps and arrays either.
  * 
  * [source,java]
@@ -251,17 +251,17 @@
  *
  * Currently are existing 6 lifecycle annotations
  * 
- * * {@link de.braintags.io.vertx.util.pojomapper.annotation.lifecycle.BeforeSave} +
+ * * {@link de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave} +
  * methods annotated with this, will be executed just before saving an instance into the datastore
- * * {@link de.braintags.io.vertx.util.pojomapper.annotation.lifecycle.AfterSave} +
+ * * {@link de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave} +
  * methods annotated with this, will be executed just after saving an instance into the datastore
- * * {@link de.braintags.io.vertx.util.pojomapper.annotation.lifecycle.BeforeLoad} +
+ * * {@link de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad} +
  * methods annotated with this, will be executed just before loading an instance from the datastore
- * * {@link de.braintags.io.vertx.util.pojomapper.annotation.lifecycle.AfterLoad} +
+ * * {@link de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad} +
  * methods annotated with this, will be executed just after loading an instance from the datastore
- * * {@link de.braintags.io.vertx.util.pojomapper.annotation.lifecycle.BeforeDelete} +
+ * * {@link de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeDelete} +
  * methods annotated with this, will be executed just before deleting an instance from the datastore
- * * {@link de.braintags.io.vertx.util.pojomapper.annotation.lifecycle.AfterDelete} +
+ * * {@link de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete} +
  * methods annotated with this, will be executed just after deleting an instance from the datastore
  * 
  * For more infos on how you can influence the mapping process, see the further descriptions above.
@@ -269,7 +269,7 @@
  * == More details about vertx-pojo-mapper
  * 
  * === IDataStore
- * {@link de.braintags.io.vertx.util.pojomapper.IDataStore} is the startpoint and the center of vertx-pojo-mapper.
+ * {@link de.braintags.io.vertx.pojomapper.IDataStore} is the startpoint and the center of vertx-pojo-mapper.
  * By IDataStore you will access all the main instances you need, to deal with the underlaying datastore.
  * To instantiate a certain implementation of IDataStore, it should be the only time, where you are directly referencing
  * to a certain datastore or database. The way, how an implementation is instantiated, is depending on the
@@ -298,7 +298,7 @@
  * If you are inserting new records into a database, those records normally need to get a unique identifyer, typically a
  * primary key. All databases can generate such a key in an automatic manner, but not every database is returning the
  * generated key. For those databases, which don't return the generated key, like MySql, the concept of
- * {@link de.braintags.io.vertx.util.pojomapper.mapping.IKeyGenerator} was implemented to allow a key generation with local
+ * {@link de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator} was implemented to allow a key generation with local
  * access before a new instance is saved into the datastore.
  * 
  * [source,java]
@@ -311,30 +311,30 @@
  * 
  * Currently there are existing two implementations:
  * 
- * * {@link de.braintags.io.vertx.util.pojomapper.mapping.impl.keygen.DebugGenerator} +
- * pure in memory counter, which starts at zero with every new {@link de.braintags.io.vertx.util.pojomapper.IDataStore},
+ * * {@link de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DebugGenerator} +
+ * pure in memory counter, which starts at zero with every new {@link de.braintags.io.vertx.pojomapper.IDataStore},
  * should be only used for testing
- * * {@link de.braintags.io.vertx.util.pojomapper.mapping.impl.keygen.FileKeyGenerator} +
+ * * {@link de.braintags.io.vertx.pojomapper.mapping.impl.keygen.FileKeyGenerator} +
  * an implementation which stores the keys per mapper inside a hidden, local directory
  * * hopefully more will follow, hazelcast is planned
  * 
- * An {@link de.braintags.io.vertx.util.pojomapper.IDataStore} implementation might contain a set of
- * {@link de.braintags.io.vertx.util.pojomapper.mapping.IKeyGenerator}, which are supported by this implementation.
+ * An {@link de.braintags.io.vertx.pojomapper.IDataStore} implementation might contain a set of
+ * {@link de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator}, which are supported by this implementation.
  * KeyGenerators are stored inside a map by their name and an instance. When initializing an
- * {@link de.braintags.io.vertx.util.pojomapper.IDataStore} you can add the property
- * {@link de.braintags.io.vertx.util.pojomapper.mapping.IKeyGenerator#DEFAULT_KEY_GENERATOR} together
+ * {@link de.braintags.io.vertx.pojomapper.IDataStore} you can add the property
+ * {@link de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator#DEFAULT_KEY_GENERATOR} together
  * with the name of the KeyGenerator, which shall be used as default. Additionally you can add the annotation
- * {@link de.braintags.io.vertx.util.pojomapper.annotation.KeyGenerator} to a mapper, where you are specifying the name of
+ * {@link de.braintags.io.vertx.pojomapper.annotation.KeyGenerator} to a mapper, where you are specifying the name of
  * the KeyGenerator, which shall be used for this mapper.
  * 
  * === Mapping of Java classes
- * {@link de.braintags.io.vertx.util.pojomapper.mapping}
+ * {@link de.braintags.io.vertx.pojomapper.mapping}
  * 
  * === TypeHandlers
- * {@link de.braintags.io.vertx.util.pojomapper.typehandler}
+ * {@link de.braintags.io.vertx.pojomapper.typehandler}
  * 
  * === Existing annotations
- * {@link de.braintags.io.vertx.util.pojomapper.annotation}
+ * {@link de.braintags.io.vertx.pojomapper.annotation}
  * 
  * == Creating a new implementation
  * 
@@ -342,7 +342,7 @@
  * 
  * == Further links
  * To get specific information about the concrete implementation of an
- * {@link de.braintags.io.vertx.util.pojomapper.IDataStore}, especially the initialization, go to:
+ * {@link de.braintags.io.vertx.pojomapper.IDataStore}, especially the initialization, go to:
  * 
  * * link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojo-mapper-mysql[implementation for
  * MySql]

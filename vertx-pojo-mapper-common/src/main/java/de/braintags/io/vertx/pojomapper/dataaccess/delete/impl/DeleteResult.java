@@ -48,7 +48,7 @@ public abstract class DeleteResult implements IDeleteResult {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.delete.IDeleteResult#getDataStore()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult#getDataStore()
    */
   @Override
   public IDataStore getDataStore() {
@@ -58,7 +58,7 @@ public abstract class DeleteResult implements IDeleteResult {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.delete.IDeleteResult#getMapper()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult#getMapper()
    */
   @Override
   public IMapper getMapper() {
@@ -68,7 +68,7 @@ public abstract class DeleteResult implements IDeleteResult {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.delete.IDeleteResult#getOriginalCommand()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult#getOriginalCommand()
    */
   @Override
   public Object getOriginalCommand() {

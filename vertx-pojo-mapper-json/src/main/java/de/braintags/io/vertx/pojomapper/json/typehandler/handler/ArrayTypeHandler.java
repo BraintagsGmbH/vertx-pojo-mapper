@@ -52,7 +52,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.typehandler.AbstractTypeHandler#matchesClass(java.lang.Class)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matchesClass(java.lang.Class)
    */
   @Override
   protected short matchesClass(Class<?> cls) {
@@ -63,7 +63,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
+   * de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
    */
   @Override
   protected boolean matchesAnnotation(Annotation annotation) {
@@ -73,8 +73,8 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
-   * de.braintags.io.vertx.util.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
   public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
@@ -106,8 +106,8 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.util.pojomapper.mapping.IField, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
    */
   @Override
   public void intoStore(Object javaValues, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {

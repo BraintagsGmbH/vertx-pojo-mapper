@@ -38,7 +38,7 @@ public class MongoDeleteResult extends DeleteResult {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.delete.IDeleteResult#getDeletedInstances()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult#getDeletedInstances()
    */
   @Override
   public int getDeletedInstances() {

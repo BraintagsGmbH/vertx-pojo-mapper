@@ -51,7 +51,7 @@ public class MongoQueryResult<T> extends AbstractQueryResult<T> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.impl.AbstractQueryResult#generatePojo(int,
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryResult#generatePojo(int,
    * io.vertx.core.Handler)
    */
   @Override

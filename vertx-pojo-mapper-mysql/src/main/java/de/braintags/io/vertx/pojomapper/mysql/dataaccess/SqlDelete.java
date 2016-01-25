@@ -48,7 +48,7 @@ public class SqlDelete<T> extends Delete<T> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.delete.impl.Delete#deleteQuery(de.braintags.io.vertx.util.pojomapper.
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete#deleteQuery(de.braintags.io.vertx.pojomapper.
    * dataaccess.query.IQuery, io.vertx.core.Handler)
    */
   @Override

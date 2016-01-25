@@ -53,7 +53,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryContainer#field(java.lang.String)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#field(java.lang.String)
    */
   @Override
   public IFieldParameter<LogicContainer<T>> field(String fieldName) {
@@ -66,7 +66,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryContainer#and(java.lang.String)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#and(java.lang.String)
    */
   @Override
   public IFieldParameter<LogicContainer<IQueryContainer>> and(String fieldName) {
@@ -78,7 +78,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryContainer#andOpen(java.lang.String)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#andOpen(java.lang.String)
    */
   @Override
   public IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> andOpen(String fieldName) {
@@ -90,7 +90,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryContainer#or(java.lang.String)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#or(java.lang.String)
    */
   @Override
   public IFieldParameter<LogicContainer<IQueryContainer>> or(String fieldName) {
@@ -102,7 +102,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryContainer#orOpen(java.lang.String)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#orOpen(java.lang.String)
    */
   @Override
   public IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> orOpen(String fieldName) {
@@ -114,7 +114,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.ILogicContainer#getLogic()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer#getLogic()
    */
   @Override
   public QueryLogic getLogic() {
@@ -131,7 +131,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.dataaccess.query.impl.IRamblerSource#applyTo(de.braintags.io.vertx.util.pojomapper.
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IRamblerSource#applyTo(de.braintags.io.vertx.pojomapper.
    * dataaccess.query.impl.IQueryRambler)
    */
   @Override
@@ -177,7 +177,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryContainer#getChildren()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#getChildren()
    */
   @Override
   public List<Object> getChildren() {

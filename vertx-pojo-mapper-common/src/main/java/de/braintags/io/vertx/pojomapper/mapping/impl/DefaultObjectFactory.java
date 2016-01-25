@@ -42,7 +42,7 @@ public class DefaultObjectFactory implements IObjectFactory {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.IObjectFactory#createInstance(java.lang.Class)
+   * @see de.braintags.io.vertx.pojomapper.mapping.IObjectFactory#createInstance(java.lang.Class)
    */
   @Override
   public <T> T createInstance(Class<T> clazz) {
@@ -57,7 +57,7 @@ public class DefaultObjectFactory implements IObjectFactory {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.mapping.IObjectFactory#setMapper(de.braintags.io.vertx.util.pojomapper.mapping.IMapper)
+   * de.braintags.io.vertx.pojomapper.mapping.IObjectFactory#setMapper(de.braintags.io.vertx.pojomapper.mapping.IMapper)
    */
   @Override
   public void setMapper(IMapper mapper) {
@@ -67,7 +67,7 @@ public class DefaultObjectFactory implements IObjectFactory {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.IObjectFactory#getMapper()
+   * @see de.braintags.io.vertx.pojomapper.mapping.IObjectFactory#getMapper()
    */
   @Override
   public IMapper getMapper() {

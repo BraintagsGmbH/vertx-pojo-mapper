@@ -40,7 +40,7 @@ public class WriteResult implements IWriteResult {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.write.IWriteResult#getResult()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult#getResult()
    */
   @Override
   public Iterator<IWriteEntry> iterator() {

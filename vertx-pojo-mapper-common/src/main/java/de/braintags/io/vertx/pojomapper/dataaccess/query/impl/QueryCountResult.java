@@ -53,7 +53,7 @@ public class QueryCountResult implements IQueryCountResult {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryCountResult#getDataStore()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult#getDataStore()
    */
   @Override
   public IDataStore getDataStore() {
@@ -63,7 +63,7 @@ public class QueryCountResult implements IQueryCountResult {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryCountResult#getMapper()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult#getMapper()
    */
   @Override
   public IMapper getMapper() {
@@ -73,7 +73,7 @@ public class QueryCountResult implements IQueryCountResult {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryCountResult#getOriginalQuery()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult#getOriginalQuery()
    */
   @Override
   public IQueryExpression getOriginalQuery() {
@@ -83,7 +83,7 @@ public class QueryCountResult implements IQueryCountResult {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryCountResult#getCount()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult#getCount()
    */
   @Override
   public long getCount() {

@@ -115,7 +115,7 @@ public class Person extends AbstractPerson {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.IPerson#beforeLoadFromInterface()
+   * @see de.braintags.io.vertx.pojomapper.IPerson#beforeLoadFromInterface()
    */
   @Override
   @BeforeLoad

@@ -49,7 +49,7 @@ public class FileKeyGenerator extends AbstractKeyGenerator {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.IKeyGenerator#generateKey()
+   * @see de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator#generateKey()
    */
   @Override
   public void generateKey(IMapper mapper, Handler<AsyncResult<Key>> handler) {

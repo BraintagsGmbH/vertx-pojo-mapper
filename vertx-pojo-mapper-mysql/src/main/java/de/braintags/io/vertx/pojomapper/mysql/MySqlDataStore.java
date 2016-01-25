@@ -70,7 +70,7 @@ public class MySqlDataStore extends AbstractDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.impl.AbstractDataStore#initSupportedKeyGenerators()
+   * @see de.braintags.io.vertx.pojomapper.impl.AbstractDataStore#initSupportedKeyGenerators()
    */
   @Override
   protected void initSupportedKeyGenerators() {
@@ -81,7 +81,7 @@ public class MySqlDataStore extends AbstractDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#createQuery(java.lang.Class)
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#createQuery(java.lang.Class)
    */
   @Override
   public <T> IQuery<T> createQuery(Class<T> mapper) {
@@ -91,7 +91,7 @@ public class MySqlDataStore extends AbstractDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#createWrite(java.lang.Class)
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#createWrite(java.lang.Class)
    */
   @Override
   public <T> IWrite<T> createWrite(Class<T> mapper) {
@@ -101,7 +101,7 @@ public class MySqlDataStore extends AbstractDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#createDelete(java.lang.Class)
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#createDelete(java.lang.Class)
    */
   @Override
   public <T> IDelete<T> createDelete(Class<T> mapper) {
@@ -133,7 +133,7 @@ public class MySqlDataStore extends AbstractDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#shutdown(io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#shutdown(io.vertx.core.Handler)
    */
   @Override
   public void shutdown(Handler<AsyncResult<Void>> resultHandler) {

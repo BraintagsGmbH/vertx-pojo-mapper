@@ -109,7 +109,7 @@ public class MongoDataStoreInit implements IDataStoreInit {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.init.IDataStoreInit#initDataStore(de.braintags.io.vertx.util.pojomapper.init.
+   * @see de.braintags.io.vertx.pojomapper.init.IDataStoreInit#initDataStore(de.braintags.io.vertx.pojomapper.init.
    * DataStoreSettings, io.vertx.core.Handler)
    */
   @Override

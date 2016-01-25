@@ -39,7 +39,7 @@ public class MongoMapperFactory extends MapperFactory {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.impl.MapperFactory#createMapper(java.lang.Class)
+   * @see de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory#createMapper(java.lang.Class)
    */
   @Override
   protected Mapper createMapper(Class mapperClass) {

@@ -55,7 +55,7 @@ public class StringColumnHandler extends AbstractSqlColumnHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#applyMetaData(de.
+   * @see de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#applyMetaData(de.
    * braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo)
    */
   @Override

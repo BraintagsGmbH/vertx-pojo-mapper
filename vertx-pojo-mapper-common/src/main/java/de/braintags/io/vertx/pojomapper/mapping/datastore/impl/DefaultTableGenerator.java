@@ -50,7 +50,7 @@ public class DefaultTableGenerator implements ITableGenerator {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.mapping.datastore.ITableGenerator#createTable(de.braintags.io.vertx.util.pojomapper
+   * de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator#createTable(de.braintags.io.vertx.pojomapper
    * .mapping.IMapper)
    */
   @Override
@@ -61,7 +61,7 @@ public class DefaultTableGenerator implements ITableGenerator {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.datastore.ITableGenerator#getColumnHandler(de.braintags.io.vertx.util.
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator#getColumnHandler(de.braintags.io.vertx.util.
    * pojomapper .mapping.IField)
    */
   @Override

@@ -40,7 +40,7 @@ public abstract class AbstractKeyGenerator implements IKeyGenerator {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.IKeyGenerator#getName()
+   * @see de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator#getName()
    */
   @Override
   public String getName() {

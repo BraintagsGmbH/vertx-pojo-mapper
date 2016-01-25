@@ -33,7 +33,7 @@ import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 @SuiteClasses({ AllTestsPojoJson.class, TMongoDirect.class, TMongoMapper.class, TMongoQueryRambler.class,
     AllTestsCommon.class })
 public class TestAllMongo {
-  // -DIDatastoreContainer=de.braintags.io.vertx.util.pojomapper.mongo.vertxunit.MongoDataStoreContainer
+  // -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mongo.vertxunit.MongoDataStoreContainer
   // -DBlockedThreadCheckInterval=10000000 -DWarningExceptionTime=10000000
   // -Ddb_name=PojongoTestDatabase
   // -DstartMongoLocal=true

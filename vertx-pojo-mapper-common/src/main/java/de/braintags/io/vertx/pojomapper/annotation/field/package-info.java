@@ -11,7 +11,7 @@
  * #L%
  */
 /**
- * Package contains annotations which can be used to define {@link de.braintags.io.vertx.util.pojomapper.mapping.IField}
+ * Package contains annotations which can be used to define {@link de.braintags.io.vertx.pojomapper.mapping.IField}
  * 
  * @author Michael Remme
  * 

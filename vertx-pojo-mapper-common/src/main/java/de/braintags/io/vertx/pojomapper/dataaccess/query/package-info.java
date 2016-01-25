@@ -11,7 +11,7 @@
  * #L%
  */
 /**
- * Contains all the stuff for search actions inside the {@link de.braintags.io.vertx.util.pojomapper.IDataStore}
+ * Contains all the stuff for search actions inside the {@link de.braintags.io.vertx.pojomapper.IDataStore}
  * 
  * @author Michael Remme
  * 

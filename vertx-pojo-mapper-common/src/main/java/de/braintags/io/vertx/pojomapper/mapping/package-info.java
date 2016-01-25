@@ -4,7 +4,7 @@
  * the underlaying database and includes the automatic table creation and synchronization. The mapping process
  * in vertx-pojo-mapper is performed exactly then, when it is needed.
  * 
- * When you are creating an {@link de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQuery} for instance, the system
+ * When you are creating an {@link de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery} for instance, the system
  * checks, wether the mapper was initialized already. If not, then the initialization is performed, which implements
  * the automatic creation and update of tables, collections etc. inside the connected datastore - so you don’t have
  * to care about that, either. Its this behaviour, why the vertx-pojo-mapper has only a very little overhead on startup!
@@ -16,22 +16,22 @@
  * definitions check the QuickStart.
  * 
  * ==== Mapper
- * The result of the mapping process is an {@link de.braintags.io.vertx.util.pojomapper.mapping.IMapper}, which is created by
- * and stored inside the {@link de.braintags.io.vertx.util.pojomapper.mapping.IMapperFactory} implementation, which fits the
+ * The result of the mapping process is an {@link de.braintags.io.vertx.pojomapper.mapping.IMapper}, which is created by
+ * and stored inside the {@link de.braintags.io.vertx.pojomapper.mapping.IMapperFactory} implementation, which fits the
  * needs of the underlaying datastore or database. The IMapper contains general information about the mapped class and
  * the generated, respectively connected table in the datastore. Additionally it contains per property of the mapper an
- * instance of {@link de.braintags.io.vertx.util.pojomapper.mapping.IField}, where the field and its behaviour regarding the
+ * instance of {@link de.braintags.io.vertx.pojomapper.mapping.IField}, where the field and its behaviour regarding the
  * mapping are desribed. Additionally per field the information about the connected column inside the datastore are kept
- * inside an instance of {@link de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnInfo}
+ * inside an instance of {@link de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo}
  * 
  * ==== TableGenerator and ColumnHandler
  * As explained above, vertx-pojo-mapper is able to generate needed structures in the underlaying datastore, like tables
  * for sql databases. Base for the generation is the
- * {@link de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnHandler}, from which the suitable instance is stored
+ * {@link de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler}, from which the suitable instance is stored
  * inside the IField. The IColumnHandler is detected during the mapping process by requesting a suitable one from the
- * {@link de.braintags.io.vertx.util.pojomapper.mapping.datastore.ITableGenerator} used by a datastore implementation.
+ * {@link de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator} used by a datastore implementation.
  * The process of creation and synchronization is performed by
- * {@link de.braintags.io.vertx.util.pojomapper.mapping.IDataStoreSynchronizer}
+ * {@link de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer}
  *
  * @author Michael Remme
  */

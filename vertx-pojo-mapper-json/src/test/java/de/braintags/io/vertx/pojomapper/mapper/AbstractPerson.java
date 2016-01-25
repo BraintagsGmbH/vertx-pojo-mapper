@@ -22,7 +22,7 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
  * 
  */
 
-@ObjectFactory(className = "de.braintags.io.vertx.util.pojomapper.impl.DummyObjectFactory")
+@ObjectFactory(className = "de.braintags.io.vertx.pojomapper.impl.DummyObjectFactory")
 public abstract class AbstractPerson implements IPerson {
 
   @BeforeLoad

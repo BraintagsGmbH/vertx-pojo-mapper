@@ -80,7 +80,7 @@ public class SqlTableGenerator extends DefaultTableGenerator {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.mapping.datastore.impl.DefaultTableGenerator#createTableInfo(de.braintags.io.vertx.util
+   * de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableGenerator#createTableInfo(de.braintags.io.vertx.util
    * .pojomapper.mapping.IMapper)
    */
   @Override

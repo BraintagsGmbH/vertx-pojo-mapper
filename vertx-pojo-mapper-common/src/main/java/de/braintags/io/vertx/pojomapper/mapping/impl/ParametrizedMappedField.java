@@ -95,7 +95,7 @@ public class ParametrizedMappedField extends MappedField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.impl.MappedField#getFullName()
+   * @see de.braintags.io.vertx.pojomapper.mapping.impl.MappedField#getFullName()
    */
   @Override
   public String getFullName() {
@@ -105,7 +105,7 @@ public class ParametrizedMappedField extends MappedField {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.impl.MappedField#getName()
+   * @see de.braintags.io.vertx.pojomapper.mapping.impl.MappedField#getName()
    */
   @Override
   public String getName() {

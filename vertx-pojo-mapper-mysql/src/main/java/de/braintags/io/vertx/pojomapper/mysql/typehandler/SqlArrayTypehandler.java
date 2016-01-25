@@ -38,8 +38,8 @@ public class SqlArrayTypehandler extends ArrayTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.json.typehandler.handler.ArrayTypeHandler#fromStore(java.lang.Object,
-   * de.braintags.io.vertx.util.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
   public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
@@ -54,8 +54,8 @@ public class SqlArrayTypehandler extends ArrayTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.json.typehandler.handler.ArrayTypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.util.pojomapper.mapping.IField, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
    */
   @Override
   public void intoStore(Object javaValues, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {

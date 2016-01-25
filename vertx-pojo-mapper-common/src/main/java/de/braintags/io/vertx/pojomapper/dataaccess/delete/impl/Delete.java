@@ -55,7 +55,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.delete.IDelete#delete(io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete#delete(io.vertx.core.Handler)
    */
   @Override
   public final void delete(Handler<AsyncResult<IDeleteResult>> resultHandler) {
@@ -116,7 +116,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.dataaccess.delete.IDelete#setQuery(de.braintags.io.vertx.util.pojomapper.dataaccess
+   * de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete#setQuery(de.braintags.io.vertx.pojomapper.dataaccess
    * .query.IQuery)
    */
   @Override
@@ -129,7 +129,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.delete.IDelete#add(java.lang.Object)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete#add(java.lang.Object)
    */
   @Override
   public void add(T record) {
@@ -141,7 +141,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.dataaccess.delete.IDelete#add(java.lang.Object[])
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete#add(java.lang.Object[])
    */
   @SuppressWarnings("unchecked")
   @Override

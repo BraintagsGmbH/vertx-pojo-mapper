@@ -53,7 +53,7 @@ public class CollectionTypeHandlerReferenced extends CollectionTypeHandler imple
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
+   * de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
    */
   @Override
   protected boolean matchesAnnotation(Annotation annotation) {
@@ -63,8 +63,8 @@ public class CollectionTypeHandlerReferenced extends CollectionTypeHandler imple
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
-   * de.braintags.io.vertx.util.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
   public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
@@ -93,9 +93,9 @@ public class CollectionTypeHandlerReferenced extends CollectionTypeHandler imple
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.json.typehandler.handler.CollectionTypeHandler#handleObjectFromStore(java.lang.
-   * Object, de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler, java.util.Collection,
-   * de.braintags.io.vertx.util.pojomapper.mapping.IField, io.vertx.core.Handler)
+   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler#handleObjectFromStore(java.lang.
+   * Object, de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler, java.util.Collection,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
    */
   @Override
   protected void handleObjectFromStore(Object o, ITypeHandler subHandler, Collection coll, IField field,

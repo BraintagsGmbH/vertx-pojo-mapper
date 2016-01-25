@@ -42,8 +42,8 @@ public class MongoTableInfo extends DefaultTableInfo {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.mapping.datastore.impl.DefaultTableInfo#generateColumnInfo(de.braintags.io.vertx.util.
-   * pojomapper.mapping.IField, de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnHandler)
+   * de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableInfo#generateColumnInfo(de.braintags.io.vertx.util.
+   * pojomapper.mapping.IField, de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler)
    */
   @Override
   protected IColumnInfo generateColumnInfo(IField field, IColumnHandler columnHandler) {

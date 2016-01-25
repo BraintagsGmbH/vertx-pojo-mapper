@@ -64,7 +64,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.util.pojomapper.dataaccess.
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess.
    * query.IQuery)
    */
   @Override
@@ -79,7 +79,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.util.pojomapper.dataaccess.
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess.
    * query.IQuery)
    */
   @Override
@@ -91,7 +91,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.util.pojomapper.dataaccess.
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess.
    * query.ILogicContainer)
    */
   @Override
@@ -104,7 +104,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.util.pojomapper.dataaccess.
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess.
    * query.ILogicContainer)
    */
   @Override
@@ -116,7 +116,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.util.pojomapper.dataaccess.
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess.
    * query.IFieldParameter, io.vertx.core.Handler)
    */
   @Override
@@ -229,7 +229,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.util.pojomapper.dataaccess.
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess.
    * query.IFieldParameter)
    */
   @Override

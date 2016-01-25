@@ -46,7 +46,7 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandlerFactory#getTypeHandler(de.braintags.io.vertx.util.pojomapper
+   * de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory#getTypeHandler(de.braintags.io.vertx.pojomapper
    * .mapping.IField)
    */
   @Override

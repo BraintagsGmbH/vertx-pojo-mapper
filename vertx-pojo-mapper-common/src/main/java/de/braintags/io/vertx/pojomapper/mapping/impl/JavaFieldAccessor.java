@@ -60,7 +60,7 @@ public class JavaFieldAccessor implements IPropertyAccessor {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.IPropertyAccessor#getName()
+   * @see de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor#getName()
    */
   @Override
   public String getName() {

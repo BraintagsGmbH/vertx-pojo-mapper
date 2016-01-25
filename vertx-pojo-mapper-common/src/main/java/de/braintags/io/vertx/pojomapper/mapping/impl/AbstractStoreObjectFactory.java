@@ -44,7 +44,7 @@ public abstract class AbstractStoreObjectFactory implements IStoreObjectFactory 
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.mapping.IStoreObjectFactory#createStoreObjects(de.braintags.io.vertx.util.pojomapper.
+   * de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory#createStoreObjects(de.braintags.io.vertx.pojomapper.
    * mapping.IMapper, java.util.List, io.vertx.core.Handler)
    */
   @Override

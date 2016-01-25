@@ -50,8 +50,8 @@ public class IdTypeHandler extends AbstractTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
-   * de.braintags.io.vertx.util.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
   public final void fromStore(final Object id, IField field, Class<?> cls,
@@ -116,8 +116,8 @@ public class IdTypeHandler extends AbstractTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.util.pojomapper.mapping.IField, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
    */
   @Override
   public final void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
@@ -155,7 +155,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.util.pojomapper.typehandler.AbstractTypeHandler#matches(de.braintags.io.vertx.util.pojomapper.mapping.
+   * de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler#matches(de.braintags.io.vertx.pojomapper.mapping.
    * IField)
    */
   @Override

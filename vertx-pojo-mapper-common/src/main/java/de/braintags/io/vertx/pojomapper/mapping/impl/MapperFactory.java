@@ -53,7 +53,7 @@ public class MapperFactory implements IMapperFactory {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapperFactory#getMapper(java.lang.Class)
+   * @see de.braintags.io.vertx.pojomapper.mapping.IMapperFactory#getMapper(java.lang.Class)
    */
   @Override
   public final IMapper getMapper(Class<?> mapperClass) {
@@ -99,7 +99,7 @@ public class MapperFactory implements IMapperFactory {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.IMapperFactory#getTypeHandlerFactory()
+   * @see de.braintags.io.vertx.pojomapper.mapping.IMapperFactory#getTypeHandlerFactory()
    */
   @Override
   public final ITypeHandlerFactory getTypeHandlerFactory() {
@@ -119,7 +119,7 @@ public class MapperFactory implements IMapperFactory {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.IDataStore#getPropertyMapperFactory()
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getPropertyMapperFactory()
    */
   @Override
   public final IPropertyMapperFactory getPropertyMapperFactory() {

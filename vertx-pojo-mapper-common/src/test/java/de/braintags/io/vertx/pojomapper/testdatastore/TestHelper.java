@@ -62,7 +62,7 @@ public class TestHelper {
     String property = System.getProperty(IDatastoreContainer.PROPERTY);
     if (property == null) {
       throw new ParameterRequiredException("Need the parameter " + IDatastoreContainer.PROPERTY
-          + ". Start the test with -DIDatastoreContainer=de.braintags.io.vertx.util.pojomapper.mysql.MySqlDataStoreContainer for instance");
+          + ". Start the test with -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer for instance");
     }
     datastoreContainer = (IDatastoreContainer) Class.forName(property).newInstance();
     ErrorObject<Void> err = new ErrorObject<Void>(null);

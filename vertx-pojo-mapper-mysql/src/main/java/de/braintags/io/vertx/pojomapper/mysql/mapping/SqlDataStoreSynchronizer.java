@@ -70,7 +70,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.IDataStoreSynchronizer#synchronize(de.braintags.io.vertx.util.pojomapper.
+   * @see de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer#synchronize(de.braintags.io.vertx.pojomapper.
    * mapping .IMapper, io.vertx.core.Handler)
    */
   @Override

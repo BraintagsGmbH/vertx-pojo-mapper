@@ -89,7 +89,7 @@ public class DefaultColumnInfo implements IColumnInfo {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnInfo#getName()
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#getName()
    */
   @Override
   public String getName() {
@@ -99,7 +99,7 @@ public class DefaultColumnInfo implements IColumnInfo {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnInfo#getFieldGenerator()
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#getFieldGenerator()
    */
   @Override
   public IColumnHandler getColumnHandler() {
@@ -109,7 +109,7 @@ public class DefaultColumnInfo implements IColumnInfo {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnInfo#getType()
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#getType()
    */
   @Override
   public String getType() {
@@ -119,7 +119,7 @@ public class DefaultColumnInfo implements IColumnInfo {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnInfo#getLength()
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#getLength()
    */
   @Override
   public int getLength() {
@@ -129,7 +129,7 @@ public class DefaultColumnInfo implements IColumnInfo {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnInfo#getScale()
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#getScale()
    */
   @Override
   public int getScale() {
@@ -139,7 +139,7 @@ public class DefaultColumnInfo implements IColumnInfo {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnInfo#getPrecision()
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#getPrecision()
    */
   @Override
   public int getPrecision() {
@@ -149,7 +149,7 @@ public class DefaultColumnInfo implements IColumnInfo {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnInfo#isNullable()
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#isNullable()
    */
   @Override
   public boolean isNullable() {
@@ -199,7 +199,7 @@ public class DefaultColumnInfo implements IColumnInfo {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.mapping.datastore.IColumnInfo#isId()
+   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo#isId()
    */
   @Override
   public boolean isId() {

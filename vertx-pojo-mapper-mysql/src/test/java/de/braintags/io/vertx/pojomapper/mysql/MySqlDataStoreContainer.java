@@ -130,7 +130,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.test.IDatastoreContainer#getDataStore()
+   * @see de.braintags.io.vertx.pojomapper.test.IDatastoreContainer#getDataStore()
    */
   @Override
   public IDataStore getDataStore() {
@@ -166,7 +166,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.util.pojomapper.testdatastore.IDatastoreContainer#clearTable(java.lang.String,
+   * @see de.braintags.io.vertx.pojomapper.testdatastore.IDatastoreContainer#clearTable(java.lang.String,
    * io.vertx.core.Handler)
    */
   @Override
