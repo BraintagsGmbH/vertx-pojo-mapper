@@ -413,12 +413,13 @@ public class Mapper implements IMapper {
     } else {
       CounterObject<Void> co = new CounterObject<>(methods.size(), handler);
       for (IMethodProxy mp : methods) {
+        LOGGER.info("execute lifecycle method: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
         executeMethod(mp, entity, result -> {
           if (result.failed()) {
             co.setThrowable(result.cause());
           } else {
             if (co.reduce()) {
-              LOGGER.debug("finished Lifecycle");
+              LOGGER.info("finished Lifecycle: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
               handler.handle(result);
             }
           }
@@ -437,9 +438,11 @@ public class Mapper implements IMapper {
         : new Object[] {
             getMapperFactory().getDataStore().getTriggerContextFactory().createTriggerContext(this, handler) };
     try {
-      LOGGER.debug("invoking trigger method " + method.getName());
+      LOGGER.info("invoking trigger method " + getMapperClass().getSimpleName() + " - " + method.getName());
       method.invoke(entity, args);
-      handler.handle(Future.succeededFuture());
+      if (args == null) {// no args - inform the handler;
+        handler.handle(Future.succeededFuture());
+      }
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }

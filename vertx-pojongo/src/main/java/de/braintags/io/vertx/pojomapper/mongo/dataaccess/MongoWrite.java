@@ -97,7 +97,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
    */
   private void doSave(T entity, MongoStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
-    LOG.info("now saving");
+    LOG.info("now saving: " + storeObject.toString());
     if (storeObject.isNewInstance()) {
       doInsert(entity, storeObject, writeResult, resultHandler);
     } else {

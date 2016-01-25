@@ -35,30 +35,37 @@ public class TestTrigger extends DatastoreBaseTest {
   public void testAllTriggers(TestContext context) {
     clearTable(context, "TriggerMapper");
 
-    TriggerMapper tm = new TriggerMapper();
-    context.assertEquals("testName", tm.name);
-    ResultContainer resultContainer = saveRecord(context, tm);
+    TriggerMapper source = new TriggerMapper();
+    context.assertEquals("testName", source.name);
+    ResultContainer resultContainer = saveRecord(context, source);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
-    context.assertEquals("beforeSave", tm.name);
-    context.assertEquals("beforeSaveWithDataStore", tm.beforeSaveWithDataStore);
+    context.assertEquals("beforeSave", source.name);
+    context.assertEquals("beforeSaveWithDataStore", source.beforeSaveWithDataStore);
 
-    context.assertEquals("afterSave", tm.afterSave);
-    context.assertEquals("afterSaveWithDataStore", tm.afterSaveWithDataStore);
+    context.assertEquals("afterSave", source.afterSave);
+    context.assertEquals("afterSaveWithDataStore", source.afterSaveWithDataStore);
 
     IQuery<TriggerMapper> query = getDataStore().createQuery(TriggerMapper.class);
-    tm = (TriggerMapper) findFirst(context, query);
-    context.assertEquals("afterLoad", tm.afterLoad);
-    context.assertEquals("afterLoadWithDatastore", tm.afterLoadWithDatastore);
+    TriggerMapper loaded = (TriggerMapper) findFirst(context, query);
+    context.assertEquals("afterLoad", loaded.afterLoad);
+    context.assertEquals("afterLoadWithDatastore", loaded.afterLoadWithDatastore);
+    // are the trigger contents saved?
+    context.assertEquals("beforeSave", loaded.name);
+    context.assertEquals("beforeSaveWithDataStore", loaded.beforeSaveWithDataStore);
+    // after save is not saved
+    TriggerMapper vorlage = new TriggerMapper();
+    context.assertEquals(vorlage.afterSave, loaded.afterSave);
+    context.assertEquals(vorlage.afterSaveWithDataStore, loaded.afterSaveWithDataStore);
 
     IDelete<TriggerMapper> del = getDataStore().createDelete(TriggerMapper.class);
-    del.add(tm);
+    del.add(loaded);
     delete(context, del, query, 0);
-    context.assertEquals("afterDelete", tm.afterDelete);
-    context.assertEquals("afterDeleteWithDatastore", tm.afterDeleteWithDatastore);
+    context.assertEquals("afterDelete", loaded.afterDelete);
+    context.assertEquals("afterDeleteWithDatastore", loaded.afterDeleteWithDatastore);
 
-    context.assertEquals("beforeDelete", tm.beforeDelete);
-    context.assertEquals("beforeDeleteWithDatastore", tm.beforeDeleteWithDatastore);
+    context.assertEquals("beforeDelete", loaded.beforeDelete);
+    context.assertEquals("beforeDeleteWithDatastore", loaded.beforeDeleteWithDatastore);
 
   }
 
