@@ -20,8 +20,8 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.MongoClient;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
-import io.vertx.groovy.core.buffer.Buffer;
 
 /**
  * 
@@ -41,10 +41,11 @@ public class TMongoDirect extends DatastoreBaseTest {
 
     JsonObject jsonCommand = new JsonObject();
     // getNextSequenceValue("productid")
-    jsonCommand.put("_id", "getNextSequenceValue(\"productid\")".getBytes());
+    // jsonCommand.put("_id", "getNextSequenceValue(\"productid\")".getBytes());
     jsonCommand.put("name", "testName");
     client.insert("nativeCommandCollection", jsonCommand, result -> {
       if (result.failed()) {
+        context.fail(result.cause());
         LOGGER.error("", result.cause());
       } else {
         LOGGER.info("executed: " + result.result());
@@ -54,30 +55,70 @@ public class TMongoDirect extends DatastoreBaseTest {
 
   }
 
-  public String getFuntion() {
-    Buffer buffer = Buffer.buffer();
-    buffer.appendString("function getNextSequenceValue(sequenceName){").appendString("\n");
-    buffer.appendString("  var sequenceDocument = db.counters.findAndModify({").appendString("\n");
-    buffer.appendString("     query:{_id: sequenceName },").appendString("\n");
-    buffer.appendString("     update: {$inc:{sequence_value:1}},").appendString("\n");
-    buffer.appendString("     new:true").appendString("\n");
-    buffer.appendString("  });").appendString("\n");
-    buffer.appendString("  return sequenceDocument.sequence_value;").appendString("\n");
-    buffer.appendString("}").appendString("\n");
-    return buffer.toString();
+  @Test
+  public void testUpdate(TestContext context) {
+    Async as = context.async();
+    String collection = "UpdateTestCollection";
+    MongoDataStore ds = (MongoDataStore) getDataStore();
+    MongoClient client = ds.getMongoClient();
+
+    JsonObject insertCommand = new JsonObject();
+    insertCommand.put("name", "testName");
+    JsonObject updateCommand = new JsonObject().put("$set", new JsonObject().put("name", "modified name"));
+    client.insert(collection, insertCommand, result -> {
+      if (result.failed()) {
+        LOGGER.error("", result.cause());
+        context.fail(result.cause());
+        as.complete();
+      } else {
+        LOGGER.info("executed: " + result.result());
+        JsonObject query = new JsonObject();
+        query.put("_id", result.result());
+        client.update(collection, query, updateCommand, ur -> {
+          if (ur.failed()) {
+            LOGGER.error("", ur.cause());
+            context.fail(ur.cause());
+            as.complete();
+          } else {
+            LOGGER.info("success");
+            as.complete();
+          }
+        });
+      }
+    });
+    as.await();
   }
 
-  /*
-   * function getNextSequenceValue(sequenceName){
-   * 
-   * var sequenceDocument = db.counters.findAndModify({
-   * query:{_id: sequenceName },
-   * update: {$inc:{sequence_value:1}},
-   * new:true
-   * });
-   * 
-   * return sequenceDocument.sequence_value;
-   * }
-   * 
-   */
+  @Test
+  public void testUpdateWithSave(TestContext context) {
+    Async as = context.async();
+    String collection = "UpdateTestCollection";
+    MongoDataStore ds = (MongoDataStore) getDataStore();
+    MongoClient client = ds.getMongoClient();
+
+    JsonObject jsonCommand = new JsonObject();
+    jsonCommand.put("name", "testName");
+    client.insert(collection, jsonCommand, result -> {
+      if (result.failed()) {
+        LOGGER.error("", result.cause());
+        as.complete();
+      } else {
+        LOGGER.info("executed: " + result.result());
+        JsonObject query = new JsonObject();
+        query.put("_id", result.result());
+        jsonCommand.put("name", "modified name");
+        client.save(collection, jsonCommand, ur -> {
+          if (ur.failed()) {
+            LOGGER.error("", ur.cause());
+            as.complete();
+          } else {
+            LOGGER.info("success");
+            as.complete();
+          }
+        });
+      }
+    });
+    as.await();
+  }
+
 }

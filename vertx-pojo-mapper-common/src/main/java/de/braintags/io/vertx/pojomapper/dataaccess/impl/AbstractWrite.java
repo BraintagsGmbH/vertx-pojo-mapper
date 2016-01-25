@@ -77,8 +77,8 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * @param entity
    *          the entity to be handled
    */
-  protected void executePostSave(T entity) {
-    getMapper().executeLifecycle(AfterSave.class, entity);
+  protected void executePostSave(T entity, Handler<AsyncResult<Void>> resultHandler) {
+    getMapper().executeLifecycle(AfterSave.class, entity, resultHandler);
   }
 
   /**

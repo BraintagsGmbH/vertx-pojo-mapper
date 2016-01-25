@@ -17,7 +17,7 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import io.vertx.core.Future;
 
 /**
- * An ITriggerHandler can be used as argument for mapper methods, which are annotated by one of the annotations like
+ * An ITriggerContext can be used as argument for mapper methods, which are annotated by one of the annotations like
  * {@link BeforeSave}, {@link AfterSave} etc.
  * Inside the implementation of the trigger method you will implement the functionality like:
  * 
@@ -35,7 +35,7 @@ import io.vertx.core.Future;
  * @author Michael Remme
  * 
  */
-public interface ITriggerHandler extends Future<Void> {
+public interface ITriggerContext extends Future<Void> {
 
   /**
    * Get the instance of IMapper, which is underlaying the current request

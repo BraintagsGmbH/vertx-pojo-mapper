@@ -16,27 +16,26 @@ import de.braintags.io.vertx.FutureImpl;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.mapping.ITriggerHandler;
+import de.braintags.io.vertx.pojomapper.mapping.ITriggerContext;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 /**
- * A TriggerHandler can be used as argument for mapper methods, which are annotated by one of the annotations like
+ * A TriggerContext can be used as argument for mapper methods, which are annotated by one of the annotations like
  * {@link BeforeSave}, {@link AfterSave} etc.
  * 
  * @author Michael Remme
  * 
  */
-public class TriggerHandler extends FutureImpl<Void> implements ITriggerHandler {
+public class TriggerContext extends FutureImpl<Void> implements ITriggerContext {
   private IMapper mapper;
-  private Handler<AsyncResult<Void>> handler;
 
   /**
    * 
    */
-  public TriggerHandler(IMapper mapper, Handler<AsyncResult<Void>> handler) {
+  TriggerContext(IMapper mapper, Handler<AsyncResult<Void>> handler) {
     this.mapper = mapper;
-    this.handler = handler;
+    setHandler(handler);
   }
 
   /**

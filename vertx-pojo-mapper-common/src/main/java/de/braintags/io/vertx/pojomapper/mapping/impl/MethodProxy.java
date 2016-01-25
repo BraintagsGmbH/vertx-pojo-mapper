@@ -14,11 +14,8 @@ package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import java.lang.reflect.Method;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.mapping.IMethodProxy;
-import de.braintags.io.vertx.util.ClassUtil;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
+import de.braintags.io.vertx.pojomapper.mapping.ITriggerContext;
 
 /**
  * Proxy for encapsulated Methods
@@ -30,47 +27,31 @@ import io.vertx.core.Handler;
 class MethodProxy implements IMethodProxy {
   Method method;
   Class<?>[] parameterTypes;
-  Object[] parameterValues;
 
-  public MethodProxy(Method method) {
+  public MethodProxy(Method method, Mapper mapper) {
     this.method = method;
-    parameterTypes = method.getParameterTypes();
+    if (method.getParameterTypes().length > 0) {
+      compute(mapper);
+    }
   }
 
-  public void computeParameterValues(Mapper mapper) {
+  private void compute(Mapper mapper) {
+    parameterTypes = method.getParameterTypes();
+    if (parameterTypes.length > 1) {
+      throw new UnsupportedOperationException("only 1 parameter supported");
+    }
     if (parameterTypes != null) {
       for (Class<?> pt : parameterTypes) {
         checkParameter(pt);
-      }
-
-      if (parameterTypes.length == 1) {
-        if (parameterTypes[0] == IDataStore.class) {
-          parameterValues = new Object[] { mapper.getMapperFactory().getDataStore() };
-        } else {
-          throw new UnsupportedOperationException("only IDataStore as parameter supported");
-        }
-      } else if (parameterTypes.length > 1) {
-        throw new UnsupportedOperationException("only 1 parameter supported");
       }
     }
   }
 
   private void checkParameter(Class<?> param) {
-    if (IDataStore.class.isAssignableFrom(param)) {
+    if (ITriggerContext.class.isAssignableFrom(param)) {
       return;
     }
-    if (Handler.class.isAssignableFrom(param)) {
-      Class<?> sub = ClassUtil.getParameterizedClass(param);
-      if (AsyncResult.class.isAssignableFrom(sub)) {
-        Class<?> subSub = ClassUtil.getParameterizedClass(sub);
-        if (Void.class.isAssignableFrom(subSub)) {
-          return;
-        }
-      }
-      throw new UnsupportedOperationException("Handler<AsyncResult<Void>> is required as parameter");
-    }
-    throw new UnsupportedOperationException(
-        "Unsupported Parameter, allowed are IDataStore and Handler<AsyncResult<Void>>");
+    throw new UnsupportedOperationException("Unsupported Parameter, only ITriggerContext allowed");
   }
 
   /*
@@ -81,20 +62,6 @@ class MethodProxy implements IMethodProxy {
   @Override
   public Method getMethod() {
     return method;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IMethodProxy#getParameterValues()
-   */
-  @Override
-  public Object[] getParameterValues() {
-    return parameterValues;
-  }
-
-  public void setParameterValues(Object[] values) {
-    this.parameterValues = values;
   }
 
   /*
@@ -125,6 +92,16 @@ class MethodProxy implements IMethodProxy {
       }
     }
     return ms;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IMethodProxy#getParameterTypes()
+   */
+  @Override
+  public Object[] getParameterTypes() {
+    return parameterTypes;
   }
 
 }

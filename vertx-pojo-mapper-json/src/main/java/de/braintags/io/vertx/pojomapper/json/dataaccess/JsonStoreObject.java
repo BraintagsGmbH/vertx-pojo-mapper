@@ -168,12 +168,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
 
   protected void finishToEntity(Object tmpObject, Handler<AsyncResult<Void>> handler) {
     this.entity = tmpObject;
-    try {
-      getMapper().executeLifecycle(AfterLoad.class, entity);
-      handler.handle(Future.succeededFuture());
-    } catch (Exception e) {
-      handler.handle(Future.failedFuture(e));
-    }
+    getMapper().executeLifecycle(AfterLoad.class, entity, handler);
   }
 
   protected final void iterateFields(Object tmpObject, Handler<AsyncResult<Void>> handler) {

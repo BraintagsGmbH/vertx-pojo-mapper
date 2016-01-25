@@ -227,7 +227,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     ResultContainer resultContainer = find(context, query, 1);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
-    context.assertEquals((long) 3, resultContainer.queryResult.getCompleteResult());
+    context.assertEquals((long) 3, resultContainer.queryResult.getCompleteResult(), "incorrect complete result");
   }
 
   /*

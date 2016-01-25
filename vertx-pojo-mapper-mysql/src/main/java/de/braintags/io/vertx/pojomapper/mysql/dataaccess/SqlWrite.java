@@ -165,9 +165,14 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     Object id = getMapper().getIdField().getPropertyAccessor().readData(storeObject.getEntity());
     LOGGER.debug("updated record with id " + id);
     try {
-      executePostSave((T) storeObject.getEntity());
-      writeResult.addEntry(storeObject, id, WriteAction.UPDATE);
-      resultHandler.handle(Future.succeededFuture());
+      executePostSave((T) storeObject.getEntity(), lcr -> {
+        if (lcr.failed()) {
+          resultHandler.handle(lcr);
+        } else {
+          writeResult.addEntry(storeObject, id, WriteAction.UPDATE);
+          resultHandler.handle(Future.succeededFuture());
+        }
+      });
     } catch (Exception e) {
       resultHandler.handle(Future.failedFuture(e));
     }
@@ -256,13 +261,18 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       Object id = storeObject.get(getMapper().getIdField());
       Objects.requireNonNull(id, "Undefined ID when storing record");
       LOGGER.debug("==>>>> inserted record " + storeObject.getMapper().getTableInfo().getName() + " with id " + id);
-      executePostSave((T) storeObject.getEntity());
-      setIdValue(id, storeObject, result -> {
-        if (result.failed()) {
-          resultHandler.handle(result);
+      executePostSave((T) storeObject.getEntity(), lcr -> {
+        if (lcr.failed()) {
+          resultHandler.handle(lcr);
         } else {
-          writeResult.addEntry(storeObject, id, WriteAction.INSERT);
-          resultHandler.handle(Future.succeededFuture());
+          setIdValue(id, storeObject, result -> {
+            if (result.failed()) {
+              resultHandler.handle(result);
+            } else {
+              writeResult.addEntry(storeObject, id, WriteAction.INSERT);
+              resultHandler.handle(Future.succeededFuture());
+            }
+          });
         }
       });
     } catch (Exception e) {

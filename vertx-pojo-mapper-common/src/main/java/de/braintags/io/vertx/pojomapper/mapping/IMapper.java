@@ -27,6 +27,8 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultObjectFactory;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * IMapper is responsible to collect information about the mapped class
@@ -126,7 +128,8 @@ public interface IMapper {
    * @param entity
    *          the entity to be handled
    */
-  public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity);
+  public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity,
+      Handler<AsyncResult<Void>> handler);
 
   /**
    * Get the parent {@link IMapperFactory}

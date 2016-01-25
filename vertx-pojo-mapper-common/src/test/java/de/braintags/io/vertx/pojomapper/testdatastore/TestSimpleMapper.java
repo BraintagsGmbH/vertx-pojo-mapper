@@ -81,8 +81,8 @@ public class TestSimpleMapper extends DatastoreBaseTest {
           } else {
             SimpleMapper rsm = (SimpleMapper) result.result();
             context.assertTrue(sm.equals(rsm));
-            context.assertEquals("succeeded", rsm.afterSave);
             context.assertEquals("succeeded", rsm.beforeSave);
+            context.assertEquals("succeeded", rsm.afterSave);
             context.assertEquals("succeeded", rsm.afterLoad);
           }
         });

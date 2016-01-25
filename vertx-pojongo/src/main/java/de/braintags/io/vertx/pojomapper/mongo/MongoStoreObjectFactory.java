@@ -31,27 +31,22 @@ import io.vertx.core.json.JsonObject;
 
 public class MongoStoreObjectFactory extends AbstractStoreObjectFactory {
 
-  /**
-   * 
-   */
-  public MongoStoreObjectFactory() {
-  }
-
   @Override
   public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler) {
-    try {
-      mapper.executeLifecycle(BeforeSave.class, entity);
-      MongoStoreObject storeObject = new MongoStoreObject(mapper, entity);
-      storeObject.initFromEntity(initResult -> {
-        if (initResult.failed()) {
-          handler.handle(Future.failedFuture(initResult.cause()));
-        } else {
-          handler.handle(Future.succeededFuture(storeObject));
-        }
-      });
-    } catch (Exception e) {
-      handler.handle(Future.failedFuture(e));
-    }
+    mapper.executeLifecycle(BeforeSave.class, entity, lcr -> {
+      if (lcr.failed()) {
+        handler.handle(Future.failedFuture(lcr.cause()));
+      } else {
+        MongoStoreObject storeObject = new MongoStoreObject(mapper, entity);
+        storeObject.initFromEntity(initResult -> {
+          if (initResult.failed()) {
+            handler.handle(Future.failedFuture(initResult.cause()));
+          } else {
+            handler.handle(Future.succeededFuture(storeObject));
+          }
+        });
+      }
+    });
   }
 
   @Override

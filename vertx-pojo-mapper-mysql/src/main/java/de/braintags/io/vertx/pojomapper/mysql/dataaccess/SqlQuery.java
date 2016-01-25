@@ -191,10 +191,15 @@ public class SqlQuery<T> extends Query<T> {
   private void createQueryResult(ResultSet resultSet, SqlQueryRambler query,
       Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     SqlQueryResult<T> qR = new SqlQueryResult<T>(resultSet, (MySqlDataStore) getDataStore(), getMapper(), query);
-    if (getLimit() > 0 && isReturnCompleteCount() && qR.size() == getLimit()) {
-      fetchCompleteCount(qR, resultHandler);
+    if (isReturnCompleteCount()) {
+      if (getStart() == 0 && getLimit() > 0 && qR.size() < getLimit()) {
+        qR.setCompleteResult(qR.size());
+        resultHandler.handle(Future.succeededFuture(qR));
+      } else {
+        fetchCompleteCount(qR, resultHandler);
+      }
     } else {
-      qR.setCompleteResult(qR.size());
+      qR.setCompleteResult(-1);
       resultHandler.handle(Future.succeededFuture(qR));
     }
   }

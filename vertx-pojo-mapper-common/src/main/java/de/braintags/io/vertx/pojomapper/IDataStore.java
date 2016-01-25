@@ -21,6 +21,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
+import de.braintags.io.vertx.pojomapper.mapping.ITriggerContext;
+import de.braintags.io.vertx.pojomapper.mapping.ITriggerContextFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -147,5 +149,20 @@ public interface IDataStore {
    * @param resultHandler
    */
   void shutdown(Handler<AsyncResult<Void>> resultHandler);
+
+  /**
+   * Get the factory, which creates instances of {@link ITriggerContext} when lifecycle methods are called
+   * 
+   * @return
+   */
+  ITriggerContextFactory getTriggerContextFactory();
+
+  /**
+   * Possibility to set the factory to be used from outside, to enabe the usage of customized objects inside a trigger
+   * 
+   * @param factory
+   *          the factory to be set
+   */
+  void setTriggerContextFactory(ITriggerContextFactory factory);
 
 }

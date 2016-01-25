@@ -84,22 +84,32 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    *          the handler to be informed
    */
   protected final void deleteRecords(Handler<AsyncResult<IDeleteResult>> resultHandler) {
-    IField idField = getMapper().getIdField();
-    try {
-      for (T record : getRecordList()) {
-        getMapper().executeLifecycle(BeforeDelete.class, record);
-      }
-    } catch (Exception e) {
-      resultHandler.handle(Future.failedFuture(e));
+    if (recordList.isEmpty()) {
+      resultHandler.handle(Future.succeededFuture());
       return;
     }
-    getRecordIds(idField, res -> {
-      if (res.failed()) {
-        resultHandler.handle(Future.failedFuture(res.cause()));
-        return;
+    CounterObject<IDeleteResult> co = new CounterObject<>(recordList.size(), resultHandler);
+    for (T record : getRecordList()) {
+      getMapper().executeLifecycle(BeforeDelete.class, record, lcr -> {
+        if (lcr.failed()) {
+          co.setThrowable(lcr.cause());
+        } else {
+          if (co.reduce()) {
+            IField idField = getMapper().getIdField();
+            getRecordIds(idField, res -> {
+              if (res.failed()) {
+                resultHandler.handle(Future.failedFuture(res.cause()));
+              } else {
+                deleteRecordsById(idField, res.result(), resultHandler);
+              }
+            });
+          }
+        }
+      });
+      if (co.isError()) {
+        break;
       }
-      deleteRecordsById(idField, res.result(), resultHandler);
-    });
+    }
   }
 
   /*
@@ -198,17 +208,23 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
     deleteQuery(q, dr -> {
       if (dr.failed()) {
         resultHandler.handle(dr);
-        return;
-      }
-      try {
+      } else {
+        CounterObject<IDeleteResult> co = new CounterObject<>(recordList.size(), resultHandler);
         for (T record : getRecordList()) {
-          getMapper().executeLifecycle(AfterDelete.class, record);
+          getMapper().executeLifecycle(AfterDelete.class, record, lcr -> {
+            if (lcr.failed()) {
+              co.setThrowable(lcr.cause());
+            } else {
+              if (co.reduce()) {
+                resultHandler.handle(dr);
+              }
+            }
+          });
+          if (co.isError()) {
+            break;
+          }
         }
-      } catch (Exception e) {
-        resultHandler.handle(Future.failedFuture(e));
-        return;
       }
-      resultHandler.handle(dr);
     });
   }
 

@@ -14,7 +14,6 @@
 
 package de.braintags.io.vertx.pojomapper.testdatastore.mapper;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete;
@@ -22,8 +21,7 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeDelete;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
+import de.braintags.io.vertx.pojomapper.mapping.ITriggerContext;
 
 /**
  * 
@@ -38,8 +36,6 @@ public class TriggerMapper {
   public String id = null;
   public String name = "testName";
   public String beforeSaveWithDataStore = "testName";
-  public String beforeSaveWithDataStoreAndHandler = "testName";
-  public String beforeSaveWithHandlerAndDatastore;
   public String afterSave = "testName";
   public String afterSaveWithDataStore = "testName";
 
@@ -65,7 +61,7 @@ public class TriggerMapper {
   }
 
   @AfterDelete
-  public void afterDeleteWithDatastore(IDataStore datastore) {
+  public void afterDeleteWithDatastore(ITriggerContext th) {
     this.afterDeleteWithDatastore = "afterDeleteWithDatastore";
   }
 
@@ -75,7 +71,8 @@ public class TriggerMapper {
   }
 
   @BeforeDelete
-  public void beforeDeleteWithDatastore(IDataStore datastore) {
+  public void beforeDeleteWithDatastore(ITriggerContext th) {
+    checkTriggerContext(th);
     this.beforeDeleteWithDatastore = "beforeDeleteWithDatastore";
   }
 
@@ -85,18 +82,9 @@ public class TriggerMapper {
   }
 
   @BeforeSave
-  public void beforeSaveWithParameter(IDataStore datastore) {
+  public void beforeSaveWithParameter(ITriggerContext th) {
+    checkTriggerContext(th);
     this.beforeSaveWithDataStore = "beforeSaveWithDataStore";
-  }
-
-  @BeforeSave
-  public void beforeSaveWithDatastoreAndHandler(IDataStore datastore, Handler<AsyncResult<Void>> handler) {
-    this.beforeSaveWithDataStoreAndHandler = "beforeSaveWithDataStoreAndHandler";
-  }
-
-  @BeforeSave
-  public void beforeSaveWithHandlerAndDatastore(Handler<AsyncResult<Void>> handler, IDataStore datastore) {
-    this.beforeSaveWithHandlerAndDatastore = "beforeSaveWithHandlerAndDatastore";
   }
 
   @AfterSave
@@ -105,7 +93,8 @@ public class TriggerMapper {
   }
 
   @AfterSave
-  public void afterSaveWithDataStore(IDataStore datastore) {
+  public void afterSaveWithDataStore(ITriggerContext th) {
+    checkTriggerContext(th);
     this.afterSaveWithDataStore = "afterSaveWithDataStore";
   }
 
@@ -115,8 +104,17 @@ public class TriggerMapper {
   }
 
   @AfterLoad
-  public void afterLoadWithDatastore(IDataStore datastore) {
+  public void afterLoadWithDatastore(ITriggerContext th) {
+    checkTriggerContext(th);
     this.afterLoadWithDatastore = "afterLoadWithDatastore";
   }
 
+  private void checkTriggerContext(ITriggerContext th) {
+    if (th == null) {
+      throw new NullPointerException("triggercontext is null");
+    }
+    if (th.getMapper() == null) {
+      throw new NullPointerException("mapper is null");
+    }
+  }
 }

@@ -36,19 +36,20 @@ public class JsonStoreObjectFactory extends AbstractStoreObjectFactory {
 
   @Override
   public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler) {
-    try {
-      mapper.executeLifecycle(BeforeSave.class, entity);
-      JsonStoreObject storeObject = new JsonStoreObject(mapper, entity);
-      storeObject.initFromEntity(initResult -> {
-        if (initResult.failed()) {
-          handler.handle(Future.failedFuture(initResult.cause()));
-        } else {
-          handler.handle(Future.succeededFuture(storeObject));
-        }
-      });
-    } catch (Exception e) {
-      handler.handle(Future.failedFuture(e));
-    }
+    mapper.executeLifecycle(BeforeSave.class, entity, lcr -> {
+      if (lcr.failed()) {
+        handler.handle(Future.failedFuture(lcr.cause()));
+      } else {
+        JsonStoreObject storeObject = new JsonStoreObject(mapper, entity);
+        storeObject.initFromEntity(initResult -> {
+          if (initResult.failed()) {
+            handler.handle(Future.failedFuture(initResult.cause()));
+          } else {
+            handler.handle(Future.succeededFuture(storeObject));
+          }
+        });
+      }
+    });
   }
 
   @Override

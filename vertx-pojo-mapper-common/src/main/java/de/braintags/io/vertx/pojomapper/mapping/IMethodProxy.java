@@ -30,9 +30,9 @@ public interface IMethodProxy {
   public Method getMethod();
 
   /**
-   * Get the prepared parameters for a method call
+   * Get the parameter types for a method call
    * 
    * @return
    */
-  public Object[] getParameterValues();
+  public Object[] getParameterTypes();
 }

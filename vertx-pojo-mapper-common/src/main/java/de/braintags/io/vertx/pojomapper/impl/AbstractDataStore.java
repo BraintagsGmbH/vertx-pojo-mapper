@@ -22,7 +22,9 @@ import de.braintags.io.vertx.pojomapper.exception.UnsupportedKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.ITriggerContextFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
+import de.braintags.io.vertx.pojomapper.mapping.impl.TriggerContextFactory;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
@@ -40,6 +42,7 @@ public abstract class AbstractDataStore implements IDataStore {
   private ITableGenerator tableGenerator;
   private IDataStoreSynchronizer dataStoreSynchronizer;
   private Map<String, IKeyGenerator> keyGeneratorMap = new HashMap<>();
+  private ITriggerContextFactory triggerContextFactory = new TriggerContextFactory();
 
   /**
    * Create a new instance. The possible properties are defined by its concete implementation
@@ -157,6 +160,23 @@ public abstract class AbstractDataStore implements IDataStore {
   @Override
   public Vertx getVertx() {
     return vertx;
+  }
+
+  /**
+   * @return the triggerContextFactory
+   */
+  @Override
+  public final ITriggerContextFactory getTriggerContextFactory() {
+    return triggerContextFactory;
+  }
+
+  /**
+   * @param triggerContextFactory
+   *          the triggerContextFactory to set
+   */
+  @Override
+  public final void setTriggerContextFactory(ITriggerContextFactory triggerContextFactory) {
+    this.triggerContextFactory = triggerContextFactory;
   }
 
 }

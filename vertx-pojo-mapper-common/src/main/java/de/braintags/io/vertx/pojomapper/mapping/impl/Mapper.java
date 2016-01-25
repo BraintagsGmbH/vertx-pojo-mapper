@@ -1,15 +1,15 @@
 /*
- * #%L
- * vertx-pojo-mapper-common
- * %%
- * Copyright (C) 2015 Braintags GmbH
- * %%
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * #L%
- */
+* #%L
+* vertx-pojo-mapper-common
+* %%
+* Copyright (C) 2015 Braintags GmbH
+* %%
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+* #L%
+*/
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
 import java.beans.BeanInfo;
@@ -18,7 +18,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -42,26 +41,28 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.exception.ClassAccessException;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
-import de.braintags.io.vertx.pojomapper.exception.MethodAccessException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IMethodProxy;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyAccessor;
-import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.util.ClassUtil;
+import de.braintags.io.vertx.util.CounterObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * This implementation of {@link IMapper} is using the bean convention to define fields, which shall be mapped. It is
  * first reading all public, non transient fields, then the bean-methods ( public getter/setter ). The way of mapping
  * can be defined by adding several annotations to the field
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 
 public class Mapper implements IMapper {
@@ -102,7 +103,7 @@ public class Mapper implements IMapper {
 
   /**
    * Creates a new definition for the given mapper class
-   * 
+   *
    * @param mapperClass
    *          the mapper class to be handled
    * @param mapperFactory
@@ -118,7 +119,7 @@ public class Mapper implements IMapper {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getObjectFactory()
    */
   @Override
@@ -218,10 +219,9 @@ public class Mapper implements IMapper {
       lifecycleMethods.put(ann, lcMethods);
     }
 
-    MethodProxy mp = new MethodProxy(method);
+    MethodProxy mp = new MethodProxy(method, this);
     if (!lcMethods.contains(mp)) {
       lcMethods.add(mp);
-      mp.computeParameterValues(this);
     }
   }
 
@@ -291,7 +291,7 @@ public class Mapper implements IMapper {
 
   /**
    * Get the {@link MapperFactory} which created the current instance
-   * 
+   *
    * @return
    */
   @Override
@@ -301,7 +301,7 @@ public class Mapper implements IMapper {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getFieldNames()
    */
   @Override
@@ -311,7 +311,7 @@ public class Mapper implements IMapper {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getField(java.lang.String)
    */
   @Override
@@ -324,7 +324,7 @@ public class Mapper implements IMapper {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getMapperClass()
    */
   @Override
@@ -334,7 +334,7 @@ public class Mapper implements IMapper {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getLifecycleMethods(java.lang.Class)
    */
   @Override
@@ -344,7 +344,7 @@ public class Mapper implements IMapper {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getEntity()
    */
   @Override
@@ -354,7 +354,7 @@ public class Mapper implements IMapper {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getAnnotation(java.lang.Class)
    */
   @Override
@@ -365,7 +365,7 @@ public class Mapper implements IMapper {
   /**
    * Add an Annotation, for which the Mapper shall be checked. Existing annotations of that type can be requested by
    * method {@link #getAnnotation(Class)}
-   * 
+   *
    * @param annotation
    *          the Annotation class, which we are interested in
    */
@@ -375,7 +375,7 @@ public class Mapper implements IMapper {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getAnnotatedFields(java.lang.Class)
    */
   @Override
@@ -399,45 +399,50 @@ public class Mapper implements IMapper {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#executeLifecycle(java.lang.Class, java.lang.Object)
    */
   @Override
-  public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity) {
+  public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity,
+      Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start executing Lifecycle " + annotationClass.getSimpleName());
     List<IMethodProxy> methods = getLifecycleMethods(annotationClass);
-    if (methods == null) {
+    if (methods == null || methods.isEmpty()) {
       LOGGER.debug("nothing to execute");
-      return;
-    }
-
-    for (IMethodProxy mp : methods) {
-      Method method = mp.getMethod();
-      method.setAccessible(true);
-      Object[] args = mp.getParameterValues();
-
-      try {
-        Object result = method.invoke(entity, args);
-        if (result != null)
-          throw new UnsupportedOperationException(
-              "Not yet supported, return value of annotated lifecyle methods: " + result.getClass().getName());
-      } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-        throw new MethodAccessException(e);
+      handler.handle(Future.succeededFuture());
+    } else {
+      CounterObject<Void> co = new CounterObject<>(methods.size(), handler);
+      for (IMethodProxy mp : methods) {
+        executeMethod(mp, entity, result -> {
+          if (result.failed()) {
+            co.setThrowable(result.cause());
+          } else {
+            if (co.reduce()) {
+              LOGGER.debug("finished Lifecycle");
+              handler.handle(result);
+            }
+          }
+        });
+        if (co.isError()) {
+          break;
+        }
       }
     }
-    LOGGER.debug("finished Lifecycle");
   }
 
-  /**
-   * Lets try to generate some arguments like {@link IDataStore}, {@link IStoreObject} for instance?
-   * 
-   * @param method
-   * @param entity
-   * @return
-   */
-  private Object[] createMethodArgs(Method method, Object entity) {
-    this.getMapperFactory().getDataStore();
-    throw new UnsupportedOperationException("Not yet supported, dynamic generation of arguments: " + method + entity);
+  private void executeMethod(IMethodProxy mp, Object entity, Handler<AsyncResult<Void>> handler) {
+    Method method = mp.getMethod();
+    method.setAccessible(true);
+    Object[] args = mp.getParameterTypes() == null ? null
+        : new Object[] {
+            getMapperFactory().getDataStore().getTriggerContextFactory().createTriggerContext(this, handler) };
+    try {
+      LOGGER.debug("invoking trigger method " + method.getName());
+      method.invoke(entity, args);
+      handler.handle(Future.succeededFuture());
+    } catch (Exception e) {
+      handler.handle(Future.failedFuture(e));
+    }
   }
 
   @Override
@@ -452,7 +457,7 @@ public class Mapper implements IMapper {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#isSyncNeeded()
    */
   @Override
@@ -462,7 +467,7 @@ public class Mapper implements IMapper {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#setSyncNeeded(boolean)
    */
   @Override
@@ -478,7 +483,7 @@ public class Mapper implements IMapper {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getKeyGenerator()
    */
   @Override

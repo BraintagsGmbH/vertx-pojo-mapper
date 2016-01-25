@@ -87,7 +87,7 @@ public abstract class DatastoreBaseTest {
     }
     write.save(result -> {
       if (result.failed()) {
-        resultContainer.assertionError = resultContainer.assertionError = new AssertionError(result.cause());
+        resultContainer.assertionError = new AssertionError(result.cause());
         async.complete();
       } else {
         try {

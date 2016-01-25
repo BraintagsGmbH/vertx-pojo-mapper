@@ -32,7 +32,7 @@ public class TestTrigger extends DatastoreBaseTest {
   private static final Logger log = LoggerFactory.getLogger(TestTrigger.class);
 
   @Test
-  public void testBeforeAfterSave(TestContext context) {
+  public void testAllTriggers(TestContext context) {
     clearTable(context, "TriggerMapper");
 
     TriggerMapper tm = new TriggerMapper();
@@ -42,7 +42,6 @@ public class TestTrigger extends DatastoreBaseTest {
       throw resultContainer.assertionError;
     context.assertEquals("beforeSave", tm.name);
     context.assertEquals("beforeSaveWithDataStore", tm.beforeSaveWithDataStore);
-    context.assertEquals("beforeSaveWithDataStoreAndHandler", tm.beforeSaveWithDataStoreAndHandler);
 
     context.assertEquals("afterSave", tm.afterSave);
     context.assertEquals("afterSaveWithDataStore", tm.afterSaveWithDataStore);

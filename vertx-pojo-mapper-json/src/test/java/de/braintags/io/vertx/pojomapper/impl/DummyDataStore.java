@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.JsonTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.ITriggerContextFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import io.vertx.core.AsyncResult;
@@ -44,6 +45,7 @@ public class DummyDataStore implements IDataStore {
   ITableGenerator tg = new DummyTableGenerator();
   String database;
   private JsonObject properties;
+  private ITriggerContextFactory triggerContextFactory;
 
   public DummyDataStore() {
   }
@@ -218,4 +220,19 @@ public class DummyDataStore implements IDataStore {
   @Override
   public void shutdown(Handler<AsyncResult<Void>> resultHandler) {
   }
+
+  @Override
+  public final ITriggerContextFactory getTriggerContextFactory() {
+    return triggerContextFactory;
+  }
+
+  /**
+   * @param triggerContextFactory
+   *          the triggerContextFactory to set
+   */
+  @Override
+  public final void setTriggerContextFactory(ITriggerContextFactory triggerContextFactory) {
+    this.triggerContextFactory = triggerContextFactory;
+  }
+
 }
