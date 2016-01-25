@@ -62,7 +62,9 @@ public class TriggerMapper {
 
   @AfterDelete
   public void afterDeleteWithDatastore(ITriggerContext th) {
+    checkTriggerContext(th);
     this.afterDeleteWithDatastore = "afterDeleteWithDatastore";
+    th.complete();
   }
 
   @BeforeDelete
@@ -74,6 +76,7 @@ public class TriggerMapper {
   public void beforeDeleteWithDatastore(ITriggerContext th) {
     checkTriggerContext(th);
     this.beforeDeleteWithDatastore = "beforeDeleteWithDatastore";
+    th.complete();
   }
 
   @BeforeSave
@@ -85,6 +88,7 @@ public class TriggerMapper {
   public void beforeSaveWithParameter(ITriggerContext th) {
     checkTriggerContext(th);
     this.beforeSaveWithDataStore = "beforeSaveWithDataStore";
+    th.complete();
   }
 
   @AfterSave
@@ -96,6 +100,7 @@ public class TriggerMapper {
   public void afterSaveWithDataStore(ITriggerContext th) {
     checkTriggerContext(th);
     this.afterSaveWithDataStore = "afterSaveWithDataStore";
+    th.complete();
   }
 
   @AfterLoad
@@ -107,6 +112,7 @@ public class TriggerMapper {
   public void afterLoadWithDatastore(ITriggerContext th) {
     checkTriggerContext(th);
     this.afterLoadWithDatastore = "afterLoadWithDatastore";
+    th.complete();
   }
 
   private void checkTriggerContext(ITriggerContext th) {
