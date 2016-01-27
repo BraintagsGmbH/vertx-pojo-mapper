@@ -14,6 +14,7 @@ package de.braintags.io.vertx.pojomapper.util;
 
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.util.IteratorAsync;
@@ -31,6 +32,25 @@ import io.vertx.core.Handler;
 public class QueryHelper {
 
   private QueryHelper() {
+  }
+
+  /**
+   * Performs a query by id and returns the found instance, or null, if none
+   * 
+   * @param datastore
+   *          the datastore to be used
+   * @param mapperClass
+   *          the mapper class
+   * @param id
+   *          the id to search for
+   * @param handler
+   *          the handler to be informed
+   */
+  public static final void findRecordById(IDataStore datastore, Class<?> mapperClass, String id,
+      Handler<AsyncResult<?>> handler) {
+    IQuery<?> query = datastore.createQuery(mapperClass);
+    query.field(query.getMapper().getIdField().getName()).is(id);
+    executeToFirstRecord(query, handler);
   }
 
   /**

@@ -199,6 +199,36 @@ public abstract class DatastoreBaseTest {
   }
 
   /**
+   * Executes a query and returns all found records
+   * 
+   * @param context
+   *          the context to be used
+   * @param query
+   *          the query to be executed
+   * @return teh list of records
+   */
+  public static List<?> findAll(TestContext context, IQuery<?> query) {
+    Async async = context.async();
+    ResultObject<List<?>> res = new ResultObject<>(null);
+    QueryHelper.executeToList(query, result -> {
+      if (result.failed()) {
+        res.setThrowable(result.cause());
+        async.complete();
+      } else {
+        res.setResult(result.result());
+        async.complete();
+      }
+    });
+
+    async.await();
+    if (res.isError()) {
+      throw res.getRuntimeException();
+    } else {
+      return res.getResult();
+    }
+  }
+
+  /**
    * Executes a query and checks for the expected result
    * 
    * @param query
@@ -282,7 +312,9 @@ public abstract class DatastoreBaseTest {
     resultFine(qResult);
     IQueryCountResult qr = qResult.result();
     context.assertNotNull(qr);
-    context.assertEquals(new Long(expectedResult), new Long(qr.getCount()));
+    if (expectedResult >= 0) {
+      context.assertEquals(new Long(expectedResult), new Long(qr.getCount()));
+    }
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
