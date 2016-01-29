@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.testdatastore;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
+import de.braintags.io.vertx.BtVertxTestBase;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ExceptionUtil;
@@ -108,7 +109,10 @@ public class TestHelper {
 
   /**
    * Creates the VertxOptions by checking System variables BlockedThreadCheckInterval and WarningExceptionTime
+   * 
+   * @deprecated Use {@link BtVertxTestBase#getOptions()}
    */
+  @Deprecated
   public static VertxOptions getOptions() {
     VertxOptions options = new VertxOptions();
     String blockedThreadCheckInterval = System.getProperty("BlockedThreadCheckInterval");

@@ -12,7 +12,7 @@
 	<artifactId>vertx-pojongo</artifactId>
 
 	<properties>
-		<MONGO_VERSION>3.0.0</MONGO_VERSION>
+		<MONGO_VERSION>3.2.0</MONGO_VERSION>
 		<maven.test.skip>false</maven.test.skip>
 		<doc.skip>false</doc.skip>
 		<source.skip>false</source.skip>

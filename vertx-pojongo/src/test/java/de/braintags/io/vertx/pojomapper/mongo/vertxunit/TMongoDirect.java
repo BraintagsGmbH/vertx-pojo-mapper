@@ -38,7 +38,6 @@ public class TMongoDirect extends DatastoreBaseTest {
     LOGGER.info("-->>test");
     MongoDataStore ds = (MongoDataStore) getDataStore();
     MongoClient client = ds.getMongoClient();
-
     JsonObject jsonCommand = new JsonObject();
     // getNextSequenceValue("productid")
     // jsonCommand.put("_id", "getNextSequenceValue(\"productid\")".getBytes());
@@ -50,9 +49,7 @@ public class TMongoDirect extends DatastoreBaseTest {
       } else {
         LOGGER.info("executed: " + result.result());
       }
-
     });
-
   }
 
   @Test
@@ -78,6 +75,39 @@ public class TMongoDirect extends DatastoreBaseTest {
           if (ur.failed()) {
             LOGGER.error("", ur.cause());
             context.fail(ur.cause());
+            as.complete();
+          } else {
+            LOGGER.info("success");
+            as.complete();
+          }
+        });
+      }
+    });
+    as.await();
+  }
+
+  // "$inc"
+  @Test
+  public void testUpdateWithInc(TestContext context) {
+    Async as = context.async();
+    String collection = "UpdateTestCollection";
+    MongoDataStore ds = (MongoDataStore) getDataStore();
+    MongoClient client = ds.getMongoClient();
+
+    JsonObject jsonCommand = new JsonObject();
+    jsonCommand.put("name", "testName");
+    client.insert(collection, jsonCommand, result -> {
+      if (result.failed()) {
+        LOGGER.error("", result.cause());
+        as.complete();
+      } else {
+        LOGGER.info("executed: " + result.result());
+        JsonObject query = new JsonObject();
+        query.put("_id", result.result());
+        jsonCommand.put("name", "modified name");
+        client.save(collection, jsonCommand, ur -> {
+          if (ur.failed()) {
+            LOGGER.error("", ur.cause());
             as.complete();
           } else {
             LOGGER.info("success");
