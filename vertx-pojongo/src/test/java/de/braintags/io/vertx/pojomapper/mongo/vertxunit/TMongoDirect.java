@@ -86,16 +86,22 @@ public class TMongoDirect extends DatastoreBaseTest {
     as.await();
   }
 
-  // "$inc"
+  /**
+   * Creats a collection with a nummeric value and executes findAndModify to raise and return the numeric value inside
+   * one request to perform a sequence
+   * 
+   * @param context
+   */
   @Test
-  public void testUpdateWithInc(TestContext context) {
+  public void createSequence(TestContext context) {
     Async as = context.async();
-    String collection = "UpdateTestCollection";
+    String collection = "SequenceTest";
     MongoDataStore ds = (MongoDataStore) getDataStore();
     MongoClient client = ds.getMongoClient();
+    clearTable(context, collection);
 
     JsonObject jsonCommand = new JsonObject();
-    jsonCommand.put("name", "testName");
+    jsonCommand.put("sequence", 1);
     client.insert(collection, jsonCommand, result -> {
       if (result.failed()) {
         LOGGER.error("", result.cause());
@@ -104,19 +110,53 @@ public class TMongoDirect extends DatastoreBaseTest {
         LOGGER.info("executed: " + result.result());
         JsonObject query = new JsonObject();
         query.put("_id", result.result());
-        jsonCommand.put("name", "modified name");
-        client.save(collection, jsonCommand, ur -> {
+        JsonObject execComnand = createSequenceCommand(collection, query, "sequence");
+        client.runCommand("findAndModify", execComnand, ur -> {
           if (ur.failed()) {
             LOGGER.error("", ur.cause());
+            context.fail(ur.cause());
             as.complete();
           } else {
             LOGGER.info("success");
+            LOGGER.info("RESULT" + ur.result());
+            JsonObject resJo = ur.result();
+            JsonObject value = resJo.getJsonObject("value");
+            int seq = value.getInteger("sequence");
+            context.assertEquals(2, seq, "the sequence is wrong");
             as.complete();
           }
         });
       }
     });
     as.await();
+  }
+
+  private JsonObject createSequenceCommand(String collection, JsonObject query, String sequenceField) {
+    JsonObject updateCommand = new JsonObject().put("$inc", new JsonObject().put(sequenceField, 1));
+    return createFindAndModify(collection, query, updateCommand);
+  }
+
+  /*
+   * {
+   * findAndModify: <collection-name>,
+   * query: <document>,
+   * sort: <document>,
+   * remove: <boolean>,
+   * update: <document>,
+   * new: <boolean>,
+   * fields: <document>,
+   * upsert: <boolean>,
+   * bypassDocumentValidation: <boolean>,
+   * writeConcern: <document>
+   * }
+   */
+  private JsonObject createFindAndModify(String collection, JsonObject query, JsonObject updateCommand) {
+    JsonObject retOb = new JsonObject();
+    retOb.put("findAndModify", collection);
+    retOb.put("query", query);
+    retOb.put("update", updateCommand);
+    retOb.put("new", true);
+    return retOb;
   }
 
   @Test

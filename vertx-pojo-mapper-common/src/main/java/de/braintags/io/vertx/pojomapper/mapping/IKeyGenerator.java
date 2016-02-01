@@ -20,7 +20,7 @@ import io.vertx.core.Handler;
 
 /**
  * The IKeyGenerator is used to generate primary keys for new instances of an {@link IMapper}. The IKeyGenerator can be
- * set per IMapper by using the annotation
+ * set per IMapper by using the annotation {@link KeyGenerator}
  * 
  * @author Michael Remme
  * 
