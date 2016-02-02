@@ -19,9 +19,9 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
+import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
-import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DebugGenerator;
-import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.FileKeyGenerator;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlDelete;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQuery;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObjectFactory;
@@ -48,6 +48,7 @@ public class MySqlDataStore extends AbstractDataStore {
 
   private AsyncSQLClient sqlClient;
   private MySqlMetaData metaData;
+  private DefaultKeyGenerator defaultKeyGenerator = new DefaultKeyGenerator(this);
 
   /**
    * Constructor for a sql based datastore
@@ -65,17 +66,6 @@ public class MySqlDataStore extends AbstractDataStore {
         new SqlStoreObjectFactory()));
     setDataStoreSynchronizer(new SqlDataStoreSynchronizer(this));
     setTableGenerator(new SqlTableGenerator());
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.impl.AbstractDataStore#initSupportedKeyGenerators()
-   */
-  @Override
-  protected void initSupportedKeyGenerators() {
-    addSupportedKeyGenerator(new DebugGenerator(this));
-    addSupportedKeyGenerator(new FileKeyGenerator(this));
   }
 
   /*
@@ -138,6 +128,17 @@ public class MySqlDataStore extends AbstractDataStore {
   @Override
   public void shutdown(Handler<AsyncResult<Void>> resultHandler) {
     sqlClient.close(resultHandler);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()
+   */
+  @Override
+  public final IKeyGenerator getDefaultKeyGenerator() {
+    String genName = getProperties().getString(IKeyGenerator.DEFAULT_KEY_GENERATOR);
+    return genName == null ? defaultKeyGenerator : getKeyGenerator(genName);
   }
 
 }

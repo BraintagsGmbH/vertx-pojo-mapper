@@ -42,7 +42,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
   public void testQuerySchema(TestContext context) {
     Async async = context.async();
     String queryExpression = "SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='test' AND TABLE_NAME='SimpleMapper'; ";
-    SqlUtil.query((MySqlDataStore) getDataStore(), queryExpression, ur -> {
+    SqlUtil.query((MySqlDataStore) getDataStore(context), queryExpression, ur -> {
       if (ur.failed()) {
         context.fail(ur.cause().toString());
         async.complete();
@@ -58,7 +58,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
   public void testTimeField(TestContext context) {
     String createTableString = "Create TABLE IF NOT EXISTS  timetable (id INT NOT NULL AUTO_INCREMENT, myTime TIMESTAMP, PRIMARY KEY(id))";
     Async async = context.async();
-    SqlUtil.execute((MySqlDataStore) getDataStore(), createTableString, createTableResult -> {
+    SqlUtil.execute((MySqlDataStore) getDataStore(context), createTableString, createTableResult -> {
       if (createTableResult.failed()) {
         log.error("", createTableResult.cause());
         context.fail(createTableResult.cause());
@@ -67,7 +67,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
         String insertExpression = "insert into timetable set myTime=?; ";
         JsonArray array = new JsonArray().add("2015-10-13 18:45:22");
 
-        SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), insertExpression, array, ur -> {
+        SqlUtil.updateWithParams((MySqlDataStore) getDataStore(context), insertExpression, array, ur -> {
           if (ur.failed()) {
             log.error("", ur.cause());
             async.complete();
@@ -77,7 +77,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
             log.info(res.getKeys());
 
             String allRecords = "SELECT * from timetable";
-            SqlUtil.query((MySqlDataStore) getDataStore(), allRecords, idResult -> {
+            SqlUtil.query((MySqlDataStore) getDataStore(context), allRecords, idResult -> {
               if (idResult.failed()) {
                 log.error("", idResult.cause());
                 context.fail(idResult.cause());
@@ -102,7 +102,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
     JsonArray array = new JsonArray().add("new name");
     String insertExpression = "insert into MiniMapper set name=?; ";
 
-    SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), insertExpression, array, ur -> {
+    SqlUtil.updateWithParams((MySqlDataStore) getDataStore(context), insertExpression, array, ur -> {
       if (ur.failed()) {
         log.error("", ur.cause());
         async.complete();
@@ -112,7 +112,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
         log.info(res.getKeys());
 
         String lastInsertIdCmd = "SELECT LAST_INSERT_ID()";
-        SqlUtil.query((MySqlDataStore) getDataStore(), lastInsertIdCmd, idResult -> {
+        SqlUtil.query((MySqlDataStore) getDataStore(context), lastInsertIdCmd, idResult -> {
           if (idResult.failed()) {
             log.error("", ur.cause());
             context.fail(ur.cause());
@@ -137,7 +137,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
     JsonArray array = new JsonArray().add("1").add("2").add("3");
     String insertExpression = "SELECT * from MiniMapper where id IN ( ?, ?, ?); ";
 
-    SqlUtil.queryWithParams((MySqlDataStore) getDataStore(), insertExpression, array, ur -> {
+    SqlUtil.queryWithParams((MySqlDataStore) getDataStore(context), insertExpression, array, ur -> {
       if (ur.failed()) {
         log.error("ERror searching", ur.cause());
         context.fail(ur.cause());
@@ -156,7 +156,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
     JsonArray array = new JsonArray().add("1").add("2").add("3");
     String insertExpression = "Delete from MiniMapper where id IN ( ?, ?, ?); ";
 
-    SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), insertExpression, array, ur -> {
+    SqlUtil.updateWithParams((MySqlDataStore) getDataStore(context), insertExpression, array, ur -> {
       if (ur.failed()) {
         log.error("Error deleting", ur.cause());
         async.complete();

@@ -15,7 +15,7 @@ package examples;
 import java.util.Objects;
 
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
-import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.FileKeyGenerator;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -35,7 +35,7 @@ public class InitMySql {
 
     JsonObject mySQLClientConfig = new JsonObject().put("host", "localhost").put("username", username)
         .put("password", password).put("database", database).put("port", 3306)
-        .put(IKeyGenerator.DEFAULT_KEY_GENERATOR, FileKeyGenerator.NAME);
+        .put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DefaultKeyGenerator.NAME);
 
     mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
     datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig);

@@ -81,11 +81,9 @@
  * ===== {@link de.braintags.io.vertx.pojomapper.annotation.KeyGenerator}
  * With this annotation you may define the {@link de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator}, which shall
  * be used for the mapper. Normally the IKeyGenerator is used, which is defined as default by
- * {@link de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()}. As a value for this annotation you are
- * defining the name of the IKeyGenerator, which shall be used, for instance
- * {@link de.braintags.io.vertx.pojomapper.mapping.impl.keygen.FileKeyGenerator#NAME}. You must define an IKeyGenerator,
- * which is supported by the {@link de.braintags.io.vertx.pojomapper.IDataStore}, otherwise an Exception will be thrown
- * during the mapping process.
+ * {@link de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()}, which should be normally
+ * {@link de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator}. As a value for this annotation you
+ * are defining the name of the IKeyGenerator, which shall be used, for instance
  * 
  *
  * @author Michael Remme

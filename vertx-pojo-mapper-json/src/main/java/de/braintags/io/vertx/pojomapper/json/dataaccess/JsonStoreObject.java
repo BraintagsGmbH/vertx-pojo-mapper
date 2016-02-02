@@ -221,7 +221,7 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    * 
    * @param handler
    */
-  public final void initFromEntity(Handler<AsyncResult<Void>> handler) {
+  public void initFromEntity(Handler<AsyncResult<Void>> handler) {
     CounterObject<Void> co = new CounterObject<>(mapper.getFieldNames().size(), handler);
     for (String fieldName : mapper.getFieldNames()) {
       initFieldFromEntity(fieldName, result -> {
@@ -273,4 +273,12 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
     return newInstance;
   }
 
+  /**
+   * Set the information, wether this underlaying instance is new for the datastore
+   * 
+   * @param newInstance
+   */
+  protected void setNewInstance(boolean newInstance) {
+    this.newInstance = newInstance;
+  }
 }

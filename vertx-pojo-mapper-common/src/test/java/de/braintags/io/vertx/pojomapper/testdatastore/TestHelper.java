@@ -16,12 +16,17 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
 import de.braintags.io.vertx.BtVertxTestBase;
+import de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle;
+import de.braintags.io.vertx.keygenerator.Settings;
+import de.braintags.io.vertx.keygenerator.impl.MongoKeyGenerator;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ExceptionUtil;
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
 
 /**
  * 
@@ -35,6 +40,7 @@ public class TestHelper {
 
   public static Vertx vertx;
   private static IDatastoreContainer datastoreContainer;
+  private static KeyGeneratorVerticle keyGenVerticle;
 
   /**
    * 
@@ -42,10 +48,10 @@ public class TestHelper {
   private TestHelper() {
   }
 
-  public static IDatastoreContainer getDatastoreContainer() {
+  public static IDatastoreContainer getDatastoreContainer(TestContext context) {
     if (datastoreContainer == null) {
       try {
-        startup();
+        startup(context);
       } catch (Exception e) {
         throw ExceptionUtil.createRuntimeException(e);
       }
@@ -56,7 +62,7 @@ public class TestHelper {
   /**
    * Init the datastore
    */
-  public static final void startup() throws Exception {
+  public static final void startup(TestContext context) throws Exception {
     logger.info("setup");
     CountDownLatch latch = new CountDownLatch(1);
     vertx = Vertx.vertx(getOptions());
@@ -78,6 +84,7 @@ public class TestHelper {
     });
 
     latch.await();
+    startKeyGeneratorVerticle(context);
     if (err.isError())
       throw err.getRuntimeException();
   }
@@ -105,6 +112,31 @@ public class TestHelper {
     if (err.isError())
       throw err.getRuntimeException();
 
+  }
+
+  public static void startKeyGeneratorVerticle(TestContext context) {
+    if (keyGenVerticle == null) {
+      logger.info("init Keygenerator");
+      Async async = context.async();
+      keyGenVerticle = createKeyGenerator(context);
+      vertx.deployVerticle(keyGenVerticle, result -> {
+        if (result.failed()) {
+          context.fail(result.cause());
+          async.complete();
+        } else {
+          async.complete();
+        }
+      });
+      async.awaitSuccess();
+    }
+
+  }
+
+  private static KeyGeneratorVerticle createKeyGenerator(TestContext context) {
+    Settings settings = new Settings();
+    settings.setKeyGeneratorClass(MongoKeyGenerator.class);
+    settings.getGeneratorProperties().put(MongoKeyGenerator.COLLECTTION_PROP, "keyGenSequence");
+    return new KeyGeneratorVerticle(settings);
   }
 
   /**

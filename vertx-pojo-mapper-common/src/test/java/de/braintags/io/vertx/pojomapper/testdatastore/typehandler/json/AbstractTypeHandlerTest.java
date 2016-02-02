@@ -41,11 +41,11 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
   @Test
   public final void testTypeHandler(TestContext context) {
     BaseRecord record = createInstance(null);
-    IMapper mapper = getDataStore().getMapperFactory().getMapper(record.getClass());
+    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(record.getClass());
     IField field = mapper.getField(getTestFieldName());
     ITypeHandler th = field.getTypeHandler();
     context.assertNotNull(th);
-    String typeHandlerName = TestHelper.getDatastoreContainer().getExpectedTypehandlerName(getClass(),
+    String typeHandlerName = TestHelper.getDatastoreContainer(context).getExpectedTypehandlerName(getClass(),
         getExpectedTypeHandlerClassName());
     context.assertEquals(typeHandlerName, th.getClass().getName());
   }
@@ -79,7 +79,7 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
     }
 
     // SimpleQuery for all records
-    IQuery<? extends BaseRecord> query = getDataStore().createQuery(record.getClass());
+    IQuery<? extends BaseRecord> query = getDataStore(context).createQuery(record.getClass());
     resultContainer = find(context, query, 1);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;

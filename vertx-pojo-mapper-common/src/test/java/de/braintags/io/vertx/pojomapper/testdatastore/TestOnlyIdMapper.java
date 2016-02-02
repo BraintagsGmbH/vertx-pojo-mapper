@@ -23,7 +23,7 @@ public class TestOnlyIdMapper extends DatastoreBaseTest {
       throw resultContainer.assertionError;
 
     // SimpleQuery for all records
-    IQuery<OnlyIdMapper> query = getDataStore().createQuery(OnlyIdMapper.class);
+    IQuery<OnlyIdMapper> query = getDataStore(context).createQuery(OnlyIdMapper.class);
     resultContainer = find(context, query, 1);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;

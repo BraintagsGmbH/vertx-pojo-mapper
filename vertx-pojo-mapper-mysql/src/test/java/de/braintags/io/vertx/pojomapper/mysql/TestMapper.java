@@ -45,12 +45,12 @@ public class TestMapper extends DatastoreBaseTest {
   @Test
   public void simpleTest(TestContext context) {
     log.info("-->>test");
-    context.assertNotNull(TestHelper.getDatastoreContainer());
+    context.assertNotNull(TestHelper.getDatastoreContainer(context));
   }
 
   @Test
   public void testId(TestContext context) {
-    IMapper mapper = getDataStore().getMapperFactory().getMapper(MiniMapper.class);
+    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(MiniMapper.class);
     IField idField = mapper.getField("id");
     context.assertNotNull(idField, "Improve that the name of the id field is 'id'");
 
@@ -79,7 +79,7 @@ public class TestMapper extends DatastoreBaseTest {
 
   @Test
   public void testMetaData(TestContext context) {
-    IMapper mapper = getDataStore().getMapperFactory().getMapper(MiniMapper.class);
+    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(MiniMapper.class);
     ITableInfo ti = mapper.getTableInfo();
     context.assertNotNull(ti);
     context.assertEquals("MiniMapper", ti.getName());

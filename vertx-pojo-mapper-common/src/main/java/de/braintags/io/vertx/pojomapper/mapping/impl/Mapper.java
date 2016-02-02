@@ -83,7 +83,8 @@ public class Mapper implements IMapper {
   /**
    * all annotations which shall be examined for the mapper class itself
    */
-  private static final List<Class<? extends Annotation>> CLASS_ANNOTATIONS = Arrays.asList(Indexes.class);
+  private static final List<Class<? extends Annotation>> CLASS_ANNOTATIONS = Arrays.asList(Indexes.class,
+      KeyGenerator.class);
 
   /**
    * all annotations which shall be examined for the mapper class itself

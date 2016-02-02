@@ -47,7 +47,6 @@ public class TestAllMongo {
   @BeforeClass
   public static void startup() throws Exception {
     LOGGER.info("STARTING SUITE");
-    TestHelper.startup();
   }
 
   @AfterClass

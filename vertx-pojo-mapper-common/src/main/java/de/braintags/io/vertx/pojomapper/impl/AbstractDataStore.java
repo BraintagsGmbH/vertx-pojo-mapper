@@ -25,6 +25,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.ITriggerContextFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.TriggerContextFactory;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DebugGenerator;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
@@ -57,12 +59,6 @@ public abstract class AbstractDataStore implements IDataStore {
     this.properties = properties;
     initSupportedKeyGenerators();
   }
-
-  /**
-   * Define all {@link IKeyGenerator}, which are supported by the current instance by using the method
-   * {@link #addSupportedKeyGenerator(IKeyGenerator)}
-   */
-  protected abstract void initSupportedKeyGenerators();
 
   /*
    * (non-Javadoc)
@@ -133,6 +129,15 @@ public abstract class AbstractDataStore implements IDataStore {
     keyGeneratorMap.put(generator.getName(), generator);
   }
 
+  /**
+   * Define all {@link IKeyGenerator}, which are supported by the current instance by using the method
+   * {@link #addSupportedKeyGenerator(IKeyGenerator)}
+   */
+  protected void initSupportedKeyGenerators() {
+    addSupportedKeyGenerator(new DebugGenerator(this));
+    addSupportedKeyGenerator(new DefaultKeyGenerator(this));
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -144,17 +149,6 @@ public abstract class AbstractDataStore implements IDataStore {
       return keyGeneratorMap.get(generatorName);
     }
     throw new UnsupportedKeyGenerator("This generator is not supported by the current datastore: " + generatorName);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()
-   */
-  @Override
-  public IKeyGenerator getDefaultKeyGenerator() {
-    String genName = getProperties().getString(IKeyGenerator.DEFAULT_KEY_GENERATOR);
-    return genName == null ? null : getKeyGenerator(genName);
   }
 
   @Override

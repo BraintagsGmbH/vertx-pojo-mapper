@@ -36,49 +36,49 @@ public class TestSqlQueryRambler extends DatastoreBaseTest {
 
   @Test
   public void test_1(TestContext context) {
-    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
+    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore(context).createQuery(RamblerMapper.class);
     query.field("name").is("name to find");
     executeRambler(context, query, 1);
   }
 
   @Test
   public void test_2(TestContext context) {
-    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
+    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore(context).createQuery(RamblerMapper.class);
     query.field("name").is("name to find").field("name").isNot("unknown");
     executeRambler(context, query, 2);
   }
 
   @Test
   public void test_3(TestContext context) {
-    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
+    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore(context).createQuery(RamblerMapper.class);
     query.or("name").is("name to find").field("name").isNot("unknown");
     executeRambler(context, query, 2);
   }
 
   @Test
   public void test_4(TestContext context) {
-    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
+    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore(context).createQuery(RamblerMapper.class);
     query.or("name").is("name to find").field("name").isNot("unknown").and("age").less(15);
     executeRambler(context, query, 3);
   }
 
   @Test
   public void test_5(TestContext context) {
-    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
+    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore(context).createQuery(RamblerMapper.class);
     query.or("name").is("name to find").field("name").isNot("unknown").and("age").in(4, 5, 7, 9);
     executeRambler(context, query, 6);
   }
 
   @Test
   public void test_6(TestContext context) {
-    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
+    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore(context).createQuery(RamblerMapper.class);
     query.orOpen("name").is("name to find").field("name").isNot("unknown");
     executeRambler(context, query, 2);
   }
 
   @Test
   public void test_7(TestContext context) {
-    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore().createQuery(RamblerMapper.class);
+    SqlQuery<RamblerMapper> query = (SqlQuery<RamblerMapper>) getDataStore(context).createQuery(RamblerMapper.class);
     query.orOpen("name").is("name to find").field("name").isNot("unknown").close().and("age").in(4, 5, 7, 9);
     executeRambler(context, query, 6);
   }

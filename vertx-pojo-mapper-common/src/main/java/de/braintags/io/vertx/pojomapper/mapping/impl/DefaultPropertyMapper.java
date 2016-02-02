@@ -46,9 +46,27 @@ public class DefaultPropertyMapper implements IPropertyMapper {
 
     if (javaValue == null) {
       handler.handle(Future.succeededFuture());
-      return;
+    } else {
+      intoStoreObject(storeObject, field, th, javaValue, handler);
     }
+  }
 
+  /**
+   * Store a java value into the StoreObject by using the defined typehandler
+   * 
+   * @param storeObject
+   *          the storeObject to place the converted value into
+   * @param field
+   *          the field to be handled
+   * @param th
+   *          the {@link ITypeHandler} to be used to convert
+   * @param javaValue
+   *          the value to convert
+   * @param handler
+   *          the handler to be informed
+   */
+  public static void intoStoreObject(IStoreObject<?> storeObject, IField field, ITypeHandler th, Object javaValue,
+      Handler<AsyncResult<Void>> handler) {
     th.intoStore(javaValue, field, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -64,7 +82,6 @@ public class DefaultPropertyMapper implements IPropertyMapper {
           storeObject.put(field, dbValue);
         handler.handle(Future.succeededFuture());
       }
-      return;
     });
   }
 

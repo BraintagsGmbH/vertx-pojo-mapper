@@ -126,26 +126,6 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()
-   */
-  @Override
-  public IKeyGenerator getDefaultKeyGenerator() {
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.impl.AbstractDataStore#initSupportedKeyGenerators()
-   */
-  @Override
-  protected void initSupportedKeyGenerators() {
-    // mongo does not support or need any key generator currently
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
    * @see de.braintags.io.vertx.pojomapper.IDataStore#shutdown(io.vertx.core.Handler)
    */
   @Override
@@ -156,6 +136,17 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
     } catch (Exception e) {
       resultHandler.handle(Future.failedFuture(new RuntimeException(e)));
     }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()
+   */
+  @Override
+  public final IKeyGenerator getDefaultKeyGenerator() {
+    String genName = getProperties().getString(IKeyGenerator.DEFAULT_KEY_GENERATOR);
+    return genName == null ? null : getKeyGenerator(genName);
   }
 
 }

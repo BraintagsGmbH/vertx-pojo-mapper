@@ -46,7 +46,7 @@ public class TestTrigger extends DatastoreBaseTest {
     context.assertEquals("afterSave", source.afterSave);
     context.assertEquals("afterSaveWithDataStore", source.afterSaveWithDataStore);
 
-    IQuery<TriggerMapper> query = getDataStore().createQuery(TriggerMapper.class);
+    IQuery<TriggerMapper> query = getDataStore(context).createQuery(TriggerMapper.class);
     TriggerMapper loaded = (TriggerMapper) findFirst(context, query);
     context.assertEquals("afterLoad", loaded.afterLoad);
     context.assertEquals("afterLoadWithDatastore", loaded.afterLoadWithDatastore);
@@ -58,7 +58,7 @@ public class TestTrigger extends DatastoreBaseTest {
     context.assertEquals(vorlage.afterSave, loaded.afterSave);
     context.assertEquals(vorlage.afterSaveWithDataStore, loaded.afterSaveWithDataStore);
 
-    IDelete<TriggerMapper> del = getDataStore().createDelete(TriggerMapper.class);
+    IDelete<TriggerMapper> del = getDataStore(context).createDelete(TriggerMapper.class);
     del.add(loaded);
     delete(context, del, query, 0);
     context.assertEquals("afterDelete", loaded.afterDelete);

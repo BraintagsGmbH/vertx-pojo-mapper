@@ -52,6 +52,8 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 public abstract class DatastoreBaseTest {
   private static final Logger logger = LoggerFactory.getLogger(DatastoreBaseTest.class);
 
+  private static final String COLLECTION = "MySequenceCollection";
+
   /**
    * Set the datastore from external to use the helper methods
    */
@@ -60,8 +62,8 @@ public abstract class DatastoreBaseTest {
   @Rule
   public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "20")));
 
-  public static IDataStore getDataStore() {
-    return EXTERNAL_DATASTORE == null ? TestHelper.getDatastoreContainer().getDataStore() : EXTERNAL_DATASTORE;
+  public static IDataStore getDataStore(TestContext context) {
+    return EXTERNAL_DATASTORE == null ? TestHelper.getDatastoreContainer(context).getDataStore() : EXTERNAL_DATASTORE;
   }
 
   public static ResultContainer saveRecords(TestContext context, List<?> records) {
@@ -81,7 +83,7 @@ public abstract class DatastoreBaseTest {
   public static ResultContainer saveRecords(TestContext context, List<?> records, int waittime) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
-    IWrite<Object> write = (IWrite<Object>) getDataStore().createWrite(records.get(0).getClass());
+    IWrite<Object> write = (IWrite<Object>) getDataStore(context).createWrite(records.get(0).getClass());
     for (Object record : records) {
       write.add(record);
     }
@@ -417,7 +419,7 @@ public abstract class DatastoreBaseTest {
   public static void clearTable(TestContext context, String tableName) {
     Async async = context.async();
     ErrorObject<Void> err = new ErrorObject<Void>(null);
-    TestHelper.getDatastoreContainer().clearTable(tableName, result -> {
+    TestHelper.getDatastoreContainer(context).clearTable(tableName, result -> {
       if (result.failed()) {
         err.setThrowable(result.cause());
       }
@@ -432,7 +434,7 @@ public abstract class DatastoreBaseTest {
   public static void dropTable(TestContext context, String tableName) {
     Async async = context.async();
     ErrorObject<Void> err = new ErrorObject<Void>(null);
-    TestHelper.getDatastoreContainer().dropTable(tableName, result -> {
+    TestHelper.getDatastoreContainer(context).dropTable(tableName, result -> {
       if (result.failed()) {
         err.setThrowable(result.cause());
       }
@@ -443,4 +445,5 @@ public abstract class DatastoreBaseTest {
     if (err.isError())
       throw err.getRuntimeException();
   }
+
 }

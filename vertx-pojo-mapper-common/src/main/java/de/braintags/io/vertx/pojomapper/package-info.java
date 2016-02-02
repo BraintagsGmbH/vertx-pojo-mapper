@@ -311,12 +311,9 @@
  * 
  * Currently there are existing two implementations:
  * 
- * * {@link de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DebugGenerator} +
- * pure in memory counter, which starts at zero with every new {@link de.braintags.io.vertx.pojomapper.IDataStore},
- * should be only used for testing
- * * {@link de.braintags.io.vertx.pojomapper.mapping.impl.keygen.FileKeyGenerator} +
- * an implementation which stores the keys per mapper inside a hidden, local directory
- * * hopefully more will follow, hazelcast is planned
+ * * {@link de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator} +
+ * an implementation which uses the eventbus to request a key from
+ * {@link de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle}
  * 
  * An {@link de.braintags.io.vertx.pojomapper.IDataStore} implementation might contain a set of
  * {@link de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator}, which are supported by this implementation.

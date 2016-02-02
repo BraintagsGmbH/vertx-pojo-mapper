@@ -26,7 +26,7 @@ import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.TypeHandlerTes
  */
 @RunWith(Suite.class)
 @SuiteClasses({ TestBaseTest.class, TestSimpleMapper.class, TestSimpleInsert.class, TestSimpleMapperQuery.class,
-    TestOnlyIdMapper.class, TestTrigger.class, TypeHandlerTestSuite.class })
+    TestOnlyIdMapper.class, TestTrigger.class, TypeHandlerTestSuite.class, TestKeyGenerator.class })
 public class AllTestsCommon {
 
 }

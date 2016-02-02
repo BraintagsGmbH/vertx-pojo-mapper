@@ -56,7 +56,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
     context.assertEquals(we.getAction(), WriteAction.UPDATE);
 
     // SimpleQuery for all records
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     resultContainer = find(context, query, 1);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;

@@ -38,13 +38,13 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testSimpleOr(TestContext context) {
     createDemoRecords(context);
 
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.field("name").is("Dublette");
     ResultContainer resultContainer = find(context, query, 2);
     if (resultContainer.assertionError != null)
       throw resultContainer.assertionError;
 
-    query = getDataStore().createQuery(SimpleMapper.class);
+    query = getDataStore(context).createQuery(SimpleMapper.class);
     query.or("secondProperty").is("erste").field("secondProperty").is("zweite");
     resultContainer = find(context, query, 2);
     if (resultContainer.assertionError != null)
@@ -55,7 +55,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testSimpleAnd(TestContext context) {
     createDemoRecords(context);
 
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.and("name").is("Dublette").field("secondProperty").is("erste");
     ResultContainer resultContainer = find(context, query, 1);
     logger.info(resultContainer.queryResult.getOriginalQuery().toString());
@@ -67,7 +67,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testSimpleAndCount(TestContext context) {
     createDemoRecords(context);
 
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.and("name").is("Dublette").field("secondProperty").is("erste");
     ResultContainer resultContainer = findCount(context, query, 1);
     if (resultContainer.assertionError != null)
@@ -77,7 +77,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   @Test
   public void testQueryMultipleFields(TestContext context) {
     createDemoRecords(context);
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.field("name").is("Dublette");
     ResultContainer resultContainer = find(context, query, 2);
     if (resultContainer.assertionError != null)
@@ -96,7 +96,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   @Test
   public void testAndOr(TestContext context) {
     createDemoRecords(context);
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.and("name").is("AndOr").field("secondProperty").is("AndOr 1").or("secondProperty").is("AndOr 2");
 
     ResultContainer resultContainer = find(context, query, -1);
@@ -110,7 +110,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   @Test
   public void testIn(TestContext context) {
     createDemoRecords(context);
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     List<String> it = Arrays.asList("Dublette", "AndOr");
     query.field("name").in(it);
 
@@ -125,7 +125,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   @Test
   public void testNotIn(TestContext context) {
     createDemoRecords(context);
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     List<String> it = Arrays.asList("erste", "zweite");
     query.field("secondProperty").notIn(it);
 
@@ -140,7 +140,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   @Test
   public void testIsNot(TestContext context) {
     createDemoRecords(context);
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.field("name").isNot("Dublette");
 
     ResultContainer resultContainer = find(context, query, 3);
@@ -154,7 +154,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   @Test
   public void testContains(TestContext context) {
     createDemoRecords(context);
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.field("secondProperty").contains("ab");
 
     ResultContainer resultContainer = find(context, query, 3);
@@ -168,7 +168,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   @Test
   public void testStartsWith(TestContext context) {
     createDemoRecords(context);
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.field("secondProperty").contains("aa");
 
     ResultContainer resultContainer = find(context, query, 3);
@@ -179,7 +179,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   @Test
   public void testEndsWith(TestContext context) {
     createDemoRecords(context);
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.field("secondProperty").contains("cc");
 
     ResultContainer resultContainer = find(context, query, 3);
@@ -190,7 +190,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   @Test
   public void testFindLimit(TestContext context) {
     createDemoRecords(context);
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.field("secondProperty").contains("cc");
     query.setLimit(2);
 
@@ -204,7 +204,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   @Test
   public void testFindLimitGetCompleteCount(TestContext context) {
     createDemoRecords(context);
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.field("secondProperty").contains("cc");
     query.setLimit(2);
     query.setReturnCompleteCount(true);
@@ -218,7 +218,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   @Test
   public void testFindLimitGetCompleteCountQueryStart(TestContext context) {
     createDemoRecords(context);
-    IQuery<SimpleMapper> query = getDataStore().createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.field("secondProperty").contains("cc");
     query.setLimit(2);
     query.setStart(2);

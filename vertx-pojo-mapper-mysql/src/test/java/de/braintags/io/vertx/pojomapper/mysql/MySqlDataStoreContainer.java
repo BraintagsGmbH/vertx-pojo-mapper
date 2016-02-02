@@ -18,7 +18,7 @@ import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
-import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.FileKeyGenerator;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.BooleanTypeHandler;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.JsonTypeHandler;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlArrayTypeHandlerEmbedded;
@@ -76,7 +76,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   private AsyncSQLClient mySQLClient;
   private Map<String, String> thMap = new HashMap<String, String>();
   private static boolean handleReferencedRecursive = true;
-  private static final String DEFAULT_KEY_GENERATOR = FileKeyGenerator.NAME; // DebugGenerator.NAME;
+  private static final String DEFAULT_KEY_GENERATOR = DefaultKeyGenerator.NAME;
 
   /**
    * 

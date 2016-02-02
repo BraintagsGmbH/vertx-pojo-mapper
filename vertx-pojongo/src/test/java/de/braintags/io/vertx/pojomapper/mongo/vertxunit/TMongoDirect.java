@@ -36,7 +36,7 @@ public class TMongoDirect extends DatastoreBaseTest {
   @Test
   public void simpleTest(TestContext context) {
     LOGGER.info("-->>test");
-    MongoDataStore ds = (MongoDataStore) getDataStore();
+    MongoDataStore ds = (MongoDataStore) getDataStore(context);
     MongoClient client = ds.getMongoClient();
     JsonObject jsonCommand = new JsonObject();
     // getNextSequenceValue("productid")
@@ -56,7 +56,7 @@ public class TMongoDirect extends DatastoreBaseTest {
   public void testUpdate(TestContext context) {
     Async as = context.async();
     String collection = "UpdateTestCollection";
-    MongoDataStore ds = (MongoDataStore) getDataStore();
+    MongoDataStore ds = (MongoDataStore) getDataStore(context);
     MongoClient client = ds.getMongoClient();
 
     JsonObject insertCommand = new JsonObject();
@@ -96,7 +96,7 @@ public class TMongoDirect extends DatastoreBaseTest {
   public void createSequence(TestContext context) {
     Async as = context.async();
     String collection = "SequenceTest";
-    MongoDataStore ds = (MongoDataStore) getDataStore();
+    MongoDataStore ds = (MongoDataStore) getDataStore(context);
     MongoClient client = ds.getMongoClient();
     clearTable(context, collection);
 
@@ -163,7 +163,7 @@ public class TMongoDirect extends DatastoreBaseTest {
   public void testUpdateWithSave(TestContext context) {
     Async as = context.async();
     String collection = "UpdateTestCollection";
-    MongoDataStore ds = (MongoDataStore) getDataStore();
+    MongoDataStore ds = (MongoDataStore) getDataStore(context);
     MongoClient client = ds.getMongoClient();
 
     JsonObject jsonCommand = new JsonObject();

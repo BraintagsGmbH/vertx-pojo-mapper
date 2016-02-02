@@ -58,19 +58,19 @@ public class TestSimpleInsert extends DatastoreBaseTest {
 
     if (LOOP != resultContainer.writeResult.size()) {
       // check wether records weren't written or "only" IWriteResult is incomplete
-      IQuery<MiniMapper> query = getDataStore().createQuery(MiniMapper.class);
+      IQuery<MiniMapper> query = getDataStore(context).createQuery(MiniMapper.class);
       query.field("name").is("looper");
       find(context, query, LOOP);
       context.assertEquals(LOOP, resultContainer.writeResult.size());
     }
 
-    IQuery<MiniMapper> query = getDataStore().createQuery(MiniMapper.class);
+    IQuery<MiniMapper> query = getDataStore(context).createQuery(MiniMapper.class);
     query.field("name").is("looper");
     ResultContainer reCo = find(context, query, LOOP);
     if (reCo.assertionError != null)
       throw reCo.assertionError;
 
-    IDelete<MiniMapper> delete = getDataStore().createDelete(MiniMapper.class);
+    IDelete<MiniMapper> delete = getDataStore(context).createDelete(MiniMapper.class);
     reCo.queryResult.toArray(toArray -> {
       if (toArray.failed()) {
         logger.error("", toArray.cause());

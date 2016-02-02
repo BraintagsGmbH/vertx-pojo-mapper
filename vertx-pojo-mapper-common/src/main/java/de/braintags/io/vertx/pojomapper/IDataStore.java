@@ -136,7 +136,8 @@ public interface IDataStore {
   IKeyGenerator getKeyGenerator(String generatorName);
 
   /**
-   * If for an IMapper the annotation {@link KeyGenerator} is undefined, then the default instance is requested here.
+   * If for an IMapper the annotation {@link KeyGenerator} is undefined, then the default instance is requested here. If
+   * the implementation isn't using an {@link IKeyGenerator}, then null will be returned
    * 
    * @return the default instance of {@link IKeyGenerator} or null, if the current instance does not need or support
    *         {@link IKeyGenerator}

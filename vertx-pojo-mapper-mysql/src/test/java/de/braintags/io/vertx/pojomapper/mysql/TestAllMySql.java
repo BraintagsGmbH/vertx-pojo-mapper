@@ -49,7 +49,6 @@ public class TestAllMySql {
   public static void startup() throws Exception {
     LOGGER.info("STARTING SUITE");
     TMapperFactory.supportsColumnHandler = true;
-    TestHelper.startup();
   }
 
   @AfterClass

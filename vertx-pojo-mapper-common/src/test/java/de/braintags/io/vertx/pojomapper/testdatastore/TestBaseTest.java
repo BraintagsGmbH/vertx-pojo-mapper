@@ -38,15 +38,15 @@ public class TestBaseTest extends DatastoreBaseTest {
   @Test
   public void simpleTest(TestContext context) {
     log.info("-->>test");
-    context.assertNotNull(TestHelper.getDatastoreContainer());
+    context.assertNotNull(TestHelper.getDatastoreContainer(context));
   }
 
   @Test
   public void testMetaData(TestContext context) {
     Async async = context.async();
-    context.assertNotNull(getDataStore());
-    context.assertNotNull(getDataStore().getMetaData());
-    getDataStore().getMetaData().getVersion(result -> {
+    context.assertNotNull(getDataStore(context));
+    context.assertNotNull(getDataStore(context).getMetaData());
+    getDataStore(context).getMetaData().getVersion(result -> {
       if (result.failed()) {
         log.error("Error in testMetaData", result.cause());
         async.complete();
