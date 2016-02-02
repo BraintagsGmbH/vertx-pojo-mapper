@@ -576,12 +576,9 @@ IDataStore datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig)
 
 Currently there are existing two implementations:
 
-* `link:unavailable[DebugGenerator]` +
-pure in memory counter, which starts at zero with every new `link:unavailable[IDataStore]`,
-should be only used for testing
-* `link:unavailable[FileKeyGenerator]` +
-an implementation which stores the keys per mapper inside a hidden, local directory
-* hopefully more will follow, hazelcast is planned
+* `link:unavailable[DefaultKeyGenerator]` +
+an implementation which uses the eventbus to request a key from
+`link:unavailable[KeyGeneratorVerticle]`
 
 An `link:unavailable[IDataStore]` implementation might contain a set of
 `link:unavailable[IKeyGenerator]`, which are supported by this implementation.
@@ -722,11 +719,9 @@ All methods, which are annotated by this annotation are executed before an insta
 ===== `link:unavailable[@KeyGenerator]`
 With this annotation you may define the `link:unavailable[IKeyGenerator]`, which shall
 be used for the mapper. Normally the IKeyGenerator is used, which is defined as default by
-`link:unavailable#get_default_key_generator-instance_method[getDefaultKeyGenerator]`. As a value for this annotation you are
-defining the name of the IKeyGenerator, which shall be used, for instance
-`link:todo[FileKeyGenerator.NAME]`. You must define an IKeyGenerator,
-which is supported by the `link:unavailable[IDataStore]`, otherwise an Exception will be thrown
-during the mapping process.
+`link:unavailable#get_default_key_generator-instance_method[getDefaultKeyGenerator]`, which should be normally
+`link:unavailable[DefaultKeyGenerator]`. As a value for this annotation you
+are defining the name of the IKeyGenerator, which shall be used, for instance
 Michael Remme
 
 == Creating a new implementation

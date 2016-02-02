@@ -576,12 +576,9 @@ IDataStore datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig)
 
 Currently there are existing two implementations:
 
-* `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/impl/keygen/DebugGenerator.html[DebugGenerator]` +
-pure in memory counter, which starts at zero with every new `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`,
-should be only used for testing
-* `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/impl/keygen/FileKeyGenerator.html[FileKeyGenerator]` +
-an implementation which stores the keys per mapper inside a hidden, local directory
-* hopefully more will follow, hazelcast is planned
+* `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/impl/keygen/DefaultKeyGenerator.html[DefaultKeyGenerator]` +
+an implementation which uses the eventbus to request a key from
+`link:../../apidocs/de/braintags/io/vertx/keygenerator/KeyGeneratorVerticle.html[KeyGeneratorVerticle]`
 
 An `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` implementation might contain a set of
 `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IKeyGenerator.html[IKeyGenerator]`, which are supported by this implementation.
@@ -722,11 +719,9 @@ All methods, which are annotated by this annotation are executed before an insta
 ===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/KeyGenerator.html[@KeyGenerator]`
 With this annotation you may define the `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IKeyGenerator.html[IKeyGenerator]`, which shall
 be used for the mapper. Normally the IKeyGenerator is used, which is defined as default by
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html#getDefaultKeyGenerator--[getDefaultKeyGenerator]`. As a value for this annotation you are
-defining the name of the IKeyGenerator, which shall be used, for instance
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/impl/keygen/FileKeyGenerator.html#NAME[FileKeyGenerator.NAME]`. You must define an IKeyGenerator,
-which is supported by the `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`, otherwise an Exception will be thrown
-during the mapping process.
+`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html#getDefaultKeyGenerator--[getDefaultKeyGenerator]`, which should be normally
+`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/impl/keygen/DefaultKeyGenerator.html[DefaultKeyGenerator]`. As a value for this annotation you
+are defining the name of the IKeyGenerator, which shall be used, for instance
 Michael Remme
 
 == Creating a new implementation

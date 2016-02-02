@@ -576,12 +576,9 @@ IDataStore datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig)
 
 Currently there are existing two implementations:
 
-* `DebugGenerator` +
-pure in memory counter, which starts at zero with every new `IDataStore`,
-should be only used for testing
-* `FileKeyGenerator` +
-an implementation which stores the keys per mapper inside a hidden, local directory
-* hopefully more will follow, hazelcast is planned
+* `DefaultKeyGenerator` +
+an implementation which uses the eventbus to request a key from
+`KeyGeneratorVerticle`
 
 An `IDataStore` implementation might contain a set of
 `IKeyGenerator`, which are supported by this implementation.
@@ -722,11 +719,9 @@ All methods, which are annotated by this annotation are executed before an insta
 ===== `@KeyGenerator`
 With this annotation you may define the `IKeyGenerator`, which shall
 be used for the mapper. Normally the IKeyGenerator is used, which is defined as default by
-`getDefaultKeyGenerator`. As a value for this annotation you are
-defining the name of the IKeyGenerator, which shall be used, for instance
-`link:todo[FileKeyGenerator.NAME]`. You must define an IKeyGenerator,
-which is supported by the `IDataStore`, otherwise an Exception will be thrown
-during the mapping process.
+`getDefaultKeyGenerator`, which should be normally
+`DefaultKeyGenerator`. As a value for this annotation you
+are defining the name of the IKeyGenerator, which shall be used, for instance
 Michael Remme
 
 == Creating a new implementation

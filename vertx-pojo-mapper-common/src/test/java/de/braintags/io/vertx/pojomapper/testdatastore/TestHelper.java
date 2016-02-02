@@ -17,7 +17,7 @@ import java.util.concurrent.CountDownLatch;
 
 import de.braintags.io.vertx.BtVertxTestBase;
 import de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle;
-import de.braintags.io.vertx.keygenerator.Settings;
+import de.braintags.io.vertx.keygenerator.KeyGeneratorSettings;
 import de.braintags.io.vertx.keygenerator.impl.MongoKeyGenerator;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.util.ErrorObject;
@@ -133,7 +133,7 @@ public class TestHelper {
   }
 
   private static KeyGeneratorVerticle createKeyGenerator(TestContext context) {
-    Settings settings = new Settings();
+    KeyGeneratorSettings settings = new KeyGeneratorSettings();
     settings.setKeyGeneratorClass(MongoKeyGenerator.class);
     settings.getGeneratorProperties().put(MongoKeyGenerator.COLLECTTION_PROP, "keyGenSequence");
     return new KeyGeneratorVerticle(settings);
