@@ -33,7 +33,7 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * @param resultHandler
    *          contains the {@link IQueryResult}
    */
-  public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
+  void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
 
   /**
    * Execute the query by counting the fitting objects
@@ -41,7 +41,7 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * @param resultHandler
    *          contains the {@link IQueryCountResult}
    */
-  public void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler);
+  void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler);
 
   /**
    * Execute the query with the option explain and sends back the suitable information
@@ -49,7 +49,7 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * @param resultHandler
    *          contains the {@link IQueryResult}
    */
-  public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
+  void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
 
   /**
    * Set the maximum number of records to be returned
@@ -57,7 +57,7 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * @param limit
    * @return the query itself for fluent access
    */
-  public IQuery<T> setLimit(int limit);
+  IQuery<T> setLimit(int limit);
 
   /**
    * Set the first record to be returned
@@ -65,7 +65,7 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * @param start
    * @return the query itself for fluent access
    */
-  public IQuery<T> setStart(int start);
+  IQuery<T> setStart(int start);
 
   /**
    * If {@link #setLimit(int)} is defined with a value > 0 and this value is set to true, then the
@@ -74,6 +74,15 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * @param start
    * @return the query itself for fluent access
    */
-  public IQuery<T> setReturnCompleteCount(boolean ret);
+  IQuery<T> setReturnCompleteCount(boolean ret);
+
+  /**
+   * Set the information, how a resulting selection shall be sorted
+   * 
+   * @param the
+   *          definition how to sort. Typically a comma separated list of field names and the information asc / desc
+   * @return the query itself for fluent access
+   */
+  IQuery<T> setOrderBy(String ret);
 
 }

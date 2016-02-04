@@ -45,6 +45,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   private int start = 0;
   private boolean returnCompleteCount = false;
 
+  private String sortString;
+
   /**
    * @param mapperClass
    * @param datastore
@@ -203,6 +205,26 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   public final IQuery<T> setReturnCompleteCount(boolean returnCompleteCount) {
     this.returnCompleteCount = returnCompleteCount;
     return this;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setOrderBy(java.lang.String)
+   */
+  @Override
+  public IQuery<T> setOrderBy(String sort) {
+    sortString = sort;
+    return this;
+  }
+
+  /**
+   * Get the sort definition for the current instance
+   * 
+   * @return
+   */
+  public String getOrderBy() {
+    return sortString;
   }
 
 }

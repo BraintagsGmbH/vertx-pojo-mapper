@@ -230,6 +230,18 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     context.assertEquals((long) 3, resultContainer.queryResult.getCompleteResult(), "incorrect complete result");
   }
 
+  @Test
+  public void testFindSorted(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    query.setOrderBy("secondProperty");
+
+    ResultContainer resultContainer = find(context, query, 1);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+    context.assertEquals((long) 3, resultContainer.queryResult.getCompleteResult(), "incorrect complete result");
+  }
+
   /*
    * **************************************************** Helper Part
    */

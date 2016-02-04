@@ -114,6 +114,9 @@ public class MongoQuery<T> extends Query<T> {
     FindOptions fo = new FindOptions();
     fo.setSkip(getStart());
     fo.setLimit(getLimit());
+    if (getOrderBy() != null && getOrderBy().hashCode() != 0) {
+      resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    }
     mongoClient.findWithOptions(column, ((MongoQueryExpression) rambler.getQueryExpression()).getQueryDefinition(), fo,
         qResult -> {
           if (qResult.failed()) {
