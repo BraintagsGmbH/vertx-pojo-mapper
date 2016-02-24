@@ -77,12 +77,23 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
   IQuery<T> setReturnCompleteCount(boolean ret);
 
   /**
-   * Set the information, how a resulting selection shall be sorted
+   * Add a field to sort the resulting selection by. This method is the same than addSort( fieldName, true )
    * 
-   * @param the
-   *          definition how to sort. Typically a comma separated list of field names and the information asc / desc
+   * @param sortField
+   *          the field, by which to sort the selection
    * @return the query itself for fluent access
    */
-  IQuery<T> setOrderBy(String ret);
+  IQuery<T> addSort(String sortField);
+
+  /**
+   * Add a field to sort the resulting selection by. This method is the same than addSort( fieldName, true )
+   * 
+   * @param sortField
+   *          the field, by which to sort the selection
+   * @param ascending
+   *          true, if sort shall be ascending
+   * @return the query itself for fluent access
+   */
+  IQuery<T> addSort(String sortField, boolean ascending);
 
 }

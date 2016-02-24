@@ -230,17 +230,17 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     context.assertEquals((long) 3, resultContainer.queryResult.getCompleteResult(), "incorrect complete result");
   }
 
-  // @Test
-  // public void testFindSorted(TestContext context) {
-  // createDemoRecords(context);
-  // IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-  // query.setOrderBy("secondProperty");
-  //
-  // ResultContainer resultContainer = find(context, query, 1);
-  // if (resultContainer.assertionError != null)
-  // throw resultContainer.assertionError;
-  // context.assertEquals((long) 3, resultContainer.queryResult.getCompleteResult(), "incorrect complete result");
-  // }
+  @Test
+  public void testFindSorted(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    query.field("secondProperty").contains("e");
+    query.addSort("secondProperty", false);
+    List<SimpleMapper> list = (List<SimpleMapper>) findAll(context, query);
+    context.assertEquals(2, list.size(), "incorrect result");
+    context.assertEquals(list.get(0).getSecondProperty(), "zweite", "sorting does not work");
+    list.forEach(sm -> logger.info(sm.getSecondProperty()));
+  }
 
   /*
    * **************************************************** Helper Part

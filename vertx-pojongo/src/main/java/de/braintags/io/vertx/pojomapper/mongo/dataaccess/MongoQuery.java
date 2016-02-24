@@ -114,8 +114,10 @@ public class MongoQuery<T> extends Query<T> {
     FindOptions fo = new FindOptions();
     fo.setSkip(getStart());
     fo.setLimit(getLimit());
-    if (getOrderBy() != null && getOrderBy().hashCode() != 0) {
-      resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    if (!getSortDefinitions().isEmpty()) {
+      JsonObject sortJson = new JsonObject();
+      getSortDefinitions().forEach(sd -> sortJson.put(sd.fieldName, sd.ascending ? 1 : -1));
+      fo.setSort(sortJson);
     }
     mongoClient.findWithOptions(column, ((MongoQueryExpression) rambler.getQueryExpression()).getQueryDefinition(), fo,
         qResult -> {

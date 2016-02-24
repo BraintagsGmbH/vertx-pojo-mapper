@@ -44,8 +44,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   private int limit = 500;
   private int start = 0;
   private boolean returnCompleteCount = false;
-
-  private String sortString;
+  private List<SortDefinition> sortDefs = new ArrayList();
 
   /**
    * @param mapperClass
@@ -213,18 +212,32 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setOrderBy(java.lang.String)
    */
   @Override
-  public IQuery<T> setOrderBy(String sort) {
-    sortString = sort;
+  public IQuery<T> addSort(String fieldName) {
+    return addSort(fieldName, true);
+  }
+
+  @Override
+  public IQuery<T> addSort(String fieldName, boolean ascending) {
+    sortDefs.add(new SortDefinition(fieldName, ascending));
     return this;
   }
 
   /**
-   * Get the sort definition for the current instance
+   * Get the sort definitions for the current instance
    * 
-   * @return
+   * @return a list of {@link SortDefinition}
    */
-  public String getOrderBy() {
-    return sortString;
+  public List<SortDefinition> getSortDefinitions() {
+    return sortDefs;
   }
 
+  public class SortDefinition {
+    public String fieldName;
+    public boolean ascending;
+
+    SortDefinition(String fieldName, boolean ascending) {
+      this.fieldName = fieldName;
+      this.ascending = ascending;
+    }
+  }
 }
