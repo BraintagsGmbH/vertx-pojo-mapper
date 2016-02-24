@@ -58,7 +58,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IMethodProxy;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
-import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.impl.ParametrizedMappedField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
@@ -71,9 +70,8 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 public class TMapperFactory {
   public static final int NUMBER_OF_PROPERTIES = Person.NUMBER_OF_PROPERTIES;
-  private static IDataStore dataStore = new DummyDataStore();
+  public static IDataStore dataStore = new DummyDataStore();
   private static IMapper mapperDef = null;
-  public static boolean supportsColumnHandler = false;
 
   /**
    * @throws java.lang.Exception
@@ -81,17 +79,6 @@ public class TMapperFactory {
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
     mapperDef = dataStore.getMapperFactory().getMapper(Person.class);
-  }
-
-  @Test
-  public void testColumnHandler() {
-    IColumnInfo ci = mapperDef.getTableInfo().getColumnInfo(mapperDef.getField("weight"));
-    assertNotNull(ci);
-    if (supportsColumnHandler) {
-      assertNotNull(ci.getColumnHandler());
-    } else {
-      assertNull(ci.getColumnHandler());
-    }
   }
 
   @Test

@@ -16,6 +16,8 @@
 
 package de.braintags.io.vertx.pojomapper.impl;
 
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.impl.DefaultTableGenerator;
 
 /**
@@ -31,6 +33,12 @@ public class DummyTableGenerator extends DefaultTableGenerator {
    * 
    */
   public DummyTableGenerator() {
+    String test = "test";
+  }
+
+  @Override
+  public ITableInfo createTableInfo(IMapper mapper) {
+    return new DummyTableInfo(mapper);
   }
 
 }

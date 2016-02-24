@@ -12,6 +12,9 @@
  */
 package de.braintags.io.vertx.pojomapper.mysql;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.List;
 
 import org.junit.Assert;
@@ -20,6 +23,7 @@ import org.junit.Test;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
+import de.braintags.io.vertx.pojomapper.mapper.Person;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
@@ -41,6 +45,19 @@ import io.vertx.ext.unit.TestContext;
 
 public class TestMapper extends DatastoreBaseTest {
   private static final Logger log = LoggerFactory.getLogger(TestMapper.class);
+  public static boolean supportsColumnHandler = false;
+
+  @Test
+  public void testColumnHandler(TestContext context) {
+    IMapper mapperDef = getDataStore(context).getMapperFactory().getMapper(Person.class);
+    IColumnInfo ci = mapperDef.getTableInfo().getColumnInfo(mapperDef.getField("weight"));
+    assertNotNull(ci);
+    if (supportsColumnHandler) {
+      assertNotNull("No columnhandler found", ci.getColumnHandler());
+    } else {
+      assertNull(ci.getColumnHandler());
+    }
+  }
 
   @Test
   public void simpleTest(TestContext context) {

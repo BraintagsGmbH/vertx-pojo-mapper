@@ -32,7 +32,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
  * 
  */
 
-public class DefaultTableInfo implements ITableInfo {
+public abstract class DefaultTableInfo implements ITableInfo {
   private String name;
   private Map<String, IColumnInfo> colsByJavaFieldName = new HashMap<String, IColumnInfo>();
   private Map<String, IColumnInfo> colsByColumnName = new HashMap<String, IColumnInfo>();
@@ -104,9 +104,7 @@ public class DefaultTableInfo implements ITableInfo {
    *          the instance of {@link IColumnHandler}
    * @return the implementation of {@link IColumnInfo}
    */
-  protected IColumnInfo generateColumnInfo(IField field, IColumnHandler columnHandler) {
-    return new DefaultColumnInfo(field, columnHandler);
-  }
+  protected abstract IColumnInfo generateColumnInfo(IField field, IColumnHandler columnHandler);
 
   /*
    * (non-Javadoc)

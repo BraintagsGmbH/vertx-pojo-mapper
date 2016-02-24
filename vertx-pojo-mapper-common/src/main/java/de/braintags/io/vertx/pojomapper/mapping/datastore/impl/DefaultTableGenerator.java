@@ -19,20 +19,18 @@ import java.util.List;
 import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
-import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
- * 
+ * Default implementation of ITableGenerator
  * 
  * @author Michael Remme
  * 
  */
 
-public class DefaultTableGenerator implements ITableGenerator {
+public abstract class DefaultTableGenerator implements ITableGenerator {
   /**
    * If for a class a {@link IColumnHandler} was requested and found, it is cached by here with the class to handle as
    * key
@@ -40,28 +38,11 @@ public class DefaultTableGenerator implements ITableGenerator {
   private final Map<Class<?>, IColumnHandler> cachedColumnHandler = new HashMap<Class<?>, IColumnHandler>();
   protected static final List<IColumnHandler> definedColumnHandlers = new ArrayList<IColumnHandler>();
 
-  /**
-   * 
-   */
-  public DefaultTableGenerator() {
-  }
-
   /*
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator#createTable(de.braintags.io.vertx.pojomapper
-   * .mapping.IMapper)
-   */
-  @Override
-  public ITableInfo createTableInfo(IMapper mapper) {
-    return new DefaultTableInfo(mapper);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator#getColumnHandler(de.braintags.io.vertx.util.
+   * de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator#getColumnHandler(de.braintags.io.vertx.util.
    * pojomapper .mapping.IField)
    */
   @Override

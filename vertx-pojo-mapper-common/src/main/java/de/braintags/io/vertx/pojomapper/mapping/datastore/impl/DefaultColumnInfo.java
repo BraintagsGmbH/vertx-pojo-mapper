@@ -27,7 +27,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
  * 
  */
 
-public class DefaultColumnInfo implements IColumnInfo {
+public abstract class DefaultColumnInfo implements IColumnInfo {
   private String colName;
   private IColumnHandler columnHandler;
 

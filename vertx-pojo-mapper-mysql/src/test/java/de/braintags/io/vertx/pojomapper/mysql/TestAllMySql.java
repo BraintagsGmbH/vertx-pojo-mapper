@@ -20,7 +20,6 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import de.braintags.io.vertx.pojomapper.AllTestsPojoJson;
-import de.braintags.io.vertx.pojomapper.TMapperFactory;
 import de.braintags.io.vertx.pojomapper.testdatastore.AllTestsCommon;
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 
@@ -48,7 +47,7 @@ public class TestAllMySql {
   @BeforeClass
   public static void startup() throws Exception {
     LOGGER.info("STARTING SUITE");
-    TMapperFactory.supportsColumnHandler = true;
+    TestMapper.supportsColumnHandler = true;
   }
 
   @AfterClass
