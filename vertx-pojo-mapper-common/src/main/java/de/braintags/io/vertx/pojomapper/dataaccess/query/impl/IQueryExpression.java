@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 
 /**
@@ -75,5 +76,14 @@ public interface IQueryExpression {
    *          the mapper
    */
   void setMapper(IMapper mapper);
+
+  /**
+   * Adds the given {@link ISortDefinition} into the current instance like it is needed by the implementation
+   * 
+   * @param sortDef
+   *          the sort definition to be added
+   * @return the IQueryExpression itself for fluent usage
+   */
+  IQueryExpression addSort(ISortDefinition<?> sortDef);
 
 }

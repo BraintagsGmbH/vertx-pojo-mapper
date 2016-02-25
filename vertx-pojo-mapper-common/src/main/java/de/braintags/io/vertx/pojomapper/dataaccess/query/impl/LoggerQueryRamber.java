@@ -16,6 +16,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -71,7 +72,6 @@ public class LoggerQueryRamber implements IQueryRambler {
   @Override
   public void start(ILogicContainer<?> container) {
     raiseLevel();
-
     log(container.getLogic().toString());
   }
 
@@ -95,6 +95,31 @@ public class LoggerQueryRamber implements IQueryRambler {
 
   private final void log(String message) {
     logger.info(levelPrefix + message);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess.
+   * query.ISortDefinition)
+   */
+  @Override
+  public void start(ISortDefinition<?> sortDefinition) {
+    raiseLevel();
+    log(sortDefinition.toString());
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess.
+   * query.ISortDefinition)
+   */
+  @Override
+  public void stop(ISortDefinition<?> sortDefinition) {
+    reduceLevel();
   }
 
 }

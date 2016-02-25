@@ -77,4 +77,20 @@ public interface IQueryRambler {
    */
   void stop(IFieldParameter<?> fieldParameter);
 
+  /**
+   * Start applying an {@link ISortDefinition}
+   * 
+   * @param sortDefinition
+   *          the sortdefinition to be applied
+   */
+  void start(ISortDefinition<?> sortDefinition);
+
+  /**
+   * Stop applying an {@link ISortDefinition}
+   * 
+   * @param sortDefinition
+   *          the sortdefinition to be applied
+   */
+  void stop(ISortDefinition<?> sortDefinition);
+
 }

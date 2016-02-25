@@ -114,20 +114,18 @@ public class MongoQuery<T> extends Query<T> {
     FindOptions fo = new FindOptions();
     fo.setSkip(getStart());
     fo.setLimit(getLimit());
-    if (!getSortDefinitions().isEmpty()) {
-      JsonObject sortJson = new JsonObject();
-      getSortDefinitions().forEach(sd -> sortJson.put(sd.fieldName, sd.ascending ? 1 : -1));
-      fo.setSort(sortJson);
+    MongoQueryExpression mq = (MongoQueryExpression) rambler.getQueryExpression();
+    if (mq.getSortArguments() != null && !mq.getSortArguments().isEmpty()) {
+      fo.setSort(mq.getSortArguments());
     }
-    mongoClient.findWithOptions(column, ((MongoQueryExpression) rambler.getQueryExpression()).getQueryDefinition(), fo,
-        qResult -> {
-          if (qResult.failed()) {
-            Future<IQueryResult<T>> future = Future.failedFuture(qResult.cause());
-            resultHandler.handle(future);
-          } else {
-            createQueryResult(qResult.result(), rambler, resultHandler);
-          }
-        });
+    mongoClient.findWithOptions(column, mq.getQueryDefinition(), fo, qResult -> {
+      if (qResult.failed()) {
+        Future<IQueryResult<T>> future = Future.failedFuture(qResult.cause());
+        resultHandler.handle(future);
+      } else {
+        createQueryResult(qResult.result(), rambler, resultHandler);
+      }
+    });
   }
 
   private void createQueryResult(List<JsonObject> findList, MongoQueryRambler rambler,

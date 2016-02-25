@@ -23,6 +23,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IRamblerSource;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.util.CounterObject;
 import io.vertx.core.AsyncResult;
@@ -44,7 +45,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   private int limit = 500;
   private int start = 0;
   private boolean returnCompleteCount = false;
-  private List<SortDefinition> sortDefs = new ArrayList();
+  private SortDefinition<T> sortDefs = new SortDefinition<>(this);
 
   /**
    * @param mapperClass
@@ -106,16 +107,36 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   public void executeQueryRambler(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     rambler.start(this);
-    if (filters.isEmpty()) {
-      finishCounter(rambler, resultHandler);
-      return;
-    }
-    CounterObject<Void> co = new CounterObject<Void>(filters.size(), resultHandler);
-    for (Object filter : filters) {
-      handleFilter(rambler, resultHandler, filter, co);
-      if (co.isError()) {
-        return;
+    handleFilterList(rambler, fr -> {
+      if (fr.failed()) {
+        resultHandler.handle(fr);
+      } else {
+        handleSortDefs(rambler, sd -> {
+          if (sd.failed()) {
+            resultHandler.handle(sd);
+          } else {
+            finishCounter(rambler, resultHandler);
+          }
+        });
       }
+    });
+  }
+
+  private void handleSortDefs(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
+    sortDefs.applyTo(rambler, resultHandler);
+  }
+
+  private void handleFilterList(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
+    if (!filters.isEmpty()) {
+      CounterObject<Void> co = new CounterObject<Void>(filters.size(), resultHandler);
+      for (Object filter : filters) {
+        handleFilter(rambler, resultHandler, filter, co);
+        if (co.isError()) {
+          return;
+        }
+      }
+    } else {
+      resultHandler.handle(Future.succeededFuture());
     }
   }
 
@@ -131,9 +152,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
       if (result.failed()) {
         co.setThrowable(result.cause());
         return;
-      }
-      if (co.reduce()) { // last element in the list
-        finishCounter(rambler, resultHandler);
+      } else if (co.reduce()) { // last element in the list
+        resultHandler.handle(Future.succeededFuture());
       }
     });
   }
@@ -212,14 +232,13 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setOrderBy(java.lang.String)
    */
   @Override
-  public IQuery<T> addSort(String fieldName) {
+  public ISortDefinition<T> addSort(String fieldName) {
     return addSort(fieldName, true);
   }
 
   @Override
-  public IQuery<T> addSort(String fieldName, boolean ascending) {
-    sortDefs.add(new SortDefinition(fieldName, ascending));
-    return this;
+  public ISortDefinition<T> addSort(String fieldName, boolean ascending) {
+    return sortDefs.addSort(fieldName, ascending);
   }
 
   /**
@@ -227,17 +246,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * 
    * @return a list of {@link SortDefinition}
    */
-  public List<SortDefinition> getSortDefinitions() {
+  public ISortDefinition<T> getSortDefinitions() {
     return sortDefs;
   }
 
-  public class SortDefinition {
-    public String fieldName;
-    public boolean ascending;
-
-    SortDefinition(String fieldName, boolean ascending) {
-      this.fieldName = fieldName;
-      this.ascending = ascending;
-    }
-  }
 }

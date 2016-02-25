@@ -18,6 +18,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.exception.QueryParameterException;
@@ -110,6 +111,29 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
   @Override
   public final void stop(ILogicContainer<?> container) {
     queryExpression.stopConnectorBlock();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess.
+   * query.ISortDefinition)
+   */
+  @Override
+  public void start(ISortDefinition<?> sortDefinition) {
+    queryExpression.addSort(sortDefinition);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess.
+   * query.ISortDefinition)
+   */
+  @Override
+  public void stop(ISortDefinition<?> sortDefinition) {
   }
 
   /*
@@ -270,4 +294,5 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
   public String toString() {
     return queryExpression.toString();
   }
+
 }

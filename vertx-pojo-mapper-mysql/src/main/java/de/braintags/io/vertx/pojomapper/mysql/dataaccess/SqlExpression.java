@@ -16,7 +16,10 @@ package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition.SortArgument;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import io.vertx.core.json.JsonArray;
 
@@ -41,6 +44,7 @@ public class SqlExpression implements IQueryExpression {
   private int offset;
 
   private StringBuilder whereClause = new StringBuilder();
+  private StringBuilder orderByClause = new StringBuilder();
   private JsonArray parameters = new JsonArray();
   private Deque<Connector> connectorDeque = new ArrayDeque<Connector>();
   private int openedParenthesis;
@@ -143,7 +147,7 @@ public class SqlExpression implements IQueryExpression {
   public SqlExpression addQuery(String fieldName, String logic, Object value) {
     Connector conn = connectorDeque.getLast();
     if (conn.arguments > 0)
-      whereClause.append(" ").append(conn.connector);
+      whereClause.append(" ").append(conn.conn);
     if (logic.equalsIgnoreCase("IN") || logic.equalsIgnoreCase("NOT IN")) {
       addQueryIn(fieldName, logic, (JsonArray) value);
     } else {
@@ -200,6 +204,7 @@ public class SqlExpression implements IQueryExpression {
   public String getSelectExpression() {
     StringBuilder complete = new StringBuilder(select);
     appendWhereClause(complete);
+    appendOrderByClause(complete);
     appendLimitClause(complete);
     return complete.toString();
   }
@@ -226,6 +231,12 @@ public class SqlExpression implements IQueryExpression {
     }
   }
 
+  private void appendOrderByClause(StringBuilder complete) {
+    if (orderByClause.length() > 0) {
+      complete.append(" ORDER BY ").append(orderByClause);
+    }
+  }
+
   private void appendWhereClause(StringBuilder complete) {
     if (whereClause.length() > 0) {
       complete.append(" WHERE").append(whereClause);
@@ -233,6 +244,24 @@ public class SqlExpression implements IQueryExpression {
       while (parCount-- > 0)
         complete.append(" )");
     }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#addSort(de.braintags.io.vertx.pojomapper.
+   * dataaccess.query.ISortDefinition)
+   */
+  @SuppressWarnings("rawtypes")
+  @Override
+  public IQueryExpression addSort(ISortDefinition<?> sortDef) {
+    SortDefinition<?> sd = (SortDefinition<?>) sortDef;
+    for (SortArgument sa : sd.getSortArguments()) {
+      orderByClause.append(orderByClause.length() == 0 ? "" : ", ").append(sa.fieldName)
+          .append(sa.ascending ? " asc" : " desc");
+    }
+    return this;
   }
 
   /**
@@ -250,11 +279,11 @@ public class SqlExpression implements IQueryExpression {
   }
 
   class Connector {
-    String connector;
+    String conn;
     int arguments;
 
     Connector(String connector) {
-      this.connector = connector;
+      this.conn = connector;
     }
   }
 

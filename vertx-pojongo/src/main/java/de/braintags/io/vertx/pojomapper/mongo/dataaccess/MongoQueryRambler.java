@@ -35,7 +35,8 @@ public class MongoQueryRambler extends AbstractQueryRambler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryRambler#translateValue(de.braintags.io.vertx.util.
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryRambler#translateValue(de.braintags.io.vertx.
+   * util.
    * pojomapper.dataaccess.query.QueryOperator, java.lang.Object)
    */
   @Override

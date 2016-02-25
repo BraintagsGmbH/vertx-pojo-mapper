@@ -81,9 +81,9 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * 
    * @param sortField
    *          the field, by which to sort the selection
-   * @return the query itself for fluent access
+   * @return an instance of {@link ISortDefinition} for fluent access
    */
-  IQuery<T> addSort(String sortField);
+  ISortDefinition<T> addSort(String sortField);
 
   /**
    * Add a field to sort the resulting selection by. This method is the same than addSort( fieldName, true )
@@ -92,8 +92,8 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    *          the field, by which to sort the selection
    * @param ascending
    *          true, if sort shall be ascending
-   * @return the query itself for fluent access
+   * @return an instance of {@link ISortDefinition} for fluent access
    */
-  IQuery<T> addSort(String sortField, boolean ascending);
+  ISortDefinition<T> addSort(String sortField, boolean ascending);
 
 }

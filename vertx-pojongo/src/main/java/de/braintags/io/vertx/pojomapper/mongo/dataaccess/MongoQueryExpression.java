@@ -15,7 +15,9 @@ package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -32,12 +34,7 @@ public class MongoQueryExpression implements IQueryExpression {
   private Object currentObject = qDef;
   private Deque<Object> deque = new ArrayDeque<>();
   private IMapper mapper;
-
-  /**
-   * 
-   */
-  public MongoQueryExpression() {
-  }
+  private JsonObject sortArguments;
 
   /**
    * Get the original Query definition for Mongo
@@ -139,5 +136,31 @@ public class MongoQueryExpression implements IQueryExpression {
   @Override
   public String toString() {
     return String.valueOf(qDef);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#addSort(de.braintags.io.vertx.pojomapper.
+   * dataaccess.query.ISortDefinition)
+   */
+  @Override
+  public IQueryExpression addSort(ISortDefinition<?> sortDef) {
+    SortDefinition<?> sd = (SortDefinition<?>) sortDef;
+    if (!sd.getSortArguments().isEmpty()) {
+      sortArguments = new JsonObject();
+      sd.getSortArguments().forEach(sda -> sortArguments.put(sda.fieldName, sda.ascending ? 1 : -1));
+    }
+    return this;
+  }
+
+  /**
+   * Get the sort arguments, which were created by method {@link #addSort(ISortDefinition)}
+   * 
+   * @return the sortArguments or null, if none
+   */
+  public final JsonObject getSortArguments() {
+    return sortArguments;
   }
 }
