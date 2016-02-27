@@ -12,13 +12,13 @@
  */
 package de.braintags.io.vertx.pojomapper.util;
 
+import java.util.Arrays;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.util.IteratorAsync;
-import edu.emory.mathcs.backport.java.util.Arrays;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;

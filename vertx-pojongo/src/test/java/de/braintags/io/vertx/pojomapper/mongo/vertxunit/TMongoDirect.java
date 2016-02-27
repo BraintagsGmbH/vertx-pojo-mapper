@@ -33,6 +33,24 @@ import io.vertx.ext.unit.TestContext;
 public class TMongoDirect extends DatastoreBaseTest {
   private static Logger LOGGER = LoggerFactory.getLogger(TMongoDirect.class);
 
+  // @Test
+  // public void dateTest(TestContext context) {
+  // MongoDataStore ds = (MongoDataStore) getDataStore(context);
+  // MongoClient client = ds.getMongoClient();
+  // JsonObject jsonCommand = new JsonObject();
+  // // getNextSequenceValue("productid")
+  // // jsonCommand.put("_id", "getNextSequenceValue(\"productid\")".getBytes());
+  // jsonCommand.put("Datum1", new Timestamp(System.currentTimeMillis()));
+  // client.insert("DateTest", jsonCommand, result -> {
+  // if (result.failed()) {
+  // context.fail(result.cause());
+  // LOGGER.error("", result.cause());
+  // } else {
+  // LOGGER.info("executed: " + result.result());
+  // }
+  // });
+  // }
+
   @Test
   public void simpleTest(TestContext context) {
     LOGGER.info("-->>test");

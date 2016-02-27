@@ -25,6 +25,7 @@
 	</modules>
 
 	<properties>
+		<jacoco.haltOnFailure>false</jacoco.haltOnFailure>
 		<braintags.pojomapper.version>1.0.1-SNAPSHOT</braintags.pojomapper.version>
 		<sonar.language>java</sonar.language>
 		<sonar.host.url>http://sqube.bt-rz.net</sonar.host.url>
