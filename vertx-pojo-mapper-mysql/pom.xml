@@ -12,7 +12,7 @@
 	<artifactId>vertx-pojo-mapper-mysql</artifactId>
 
 	<properties>
-		<mysql_version>3.2.0-SNAPSHOT</mysql_version>
+		<mysql_version>${stack.version}</mysql_version>
 		<maven.test.skip>false</maven.test.skip>
 		<doc.skip>false</doc.skip>
 		<source.skip>false</source.skip>
@@ -49,7 +49,7 @@
 		<dependency>
 		  <groupId>io.vertx</groupId>
 		  <artifactId>vertx-unit</artifactId>
-		  <version>3.2.0-SNAPSHOT</version>
+		  <version>${stack.version}</version>
 		</dependency>
 
 	</dependencies>
