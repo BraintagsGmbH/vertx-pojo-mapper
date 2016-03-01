@@ -17,11 +17,16 @@ import java.util.List;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
+import de.braintags.io.vertx.util.exception.ParameterRequiredException;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.asyncsql.AsyncSQLClient;
+import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.ResultSet;
+import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -34,12 +39,33 @@ import io.vertx.ext.unit.TestContext;
  */
 
 public class TestSqlExpressions extends DatastoreBaseTest {
-  private static final Logger log = LoggerFactory.getLogger(TestSqlExpressions.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TestSqlExpressions.class);
 
-  // SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='test' AND TABLE_NAME='SimpleMapper'
-
+  @Test
   public void testConnection(TestContext context) {
+    Vertx vertx = Vertx.vertx();
+    String username = System.getProperty("MySqlDataStoreContainer.username", null);
+    if (username == null) {
+      throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.username'");
+    }
+    String password = System.getProperty("MySqlDataStoreContainer.password", null);
+    if (password == null) {
+      throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.password'");
+    }
 
+    JsonObject mySQLClientConfig = new JsonObject().put("host", "localhost").put("username", username)
+        .put("password", password).put("database", "test").put("port", 3306);
+    AsyncSQLClient client = MySQLClient.createNonShared(vertx, mySQLClientConfig);
+    client.getConnection(res -> {
+      if (res.succeeded()) {
+        SQLConnection connection = res.result();
+        // Got a connection
+        LOGGER.info("succeeded connection");
+      } else {
+        LOGGER.error("", res.cause());
+        context.fail(res.cause());
+      }
+    });
   }
 
   @Test
@@ -52,7 +78,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
         async.complete();
       } else {
         ResultSet res = ur.result();
-        log.info("found records: " + res.getNumRows());
+        LOGGER.info("found records: " + res.getNumRows());
         async.complete();
       }
     });
@@ -64,7 +90,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
     Async async = context.async();
     SqlUtil.execute((MySqlDataStore) getDataStore(context), createTableString, createTableResult -> {
       if (createTableResult.failed()) {
-        log.error("", createTableResult.cause());
+        LOGGER.error("", createTableResult.cause());
         context.fail(createTableResult.cause());
         async.complete();
       } else {
@@ -73,23 +99,23 @@ public class TestSqlExpressions extends DatastoreBaseTest {
 
         SqlUtil.updateWithParams((MySqlDataStore) getDataStore(context), insertExpression, array, ur -> {
           if (ur.failed()) {
-            log.error("", ur.cause());
+            LOGGER.error("", ur.cause());
             async.complete();
           } else {
             UpdateResult res = ur.result();
-            log.info(res.toJson());
-            log.info(res.getKeys());
+            LOGGER.info(res.toJson());
+            LOGGER.info(res.getKeys());
 
             String allRecords = "SELECT * from timetable";
             SqlUtil.query((MySqlDataStore) getDataStore(context), allRecords, idResult -> {
               if (idResult.failed()) {
-                log.error("", idResult.cause());
+                LOGGER.error("", idResult.cause());
                 context.fail(idResult.cause());
                 async.complete();
               } else {
                 List<JsonObject> ids = idResult.result().getRows();
                 for (JsonObject row : ids) {
-                  log.info(row);
+                  LOGGER.info(row);
                 }
                 async.complete();
               }
@@ -108,23 +134,23 @@ public class TestSqlExpressions extends DatastoreBaseTest {
 
     SqlUtil.updateWithParams((MySqlDataStore) getDataStore(context), insertExpression, array, ur -> {
       if (ur.failed()) {
-        log.error("", ur.cause());
+        LOGGER.error("", ur.cause());
         async.complete();
       } else {
         UpdateResult res = ur.result();
-        log.info(res.toJson());
-        log.info(res.getKeys());
+        LOGGER.info(res.toJson());
+        LOGGER.info(res.getKeys());
 
         String lastInsertIdCmd = "SELECT LAST_INSERT_ID()";
         SqlUtil.query((MySqlDataStore) getDataStore(context), lastInsertIdCmd, idResult -> {
           if (idResult.failed()) {
-            log.error("", ur.cause());
+            LOGGER.error("", ur.cause());
             context.fail(ur.cause());
             async.complete();
           } else {
             List<JsonObject> ids = idResult.result().getRows();
             for (JsonObject row : ids) {
-              log.info(row);
+              LOGGER.info(row);
             }
             async.complete();
           }
@@ -143,12 +169,12 @@ public class TestSqlExpressions extends DatastoreBaseTest {
 
     SqlUtil.queryWithParams((MySqlDataStore) getDataStore(context), insertExpression, array, ur -> {
       if (ur.failed()) {
-        log.error("ERror searching", ur.cause());
+        LOGGER.error("ERror searching", ur.cause());
         context.fail(ur.cause());
         async.complete();
       } else {
         ResultSet res = ur.result();
-        log.info("found records: " + res.getNumRows());
+        LOGGER.info("found records: " + res.getNumRows());
         async.complete();
       }
     });
@@ -162,11 +188,11 @@ public class TestSqlExpressions extends DatastoreBaseTest {
 
     SqlUtil.updateWithParams((MySqlDataStore) getDataStore(context), insertExpression, array, ur -> {
       if (ur.failed()) {
-        log.error("Error deleting", ur.cause());
+        LOGGER.error("Error deleting", ur.cause());
         async.complete();
       } else {
         UpdateResult res = ur.result();
-        log.info("deleted: " + res.getUpdated());
+        LOGGER.info("deleted: " + res.getUpdated());
         async.complete();
       }
     });

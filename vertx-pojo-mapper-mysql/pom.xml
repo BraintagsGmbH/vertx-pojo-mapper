@@ -37,21 +37,24 @@
 			<artifactId>vertx-pojo-mapper-json</artifactId>
 			<classifier>tests</classifier>
 			<version>1.0.1-SNAPSHOT</version>
-		</dependency>
-		
+		</dependency>		
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mysql-postgresql-client</artifactId>
 			<version>${mysql_version}</version>
 		</dependency>
-
-		
 		<dependency>
 		  <groupId>io.vertx</groupId>
 		  <artifactId>vertx-unit</artifactId>
 		  <version>${stack.version}</version>
 		</dependency>
 
+	    <dependency>
+	      <groupId>org.slf4j</groupId>
+	      <artifactId>slf4j-api</artifactId>
+	      <version>1.6.2</version>
+	      <scope>provided</scope>
+	    </dependency>
 	</dependencies>
 	
 	<build>
