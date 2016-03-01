@@ -51,4 +51,11 @@ public interface IWrite<T> extends IDataAccessObject<T> {
    *          a handler, which will receive information about the save result
    */
   public void save(Handler<AsyncResult<IWriteResult>> resultHandler);
+
+  /**
+   * Get the number of records to be saved
+   * 
+   * @return the count
+   */
+  public int size();
 }

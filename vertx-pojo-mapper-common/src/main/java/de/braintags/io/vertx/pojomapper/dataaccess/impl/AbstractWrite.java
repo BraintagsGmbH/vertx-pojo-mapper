@@ -101,4 +101,14 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
     }
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite#size()
+   */
+  @Override
+  public int size() {
+    return objectsToSave.size();
+  }
+
 }
