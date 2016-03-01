@@ -38,6 +38,10 @@ public class TestSqlExpressions extends DatastoreBaseTest {
 
   // SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='test' AND TABLE_NAME='SimpleMapper'
 
+  public void testConnection(TestContext context) {
+
+  }
+
   @Test
   public void testQuerySchema(TestContext context) {
     Async async = context.async();
