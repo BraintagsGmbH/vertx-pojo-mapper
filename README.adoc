@@ -15,7 +15,7 @@ Key features
 * very fast initialization
 * dynamic object loading
 
-*link:vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[Quickstart and documentation]*
+*link:vertx-pojo-mapper-common/src/docs/asciidoc/java/index.adoc[Quickstart and documentation]*
 
 
 *List of supported datasources*
