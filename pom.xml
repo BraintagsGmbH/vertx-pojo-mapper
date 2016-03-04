@@ -28,7 +28,7 @@
 		<jacoco.haltOnFailure>false</jacoco.haltOnFailure>
 		<braintags.pojomapper.version>1.0.1-SNAPSHOT</braintags.pojomapper.version>
 		<testjar.skip>true</testjar.skip>
-		<doc.skip>false</doc.skip>
+		<doc.skip>true</doc.skip>
 		<maven.test.skip>true</maven.test.skip>
 		<source.skip>true</source.skip>
 	</properties>
