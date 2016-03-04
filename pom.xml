@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>de.braintags</groupId>
 		<artifactId>btVertxBasePOM</artifactId>
-		<version>9-SNAPSHOT</version>
+		<version>10-SNAPSHOT</version>
 	</parent>
 
 	<modules>
@@ -27,10 +27,8 @@
 	<properties>
 		<jacoco.haltOnFailure>false</jacoco.haltOnFailure>
 		<braintags.pojomapper.version>1.0.1-SNAPSHOT</braintags.pojomapper.version>
-		<sonar.language>java</sonar.language>
-		<sonar.host.url>http://sqube.bt-rz.net</sonar.host.url>
 		<testjar.skip>true</testjar.skip>
-		<doc.skip>true</doc.skip>
+		<doc.skip>false</doc.skip>
 		<maven.test.skip>true</maven.test.skip>
 		<source.skip>true</source.skip>
 	</properties>
