@@ -264,6 +264,16 @@
  * * {@link de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete} +
  * methods annotated with this, will be executed just after deleting an instance from the datastore
  * 
+ * The trigger methods can be empty, or get the parameter
+ * {@link de.braintags.io.vertx.pojomapper.mapping.ITriggerContext}, by which you are able to access the current
+ * {@link de.braintags.io.vertx.pojomapper.IDataStore} for instance, like shown in the example method afterLoad
+ * 
+ * [source,java]
+ * ----
+ * {@link examples.mapper.LifecycleMapper#afterLoad(de.braintags.io.vertx.pojomapper.mapping.ITriggerContext)}
+ * ----
+ *
+ * 
  * For more infos on how you can influence the mapping process, see the further descriptions above.
  *
  * == More details about vertx-pojo-mapper
@@ -309,11 +319,21 @@
  * ...
  * ----
  * 
- * Currently there are existing two implementations:
+ * To add an IKeyGenerator to a mapper, you will add the annotation
+ * {@link de.braintags.io.vertx.pojomapper.annotation.KeyGenerator} to the classes head and optionally define the type
+ * of keygenerator, which shall be used.
+ * 
+ * Currently there are existing two implementations of {@link de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator}:
  * 
  * * {@link de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator} +
  * an implementation which uses the eventbus to request a key from
- * {@link de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle}
+ * {@link de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle}. To init and launch the KeyGeneratorVerticle, please
+ * refer to the doscumentation of the project
+ * link:https://github.com/BraintagsGmbH/vertx-key-generator/blob/master/src/docs/asciidoc/java/index.adoc[*vertx-key-
+ * generator*]
+ * 
+ * * {@link de.braintags.io.vertx.keygenerator.impl.DebugGenerator} +
+ * a local implementation which starts at zero by each launch and maybe useful for unint tests etc.
  * 
  * An {@link de.braintags.io.vertx.pojomapper.IDataStore} implementation might contain a set of
  * {@link de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator}, which are supported by this implementation.

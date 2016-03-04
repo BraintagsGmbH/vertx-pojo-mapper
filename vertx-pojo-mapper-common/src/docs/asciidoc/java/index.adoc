@@ -460,6 +460,7 @@ one of the lifecycle annotations, then those method(s) are executed inside the s
 ----
 package examples.mapper;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete;
@@ -468,6 +469,8 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeDelete;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.mapping.ITriggerContext;
 import io.vertx.docgen.Source;
 
 @Source(translate = false)
@@ -486,8 +489,19 @@ public class LifecycleMapper {
   }
 
   @AfterLoad
-  public void afterLoad() {
+  public void afterLoad(ITriggerContext triggerContext) {
     name = "just after load";
+    IDataStore ds = triggerContext.getMapper().getMapperFactory().getDataStore();
+    IQuery<MiniMapper> q = ds.createQuery(MiniMapper.class);
+    q.field("name").is("test");
+    q.execute(qr -> {
+      if (qr.failed()) {
+        triggerContext.fail(qr.cause());
+      } else {
+        // do something
+        triggerContext.complete();
+      }
+    });
   }
 
   @BeforeSave
@@ -528,6 +542,27 @@ methods annotated with this, will be executed just after loading an instance fro
 methods annotated with this, will be executed just before deleting an instance from the datastore
 * `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/AfterDelete.html[@AfterDelete]` +
 methods annotated with this, will be executed just after deleting an instance from the datastore
+
+The trigger methods can be empty, or get the parameter
+`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/ITriggerContext.html[ITriggerContext]`, by which you are able to access the current
+`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` for instance, like shown in the example method afterLoad
+
+[source,java]
+----
+name = "just after load";
+IDataStore ds = triggerContext.getMapper().getMapperFactory().getDataStore();
+IQuery<MiniMapper> q = ds.createQuery(MiniMapper.class);
+q.field("name").is("test");
+q.execute(qr -> {
+  if (qr.failed()) {
+    triggerContext.fail(qr.cause());
+  } else {
+    // do something
+    triggerContext.complete();
+  }
+});
+----
+
 
 For more infos on how you can influence the mapping process, see the further descriptions above.
 
@@ -574,11 +609,21 @@ IDataStore datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig)
 ...
 ----
 
-Currently there are existing two implementations:
+To add an IKeyGenerator to a mapper, you will add the annotation
+`link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/KeyGenerator.html[@KeyGenerator]` to the classes head and optionally define the type
+of keygenerator, which shall be used.
+
+Currently there are existing two implementations of `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IKeyGenerator.html[IKeyGenerator]`:
 
 * `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/impl/keygen/DefaultKeyGenerator.html[DefaultKeyGenerator]` +
 an implementation which uses the eventbus to request a key from
-`link:../../apidocs/de/braintags/io/vertx/keygenerator/KeyGeneratorVerticle.html[KeyGeneratorVerticle]`
+`link:../../apidocs/de/braintags/io/vertx/keygenerator/KeyGeneratorVerticle.html[KeyGeneratorVerticle]`. To init and launch the KeyGeneratorVerticle, please
+refer to the doscumentation of the project
+link:https://github.com/BraintagsGmbH/vertx-key-generator/blob/master/src/docs/asciidoc/java/index.adoc[*vertx-key-
+generator*]
+
+* `link:../../apidocs/de/braintags/io/vertx/keygenerator/impl/DebugGenerator.html[DebugGenerator]` +
+a local implementation which starts at zero by each launch and maybe useful for unint tests etc.
 
 An `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` implementation might contain a set of
 `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IKeyGenerator.html[IKeyGenerator]`, which are supported by this implementation.
@@ -721,7 +766,27 @@ With this annotation you may define the `link:../../apidocs/de/braintags/io/vert
 be used for the mapper. Normally the IKeyGenerator is used, which is defined as default by
 `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html#getDefaultKeyGenerator--[getDefaultKeyGenerator]`, which should be normally
 `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/impl/keygen/DefaultKeyGenerator.html[DefaultKeyGenerator]`. As a value for this annotation you
-are defining the name of the IKeyGenerator, which shall be used, for instance
+are defining the name of the IKeyGenerator, which shall be used
+
+[source, java]
+----
+package examples.mapper;
+
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.annotation.KeyGenerator;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import io.vertx.docgen.Source;
+
+@Source(translate = false)
+@Entity
+@KeyGenerator
+public class KeyGeneratorMapper {
+ @Id
+ public String id;
+
+}
+
+----
 Michael Remme
 
 == Creating a new implementation

@@ -83,9 +83,13 @@
  * be used for the mapper. Normally the IKeyGenerator is used, which is defined as default by
  * {@link de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()}, which should be normally
  * {@link de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator}. As a value for this annotation you
- * are defining the name of the IKeyGenerator, which shall be used, for instance
+ * are defining the name of the IKeyGenerator, which shall be used
+ * 
+ * [source, java]
+ * ----
+ * {@link examples.mapper.KeyGeneratorMapper}
+ * ----
  * 
  *
- * @author Michael Remme
  */
 package de.braintags.io.vertx.pojomapper.annotation;
