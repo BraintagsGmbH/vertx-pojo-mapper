@@ -20,4 +20,4 @@ Example initialization for the IDataStore for MongoDB:
 
 ----
 
-link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.adoc[*Quickstart and documentation*]
+link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/docs/asciidoc/java/index.adoc[*Quickstart and documentation*]

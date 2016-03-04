@@ -7,7 +7,4 @@ README
 
 See the documentation under
 
-* link:src/main/asciidoc/java/index.adoc[ java ]
-* link:src/main/asciidoc/js/index.adoc[ java-script ]
-* link:src/main/asciidoc/ruby/index.adoc[ ruby ]
-* link:src/main/asciidoc/groovy/index.adoc[ groovy ]
+* link:src/docs/asciidoc/java/index.adoc[ java ]
