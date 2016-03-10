@@ -787,7 +787,6 @@ public class KeyGeneratorMapper {
 }
 
 ----
-Michael Remme
 
 == Creating a new implementation
 
