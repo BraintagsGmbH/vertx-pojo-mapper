@@ -78,9 +78,17 @@ public class EnumTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
    * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
    */
+  @SuppressWarnings("rawtypes")
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : getName((Enum) source), resultHandler);
+    Object value = null;
+    if (source != null && source instanceof Enum) {
+      value = getName((Enum) source);
+    } else if (source instanceof CharSequence) {
+      // happens in case of Query contains with text
+      value = ((CharSequence) source).toString();
+    }
+    success(value, resultHandler);
   }
 
   private <T extends Enum> String getName(final T value) {

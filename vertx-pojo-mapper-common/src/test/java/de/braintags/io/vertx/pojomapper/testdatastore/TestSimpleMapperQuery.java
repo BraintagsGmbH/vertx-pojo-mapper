@@ -19,7 +19,9 @@ import java.util.List;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleMapper;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EnumRecord;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.TestContext;
@@ -242,6 +244,26 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     list.forEach(sm -> logger.info(sm.getSecondProperty()));
   }
 
+  @Test
+  public void testFindByEnum(TestContext context) {
+    createDemoRecords(context);
+    IQuery<EnumRecord> query = getDataStore(context).createQuery(EnumRecord.class);
+    query.field("enumEnum").is(WriteAction.INSERT);
+    List<EnumRecord> list = (List<EnumRecord>) findAll(context, query);
+    list.forEach(sm -> logger.info(sm.enumEnum));
+    context.assertEquals(1, list.size(), "incorrect result");
+  }
+
+  @Test
+  public void testFindByEnumContains(TestContext context) {
+    createDemoRecords(context);
+    IQuery<EnumRecord> query = getDataStore(context).createQuery(EnumRecord.class);
+    query.field("enumEnum").contains("IN");
+    List<EnumRecord> list = (List<EnumRecord>) findAll(context, query);
+    list.forEach(sm -> logger.info(sm.enumEnum));
+    context.assertEquals(1, list.size(), "incorrect result");
+  }
+
   /*
    * **************************************************** Helper Part
    */
@@ -250,6 +272,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     if (!dropTable) {
       dropTable = true;
       super.clearTable(context, "SimpleMapper");
+      super.clearTable(context, "EnumRecord");
 
       SimpleMapper sm = new SimpleMapper();
       sm.name = "Dublette";
@@ -298,6 +321,24 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
       sm.setSecondProperty("aabbcc");
       sm.intValue = 11;
       resultContainer = saveRecord(context, sm);
+      if (resultContainer.assertionError != null)
+        throw resultContainer.assertionError;
+
+      EnumRecord en = new EnumRecord();
+      en.enumEnum = WriteAction.INSERT;
+      resultContainer = saveRecord(context, en);
+      if (resultContainer.assertionError != null)
+        throw resultContainer.assertionError;
+
+      en = new EnumRecord();
+      en.enumEnum = WriteAction.UNKNOWN;
+      resultContainer = saveRecord(context, en);
+      if (resultContainer.assertionError != null)
+        throw resultContainer.assertionError;
+
+      en = new EnumRecord();
+      en.enumEnum = WriteAction.UPDATE;
+      resultContainer = saveRecord(context, en);
       if (resultContainer.assertionError != null)
         throw resultContainer.assertionError;
 
