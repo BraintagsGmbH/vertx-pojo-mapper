@@ -4,31 +4,14 @@ An implementation of vertx-pojo-mapper for MySql and Maria-DB
 
 vertx-pojo-mapper-mysql uses the link:https://github.com/vert-x3/vertx-mysql-postgresql-client[vertx-mysql-postgresql-client]
 
-Example initialization for the IDataStore for MySql:
-   
-[source, java]
-----
+See the documentation specific for MongoDb under
 
-  public void initMySqlClient(Vertx vertx, String username, String password, String database) {
-    Objects.requireNonNull(username, "Username is required");
-    Objects.requireNonNull(password, "Password is required");
-    Objects.requireNonNull(database, "database is required");
+* link:src/docs/asciidoc/java/index.adoc[ java ]
 
-    JsonObject mySQLClientConfig = new JsonObject();
-    mySQLClientConfig.put("host", "localhost");
-    mySQLClientConfig.put("username", username);
-    mySQLClientConfig.put("password", password);
-    mySQLClientConfig.put("database", database);
-    mySQLClientConfig.put("port", 3306);
-    mySQLClientConfig.put(IKeyGenerator.DEFAULT_KEY_GENERATOR, FileKeyGenerator.NAME);
 
-    mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
-    datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig);
-  }
+See the overall quickstart of pojo-mapper under:
 
-----
-    
-link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/docs/asciidoc/java/index.adoc[*Quickstart and documentation*]
+link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/docs/asciidoc/java/index.adoc[*General Quickstart and documentation*]
 
-    
+
     

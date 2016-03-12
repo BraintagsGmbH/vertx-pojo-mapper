@@ -20,8 +20,8 @@ Key features
 
 *List of supported datasources*
 
-* link:vertx-pojo-mapper-mysql/README.adoc[implementation for Mongo-DB]
-* link:vertx-pojongo/README.adoc[implementation for MySql / MariaDb]
+* link:vertx-pojongo/README.adoc[implementation for Mongo-DB]
+* link:vertx-pojo-mapper-mysql/README.adoc[implementation for MySql / MariaDb]
 
 
 *Modules inside this project*
