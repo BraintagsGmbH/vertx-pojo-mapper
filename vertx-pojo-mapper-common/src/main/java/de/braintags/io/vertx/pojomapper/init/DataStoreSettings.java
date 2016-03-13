@@ -33,7 +33,7 @@ public class DataStoreSettings {
    * Standard constructor needed for saving as local file
    */
   public DataStoreSettings() {
-
+    // default
   }
 
   /**

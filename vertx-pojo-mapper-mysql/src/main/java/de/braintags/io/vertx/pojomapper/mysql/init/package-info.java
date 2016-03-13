@@ -6,11 +6,10 @@
 
 /**
  * PLease take the possible properties, which can be set from
- * {@link de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit}
- *
+ * {@link de.braintags.io.vertx.pojomapper.mysql.init.MySqlDataStoreinit}
  * 
  * @author Michael Remme
  * 
  */
 
-package de.braintags.io.vertx.pojomapper.mongo.init;
+package de.braintags.io.vertx.pojomapper.mysql.init;

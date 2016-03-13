@@ -5,20 +5,20 @@
  */
 
 /**
- * == Implementation of pojo mapper for Mongo
+ * == Implementation of pojo mapper for MySql
  *
  * We provide an implementation of {@link de.braintags.io.vertx.pojomapper.IDataStore} which uses the Vert.x
- * {@link io.vertx.ext.mongo.MongoClient} to perform mapping of POJOs into the datastore
+ * {@link io.vertx.ext.asyncsql.MySQLClient} to perform mapping of POJOs into the datastore
  *
- * To create an instance of MongoDataStore programmatically:
+ * To create an instance of MySqlDataStore programmatically:
  *
  * [source,java]
  * ----
- * {@link examples.Examples#example1(io.vertx.core.Vertx )}
+ * {@link examples.InitMySql#initMySqlClient(io.vertx.core.Vertx, String, String, String)}
  * ----
  * 
  * === Initialize by DataStoreSettings
- * {@link de.braintags.io.vertx.pojomapper.mongo.init}
+ * {@link de.braintags.io.vertx.pojomapper.mysql.init}
  * 
  * 
  * The rest of the usage is the same than described in the documentation of
@@ -29,4 +29,4 @@
  * 
  */
 
-package de.braintags.io.vertx.pojomapper.mongo;
+package de.braintags.io.vertx.pojomapper.mysql;

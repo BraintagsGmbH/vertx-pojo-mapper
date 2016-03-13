@@ -4,20 +4,11 @@ An implementation of vertx-pojo-mapper for MongoDB
 
 vertx-pojongo uses the link:https://github.com/vert-x3/vertx-mongo-client[vertx-mongo-client]
 
-Example initialization for the IDataStore for MongoDB:
- 
-[source, java]
-----
+See the documentation specific for MongoDb under
 
-  public void initMongoDatastore(Vertx vertx, String database) {
-    Objects.requireNonNull(database, "database is required");
-    JsonObject config = new JsonObject();
-    config.put("connection_string", "mongodb://localhost:27017");
-    config.put("db_name", database);
-    MongoClient mongoClient = MongoClient.createNonShared(vertx, config);
-    MongoDataStore mongoDataStore = new MongoDataStore(vertx, mongoClient, config);
-  }
+* link:src/docs/asciidoc/java/index.adoc[ java ]
 
-----
 
-link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/docs/asciidoc/java/index.adoc[*Quickstart and documentation*]
+See the overall quickstart of pojo-mapper under:
+
+link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/docs/asciidoc/java/index.adoc[*General Quickstart and documentation*]
