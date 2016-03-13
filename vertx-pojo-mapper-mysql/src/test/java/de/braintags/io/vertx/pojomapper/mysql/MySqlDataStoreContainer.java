@@ -17,8 +17,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
+import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
+import de.braintags.io.vertx.pojomapper.mysql.init.MySqlDataStoreinit;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.BooleanTypeHandler;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.JsonTypeHandler;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlArrayTypeHandlerEmbedded;
@@ -53,14 +56,12 @@ import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.Reference
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.ReferencedListTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.ReferencedMapTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.ReferencedSingleTest;
+import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.asyncsql.AsyncSQLClient;
-import io.vertx.ext.asyncsql.MySQLClient;
 
 /**
  * 
@@ -73,7 +74,6 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
       .getLogger(MySqlDataStoreContainer.class);
 
   private MySqlDataStore datastore;
-  private AsyncSQLClient mySQLClient;
   private Map<String, String> thMap = new HashMap<String, String>();
   private static boolean handleReferencedRecursive = true;
   private static final String DEFAULT_KEY_GENERATOR = DefaultKeyGenerator.NAME;
@@ -104,27 +104,46 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
   @Override
   public void startup(Vertx vertx, Handler<AsyncResult<Void>> handler) {
     try {
-      String username = System.getProperty("MySqlDataStoreContainer.username", null);
-      if (username == null) {
-        throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.username'");
+      if (datastore == null) {
+        DataStoreSettings settings = createSettings();
+        IDataStoreInit dsInit = settings.getDatastoreInit().newInstance();
+        dsInit.initDataStore(vertx, settings, initResult -> {
+          if (initResult.failed()) {
+            LOGGER.error("could not start mysql client", initResult.cause());
+            handler.handle(Future.failedFuture(new InitException(initResult.cause())));
+          } else {
+            datastore = (MySqlDataStore) initResult.result();
+            handler.handle(Future.succeededFuture());
+          }
+        });
+      } else {
+        handler.handle(Future.succeededFuture());
       }
-      String password = System.getProperty("MySqlDataStoreContainer.password", null);
-      if (password == null) {
-        throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.password'");
-      }
-
-      String database = "test";
-      JsonObject mySQLClientConfig = new JsonObject().put("host", "localhost").put("username", username)
-          .put(IDataStore.HANDLE_REFERENCED_RECURSIVE, handleReferencedRecursive).put("password", password)
-          .put("database", database).put("port", 3306).put("initial_pool_size", 10)
-          .put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
-
-      mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
-      datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig);
-      handler.handle(Future.succeededFuture());
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }
+  }
+
+  private DataStoreSettings createSettings() {
+    String database = "test";
+    String username = System.getProperty("MySqlDataStoreContainer.username", null);
+    if (username == null) {
+      throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.username'");
+    }
+    String password = System.getProperty("MySqlDataStoreContainer.password", null);
+    if (password == null) {
+      throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.password'");
+    }
+    DataStoreSettings settings = MySqlDataStoreinit.createDefaultSettings();
+    settings.setDatabaseName(database);
+    settings.getProperties().put(MySqlDataStoreinit.HOST_PROPERTY, "localhost");
+    settings.getProperties().put(MySqlDataStoreinit.PORT_PROPERTY, MySqlDataStoreinit.DEFAULT_PORT);
+    settings.getProperties().put(MySqlDataStoreinit.USERNAME_PROPERTY, username);
+    settings.getProperties().put(MySqlDataStoreinit.PASSWORD_PROPERTY, password);
+    settings.getProperties().put(MySqlDataStoreinit.SHARED_PROP, "true");
+    settings.getProperties().put(MySqlDataStoreinit.HANDLE_REFERENCED_RECURSIVE_PROP, handleReferencedRecursive);
+    settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
+    return settings;
   }
 
   /*
@@ -139,7 +158,14 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
 
   @Override
   public void shutdown(Handler<AsyncResult<Void>> handler) {
-    mySQLClient.close(handler);
+    LOGGER.info("shutdown performed");
+    datastore.shutdown(result -> {
+      if (result.failed()) {
+        LOGGER.error("", result.cause());
+      }
+      datastore = null;
+      handler.handle(Future.succeededFuture());
+    });
   }
 
   @Override
