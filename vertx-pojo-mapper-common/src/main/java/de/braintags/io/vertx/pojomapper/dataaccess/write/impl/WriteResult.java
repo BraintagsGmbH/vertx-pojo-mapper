@@ -37,6 +37,9 @@ public class WriteResult implements IWriteResult {
   @SuppressWarnings("rawtypes")
   private List insertedIds = new ArrayList();
 
+  public WriteResult() {
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -54,9 +57,8 @@ public class WriteResult implements IWriteResult {
    *          the entry to be added
    */
   @SuppressWarnings("unchecked")
-  private synchronized void addEntry(IWriteEntry entry) {
+  protected void addEntry(IWriteEntry entry) {
     resultList.add(entry);
-    logger.info(resultList.size());
     if (entry.getAction().equals(WriteAction.INSERT)) {
       if (insertedIds.contains(entry.getId())) {
         throw new InsertException(String.format("Trial to insert duplicate ID. Existing IDs: %s | new Id: %s ",

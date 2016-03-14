@@ -68,7 +68,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         return;
       }
       if (getObjectsToSave().isEmpty()) {
-        resultHandler.handle(Future.succeededFuture(new WriteResult()));
+        resultHandler.handle(Future.succeededFuture(new SqlWriteResult()));
         return;
       }
       getDataStore().getMapperFactory().getStoreObjectFactory().createStoreObjects(getMapper(), getObjectsToSave(),
@@ -89,7 +89,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   private void save(List<IStoreObject<?>> storeObjects, Handler<AsyncResult<IWriteResult>> resultHandler) {
     CounterObject<IWriteResult> co = new CounterObject<>(storeObjects.size(), resultHandler);
-    WriteResult rr = new WriteResult();
+    WriteResult rr = new SqlWriteResult();
     for (IStoreObject<?> sto : storeObjects) {
       saveStoreObject((SqlStoreObject) sto, rr, saveResult -> {
         if (saveResult.failed()) {

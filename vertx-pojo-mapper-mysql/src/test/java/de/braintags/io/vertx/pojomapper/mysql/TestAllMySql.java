@@ -30,8 +30,8 @@ import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ AllTestsPojoJson.class, TestSqlExpressions.class, TestMassInsert.class, TestMapper.class,
-    TestSqlQueryRambler.class, AllTestsCommon.class })
+@SuiteClasses({ AllTestsPojoJson.class, TestSqlExpressions.class, TestMapper.class, TestSqlQueryRambler.class,
+    AllTestsCommon.class })
 public class TestAllMySql {
   /*
    * -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer

@@ -16,7 +16,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
-import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.util.CounterObject;
@@ -52,7 +51,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
 
   @Override
   public void save(Handler<AsyncResult<IWriteResult>> resultHandler) {
-    WriteResult rr = new WriteResult();
+    MongoWriteResult rr = new MongoWriteResult();
     if (getObjectsToSave().isEmpty()) {
       resultHandler.handle(Future.succeededFuture(rr));
       return;
@@ -97,7 +96,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
    */
   private void doSave(T entity, MongoStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
-    LOG.info("now saving: " + storeObject.toString());
+    LOG.debug("now saving: " + storeObject.toString());
     if (storeObject.isNewInstance()) {
       doInsert(entity, storeObject, writeResult, resultHandler);
     } else {
@@ -116,7 +115,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
         LOG.info("failed", result.cause());
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
-        LOG.info("inserted");
+        LOG.debug("inserted");
         Object id = result.result() == null ? storeObject.generatedId : result.result();
         finishInsert(id, entity, storeObject, writeResult, resultHandler);
       }
@@ -138,7 +137,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
         LOG.info("failed", result.cause());
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
-        LOG.info("updated");
+        LOG.debug("updated");
         finishUpdate(currentId, entity, storeObject, writeResult, resultHandler);
       }
     });
