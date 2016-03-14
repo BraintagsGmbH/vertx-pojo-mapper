@@ -57,7 +57,7 @@ are defining the location of the running Mongo-DB and the database to be used.
 With this MongoClient we are then able to create a MongoDataStore, which will be the base for all the followings.
 
 ==== Initialize by DataStoreSettings
-In contrast to a programmatical initialization of an IDataStore, you may initialize by using
+In contrast to a programmatical initialization of an IDataStore, you may initialize it by using
 `link:unavailable[DataStoreSettings]`, which you can simply store as
 a local file.
 
@@ -81,29 +81,30 @@ try {
 In this example first the `link:unavailable[DataStoreSettings]` are loaded from a local
 file. Afterwards the `link:unavailable[IDataStoreInit]` is instantiated and then the
 method IDataStoreInit#initDataStore is called.
-This method uses the `link:unavailable[Properties]`, which are defined inside the
-`link:unavailable#get_properties-instance_method[getProperties]` to create a suitable IDataStore.
-The possible properties to be set are defined inside the appropriate implementation of
-`link:unavailable[IDataStoreInit]`, please refer to the documentation there.
-
+This method uses the `link:unavailable#get_properties-instance_method[getProperties]` to create a
+suitable IDataStore.
+The properties, which can be set here, are depending from the implementation of IDataStoreInit, please refer to the
+extensions for MySql and MongoDb, for instance.
 
 [source, java]
 ----
+public DataStoreSettings loadDataStoreSettings(String path) {
 FileSystem fs = vertx.fileSystem();
 if (fs.existsBlocking(path)) {
- Buffer buffer = fs.readFileBlocking(path);
- DataStoreSettings settings = Json.decodeValue(buffer.toString(), DataStoreSettings.class);
- return settings;
+Buffer buffer = fs.readFileBlocking(path);
+DataStoreSettings settings = Json.decodeValue(buffer.toString(), DataStoreSettings.class);
+return settings;
 } else {
- DataStoreSettings settings = new DataStoreSettings(IDataStoreInit.class, "testdatabase");
- // fill the settings like you need, REPLACE IDataStoreInit with a real implementation
- fs.writeFileBlocking(path, Buffer.buffer(Json.encode(settings)));
- throw new FileSystemException("File did not exist and was created new in path " + path);
+IDataStoreSettings settings = MongoDataStoreInit.createDefaultSettings();
+fs.writeFileBlocking(path, Buffer.buffer(Json.encode(settings)));
+throw new FileSystemException("File did not exist and was created new in path " + path);
 }
+}
+
 ----
-This method loads the `link:unavailable[DataStoreSettings]` from a local file from a Json
-format directly. If they are't existing, they are created and saved as needed. For the properties to be set, refer to
-the appropriate implementation of IDataStore.
+The above method loads the DataStoreSettings from the filesystem as Json format. If the file doesn't exist, the
+default settings are created by requesting a static method of MongoDataStoreInit. After they are saved at the
+expected location and an exeption is thrown, to force the user to edit them.
 
 === Creating a mapper
 Creating a mapper is very simple:

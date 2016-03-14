@@ -10,12 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.mysql;
-
-import org.junit.Test;
-
-import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
-import io.vertx.ext.unit.TestContext;
+package de.braintags.io.vertx.pojomapper.testdatastore.mapper;
 
 /**
  * 
@@ -23,10 +18,11 @@ import io.vertx.ext.unit.TestContext;
  * @author Michael Remme
  * 
  */
-public class TestMassInsert extends DatastoreBaseTest {
+public class MiniNumberMapper extends MiniMapper {
+  public int number;
 
-  @Test
-  public void simpleTest(TestContext context) {
-
+  public MiniNumberMapper(String name, int number) {
+    super(name);
+    this.number = number;
   }
 }

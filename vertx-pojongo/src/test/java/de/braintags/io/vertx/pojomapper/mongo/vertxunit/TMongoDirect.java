@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
+import de.braintags.io.vertx.util.CounterObject;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -32,6 +33,7 @@ import io.vertx.ext.unit.TestContext;
 
 public class TMongoDirect extends DatastoreBaseTest {
   private static Logger LOGGER = LoggerFactory.getLogger(TMongoDirect.class);
+  private static final int LOOP = 5000;
 
   // @Test
   // public void dateTest(TestContext context) {
@@ -50,6 +52,35 @@ public class TMongoDirect extends DatastoreBaseTest {
   // }
   // });
   // }
+
+  @Test
+  public void massInsert(TestContext context) {
+    LOGGER.info("-->>test");
+    Async async = context.async();
+    MongoDataStore ds = (MongoDataStore) getDataStore(context);
+    MongoClient client = ds.getMongoClient();
+    CounterObject co = new CounterObject<>(LOOP, null);
+    for (int i = 0; i < LOOP; i++) {
+      JsonObject jsonCommand = new JsonObject().put("name", "testName " + i);
+      client.insert("massInsert", jsonCommand, result -> {
+        if (result.failed()) {
+          co.setThrowable(result.cause());
+          context.fail(result.cause());
+          LOGGER.error("", result.cause());
+          async.complete();
+        } else {
+          LOGGER.info("executed: " + result.result());
+          if (co.reduce()) {
+            async.complete();
+          }
+        }
+      });
+      if (co.isError()) {
+        break;
+      }
+    }
+    async.await();
+  }
 
   @Test
   public void simpleTest(TestContext context) {
