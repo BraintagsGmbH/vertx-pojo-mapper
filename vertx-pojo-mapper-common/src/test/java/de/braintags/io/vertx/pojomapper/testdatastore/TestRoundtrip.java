@@ -34,8 +34,8 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 
-public class TestSimpleInsert extends DatastoreBaseTest {
-  private static Logger logger = LoggerFactory.getLogger(TestSimpleInsert.class);
+public class TestRoundtrip extends DatastoreBaseTest {
+  private static Logger logger = LoggerFactory.getLogger(TestRoundtrip.class);
   private static final int LOOP = 50;
 
   @Test
