@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <parent>
-    <artifactId>vertx-pojo-mapper</artifactId>
-    <groupId>de.braintags</groupId>
-    <version>1.0.1-SNAPSHOT</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-
-  <artifactId>vertx-pojo-mapper-json</artifactId>
-
-  <dependencies>
-  	<dependency>
-  		<groupId>de.braintags</groupId>
-  		<artifactId>vertx-pojo-mapper-common</artifactId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>vertx-pojo-mapper</artifactId>
+		<groupId>de.braintags</groupId>
 		<version>1.0.1-SNAPSHOT</version>
-  	</dependency>
-  </dependencies>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
 
-  <properties>
-    <doc.skip>false</doc.skip>
-    <maven.test.skip>false</maven.test.skip>
-	<testjar.skip>false</testjar.skip>
-  </properties>
+	<artifactId>vertx-pojo-mapper-json</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-common</artifactId>
+			<version>${braintags.pojomapper.version}</version>
+		</dependency>
+	</dependencies>
+
+	<properties>
+		<doc.skip>false</doc.skip>
+		<maven.test.skip>false</maven.test.skip>
+		<testjar.skip>false</testjar.skip>
+	</properties>
 
 </project>

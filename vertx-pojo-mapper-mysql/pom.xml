@@ -18,44 +18,49 @@
 		<source.skip>false</source.skip>
 		<testjar.skip>false</testjar.skip>
 		<skipAssembly>false</skipAssembly>
-		
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-json</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>${braintags.pojomapper.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-pojo-mapper-common</artifactId>
-			<classifier>tests</classifier>
-			<version>1.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-pojo-mapper-json</artifactId>
-			<classifier>tests</classifier>
-			<version>1.0.1-SNAPSHOT</version>
-		</dependency>		
+	  	<dependency>
+	  		<groupId>de.braintags</groupId>
+	  		<artifactId>vertx-pojo-mapper-common</artifactId>
+			<version>${braintags.pojomapper.version}</version>
+	  	</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mysql-postgresql-client</artifactId>
 			<version>${mysql_version}</version>
 		</dependency>
-		<dependency>
-		  <groupId>io.vertx</groupId>
-		  <artifactId>vertx-unit</artifactId>
-		  <version>${stack.version}</version>
-		</dependency>
-
 	    <dependency>
 	      <groupId>org.slf4j</groupId>
 	      <artifactId>slf4j-api</artifactId>
 	      <version>1.6.2</version>
 	      <scope>provided</scope>
 	    </dependency>
+	
+		<dependency>
+		  <groupId>io.vertx</groupId>
+		  <artifactId>vertx-unit</artifactId>
+		  <version>${stack.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-common-test</artifactId>
+			<version>${braintags.pojomapper.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-json</artifactId>
+			<classifier>tests</classifier>
+			<version>${braintags.pojomapper.version}</version>
+		</dependency>		
+
 	</dependencies>
 	
 	<build>

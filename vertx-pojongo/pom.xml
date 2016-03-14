@@ -12,7 +12,6 @@
 	<artifactId>vertx-pojongo</artifactId>
 
 	<properties>
-		<MONGO_VERSION>3.2.0</MONGO_VERSION>
 		<maven.test.skip>false</maven.test.skip>
 		<doc.skip>false</doc.skip>
 		<source.skip>false</source.skip>
@@ -51,27 +50,25 @@
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-json</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>${braintags.pojomapper.version}</version>
 		</dependency>
 	  	<dependency>
 	  		<groupId>de.braintags</groupId>
 	  		<artifactId>vertx-pojo-mapper-common</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>${braintags.pojomapper.version}</version>
 	  	</dependency>
 		
 		<dependency>
 			<groupId>de.braintags</groupId>
-			<artifactId>vertx-pojo-mapper-common</artifactId>
-			<classifier>tests</classifier>
-			<scope>>test</scope>
-			<version>1.0.1-SNAPSHOT</version>
+			<artifactId>vertx-pojo-mapper-common-test</artifactId>
+			<version>${braintags.pojomapper.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-json</artifactId>
+			<scope>test</scope>
 			<classifier>tests</classifier>
-			<scope>>test</scope>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>${braintags.pojomapper.version}</version>
 		</dependency>
 
 		<dependency>
@@ -79,25 +76,6 @@
 			<artifactId>vertx-mongo-embedded-db</artifactId>
 		</dependency>
 		
-<!-- 		<dependency> -->
-<!-- 			<groupId>io.vertx</groupId> -->
-<!-- 			<artifactId>vertx-mongo-client</artifactId> -->
-<!-- 			<version>${MONGO_VERSION}</version> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>io.vertx</groupId> -->
-<!-- 			<artifactId>vertx-mongo-service</artifactId> -->
-<!-- 			<version>${MONGO_VERSION}</version> -->
-<!-- 		</dependency> -->
-
-<!-- 		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-mongo-service</artifactId>
-			<scope>test</scope>
-			<classifier>tests</classifier>
-			<version>${MONGO_VERSION}</version>
-		</dependency>
- -->		
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>

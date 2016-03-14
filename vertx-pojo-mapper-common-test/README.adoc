@@ -1,0 +1,4 @@
+# vertx-pojo-mapper-common-test
+
+This module contains common test classes and structures for executing unit tests with a datastore.
+

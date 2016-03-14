@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require 'rubygems' if RUBY_VERSION < '1.9'
+
+require File.join File.dirname(__FILE__), '../lib/asciidoctor'
+require 'asciidoctor/cli'
+
+invoker = Asciidoctor::Cli::Invoker.new ARGV
+GC.start
+invoker.invoke!
+exit invoker.code

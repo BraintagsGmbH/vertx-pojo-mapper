@@ -8,7 +8,7 @@
 	<packaging>pom</packaging>
 
 	<artifactId>vertx-pojo-mapper</artifactId>
-	<version>${braintags.pojomapper.version}</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>Vert.x Pojo Mapper</name>
 
 	<parent>
@@ -19,6 +19,7 @@
 
 	<modules>
 		<module>vertx-pojo-mapper-common</module>
+		<module>vertx-pojo-mapper-common-test</module>
 		<module>vertx-pojo-mapper-json</module>
 		<module>vertx-pojongo</module>
 		<module>vertx-pojo-mapper-mysql</module>

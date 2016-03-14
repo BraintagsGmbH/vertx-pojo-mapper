@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+require 'rubygems' if RUBY_VERSION < '1.9'
+
+require File.join File.dirname(__FILE__), '../lib/asciidoctor'
+require 'asciidoctor/cli'
+
+options = Asciidoctor::Cli::Options.parse! ARGV
+options[:safe] = Asciidoctor::SafeMode::SAFE
+invoker = Asciidoctor::Cli::Invoker.new options
+invoker.invoke!
+exit invoker.code

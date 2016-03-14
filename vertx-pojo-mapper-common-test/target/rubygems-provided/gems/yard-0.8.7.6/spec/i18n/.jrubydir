@@ -1,0 +1,7 @@
+..
+.
+locale_spec.rb
+message_spec.rb
+messages_spec.rb
+pot_generator_spec.rb
+text_spec.rb

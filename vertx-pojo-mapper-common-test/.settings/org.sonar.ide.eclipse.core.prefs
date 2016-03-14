@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+extraProperties=sonar.language\=java\r\nsonar.jdbc.username\=sonar\r\nsonar.login\=mremme\r\nsonar.host.url\=http\://sqube.bt-rz.net\r\nsonar.jdbc.password\=xt1729x\r\nsonar.jdbc.url\=jdbc\:mysql\://192.168.41.84\:3306/sonarqube?useUnicode\=true&characterEncoding\=utf8\r\nsonar.password\=9ajasy
+projectKey=de.braintags\:vertx-pojo-mapper-common-test
+serverUrl=http\://sqube.bt-rz.net
+version=2
