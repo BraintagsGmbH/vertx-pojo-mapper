@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<project name="maven-antrun-" default="main"  >
-<target name="main">
-  <mkdir dir="/Users/mremme/workspace/vertx/vertx-pojo-mapper/vertx-pojo-mapper-common-test/src/docs/asciidoc"/>
-</target>
-</project>

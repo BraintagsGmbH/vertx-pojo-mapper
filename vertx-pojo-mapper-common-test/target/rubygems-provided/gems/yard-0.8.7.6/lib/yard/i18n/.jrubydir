@@ -1,8 +1,0 @@
-..
-.
-locale.rb
-message.rb
-messages.rb
-po_parser.rb
-pot_generator.rb
-text.rb

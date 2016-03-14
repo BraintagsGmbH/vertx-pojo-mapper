@@ -1,7 +1,0 @@
-..
-.
-ruby_lex.rb
-ruby_parser.rb
-statement.rb
-statement_list.rb
-token_list.rb

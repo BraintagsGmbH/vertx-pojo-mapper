@@ -1,7 +1,0 @@
-..
-.
-base.rb
-file_system_serializer.rb
-process_serializer.rb
-stdout_serializer.rb
-yardoc_serializer.rb

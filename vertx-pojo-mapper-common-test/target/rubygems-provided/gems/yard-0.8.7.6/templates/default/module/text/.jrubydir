@@ -1,9 +1,0 @@
-..
-.
-children.erb
-class_meths_list.erb
-extends.erb
-header.erb
-includes.erb
-instance_meths_list.erb
-setup.rb
