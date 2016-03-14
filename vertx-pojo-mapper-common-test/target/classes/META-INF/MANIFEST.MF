@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-Maven-Artifact-Id: vertx-pojo-mapper-common-test
-Built-By: mremme
-Maven-Version: 1.0.1-SNAPSHOT
-Build-Jdk: 1.8.0_73
-Created-By: Maven Integration for Eclipse
-Maven-Group-Id: de.braintags
-
