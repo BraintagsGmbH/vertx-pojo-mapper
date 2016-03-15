@@ -177,4 +177,17 @@ public class Examples {
     }
   }
 
+  public void executeNative(IDataStore datastore) {
+    MongoClient client = (MongoClient) datastore.getClient();
+    JsonObject insertCommand = new JsonObject();
+    insertCommand.put("name", "testName");
+    client.insert("TestCollection", insertCommand, result -> {
+      if (result.failed()) {
+        logger.error("", result.cause());
+      } else {
+        logger.info("executed: " + result.result());
+      }
+    });
+  }
+
 }

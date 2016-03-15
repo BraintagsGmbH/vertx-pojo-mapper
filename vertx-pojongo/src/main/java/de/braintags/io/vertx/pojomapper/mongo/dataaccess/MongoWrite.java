@@ -35,7 +35,7 @@ import io.vertx.ext.mongo.MongoClient;
  *          the type of the underlaying mapper
  */
 public class MongoWrite<T> extends AbstractWrite<T> {
-  private static Logger LOG = LoggerFactory.getLogger(MongoWrite.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MongoWrite.class);
 
   /**
    * Constructor
@@ -107,7 +107,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
 
   private void doInsert(T entity, MongoStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
-    MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
+    MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     IMapper mapper = getMapper();
     String collection = mapper.getTableInfo().getName();
     mongoClient.insert(collection, storeObject.getContainer(), result -> {
@@ -124,7 +124,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
 
   private void doUpdate(T entity, MongoStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
-    MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
+    MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     IMapper mapper = getMapper();
     String collection = mapper.getTableInfo().getName();
     final Object currentId = storeObject.get(mapper.getIdField());

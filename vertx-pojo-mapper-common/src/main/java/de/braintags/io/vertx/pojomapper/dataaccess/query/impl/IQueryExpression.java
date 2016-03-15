@@ -57,6 +57,14 @@ public interface IQueryExpression {
   IQueryExpression closeParenthesis();
 
   /**
+   * Set a native command to be executed as query
+   * 
+   * @param nativeCommand
+   *          the command to be set
+   */
+  void setNativeCommand(Object nativeCommand);
+
+  /**
    * add a query expression
    * 
    * @param fieldName

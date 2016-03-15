@@ -29,6 +29,7 @@ import de.braintags.io.vertx.pojomapper.mapping.ITriggerContextFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -90,6 +91,11 @@ public class DummyDataStore implements IDataStore {
     return mf;
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private void setUnsupported(Handler handler) {
+    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+  }
+
   class DummyQuery<T> extends Query<T> {
 
     /**
@@ -107,7 +113,7 @@ public class DummyDataStore implements IDataStore {
      */
     @Override
     public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-      throw new UnsupportedOperationException();
+      setUnsupported(resultHandler);
     }
 
     /*
@@ -117,7 +123,7 @@ public class DummyDataStore implements IDataStore {
      */
     @Override
     public void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
-      throw new UnsupportedOperationException();
+      setUnsupported(resultHandler);
     }
 
     /*
@@ -137,6 +143,16 @@ public class DummyDataStore implements IDataStore {
      */
     @Override
     public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+      setUnsupported(resultHandler);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#addNativeCommand(java.lang.Object)
+     */
+    @Override
+    public void setNativeCommand(Object command) {
       throw new UnsupportedOperationException();
     }
 
@@ -233,6 +249,16 @@ public class DummyDataStore implements IDataStore {
   @Override
   public final void setTriggerContextFactory(ITriggerContextFactory triggerContextFactory) {
     this.triggerContextFactory = triggerContextFactory;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getClient()
+   */
+  @Override
+  public Object getClient() {
+    return null;
   }
 
 }

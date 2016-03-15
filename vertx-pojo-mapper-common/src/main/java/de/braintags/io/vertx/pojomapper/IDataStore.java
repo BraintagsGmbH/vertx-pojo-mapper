@@ -166,4 +166,11 @@ public interface IDataStore {
    */
   void setTriggerContextFactory(ITriggerContextFactory factory);
 
+  /**
+   * Get the client, which is internally used to connect to the database
+   * 
+   * @return the database specific client
+   */
+  Object getClient();
+
 }

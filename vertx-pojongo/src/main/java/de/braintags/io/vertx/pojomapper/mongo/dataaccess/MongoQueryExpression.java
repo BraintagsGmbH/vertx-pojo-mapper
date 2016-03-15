@@ -163,4 +163,18 @@ public class MongoQueryExpression implements IQueryExpression {
   public final JsonObject getSortArguments() {
     return sortArguments;
   }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#setNativeCommand(java.lang.Object)
+   */
+  @Override
+  public void setNativeCommand(Object nativeCommand) {
+    if (nativeCommand instanceof JsonObject) {
+      qDef = (JsonObject) nativeCommand;
+    } else {
+      throw new UnsupportedOperationException("the mongo datastore needs a Jsonobject as native format");
+    }
+  }
 }

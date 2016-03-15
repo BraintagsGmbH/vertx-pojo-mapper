@@ -55,6 +55,7 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * Set the maximum number of records to be returned
    * 
    * @param limit
+   *          the maximum number of records to be returned
    * @return the query itself for fluent access
    */
   IQuery<T> setLimit(int limit);
@@ -63,6 +64,7 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * Set the first record to be returned
    * 
    * @param start
+   *          the number of the first record to be returned
    * @return the query itself for fluent access
    */
   IQuery<T> setStart(int start);
@@ -71,10 +73,11 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * If {@link #setLimit(int)} is defined with a value > 0 and this value is set to true, then the
    * {@link IQueryResult#getCompleteResult()} will return the fitting value
    * 
-   * @param start
+   * @param returnCompleteCount
+   *          true, if complete count of selection shall be returned ( which might result into a double query count )
    * @return the query itself for fluent access
    */
-  IQuery<T> setReturnCompleteCount(boolean ret);
+  IQuery<T> setReturnCompleteCount(boolean returnCompleteCount);
 
   /**
    * Add a field to sort the resulting selection by. This method is the same than addSort( fieldName, true )
@@ -96,4 +99,20 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    */
   ISortDefinition<T> addSort(String sortField, boolean ascending);
 
+  /**
+   * Add a command, which is a database specific object like an sql string or a JsonObject for mongo. If a native
+   * command is added, other parameters are ignored on execution. When the IQuery is executed later, then the native
+   * command is executed and the result is transformed into the POJOs of the defined mapper class
+   * 
+   * @param command
+   *          the command to be executed
+   */
+  void setNativeCommand(Object command);
+
+  /**
+   * Get a formerly defined native command
+   * 
+   * @return the command or null, if none defined
+   */
+  Object getNativeCommand();
 }

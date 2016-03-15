@@ -37,6 +37,7 @@ public class SqlExpression implements IQueryExpression {
   private static final String COUNT_STATEMENT = "SELECT count(*) from %s";
   private IMapper mapper;
 
+  private String nativeCommand = null;
   private StringBuilder select = new StringBuilder();
   private StringBuilder delete = new StringBuilder();
   private StringBuilder count = new StringBuilder();
@@ -65,6 +66,20 @@ public class SqlExpression implements IQueryExpression {
     select.append(String.format(SELECT_STATEMENT, mapper.getTableInfo().getName()));
     delete.append(String.format(DELETE_STATEMENT, mapper.getTableInfo().getName()));
     count.append(String.format(COUNT_STATEMENT, mapper.getTableInfo().getName()));
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#setNativeCommand(java.lang.Object)
+   */
+  @Override
+  public void setNativeCommand(Object nativeCommand) {
+    if (nativeCommand instanceof CharSequence) {
+      this.nativeCommand = nativeCommand.toString();
+    } else {
+      throw new UnsupportedOperationException("the dql datastore needs a CharSequence as native format");
+    }
   }
 
   /**
@@ -191,6 +206,9 @@ public class SqlExpression implements IQueryExpression {
    * @return the complete expression
    */
   public String getCountExpression() {
+    if (nativeCommand != null) {
+      return nativeCommand;
+    }
     StringBuilder complete = new StringBuilder(count);
     appendWhereClause(complete);
     return complete.toString();
@@ -202,6 +220,9 @@ public class SqlExpression implements IQueryExpression {
    * @return the complete expression
    */
   public String getSelectExpression() {
+    if (nativeCommand != null) {
+      return nativeCommand;
+    }
     StringBuilder complete = new StringBuilder(select);
     appendWhereClause(complete);
     appendOrderByClause(complete);

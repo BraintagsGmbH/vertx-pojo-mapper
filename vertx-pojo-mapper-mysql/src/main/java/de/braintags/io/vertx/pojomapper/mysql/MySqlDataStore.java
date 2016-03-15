@@ -99,11 +99,20 @@ public class MySqlDataStore extends AbstractDataStore {
   }
 
   /**
+   * @deprecated use getClient() instead
+   */
+  @Deprecated
+  public final AsyncSQLClient getSqlClient() {
+    return (AsyncSQLClient) getClient();
+  }
+
+  /**
    * Get the underlaying instance of {@link AsyncSQLClient} which is used to process requests to the datastore
    * 
    * @return the sqlClient
    */
-  public final AsyncSQLClient getSqlClient() {
+  @Override
+  public Object getClient() {
     return sqlClient;
   }
 

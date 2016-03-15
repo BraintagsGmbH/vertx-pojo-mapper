@@ -12,11 +12,15 @@
  */
 package de.braintags.io.vertx.pojomapper.mysql;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
@@ -40,6 +44,36 @@ import io.vertx.ext.unit.TestContext;
 
 public class TestSqlExpressions extends DatastoreBaseTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(TestSqlExpressions.class);
+
+  @Test
+  public void executeNativeQuery(TestContext context) {
+    MySqlDataStore ds = (MySqlDataStore) getDataStore(context);
+    clearTable(context, MiniMapper.class);
+    List<MiniMapper> write = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+      write.add(new MiniMapper("native " + i));
+    }
+    saveRecords(context, write);
+    IQuery<MiniMapper> query = ds.createQuery(MiniMapper.class);
+    String qs = "select * from MiniMapper where name LIKE \"native%\"";
+    query.setNativeCommand(qs);
+
+    ResultContainer resultContainer = find(context, query, 10);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+
+  }
+
+  @Test
+  public void testWrongNativeFormat(TestContext context) {
+    MySqlDataStore ds = (MySqlDataStore) getDataStore(context);
+    IQuery<MiniMapper> query = ds.createQuery(MiniMapper.class);
+    JsonObject qs = new JsonObject();
+    query.setNativeCommand(qs);
+    ResultContainer resultContainer = find(context, query, -1);
+    if (resultContainer.assertionError == null)
+      context.fail("Expected an exception here");
+  }
 
   @Test
   public void testConnection(TestContext context) {

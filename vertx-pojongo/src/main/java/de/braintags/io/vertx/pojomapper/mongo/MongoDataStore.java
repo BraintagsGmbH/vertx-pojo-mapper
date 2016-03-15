@@ -97,11 +97,20 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
   }
 
   /**
+   * @deprecated use getClient() instead
+   */
+  @Deprecated
+  public MongoClient getMongoClient() {
+    return (MongoClient) getClient();
+  }
+
+  /**
    * Get the underlaying instance of {@link MongoClient}
    * 
    * @return the client
    */
-  public MongoClient getMongoClient() {
+  @Override
+  public Object getClient() {
     return client;
   }
 

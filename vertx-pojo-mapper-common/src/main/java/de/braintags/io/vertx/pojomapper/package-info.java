@@ -174,6 +174,55 @@
  * {@link de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery}.
  * All records, which are fitting the arguments of the query are deleted.
  *
+ * === Executing native, database specific commands
+ * If the facilities of vertx-pojo-mapper aren't enough, you are able to execute native commands directly in two ways:
+ * 
+ * ==== Using the internal driver
+ * The method {@link de.braintags.io.vertx.pojomapper.IDataStore#getClient()} returns the internall client, which is
+ * used to communicate with the database. Casting this to the correct Class will allow you to send native commands in
+ * any form to the database and deal with the native format, like in the example here for a MongoDb:
+ * 
+ * <pre>
+ * [source,java]
+ * ----
+  MongoClient client = (MongoClient) datastore.getClient();
+  JsonObject insertCommand = new JsonObject();
+  insertCommand.put("name", "testName");
+  client.insert("TestCollection", insertCommand, result -> {
+    if (result.failed()) {
+      logger.error("", result.cause());
+    } else {
+      logger.info("executed: " + result.result());
+    }
+  });
+ * ----
+ * </pre>
+ * 
+ * ==== Using IQuery for a native command
+ * The method {@link de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setNativeCommand(Object)} allows you to
+ * define
+ * an object with a native, database specific query expression. If this argument is passed and the IQuery is executed,
+ * then the system will use this command to perform the query and will transform the result into instances of the
+ * defined mapper.
+ * In the example below we are performing a native execution for MySqlDataStore:
+ * 
+ * 
+ * [source, java]
+ * ----
+ * IQuery<MiniMapper> query = datastore.createQuery(MiniMapper.class);
+ * String qs = "select * from MiniMapper where name LIKE \"native%\"";
+ * query.setNativeCommand(qs);
+ * query.execute(qr -> {
+ * if (qr.succeeded()) {
+ * IteratorAsync<MiniMapper> it = qr.result().iterator();
+ * while (it.hasNext()) {
+ * ...
+ * }
+ * }
+ * });
+ * 
+ * ----
+ * 
  * === Complexer mapper definitions
  * 
  * The example above was very simple and straightforward, just to explain the basics of vertx-pojo-mapper. But of course

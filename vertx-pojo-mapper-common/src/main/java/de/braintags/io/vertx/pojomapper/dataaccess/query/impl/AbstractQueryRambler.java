@@ -74,6 +74,9 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
       throw new UnsupportedOperationException("sub query not implemented yet");
     mapper = query.getMapper();
     queryExpression.setMapper(mapper);
+    if (query.getNativeCommand() != null) {
+      queryExpression.setNativeCommand(query.getNativeCommand());
+    }
   }
 
   /*

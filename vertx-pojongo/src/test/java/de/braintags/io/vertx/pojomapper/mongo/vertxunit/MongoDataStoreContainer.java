@@ -27,6 +27,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.ext.mongo.MongoClient;
 
 /**
  * 
@@ -133,7 +134,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   @Override
   public void dropTable(String collection, Handler<AsyncResult<Void>> handler) {
     logger.info("DROPPING: " + collection);
-    mongoDataStore.getMongoClient().dropCollection(collection, dropResult -> {
+    ((MongoClient) mongoDataStore.getClient()).dropCollection(collection, dropResult -> {
       if (dropResult.failed()) {
         logger.error("", dropResult.cause());
         handler.handle(dropResult);

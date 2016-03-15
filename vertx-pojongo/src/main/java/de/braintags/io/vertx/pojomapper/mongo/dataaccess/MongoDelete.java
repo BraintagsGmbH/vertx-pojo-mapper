@@ -48,7 +48,7 @@ public class MongoDelete<T> extends Delete<T> {
 
   @Override
   protected void deleteQuery(IQuery<T> q, Handler<AsyncResult<IDeleteResult>> resultHandler) {
-    MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
+    MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     String collection = getMapper().getTableInfo().getName();
     MongoQuery<T> query = (MongoQuery<T>) q;
     query.createQueryDefinition(qDefResult -> {

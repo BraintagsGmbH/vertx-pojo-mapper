@@ -93,7 +93,7 @@ public class MongoQuery<T> extends Query<T> {
   }
 
   private void doFindCount(MongoQueryRambler rambler, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
-    MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
+    MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     String column = getMapper().getTableInfo().getName();
     mongoClient.count(column, ((MongoQueryExpression) rambler.getQueryExpression()).getQueryDefinition(), qResult -> {
       if (qResult.failed()) {
@@ -109,7 +109,7 @@ public class MongoQuery<T> extends Query<T> {
   }
 
   private void doFind(MongoQueryRambler rambler, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    MongoClient mongoClient = ((MongoDataStore) getDataStore()).getMongoClient();
+    MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     String column = getMapper().getTableInfo().getName();
     FindOptions fo = new FindOptions();
     fo.setSkip(getStart());

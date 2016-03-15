@@ -46,6 +46,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   private int start = 0;
   private boolean returnCompleteCount = false;
   private SortDefinition<T> sortDefs = new SortDefinition<>(this);
+  private Object nativeCommand;
 
   /**
    * @param mapperClass
@@ -102,24 +103,28 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * 
    * @param rambler
    *          the rambler to be filled
-   * @param resulthandler
+   * @param resultHandler
    *          the handler to be informed about the result
    */
   public void executeQueryRambler(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     rambler.start(this);
-    handleFilterList(rambler, fr -> {
-      if (fr.failed()) {
-        resultHandler.handle(fr);
-      } else {
-        handleSortDefs(rambler, sd -> {
-          if (sd.failed()) {
-            resultHandler.handle(sd);
-          } else {
-            finishCounter(rambler, resultHandler);
-          }
-        });
-      }
-    });
+    if (getNativeCommand() == null) {
+      handleFilterList(rambler, fr -> {
+        if (fr.failed()) {
+          resultHandler.handle(fr);
+        } else {
+          handleSortDefs(rambler, sd -> {
+            if (sd.failed()) {
+              resultHandler.handle(sd);
+            } else {
+              finishCounter(rambler, resultHandler);
+            }
+          });
+        }
+      });
+    } else {
+      resultHandler.handle(Future.succeededFuture());
+    }
   }
 
   private void handleSortDefs(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
@@ -248,6 +253,31 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   public ISortDefinition<T> getSortDefinitions() {
     return sortDefs;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#parent()
+   */
+  @Override
+  public Object parent() {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#addNativeCommand(java.lang.Object)
+   */
+  @Override
+  public void setNativeCommand(Object command) {
+    this.nativeCommand = command;
+  }
+
+  @Override
+  public Object getNativeCommand() {
+    return nativeCommand;
   }
 
 }

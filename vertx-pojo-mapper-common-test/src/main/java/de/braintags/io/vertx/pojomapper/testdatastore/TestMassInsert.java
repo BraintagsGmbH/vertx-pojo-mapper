@@ -31,7 +31,7 @@ import io.vertx.ext.unit.TestContext;
 public class TestMassInsert extends DatastoreBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TestMassInsert.class);
-  private static final int LOOP = 5000;
+  private static final int LOOP = 500;
 
   @Test
   public void simpleTest(TestContext context) {

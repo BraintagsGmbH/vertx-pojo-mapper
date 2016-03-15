@@ -12,10 +12,16 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.vertxunit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
 import de.braintags.io.vertx.util.CounterObject;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -34,6 +40,35 @@ import io.vertx.ext.unit.TestContext;
 public class TMongoDirect extends DatastoreBaseTest {
   private static Logger LOGGER = LoggerFactory.getLogger(TMongoDirect.class);
   private static final int LOOP = 5000;
+
+  @Test
+  public void executeNativeQuery(TestContext context) {
+    MongoDataStore ds = (MongoDataStore) getDataStore(context);
+    clearTable(context, MiniMapper.class);
+    List<MiniMapper> write = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+      write.add(new MiniMapper("native " + i));
+    }
+    saveRecords(context, write);
+    IQuery<MiniMapper> query = ds.createQuery(MiniMapper.class);
+    String qs = "{\"name\":{\"$regex\":\".*native.*\"}}";
+    JsonObject json = new JsonObject(qs);
+    query.setNativeCommand(json);
+
+    ResultContainer resultContainer = find(context, query, 10);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
+  @Test
+  public void testWrongNativeFormat(TestContext context) {
+    MongoDataStore ds = (MongoDataStore) getDataStore(context);
+    IQuery<MiniMapper> query = ds.createQuery(MiniMapper.class);
+    query.setNativeCommand(new String());
+    ResultContainer resultContainer = find(context, query, -1);
+    if (resultContainer.assertionError == null)
+      context.fail("Expected an exception here");
+  }
 
   // @Test
   // public void dateTest(TestContext context) {
@@ -58,7 +93,7 @@ public class TMongoDirect extends DatastoreBaseTest {
     LOGGER.info("-->>test");
     Async async = context.async();
     MongoDataStore ds = (MongoDataStore) getDataStore(context);
-    MongoClient client = ds.getMongoClient();
+    MongoClient client = (MongoClient) ds.getClient();
     CounterObject co = new CounterObject<>(LOOP, null);
     for (int i = 0; i < LOOP; i++) {
       JsonObject jsonCommand = new JsonObject().put("name", "testName " + i);
@@ -86,7 +121,7 @@ public class TMongoDirect extends DatastoreBaseTest {
   public void simpleTest(TestContext context) {
     LOGGER.info("-->>test");
     MongoDataStore ds = (MongoDataStore) getDataStore(context);
-    MongoClient client = ds.getMongoClient();
+    MongoClient client = (MongoClient) ds.getClient();
     JsonObject jsonCommand = new JsonObject();
     // getNextSequenceValue("productid")
     // jsonCommand.put("_id", "getNextSequenceValue(\"productid\")".getBytes());
@@ -106,7 +141,7 @@ public class TMongoDirect extends DatastoreBaseTest {
     Async as = context.async();
     String collection = "UpdateTestCollection";
     MongoDataStore ds = (MongoDataStore) getDataStore(context);
-    MongoClient client = ds.getMongoClient();
+    MongoClient client = (MongoClient) ds.getClient();
 
     JsonObject insertCommand = new JsonObject();
     insertCommand.put("name", "testName");
@@ -146,7 +181,7 @@ public class TMongoDirect extends DatastoreBaseTest {
     Async as = context.async();
     String collection = "SequenceTest";
     MongoDataStore ds = (MongoDataStore) getDataStore(context);
-    MongoClient client = ds.getMongoClient();
+    MongoClient client = (MongoClient) ds.getClient();
     clearTable(context, collection);
 
     JsonObject jsonCommand = new JsonObject();
@@ -213,7 +248,7 @@ public class TMongoDirect extends DatastoreBaseTest {
     Async as = context.async();
     String collection = "UpdateTestCollection";
     MongoDataStore ds = (MongoDataStore) getDataStore(context);
-    MongoClient client = ds.getMongoClient();
+    MongoClient client = (MongoClient) ds.getClient();
 
     JsonObject jsonCommand = new JsonObject();
     jsonCommand.put("name", "testName");

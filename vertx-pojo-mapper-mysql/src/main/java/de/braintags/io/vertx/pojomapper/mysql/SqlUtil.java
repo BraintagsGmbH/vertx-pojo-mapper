@@ -95,7 +95,7 @@ public class SqlUtil {
    *          a resulthandler to be informed
    */
   public static void query(MySqlDataStore datastore, String command, Handler<AsyncResult<ResultSet>> resultHandler) {
-    query(datastore.getSqlClient(), command, resultHandler);
+    query((AsyncSQLClient) datastore.getClient(), command, resultHandler);
   }
 
   /**
@@ -157,7 +157,7 @@ public class SqlUtil {
    */
   public static void queryWithParams(MySqlDataStore datastore, String command, JsonArray params,
       Handler<AsyncResult<ResultSet>> resultHandler) {
-    queryWithParams(datastore.getSqlClient(), command, params, resultHandler);
+    queryWithParams((AsyncSQLClient) datastore.getClient(), command, params, resultHandler);
   }
 
   /**
@@ -221,7 +221,7 @@ public class SqlUtil {
    *          a resulthandler to be informed
    */
   public static void execute(MySqlDataStore datastore, String command, Handler<AsyncResult<Void>> resultHandler) {
-    execute(datastore.getSqlClient(), command, resultHandler);
+    execute((AsyncSQLClient) datastore.getClient(), command, resultHandler);
   }
 
   /**
@@ -287,7 +287,7 @@ public class SqlUtil {
    */
   public static void update(MySqlDataStore datastore, String command,
       Handler<AsyncResult<UpdateResult>> resultHandler) {
-    update(datastore.getSqlClient(), command, resultHandler);
+    update((MySqlDataStore) datastore.getClient(), command, resultHandler);
   }
 
   /**
@@ -328,7 +328,7 @@ public class SqlUtil {
    */
   public static void updateWithParams(MySqlDataStore datastore, String command, JsonArray params,
       Handler<AsyncResult<UpdateResult>> resultHandler) {
-    updateWithParams(datastore.getSqlClient(), command, params, resultHandler);
+    updateWithParams((AsyncSQLClient) datastore.getClient(), command, params, resultHandler);
   }
 
   /**
