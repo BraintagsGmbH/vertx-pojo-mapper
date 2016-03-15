@@ -8,13 +8,13 @@
 	<packaging>pom</packaging>
 
 	<artifactId>vertx-pojo-mapper</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.0-ms1</version>
 	<name>Vert.x Pojo Mapper</name>
 
 	<parent>
 		<groupId>de.braintags</groupId>
 		<artifactId>btVertxBasePOM</artifactId>
-		<version>10-SNAPSHOT</version>
+		<version>10</version>
 	</parent>
 
 	<modules>
@@ -26,8 +26,9 @@
 	</modules>
 
 	<properties>
+		<vertx-util-version>1.0.0-ms1</vertx-util-version>
 		<jacoco.haltOnFailure>false</jacoco.haltOnFailure>
-		<braintags.pojomapper.version>1.0.1-SNAPSHOT</braintags.pojomapper.version>
+		<braintags.pojomapper.version>1.0.0-ms1</braintags.pojomapper.version>
 		<testjar.skip>true</testjar.skip>
 		<doc.skip>true</doc.skip>
 		<maven.test.skip>true</maven.test.skip>
@@ -38,7 +39,7 @@
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-util</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${vertx-util-version}</version>
 		</dependency>
 	</dependencies>
 
