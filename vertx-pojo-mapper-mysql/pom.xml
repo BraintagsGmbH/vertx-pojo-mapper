@@ -5,14 +5,13 @@
 	<parent>
 		<artifactId>vertx-pojo-mapper</artifactId>
 		<groupId>de.braintags</groupId>
-		<version>1.0.0-ms1</version>
+		<version>1.0.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>vertx-pojo-mapper-mysql</artifactId>
 
 	<properties>
-		<mysql_version>3.2.1</mysql_version>
 		<maven.test.skip>false</maven.test.skip>
 		<doc.skip>false</doc.skip>
 		<source.skip>false</source.skip>
@@ -24,17 +23,23 @@
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-json</artifactId>
-			<version>${braintags.pojomapper.version}</version>
 		</dependency>
 	  	<dependency>
 	  		<groupId>de.braintags</groupId>
 	  		<artifactId>vertx-pojo-mapper-common</artifactId>
-			<version>${braintags.pojomapper.version}</version>
 	  	</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mysql-postgresql-client</artifactId>
-			<version>${mysql_version}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-common-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-json</artifactId>
+			<classifier>tests</classifier>
 		</dependency>
 	    <dependency>
 	      <groupId>org.slf4j</groupId>
@@ -42,25 +47,6 @@
 	      <version>1.6.2</version>
 	      <scope>provided</scope>
 	    </dependency>
-	
-		<dependency>
-		  <groupId>io.vertx</groupId>
-		  <artifactId>vertx-unit</artifactId>
-		  <version>${stack.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-pojo-mapper-common-test</artifactId>
-			<version>${braintags.pojomapper.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-pojo-mapper-json</artifactId>
-			<classifier>tests</classifier>
-			<version>${braintags.pojomapper.version}</version>
-		</dependency>		
-
 	</dependencies>
 	
 	<build>

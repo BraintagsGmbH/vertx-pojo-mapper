@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>vertx-pojo-mapper</artifactId>
 		<groupId>de.braintags</groupId>
-		<version>1.0.0-ms1</version>
+		<version>1.0.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -18,6 +18,41 @@
 		<testjar.skip>false</testjar.skip>
 		<maven.test.skip>false</maven.test.skip>
 	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-json</artifactId>
+		</dependency>
+	  	<dependency>
+	  		<groupId>de.braintags</groupId>
+	  		<artifactId>vertx-pojo-mapper-common</artifactId>
+	  	</dependency>
+		
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-common-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-json</artifactId>
+			<scope>test</scope>
+			<classifier>tests</classifier>
+		</dependency>
+
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-mongo-embedded-db</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.12</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
 
 	<build>
 		<pluginManagement>
@@ -45,45 +80,6 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
-	<dependencies>
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-pojo-mapper-json</artifactId>
-			<version>${braintags.pojomapper.version}</version>
-		</dependency>
-	  	<dependency>
-	  		<groupId>de.braintags</groupId>
-	  		<artifactId>vertx-pojo-mapper-common</artifactId>
-			<version>${braintags.pojomapper.version}</version>
-	  	</dependency>
-		
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-pojo-mapper-common-test</artifactId>
-			<version>${braintags.pojomapper.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-pojo-mapper-json</artifactId>
-			<scope>test</scope>
-			<classifier>tests</classifier>
-			<version>${braintags.pojomapper.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-mongo-embedded-db</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.12</version>
-			<scope>test</scope>
-		</dependency>
-
-	</dependencies>
 
 
 
