@@ -8,13 +8,13 @@
 	<packaging>pom</packaging>
 
 	<artifactId>vertx-pojo-mapper</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0_SNAPSHOT</version>
 	<name>Vert.x Pojo Mapper</name>
 
 	<parent>
 		<groupId>de.braintags</groupId>
 		<artifactId>btVertxBasePOM</artifactId>
-		<version>12</version>
+		<version>13-SNAPSHOT</version>
 	</parent>
 
 	<modules>
