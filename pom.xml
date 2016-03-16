@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>de.braintags</groupId>
 		<artifactId>btVertxBasePOM</artifactId>
-		<version>11</version>
+		<version>12</version>
 	</parent>
 
 	<modules>
@@ -58,6 +58,12 @@
 	</dependencies>
 
 	<scm>
-		<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper.git</url>
+		<connection>scm:git:git@github.com:BraintagsGmbH/vertx-pojo-mapper.git</connection>
+		<developerConnection>scm:git:git@github.com:BraintagsGmbH/vertx-pojo-mapper.git</developerConnection>
+		<url>git@github.com:BraintagsGmbH/vertx-pojo-mapper.git</url>
 	</scm>
+	
+	<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper</url>
+	<description>vertx-pojo-mapper is a framework for nonblocking pojo mapping for different datasources.
+</description>
 </project>

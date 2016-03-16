@@ -20,4 +20,8 @@
 		<skipAssembly>false</skipAssembly>
 	</properties>
 
+	<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper</url>
+	<description>common interfaces and implementations for pojo mapper
+	</description>
+
 </project>

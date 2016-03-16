@@ -13,9 +13,10 @@
 
 	<properties>
 		<maven.test.skip>true</maven.test.skip>
-		<doc.skip>true</doc.skip>
+		<jsdoc.skip>true</jsdoc.skip>
+		<doc.skip>false</doc.skip>
 		<source.skip>false</source.skip>
-		<maven.javadoc.skip>true</maven.javadoc.skip>
+		<maven.javadoc.skip>false</maven.javadoc.skip>
 		<testjar.skip>true</testjar.skip>
 		<skipAssembly>false</skipAssembly>
 	</properties>
@@ -26,5 +27,9 @@
 			<artifactId>vertx-pojo-mapper-common</artifactId>
 		</dependency>
 	</dependencies>
+	
+	<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper</url>
+	<description>common testcases
+	</description>
 
 </project>

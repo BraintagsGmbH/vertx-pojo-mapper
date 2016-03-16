@@ -77,5 +77,8 @@
 		</pluginManagement>
 	</build>
 	
+	<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper</url>
+	<description>implementation of a pojo mapper for MySql
+	</description>
 
 </project>

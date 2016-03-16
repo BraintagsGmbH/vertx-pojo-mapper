@@ -25,4 +25,7 @@
 		<testjar.skip>false</testjar.skip>
 	</properties>
 
+	<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper</url>
+	<description>common implementations for solutions based on Json
+	</description>
 </project>
