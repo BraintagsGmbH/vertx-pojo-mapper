@@ -36,4 +36,7 @@ a format to serialize Java objects
 * link:vertx-pojongo/README.adoc[vertx-pojongo] +
 This is the concrete implementation of vertx-pojo-mapper, which is using MongoDB as datastore
 
+* link:vertx-pojo-mapper-mysql/README.adoc[vertx-pojo-mapper-mysql] +
+This is the concrete implementation of vertx-pojo-mapper, which is using MySql as datastore
+
 
