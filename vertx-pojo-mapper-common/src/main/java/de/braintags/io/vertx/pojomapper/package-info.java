@@ -9,6 +9,7 @@
  * :toclevels: 3
  * 
  * = vertx pojo mapper common
+ * 
  * Map Java objects into datastores and back
  * 
  * == Quick-Start
