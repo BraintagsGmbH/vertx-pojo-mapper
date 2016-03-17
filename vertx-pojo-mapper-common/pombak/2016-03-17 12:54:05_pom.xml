@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>vertx-pojo-mapper</artifactId>
+		<groupId>de.braintags</groupId>
+		<version>1.1.0_SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>vertx-pojo-mapper-common</artifactId>
+
+	<properties>
+		<maven.test.skip>true</maven.test.skip>
+		<doc.skip>false</doc.skip>
+		<source.skip>false</source.skip>
+		<maven.javadoc.skip>false</maven.javadoc.skip>
+		<testjar.skip>false</testjar.skip>
+		<skipAssembly>false</skipAssembly>
+	</properties>
+
+	<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper</url>
+	<description>common interfaces and implementations for pojo mapper
+	</description>
+
+</project>
