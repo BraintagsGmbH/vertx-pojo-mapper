@@ -25,9 +25,9 @@
  * [source,xml,subs="+attributes"]
  * ----
  * <dependency>
- * <groupId>de.braintags</groupId>
- * <artifactId>{maven.artifactId}</artifactId>
- * <version>{maven.version}</version>
+ *   <groupId>${maven.groupId}</groupId>
+ *   <artifactId>${maven.artifactId}</artifactId>
+ *   <version>${maven.version}</version>
  * </dependency>
  * ----
  *
@@ -35,8 +35,11 @@
  *
  * [source,groovy,subs="+attributes"]
  * ----
- * compile "de.braintags:{maven.artifactId}:{maven.version}"
+ * dependencies {
+ *   compile '${maven.groupId}:${maven.artifactId}:${maven.version}'
+ * }
  * ----
+ *
  *
  * replace maven-artifactId against one of
  * 
