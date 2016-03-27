@@ -3,6 +3,7 @@
 :toclevels: 3
 
 = vertx pojo mapper common
+
 Map Java objects into datastores and back
 
 == Quick-Start
@@ -20,9 +21,9 @@ To use this project, add the following dependency to the _dependencies_ section 
 [source,xml,subs="+attributes"]
 ----
 <dependency>
-<groupId>de.braintags</groupId>
-<artifactId>{maven.artifactId}</artifactId>
-<version>{maven.version}</version>
+  <groupId>de.braintags</groupId>
+  <artifactId>vertx-pojo-mapper-common</artifactId>
+  <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ----
 
@@ -30,8 +31,11 @@ To use this project, add the following dependency to the _dependencies_ section 
 
 [source,groovy,subs="+attributes"]
 ----
-compile "de.braintags:{maven.artifactId}:{maven.version}"
+dependencies {
+  compile 'de.braintags:vertx-pojo-mapper-common:1.1.0-SNAPSHOT'
+}
 ----
+
 
 replace maven-artifactId against one of
 

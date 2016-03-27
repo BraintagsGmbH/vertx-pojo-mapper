@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>vertx-pojo-mapper</artifactId>
 		<groupId>de.braintags</groupId>
-		<version>1.1.0_SNAPSHOT</version>
+		<version>1.1.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 

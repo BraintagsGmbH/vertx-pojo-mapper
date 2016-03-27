@@ -5,18 +5,18 @@
 	<parent>
 		<artifactId>vertx-pojo-mapper</artifactId>
 		<groupId>de.braintags</groupId>
-		<version>1.1.0-SNAPSHOT</version>
+		<version>1.1.0_SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>vertx-pojongo</artifactId>
+	<artifactId>vertx-pojo-mapper-mysql</artifactId>
 
 	<properties>
 		<maven.test.skip>false</maven.test.skip>
 		<doc.skip>false</doc.skip>
 		<source.skip>false</source.skip>
 		<testjar.skip>false</testjar.skip>
-		<maven.test.skip>false</maven.test.skip>
+		<skipAssembly>false</skipAssembly>
 	</properties>
 
 	<dependencies>
@@ -28,7 +28,10 @@
 	  		<groupId>de.braintags</groupId>
 	  		<artifactId>vertx-pojo-mapper-common</artifactId>
 	  	</dependency>
-		
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-mysql-postgresql-client</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-common-test</artifactId>
@@ -36,24 +39,16 @@
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-json</artifactId>
-			<scope>test</scope>
 			<classifier>tests</classifier>
 		</dependency>
-
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-mongo-embedded-db</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.12</version>
-			<scope>test</scope>
-		</dependency>
-
+	    <dependency>
+	      <groupId>org.slf4j</groupId>
+	      <artifactId>slf4j-api</artifactId>
+	      <version>1.6.2</version>
+	      <scope>provided</scope>
+	    </dependency>
 	</dependencies>
-
+	
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -68,9 +63,10 @@
 						<failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
 						<systemPropertyVariables>
 							<io.netty.leakDetectionLevel>PARANOID</io.netty.leakDetectionLevel>
-							<IDatastoreContainer>de.braintags.io.vertx.pojomapper.mongo.vertxunit.MongoDataStoreContainer</IDatastoreContainer>
-							<startMongoLocal>true</startMongoLocal>
-							<db_name>PojongoTestDatabase</db_name>
+							<IDatastoreContainer>de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer</IDatastoreContainer>
+							<MySqlDataStoreContainer.username>${MySqlDataStoreContainer.username}</MySqlDataStoreContainer.username>
+                			<MySqlDataStoreContainer.password>${MySqlDataStoreContainer.password}</MySqlDataStoreContainer.password>
+							
 						</systemPropertyVariables>
 						<argLine>-server -Xmx1200M</argLine>
 						<forkCount>1</forkCount>
@@ -80,10 +76,9 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
+	
 	<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper</url>
-	<description>implementation of a pojo mapper for MongoDb
+	<description>implementation of a pojo mapper for MySql
 	</description>
-
 
 </project>
