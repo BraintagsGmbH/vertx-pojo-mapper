@@ -12,6 +12,8 @@
 	<artifactId>vertx-pojo-mapper-common-test</artifactId>
 
 	<properties>
+		<sonar.exclusions>src/main/java/**</sonar.exclusions>
+		              
 		<maven.test.skip>true</maven.test.skip>
 		<jsdoc.skip>true</jsdoc.skip>
 		<doc.skip>false</doc.skip>
