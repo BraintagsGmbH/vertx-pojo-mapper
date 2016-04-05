@@ -70,12 +70,12 @@ public class Mapper implements IMapper {
       .getLogger(Mapper.class);
 
   private IObjectFactory objectFactory;
-  private Map<String, MappedField> mappedFields = new HashMap<String, MappedField>();
+  private Map<String, MappedField> mappedFields = new HashMap<>();
   private IField idField;
   private MapperFactory mapperFactory;
   private Class<?> mapperClass;
   private Entity entity;
-  private Map<Class<? extends Annotation>, IField[]> fieldCache = new HashMap<Class<? extends Annotation>, IField[]>();
+  private Map<Class<? extends Annotation>, IField[]> fieldCache = new HashMap<>();
   private ITableInfo tableInfo;
   private boolean syncNeeded = true;
   private IKeyGenerator keyGenerator;
@@ -95,12 +95,12 @@ public class Mapper implements IMapper {
   /**
    * Class annotations which were found inside the current definition
    */
-  private final Map<Class<? extends Annotation>, Annotation> existingClassAnnotations = new HashMap<Class<? extends Annotation>, Annotation>();
+  private final Map<Class<? extends Annotation>, Annotation> existingClassAnnotations = new HashMap<>();
 
   /**
    * Methods which are life-cycle events. Per event there can be several methods defined
    */
-  private final Map<Class<? extends Annotation>, List<IMethodProxy>> lifecycleMethods = new HashMap<Class<? extends Annotation>, List<IMethodProxy>>();
+  private final Map<Class<? extends Annotation>, List<IMethodProxy>> lifecycleMethods = new HashMap<>();
 
   /**
    * Creates a new definition for the given mapper class
@@ -216,7 +216,7 @@ public class Mapper implements IMapper {
   private void addLifecycleAnnotationMethod(Class<? extends Annotation> ann, Method method) {
     List<IMethodProxy> lcMethods = lifecycleMethods.get(ann);
     if (lcMethods == null) {
-      lcMethods = new ArrayList<IMethodProxy>();
+      lcMethods = new ArrayList<>();
       lifecycleMethods.put(ann, lcMethods);
     }
 
@@ -244,20 +244,29 @@ public class Mapper implements IMapper {
     try {
       BeanInfo beanInfo = Introspector.getBeanInfo(mapperClass);
       PropertyDescriptor[] beanDescriptors = beanInfo.getPropertyDescriptors();
-      for (int i = 0; i < beanDescriptors.length; i++) {
-        Method readMethod = beanDescriptors[i].getReadMethod();
-        Method writeMethod = beanDescriptors[i].getWriteMethod();
-        if (readMethod != null && writeMethod != null) {
-          JavaBeanAccessor accessor = new JavaBeanAccessor(beanDescriptors[i]);
-          String name = accessor.getName();
-          Field field = ClassUtil.getDeclaredField(mapperClass, name);
-          if (field == null)
-            throw new NoSuchFieldException("Field not found: " + name);
-          addMappedField(name, createMappedField(field, accessor));
-        }
-      }
+      loopPropertyDescriptors(beanDescriptors);
     } catch (IntrospectionException | NoSuchFieldException e) {
       throw new ClassAccessException("Cannot perform introspection of class", e);
+    }
+  }
+
+  /**
+   * @param beanDescriptors
+   * @throws NoSuchFieldException
+   */
+  private void loopPropertyDescriptors(PropertyDescriptor[] beanDescriptors) throws NoSuchFieldException {
+    for (int i = 0; i < beanDescriptors.length; i++) {
+      Method readMethod = beanDescriptors[i].getReadMethod();
+      Method writeMethod = beanDescriptors[i].getWriteMethod();
+      if (readMethod != null && writeMethod != null) {
+        JavaBeanAccessor accessor = new JavaBeanAccessor(beanDescriptors[i]);
+        String name = accessor.getName();
+        Field field = ClassUtil.getDeclaredField(mapperClass, name);
+        if (field == null) {
+          throw new NoSuchFieldException("Field not found: " + name);
+        }
+        addMappedField(name, createMappedField(field, accessor));
+      }
     }
   }
 
@@ -393,9 +402,7 @@ public class Mapper implements IMapper {
       }
       fieldCache.put(annotationClass, result);
     }
-
-    IField[] result = fieldCache.get(annotationClass);
-    return result;
+    return fieldCache.get(annotationClass);
   }
 
   /*
@@ -412,22 +419,31 @@ public class Mapper implements IMapper {
       LOGGER.debug("nothing to execute");
       handler.handle(Future.succeededFuture());
     } else {
-      CounterObject<Void> co = new CounterObject<>(methods.size(), handler);
-      for (IMethodProxy mp : methods) {
-        LOGGER.info("execute lifecycle method: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
-        executeMethod(mp, entity, result -> {
-          if (result.failed()) {
-            co.setThrowable(result.cause());
-          } else {
-            if (co.reduce()) {
-              LOGGER.info("finished Lifecycle: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
-              handler.handle(result);
-            }
+      executeLifecycleMethods(entity, handler, methods);
+    }
+  }
+
+  /**
+   * @param entity
+   * @param handler
+   * @param methods
+   */
+  private void executeLifecycleMethods(Object entity, Handler<AsyncResult<Void>> handler, List<IMethodProxy> methods) {
+    CounterObject<Void> co = new CounterObject<>(methods.size(), handler);
+    for (IMethodProxy mp : methods) {
+      LOGGER.info("execute lifecycle method: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
+      executeMethod(mp, entity, result -> {
+        if (result.failed()) {
+          co.setThrowable(result.cause());
+        } else {
+          if (co.reduce()) {
+            LOGGER.info("finished Lifecycle: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
+            handler.handle(result);
           }
-        });
-        if (co.isError()) {
-          break;
         }
+      });
+      if (co.isError()) {
+        break;
       }
     }
   }
@@ -441,9 +457,7 @@ public class Mapper implements IMapper {
     try {
       LOGGER.info("invoking trigger method " + getMapperClass().getSimpleName() + " - " + method.getName());
       method.invoke(entity, args);
-      if (args == null) {// no args - inform the handler;
-        handler.handle(Future.succeededFuture());
-      }
+      handler.handle(Future.succeededFuture());
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }
