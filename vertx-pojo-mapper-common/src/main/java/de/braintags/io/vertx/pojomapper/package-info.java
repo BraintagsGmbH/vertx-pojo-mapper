@@ -26,8 +26,8 @@
  * ----
  * <dependency>
  *   <groupId>${maven.groupId}</groupId>
- *   <artifactId>${maven.artifactId}</artifactId>
- *   <version>${maven.version}</version>
+ * <artifactId>${maven.artifactId}</artifactId>
+ * <version>${maven.version}</version>
  * </dependency>
  * ----
  *
@@ -36,7 +36,7 @@
  * [source,groovy,subs="+attributes"]
  * ----
  * dependencies {
- *   compile '${maven.groupId}:${maven.artifactId}:${maven.version}'
+ * compile '${maven.groupId}:${maven.artifactId}:${maven.version}'
  * }
  * ----
  *
@@ -325,6 +325,9 @@
  * ----
  * {@link examples.mapper.LifecycleMapper#afterLoad(de.braintags.io.vertx.pojomapper.mapping.ITriggerContext)}
  * ----
+ *
+ * === Working with geodata
+ * {@link de.braintags.io.vertx.pojomapper.datatypes.geojson}
  *
  * 
  * For more infos on how you can influence the mapping process, see the further descriptions above.
