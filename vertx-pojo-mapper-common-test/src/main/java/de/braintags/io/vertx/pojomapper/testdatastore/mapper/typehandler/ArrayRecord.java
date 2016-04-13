@@ -23,11 +23,17 @@ import de.braintags.io.vertx.pojomapper.annotation.Entity;
 @Entity
 public class ArrayRecord extends BaseRecord {
   public String[] array = new String[3];
+  public String[] arrayWithEqualValues = new String[3];
 
   public ArrayRecord() {
     array[0] = "eins";
     array[1] = "zwei";
     array[2] = "drei";
+
+    arrayWithEqualValues[0] = "eins";
+    arrayWithEqualValues[1] = "eins";
+    arrayWithEqualValues[2] = "eins";
+
   }
 
 }

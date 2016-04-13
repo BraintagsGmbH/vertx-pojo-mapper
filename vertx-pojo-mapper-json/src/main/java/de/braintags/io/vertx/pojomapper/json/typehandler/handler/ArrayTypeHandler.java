@@ -159,10 +159,6 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
       if (content[position] != null) {
         errorObject.setThrowable(new InsertException(String.format(
             "Trying to write an entry, which was filled already. Old: %s | new: %s", content[position], instance)));
-      } else if (contentList.contains(instance)) {
-        errorObject.setThrowable(
-            new InsertException(String.format("Trying to write an entry, which was filled already. List: %s | new: %s",
-                contentList.toString(), instance)));
       } else {
         content[position] = instance;
         contentList.add(instance);
@@ -173,12 +169,6 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
     JsonArray toJsonArray(ErrorObject<ITypeHandlerResult> errorObject) {
       JsonArray arr = new JsonArray();
       for (int k = 0; k < content.length; k++) {
-        Object value = content[k];
-        if (arr.contains(value)) {
-          errorObject.setThrowable(new InsertException(
-              String.format("duplicate value on inserting: %s | %s", String.valueOf(value), arr.toString())));
-          return null;
-        }
         arr.add(content[k]);
       }
       return arr;
