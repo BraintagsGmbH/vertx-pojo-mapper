@@ -166,10 +166,21 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
 
     }
 
+    /**
+     * transforms the content into a JsonArray, null values are omitted so that they are staying null inside the
+     * JsonArray as well
+     * 
+     * @param errorObject
+     * @return
+     */
     JsonArray toJsonArray(ErrorObject<ITypeHandlerResult> errorObject) {
       JsonArray arr = new JsonArray();
       for (int k = 0; k < content.length; k++) {
-        arr.add(content[k]);
+        if (content[k] != null) {
+          arr.add(content[k]);
+        } else {
+          arr.addNull();
+        }
       }
       return arr;
     }

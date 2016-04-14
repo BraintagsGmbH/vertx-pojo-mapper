@@ -24,6 +24,7 @@ import de.braintags.io.vertx.pojomapper.annotation.Entity;
 public class ArrayRecord extends BaseRecord {
   public String[] array = new String[3];
   public String[] arrayWithEqualValues = new String[3];
+  public String[] arrayWithNullValues = new String[3];
 
   public ArrayRecord() {
     array[0] = "eins";
@@ -34,6 +35,7 @@ public class ArrayRecord extends BaseRecord {
     arrayWithEqualValues[1] = "eins";
     arrayWithEqualValues[2] = "eins";
 
+    arrayWithNullValues[2] = "eins";
   }
 
 }
