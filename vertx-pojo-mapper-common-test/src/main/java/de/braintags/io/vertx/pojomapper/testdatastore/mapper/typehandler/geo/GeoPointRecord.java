@@ -1,6 +1,6 @@
 package de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.geo;
 
-import de.braintags.io.vertx.pojomapper.datatypes.geojson.Point;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
 import de.braintags.io.vertx.pojomapper.datatypes.geojson.Position;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 
@@ -15,6 +15,6 @@ import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRec
  */
 
 public class GeoPointRecord extends BaseRecord {
-  public Point point = new Point(new Position(15.5, 13.3));
+  public GeoPoint point = new GeoPoint(new Position(15.5, 13.3));
 
 }

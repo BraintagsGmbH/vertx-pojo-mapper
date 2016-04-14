@@ -12,7 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
-import de.braintags.io.vertx.pojomapper.datatypes.geojson.Point;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
@@ -23,7 +23,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 
 /**
- * An implementation of {@link ITypeHandler} which handles intances of {@link Point}
+ * An implementation of {@link ITypeHandler} which handles intances of {@link GeoPoint}
  * 
  * @author Michael Remme
  * 
@@ -57,7 +57,7 @@ public class PointTypeHandlerJson extends PointTypeHandler {
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : encode((Point) source), resultHandler);
+    success(source == null ? source : encode((GeoPoint) source), resultHandler);
   }
 
 }

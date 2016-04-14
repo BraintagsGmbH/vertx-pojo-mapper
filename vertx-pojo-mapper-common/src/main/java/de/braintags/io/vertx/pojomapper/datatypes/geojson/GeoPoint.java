@@ -20,11 +20,11 @@ import static com.mongodb.assertions.Assertions.notNull;
  * @author Michael Remme
  * 
  */
-public class Point extends GeoJsonObject {
+public class GeoPoint extends GeoJsonObject {
 
   private Position coordinate;
 
-  public Point() {
+  public GeoPoint() {
     // empty
   }
 
@@ -34,7 +34,7 @@ public class Point extends GeoJsonObject {
    * @param coordinate
    *          the non-null coordinate of the point
    */
-  public Point(final Position coordinate) {
+  public GeoPoint(final Position coordinate) {
     this.coordinate = notNull("coordinates", coordinate);
   }
 
@@ -65,7 +65,7 @@ public class Point extends GeoJsonObject {
       return false;
     }
 
-    Point point = (Point) o;
+    GeoPoint point = (GeoPoint) o;
 
     if (!coordinate.equals(point.coordinate)) {
       return false;

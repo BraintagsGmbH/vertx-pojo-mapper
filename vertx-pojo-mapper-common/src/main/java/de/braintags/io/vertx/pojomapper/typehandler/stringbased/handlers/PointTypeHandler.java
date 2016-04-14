@@ -12,7 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers;
 
-import de.braintags.io.vertx.pojomapper.datatypes.geojson.Point;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
 import de.braintags.io.vertx.pojomapper.datatypes.geojson.Position;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
@@ -25,7 +25,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 /**
- * An implementation of {@link ITypeHandler} which handles intances of {@link Point}
+ * An implementation of {@link ITypeHandler} which handles intances of {@link GeoPoint}
  * 
  * @author Michael Remme
  * 
@@ -41,7 +41,7 @@ public class PointTypeHandler extends AbstractTypeHandler {
    * @param typeHandlerFactory
    */
   public PointTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
-    super(typeHandlerFactory, Point.class);
+    super(typeHandlerFactory, GeoPoint.class);
   }
 
   /*
@@ -64,18 +64,18 @@ public class PointTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : encode((Point) source).toString(), resultHandler);
+    success(source == null ? source : encode((GeoPoint) source).toString(), resultHandler);
   }
 
-  protected JsonObject encode(Point source) {
+  protected JsonObject encode(GeoPoint source) {
     JsonObject result = new JsonObject();
     result.put("type", (source).getType()).put(COORDINATES, new JsonArray(source.getCoordinates().getValues()));
     return result;
   }
 
-  protected Point parse(JsonObject source) {
+  protected GeoPoint parse(JsonObject source) {
     Position pos = new Position(source.getJsonArray(COORDINATES).iterator());
-    return new Point(pos);
+    return new GeoPoint(pos);
   }
 
 }
