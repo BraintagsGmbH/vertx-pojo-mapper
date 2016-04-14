@@ -13,6 +13,7 @@ import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.util.ObjectUtil;
 
 /**
  * Basic Record for testing {@link ITypeHandler}
@@ -38,10 +39,6 @@ public class BaseRecord {
   private boolean compare(Field field, Object compare) {
     if (field.getName().equals("id"))
       return true;
-    if (field.getName().equals("buffer")) {
-      @SuppressWarnings("unused")
-      String test = "test ";
-    }
     try {
       Object value = field.get(this);
       Object compareValue = field.get(compare);
@@ -63,7 +60,6 @@ public class BaseRecord {
     return idEqual;
   }
 
-  @SuppressWarnings({ "unused", "rawtypes" })
   private boolean equalValues(Object value, Object compareValue, String fieldName) {
     if (value == null && compareValue == null)
       return true;
@@ -73,21 +69,11 @@ public class BaseRecord {
     }
 
     if (value.getClass().isArray()) {
-      if (!compareValue.getClass().isArray())
-        throw new MappingException("Contents are not equal: " + fieldName);
-      for (int i = 0; i < Array.getLength(value); i++) {
-        if (!Array.get(value, i).equals(Array.get(compareValue, i)))
-          throw new MappingException("Contents are not equal: " + fieldName);
-      }
-      return true;
+      return compareArray(value, compareValue, fieldName);
     }
 
     if (value instanceof Date) {
-      long t = ((Date) value).getTime();
-      long p = ((Date) compareValue).getTime();
-      if (t != p)
-        throw new MappingException(
-            "Contents are not equal: " + fieldName + ": " + value + " - " + t + " / " + compareValue + " - " + p);
+      compareDate(value, compareValue, fieldName);
     }
 
     if (value instanceof Collection) {
@@ -96,10 +82,7 @@ public class BaseRecord {
 
     // by saving arrays or List as JsonArray, a type change can happen from Long to Integer for instance
     if (value instanceof Number) {
-      if (((Number) value).hashCode() != ((Number) compareValue).hashCode())
-        throw new MappingException("Contents are not equal: " + fieldName + ": " + value + " - " + value.hashCode()
-            + " / " + compareValue + " - " + compareValue.hashCode());
-      return true;
+      return compareNumber(value, compareValue, fieldName);
     }
 
     if (value instanceof Map) {
@@ -108,6 +91,50 @@ public class BaseRecord {
 
     if (!value.equals(compareValue))
       throw new MappingException("Contents are not equal: " + fieldName + ": " + value + " / " + compareValue);
+    return true;
+  }
+
+  /**
+   * @param value
+   * @param compareValue
+   * @param fieldName
+   */
+  private void compareDate(Object value, Object compareValue, String fieldName) {
+    long t = ((Date) value).getTime();
+    long p = ((Date) compareValue).getTime();
+    if (t != p)
+      throw new MappingException(
+          "Contents are not equal: " + fieldName + ": " + value + " - " + t + " / " + compareValue + " - " + p);
+  }
+
+  /**
+   * @param value
+   * @param compareValue
+   * @param fieldName
+   * @return
+   */
+  private boolean compareNumber(Object value, Object compareValue, String fieldName) {
+    if (((Number) value).hashCode() != ((Number) compareValue).hashCode())
+      throw new MappingException("Contents are not equal: " + fieldName + ": " + value + " - " + value.hashCode()
+          + " / " + compareValue + " - " + compareValue.hashCode());
+    return true;
+  }
+
+  /**
+   * @param value
+   * @param compareValue
+   * @param fieldName
+   * @return
+   */
+  private boolean compareArray(Object value, Object compareValue, String fieldName) {
+    if (!compareValue.getClass().isArray())
+      throw new MappingException("Contents are not equal: " + fieldName);
+    for (int i = 0; i < Array.getLength(value); i++) {
+      if (!ObjectUtil.isEqual(Array.get(value, i), Array.get(compareValue, i))) {
+        throw new MappingException(String.format("Contents are not equal in field %s: %s / %s ", fieldName,
+            String.valueOf(Array.get(value, i)), String.valueOf(Array.get(compareValue, i))));
+      }
+    }
     return true;
   }
 
