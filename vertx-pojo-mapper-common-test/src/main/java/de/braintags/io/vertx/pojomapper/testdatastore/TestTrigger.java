@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MultipleTriggerMapper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.TriggerMapper;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -30,6 +31,21 @@ import io.vertx.ext.unit.TestContext;
 
 public class TestTrigger extends DatastoreBaseTest {
   private static final Logger log = LoggerFactory.getLogger(TestTrigger.class);
+
+  @Test
+  public void testMultipleTriggers(TestContext context) {
+    clearTable(context, MultipleTriggerMapper.class.getSimpleName());
+    MultipleTriggerMapper source = new MultipleTriggerMapper("multi");
+    ResultContainer resultContainer = saveRecord(context, source);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+    source.validate(context);
+
+    IQuery<MultipleTriggerMapper> query = getDataStore(context).createQuery(MultipleTriggerMapper.class);
+    MultipleTriggerMapper loaded = (MultipleTriggerMapper) findFirst(context, query);
+    loaded.validate(context);
+
+  }
 
   @Test
   public void testAllTriggers(TestContext context) {

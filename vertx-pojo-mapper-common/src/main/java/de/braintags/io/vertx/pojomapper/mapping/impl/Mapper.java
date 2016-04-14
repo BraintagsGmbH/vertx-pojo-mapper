@@ -448,6 +448,14 @@ public class Mapper implements IMapper {
     }
   }
 
+  /**
+   * Execute the trigger method. IMPORTANT: if a TriggerContext is created, the handler is informed by the
+   * TriggerContext, if not, then the handler is informed by this method
+   * 
+   * @param mp
+   * @param entity
+   * @param handler
+   */
   private void executeMethod(IMethodProxy mp, Object entity, Handler<AsyncResult<Void>> handler) {
     Method method = mp.getMethod();
     method.setAccessible(true);
@@ -457,7 +465,10 @@ public class Mapper implements IMapper {
     try {
       LOGGER.info("invoking trigger method " + getMapperClass().getSimpleName() + " - " + method.getName());
       method.invoke(entity, args);
-      handler.handle(Future.succeededFuture());
+      if (args == null) {
+        // ONLY INFORM HANDLER, if no TriggerContext is given
+        handler.handle(Future.succeededFuture());
+      }
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }

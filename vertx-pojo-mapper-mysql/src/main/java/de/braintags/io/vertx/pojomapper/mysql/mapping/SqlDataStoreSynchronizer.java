@@ -117,7 +117,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
       Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
     Map<String, SyncAction> syncMap = currentDbTable.compareColumns(mapper);
     if (!syncMap.isEmpty()) {
-      logSyncMap(syncMap);
+      logSyncMap(mapper, syncMap);
       throw new UnsupportedOperationException("Implement update of table structure in mapper "
           + mapper.getMapperClass().getName() + ": " + syncMap.toString());
     } else {
@@ -126,8 +126,8 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
 
   }
 
-  private void logSyncMap(Map<String, SyncAction> syncMap) {
-    LOGGER.info(syncMap);
+  private void logSyncMap(IMapper mapper, Map<String, SyncAction> syncMap) {
+    LOGGER.info(mapper.getMapperClass().getName() + ": " + syncMap);
   }
 
   /*

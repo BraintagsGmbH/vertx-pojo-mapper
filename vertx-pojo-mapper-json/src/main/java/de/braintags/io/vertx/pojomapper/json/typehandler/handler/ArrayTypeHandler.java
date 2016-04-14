@@ -81,7 +81,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
     JsonArray jsonArray = (JsonArray) source;
     if (jsonArray == null || jsonArray.isEmpty())
       handler.handle(Future.succeededFuture());
-    CounterObject<ITypeHandlerResult> co = new CounterObject<ITypeHandlerResult>(jsonArray.size(), handler);
+    CounterObject<ITypeHandlerResult> co = new CounterObject<>(jsonArray.size(), handler);
     final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
     int counter = 0;
     for (Object jo : jsonArray) {
@@ -137,7 +137,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
       } else {
         resultArray.add(cc.i, subResult.result().getResult(), co);
         if (co.reduce()) {
-          JsonArray arr = resultArray.toJsonArray(co);
+          JsonArray arr = resultArray.toJsonArray();
           if (!co.isError()) {
             success(arr, handler);
           }
@@ -173,7 +173,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
      * @param errorObject
      * @return
      */
-    JsonArray toJsonArray(ErrorObject<ITypeHandlerResult> errorObject) {
+    JsonArray toJsonArray() {
       JsonArray arr = new JsonArray();
       for (int k = 0; k < content.length; k++) {
         if (content[k] != null) {

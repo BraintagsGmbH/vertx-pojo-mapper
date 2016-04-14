@@ -148,22 +148,26 @@ public class JsonStoreObject implements IStoreObject<JsonObject> {
    * @param handler
    */
   public final void initToEntity(Handler<AsyncResult<Void>> handler) {
-    Object tmpObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
-    LOGGER.debug("start initToEntity");
-    iterateFields(tmpObject, fieldResult -> {
-      if (fieldResult.failed()) {
-        handler.handle(fieldResult);
-        return;
-      }
-      iterateObjectReferences(tmpObject, orResult -> {
-        if (orResult.failed()) {
-          handler.handle(orResult);
+    try {
+      Object tmpObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
+      LOGGER.debug("start initToEntity");
+      iterateFields(tmpObject, fieldResult -> {
+        if (fieldResult.failed()) {
+          handler.handle(fieldResult);
           return;
         }
-        finishToEntity(tmpObject, handler);
-        LOGGER.debug("finished initToEntity");
+        iterateObjectReferences(tmpObject, orResult -> {
+          if (orResult.failed()) {
+            handler.handle(orResult);
+            return;
+          }
+          finishToEntity(tmpObject, handler);
+          LOGGER.debug("finished initToEntity");
+        });
       });
-    });
+    } catch (Exception e) {
+      handler.handle(Future.failedFuture(e));
+    }
   }
 
   protected void finishToEntity(Object tmpObject, Handler<AsyncResult<Void>> handler) {
