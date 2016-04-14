@@ -22,7 +22,7 @@ import java.util.List;
  * @author Michael Remme
  * 
  */
-public class Polygon extends GeoJsonObject {
+public class GeoPolygon extends GeoJsonObject {
   private final PolygonCoordinates coordinates;
 
   /**
@@ -33,7 +33,7 @@ public class Polygon extends GeoJsonObject {
    * @param holes
    *          optional interior rings of the polygon
    */
-  public Polygon(final List<Position> exterior, final List<Position>... holes) {
+  public GeoPolygon(final List<Position> exterior, final List<Position>... holes) {
     this(new PolygonCoordinates(exterior, holes));
   }
 
@@ -43,7 +43,7 @@ public class Polygon extends GeoJsonObject {
    * @param coordinates
    *          the coordinates
    */
-  public Polygon(final PolygonCoordinates coordinates) {
+  public GeoPolygon(final PolygonCoordinates coordinates) {
     this.coordinates = notNull("coordinates", coordinates);
   }
 
@@ -97,7 +97,7 @@ public class Polygon extends GeoJsonObject {
       return false;
     }
 
-    Polygon polygon = (Polygon) o;
+    GeoPolygon polygon = (GeoPolygon) o;
 
     if (!coordinates.equals(polygon.coordinates)) {
       return false;

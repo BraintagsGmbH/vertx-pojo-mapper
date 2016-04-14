@@ -18,16 +18,14 @@ import static de.braintags.io.vertx.util.assertion.Assert.notNull;
 import java.util.Collections;
 import java.util.List;
 
-import com.mongodb.client.model.geojson.PolygonCoordinates;
-
 /**
- * A representation of a GeoJSON MultiPolygon.
+ * A representation of a GeoJSON LineString.
  * 
  * @author Michael Remme
  * 
  */
-public class MultiPolygon extends GeoJsonObject {
-  private final List<PolygonCoordinates> coordinates;
+public class GeoLineString extends GeoJsonObject {
+  private final List<Position> coordinates;
 
   /**
    * Construct an instance with the given coordinates.
@@ -35,9 +33,10 @@ public class MultiPolygon extends GeoJsonObject {
    * @param coordinates
    *          the coordinates
    */
-  public MultiPolygon(List<PolygonCoordinates> coordinates) {
+  public GeoLineString(final List<Position> coordinates) {
     notNull("coordinates", coordinates);
-    isTrueArgument("coordinates has no null elements", !coordinates.contains(null));
+    isTrueArgument("coordinates must contain at least two positions", coordinates.size() >= 2);
+    isTrueArgument("coordinates contains only non-null positions", !coordinates.contains(null));
     this.coordinates = Collections.unmodifiableList(coordinates);
   }
 
@@ -48,15 +47,15 @@ public class MultiPolygon extends GeoJsonObject {
    */
   @Override
   public GeoJsonType getType() {
-    return GeoJsonType.MULTI_POLYGON;
+    return GeoJsonType.LINE_STRING;
   }
 
   /**
-   * Gets the coordinates.
+   * Gets the GeoJSON coordinates of this LineString.
    *
    * @return the coordinates
    */
-  public List<PolygonCoordinates> getCoordinates() {
+  public List<Position> getCoordinates() {
     return coordinates;
   }
 
@@ -68,13 +67,14 @@ public class MultiPolygon extends GeoJsonObject {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     if (!super.equals(o)) {
       return false;
     }
 
-    MultiPolygon that = (MultiPolygon) o;
+    GeoLineString lineString = (GeoLineString) o;
 
-    if (!coordinates.equals(that.coordinates)) {
+    if (!coordinates.equals(lineString.coordinates)) {
       return false;
     }
 
@@ -84,12 +84,11 @@ public class MultiPolygon extends GeoJsonObject {
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    result = 31 * result + coordinates.hashCode();
-    return result;
+    return 31 * result + coordinates.hashCode();
   }
 
   @Override
   public String toString() {
-    return "MultiPolygon{" + "coordinates=" + coordinates + '}';
+    return "LineString{" + "coordinates=" + coordinates + '}';
   }
 }

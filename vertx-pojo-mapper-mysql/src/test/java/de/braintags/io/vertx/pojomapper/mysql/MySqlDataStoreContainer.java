@@ -57,7 +57,7 @@ import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.Reference
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.ReferencedSingleTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.geo.GeoPointTest;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.JsonTypeHandler;
-import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.PointTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.GeoPointTypeHandler;
 import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.AsyncResult;
@@ -101,7 +101,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
     thMap.put(ReferencedArrayTest.class.getName(), SqlArrayTypeHandlerReferenced.class.getName());
     thMap.put(ReferencedListTest.class.getName(), SqlCollectionTypeHandlerReferenced.class.getName());
     thMap.put(ReferencedMapTest.class.getName(), SqlMapTypeHandlerReferenced.class.getName());
-    thMap.put(GeoPointTest.class.getName(), PointTypeHandler.class.getName());
+    thMap.put(GeoPointTest.class.getName(), GeoPointTypeHandler.class.getName());
   }
 
   @Override

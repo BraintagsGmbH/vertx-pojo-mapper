@@ -51,10 +51,14 @@ public class Position {
   public Position(final Iterator<?> values) {
     Objects.requireNonNull(values, "values must not be null");
     List<Double> tl = new ArrayList<>();
-    values.forEachRemaining(r -> tl.add((Double) r));
+    values.forEachRemaining(r -> tl.add(parseDouble(r)));
     Assert.isTrueArgument("value contains only non-null elements", !tl.contains(null));
     Assert.isTrueArgument("value must contain at least two elements", tl.size() >= 2);
     this.values = Collections.unmodifiableList(tl);
+  }
+
+  private Double parseDouble(Object o) {
+    return o instanceof Double ? (Double) o : Double.parseDouble(String.valueOf(o));
   }
 
   /**

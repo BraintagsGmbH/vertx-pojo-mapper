@@ -31,6 +31,7 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeH
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.EnumTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.FloatTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.GeoPointTypeHandlerJson;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.IdTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.IntegerTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.LocaleTypeHandler;
@@ -41,7 +42,6 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerR
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerReferenced;
-import de.braintags.io.vertx.pojomapper.json.typehandler.handler.PointTypeHandlerJson;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.PriceTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ShortTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.StringTypeHandler;
@@ -89,7 +89,7 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     add(new ByteTypeHandler(this));
     add(new URITypeHandler(this));
     add(new URLTypeHandler(this));
-    add(new PointTypeHandlerJson(this));
+    add(new GeoPointTypeHandlerJson(this));
 
     add(new CollectionTypeHandler(this));
     add(new CollectionTypeHandlerEmbedded(this));
@@ -104,10 +104,6 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
     add(new ArrayTypeHandler(this));
     add(new ArrayTypeHandlerEmbedded(this));
     add(new ArrayTypeHandlerReferenced(this));
-  }
-
-  private void add(ITypeHandler th) {
-    getDefinedTypeHandlers().add(th);
   }
 
   @Override

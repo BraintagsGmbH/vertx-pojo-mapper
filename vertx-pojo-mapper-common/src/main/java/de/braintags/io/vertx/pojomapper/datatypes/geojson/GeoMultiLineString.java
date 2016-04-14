@@ -12,29 +12,34 @@
  */
 package de.braintags.io.vertx.pojomapper.datatypes.geojson;
 
+import static de.braintags.io.vertx.util.assertion.Assert.isTrueArgument;
+import static de.braintags.io.vertx.util.assertion.Assert.notNull;
+
 import java.util.Collections;
 import java.util.List;
 
-import de.braintags.io.vertx.util.assertion.Assert;
-
 /**
- * A representation of a GeoJSON MultiPoint.
+ * A representation of a GeoJSON LineString.
  * 
  * @author Michael Remme
  * 
  */
-public class MultiPoint extends GeoJsonObject {
-  private final List<Position> coordinates;
+public class GeoMultiLineString extends GeoJsonObject {
+  private final List<List<Position>> coordinates;
 
   /**
    * Construct an instance with the given coordinates.
-   * 
+   *
    * @param coordinates
-   *          the coordinates of the new instance
+   *          the coordinates of each line
    */
-  public MultiPoint(final List<Position> coordinates) {
-    Assert.notNull("coordinates", coordinates);
-    Assert.isTrueArgument("coordinates contains only non-null positions", !coordinates.contains(null));
+  public GeoMultiLineString(final List<List<Position>> coordinates) {
+    notNull("coordinates", coordinates);
+    for (List<Position> line : coordinates) {
+      notNull("line", line);
+      isTrueArgument("line contains only non-null positions", !line.contains(null));
+    }
+
     this.coordinates = Collections.unmodifiableList(coordinates);
   }
 
@@ -45,15 +50,15 @@ public class MultiPoint extends GeoJsonObject {
    */
   @Override
   public GeoJsonType getType() {
-    return GeoJsonType.MULTI_POINT;
+    return GeoJsonType.MULTI_LINE_STRING;
   }
 
   /**
-   * Gets the GeoJSON coordinates of this MultiPoint.
+   * Gets the GeoJSON coordinates of this MultiLineString
    *
    * @return the coordinates
    */
-  public List<Position> getCoordinates() {
+  public List<List<Position>> getCoordinates() {
     return coordinates;
   }
 
@@ -70,9 +75,9 @@ public class MultiPoint extends GeoJsonObject {
       return false;
     }
 
-    MultiPoint multiPoint = (MultiPoint) o;
+    GeoMultiLineString polygon = (GeoMultiLineString) o;
 
-    if (!coordinates.equals(multiPoint.coordinates)) {
+    if (!coordinates.equals(polygon.coordinates)) {
       return false;
     }
 
@@ -82,11 +87,12 @@ public class MultiPoint extends GeoJsonObject {
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    return 31 * result + coordinates.hashCode();
+    result = 31 * result + coordinates.hashCode();
+    return result;
   }
 
   @Override
   public String toString() {
-    return "MultiPoint{" + "coordinates=" + coordinates + '}';
+    return "MultiLineString{" + "coordinates=" + coordinates + '}';
   }
 }

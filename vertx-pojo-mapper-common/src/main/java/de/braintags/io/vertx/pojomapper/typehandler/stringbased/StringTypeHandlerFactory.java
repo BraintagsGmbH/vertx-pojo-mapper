@@ -28,12 +28,12 @@ import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.DateTyp
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.DoubleTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.EnumTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.FloatTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.GeoPointTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.IntegerTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.JsonTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.LocaleTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.LongTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ObjectTypeHandler;
-import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.PointTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.PriceTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ShortTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.TimeTypeHandler;
@@ -81,19 +81,10 @@ public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
     add(new ClassTypeHandler(this));
     add(new LocaleTypeHandler(this));
     add(new EnumTypeHandler(this));
-    add(new PointTypeHandler(this));
+    add(new GeoPointTypeHandler(this));
 
   }
 
-  private void add(ITypeHandler th) {
-    getDefinedTypeHandlers().add(th);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandlerFactory#getDefaultTypeHandler()
-   */
   @Override
   public ITypeHandler getDefaultTypeHandler(Annotation embedRef) {
     return defaultHandler;

@@ -135,6 +135,39 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
   }
 
   /**
+   * Remove the typehandler specified by the given class
+   * 
+   * @param typeHandlerClass
+   *          the class of the typehandler, which shall be removed
+   */
+  public void remove(Class<? extends ITypeHandler> typeHandlerClass) {
+    for (int i = definedTypeHandlers.size() - 1; i >= 0; i--) {
+      if (definedTypeHandlers.get(i).getClass() == typeHandlerClass)
+        definedTypeHandlers.remove(i);
+    }
+  }
+
+  /**
+   * Add a new typehandler
+   * 
+   * @param th
+   */
+  protected final void add(ITypeHandler th) {
+    getDefinedTypeHandlers().add(th);
+  }
+
+  /**
+   * Remove all entries of the class definition and add the new one
+   * 
+   * @param typeHandlerClass
+   * @param th
+   */
+  public void replace(Class<? extends ITypeHandler> typeHandlerClass, ITypeHandler th) {
+    remove(typeHandlerClass);
+    add(th);
+  }
+
+  /**
    * Get the default {@link ITypeHandler}
    * 
    * @param embedRef
@@ -155,19 +188,6 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
     @Override
     public String toString() {
       return cacheKey;
-    }
-  }
-
-  /**
-   * Remove the typehandler specified by the given class
-   * 
-   * @param typeHandlerClass
-   *          the class of the typehandler, which shall be removed
-   */
-  public void remove(Class typeHandlerClass) {
-    for (int i = definedTypeHandlers.size() - 1; i >= 0; i--) {
-      if (definedTypeHandlers.get(i).getClass() == typeHandlerClass)
-        definedTypeHandlers.remove(i);
     }
   }
 
