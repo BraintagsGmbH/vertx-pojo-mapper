@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
+import de.braintags.io.vertx.util.ClassUtil;
 
 /**
  * Default implementation of {@link IObjectFactory}
@@ -35,9 +36,9 @@ import de.braintags.io.vertx.pojomapper.mapping.IObjectFactory;
 
 public class DefaultObjectFactory implements IObjectFactory {
   private IMapper mapper;
-  private Class<?> DEFAULT_LIST_CLASS = ArrayList.class;
-  private Class<?> DEFAULT_SET_CLASS = HashSet.class;
-  private Class<?> DEFAULT_MAP_CLASS = HashMap.class;
+  private static final Class<?> DEFAULT_LIST_CLASS = ArrayList.class;
+  private static final Class<?> DEFAULT_SET_CLASS = HashSet.class;
+  private static final Class<?> DEFAULT_MAP_CLASS = HashMap.class;
 
   /*
    * (non-Javadoc)
@@ -47,6 +48,9 @@ public class DefaultObjectFactory implements IObjectFactory {
   @Override
   public <T> T createInstance(Class<T> clazz) {
     try {
+      if (!ClassUtil.hasDefaultConstructor(clazz)) {
+        throw new MappingException("No default constructor existing in class " + clazz.getName());
+      }
       return clazz.newInstance();
     } catch (InstantiationException | IllegalAccessException e) {
       throw new MappingException(e);

@@ -23,6 +23,7 @@ import io.vertx.core.Handler;
  * @author Michael Remme
  * 
  */
+@FunctionalInterface
 public interface ITriggerContextFactory {
 
   /**
