@@ -65,7 +65,7 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
   protected abstract String getExpectedTypeHandlerClassName();
 
   @Test
-  public void testSaveAndReadRecord(TestContext context) {
+  public final void testSaveAndReadRecord(TestContext context) {
     BaseRecord record = createInstance(context);
     dropTables(context, record);
 
@@ -81,9 +81,7 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
     // SimpleQuery for all records
     IQuery<? extends BaseRecord> query = getDataStore(context).createQuery(record.getClass());
     resultContainer = find(context, query, 1);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-
+    verifyResult(context, record, resultContainer);
     resultContainer.queryResult.iterator().next(result -> {
       if (result.failed()) {
         result.cause().printStackTrace();
@@ -92,7 +90,20 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
         LOGGER.info("finished!");
       }
     });
+  }
 
+  /**
+   * Verifies the result of the query
+   * 
+   * @param context
+   * @param record
+   * @param resultContainer
+   * @throws AssertionError
+   */
+  protected void verifyResult(TestContext context, BaseRecord record, ResultContainer resultContainer)
+      throws AssertionError {
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
   }
 
   protected void dropTables(TestContext context, BaseRecord record) {
