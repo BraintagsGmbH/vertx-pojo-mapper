@@ -31,8 +31,10 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.PointTypeHandlerJson;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.PointTypeHandler;
 
 /**
  * {@link ITypeHandlerFactory} for use with Sql
@@ -68,7 +70,11 @@ public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
     remove(ByteTypeHandler.class);
     getDefinedTypeHandlers().add(new SqlByteTypeHandler(this));
 
-    getDefinedTypeHandlers().add(new JsonTypeHandler(this));
+    getDefinedTypeHandlers()
+        .add(new de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.JsonTypeHandler(this));
+
+    remove(PointTypeHandlerJson.class);
+    getDefinedTypeHandlers().add(new PointTypeHandler(this));
 
     remove(ArrayTypeHandler.class);
     getDefinedTypeHandlers().add(new SqlArrayTypehandler(this));

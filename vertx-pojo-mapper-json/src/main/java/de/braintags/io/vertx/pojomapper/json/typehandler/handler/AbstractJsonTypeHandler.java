@@ -1,6 +1,6 @@
 /*
  * #%L
- * vertx-pojo-mapper-json
+ * vertx-pojongo
  * %%
  * Copyright (C) 2015 Braintags GmbH
  * %%
@@ -12,32 +12,29 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
-import java.util.Locale;
-
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
 /**
- * 
+ * Abstract implementation of {@link ITypeHandler} which encodes entities into {@link JsonObject}
  * 
  * @author Michael Remme
  * 
  */
-
-public class LocaleTypeHandler extends AbstractTypeHandler {
+public abstract class AbstractJsonTypeHandler<T, V> extends AbstractTypeHandler {
 
   /**
-   * Constructor with parent {@link ITypeHandlerFactory}
-   * 
    * @param typeHandlerFactory
-   *          the parent {@link ITypeHandlerFactory}
+   * @param classesToDeal
    */
-  public LocaleTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
-    super(typeHandlerFactory, Locale.class);
+  public AbstractJsonTypeHandler(ITypeHandlerFactory typeHandlerFactory, Class<?>... classesToDeal) {
+    super(typeHandlerFactory, classesToDeal);
   }
 
   /*
@@ -49,7 +46,7 @@ public class LocaleTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : parseLocale((String) source), resultHandler);
+    success(source == null ? source : parse((T) source), resultHandler);
   }
 
   /*
@@ -60,26 +57,23 @@ public class LocaleTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : source.toString(), resultHandler);
+    success(source == null ? source : encode((V) source), resultHandler);
   }
 
-  public static Locale parseLocale(final String localeString) {
-    if ((localeString != null) && (localeString.length() != 0)) {
-      final int index = localeString.indexOf('_');
-      final int index2 = localeString.indexOf('_', index + 1);
-      Locale resultLocale;
-      if (index == -1) {
-        resultLocale = new Locale(localeString);
-      } else if (index2 == -1) {
-        resultLocale = new Locale(localeString.substring(0, index), localeString.substring(index + 1));
-      } else {
-        resultLocale = new Locale(localeString.substring(0, index), localeString.substring(index + 1, index2),
-            localeString.substring(index2 + 1));
+  /**
+   * Encodes the instance into a JsonObject to be stored inside the datastore
+   * 
+   * @param source
+   * @return the encoded instance
+   */
+  protected abstract T encode(V source);
 
-      }
-      return resultLocale;
-    }
+  /**
+   * Parses the instance coming out of the datastore
+   * 
+   * @param source
+   * @return the parsed instance
+   */
+  protected abstract V parse(T source);
 
-    return null;
-  }
 }

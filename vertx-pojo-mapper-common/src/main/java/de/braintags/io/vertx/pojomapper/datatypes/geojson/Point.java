@@ -22,7 +22,11 @@ import static com.mongodb.assertions.Assertions.notNull;
  */
 public class Point extends GeoJsonObject {
 
-  private final Position coordinate;
+  private Position coordinate;
+
+  public Point() {
+    // empty
+  }
 
   /**
    * Construct an instance with the given coordinate.
@@ -45,15 +49,6 @@ public class Point extends GeoJsonObject {
    * @return the coordinates
    */
   public Position getCoordinates() {
-    return coordinate;
-  }
-
-  /**
-   * Gets the position of this point.
-   *
-   * @return the position
-   */
-  public Position getPosition() {
     return coordinate;
   }
 

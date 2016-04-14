@@ -33,6 +33,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.JsonTyp
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.LocaleTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.LongTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ObjectTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.PointTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.PriceTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.ShortTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.TimeTypeHandler;
@@ -58,28 +59,34 @@ public class StringTypeHandlerFactory extends AbstractTypeHandlerFactory {
   }
 
   protected void init() {
-    getDefinedTypeHandlers().add(new BooleanTypeHandler(this));
-    getDefinedTypeHandlers().add(new JsonTypeHandler(this));
-    getDefinedTypeHandlers().add(new CharacterTypeHandler(this));
-    getDefinedTypeHandlers().add(new PriceTypeHandler(this));
-    getDefinedTypeHandlers().add(new BigDecimalTypeHandler(this));
-    getDefinedTypeHandlers().add(new BigIntegerTypeHandler(this));
-    getDefinedTypeHandlers().add(new FloatTypeHandler(this));
-    getDefinedTypeHandlers().add(new DoubleTypeHandler(this));
-    getDefinedTypeHandlers().add(new ShortTypeHandler(this));
-    getDefinedTypeHandlers().add(new IntegerTypeHandler(this));
-    getDefinedTypeHandlers().add(new LongTypeHandler(this));
-    getDefinedTypeHandlers().add(new TimestampTypeHandler(this));
-    getDefinedTypeHandlers().add(new TimeTypeHandler(this));
-    getDefinedTypeHandlers().add(new DateTypeHandler(this));
-    getDefinedTypeHandlers().add(new CalendarTypeHandler(this));
-    getDefinedTypeHandlers().add(new CharSequenceTypeHandler(this));
-    getDefinedTypeHandlers().add(new ByteTypeHandler(this));
-    getDefinedTypeHandlers().add(new URITypeHandler(this));
-    getDefinedTypeHandlers().add(new URLTypeHandler(this));
-    getDefinedTypeHandlers().add(new ClassTypeHandler(this));
-    getDefinedTypeHandlers().add(new LocaleTypeHandler(this));
-    getDefinedTypeHandlers().add(new EnumTypeHandler(this));
+    add(new BooleanTypeHandler(this));
+    add(new JsonTypeHandler(this));
+    add(new CharacterTypeHandler(this));
+    add(new PriceTypeHandler(this));
+    add(new BigDecimalTypeHandler(this));
+    add(new BigIntegerTypeHandler(this));
+    add(new FloatTypeHandler(this));
+    add(new DoubleTypeHandler(this));
+    add(new ShortTypeHandler(this));
+    add(new IntegerTypeHandler(this));
+    add(new LongTypeHandler(this));
+    add(new TimestampTypeHandler(this));
+    add(new TimeTypeHandler(this));
+    add(new DateTypeHandler(this));
+    add(new CalendarTypeHandler(this));
+    add(new CharSequenceTypeHandler(this));
+    add(new ByteTypeHandler(this));
+    add(new URITypeHandler(this));
+    add(new URLTypeHandler(this));
+    add(new ClassTypeHandler(this));
+    add(new LocaleTypeHandler(this));
+    add(new EnumTypeHandler(this));
+    add(new PointTypeHandler(this));
+
+  }
+
+  private void add(ITypeHandler th) {
+    getDefinedTypeHandlers().add(th);
   }
 
   /*

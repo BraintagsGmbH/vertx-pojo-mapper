@@ -14,6 +14,7 @@ package de.braintags.io.vertx.pojomapper.datatypes.geojson;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,6 +40,21 @@ public class Position {
     Assert.isTrueArgument("value contains only non-null elements", !values.contains(null));
     Assert.isTrueArgument("value must contain at least two elements", values.size() >= 2);
     this.values = Collections.unmodifiableList(values);
+  }
+
+  /**
+   * Construct an instance.
+   *
+   * @param values
+   *          the non-null values
+   */
+  public Position(final Iterator<?> values) {
+    Objects.requireNonNull(values, "values must not be null");
+    List<Double> tl = new ArrayList<>();
+    values.forEachRemaining(r -> tl.add((Double) r));
+    Assert.isTrueArgument("value contains only non-null elements", !tl.contains(null));
+    Assert.isTrueArgument("value must contain at least two elements", tl.size() >= 2);
+    this.values = Collections.unmodifiableList(tl);
   }
 
   /**

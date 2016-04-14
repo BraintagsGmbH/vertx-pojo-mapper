@@ -1,6 +1,6 @@
 /*
  * #%L
- * vertx-pojo-mapper-json
+ * vertx-pojongo
  * %%
  * Copyright (C) 2015 Braintags GmbH
  * %%
@@ -10,34 +10,38 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
+package de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers;
 
-import java.util.Locale;
-
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.Point;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.Position;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 /**
- * 
+ * An implementation of {@link ITypeHandler} which handles intances of {@link Point}
  * 
  * @author Michael Remme
  * 
  */
-
-public class LocaleTypeHandler extends AbstractTypeHandler {
+public class PointTypeHandler extends AbstractTypeHandler {
 
   /**
-   * Constructor with parent {@link ITypeHandlerFactory}
-   * 
-   * @param typeHandlerFactory
-   *          the parent {@link ITypeHandlerFactory}
+   * Comment for <code>COORDINATES</code>
    */
-  public LocaleTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
-    super(typeHandlerFactory, Locale.class);
+  private static final String COORDINATES = "coordinates";
+
+  /**
+   * @param typeHandlerFactory
+   */
+  public PointTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+    super(typeHandlerFactory, Point.class);
   }
 
   /*
@@ -49,7 +53,7 @@ public class LocaleTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : parseLocale((String) source), resultHandler);
+    success(source == null ? source : parse(new JsonObject((String) source)), resultHandler);
   }
 
   /*
@@ -60,26 +64,18 @@ public class LocaleTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : source.toString(), resultHandler);
+    success(source == null ? source : encode((Point) source).toString(), resultHandler);
   }
 
-  public static Locale parseLocale(final String localeString) {
-    if ((localeString != null) && (localeString.length() != 0)) {
-      final int index = localeString.indexOf('_');
-      final int index2 = localeString.indexOf('_', index + 1);
-      Locale resultLocale;
-      if (index == -1) {
-        resultLocale = new Locale(localeString);
-      } else if (index2 == -1) {
-        resultLocale = new Locale(localeString.substring(0, index), localeString.substring(index + 1));
-      } else {
-        resultLocale = new Locale(localeString.substring(0, index), localeString.substring(index + 1, index2),
-            localeString.substring(index2 + 1));
-
-      }
-      return resultLocale;
-    }
-
-    return null;
+  protected JsonObject encode(Point source) {
+    JsonObject result = new JsonObject();
+    result.put("type", (source).getType()).put(COORDINATES, new JsonArray(source.getCoordinates().getValues()));
+    return result;
   }
+
+  protected Point parse(JsonObject source) {
+    Position pos = new Position(source.getJsonArray(COORDINATES).iterator());
+    return new Point(pos);
+  }
+
 }

@@ -12,8 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.datatypes.geojson;
 
-import io.vertx.core.json.Json;
-
 /**
  * An abstract class for representations of GeoJSON geographic objects.
  * 
@@ -28,15 +26,6 @@ public abstract class GeoJsonObject {
    * @return
    */
   public abstract GeoJsonType getType();
-
-  /**
-   * Encodes the current instance into Json format
-   * 
-   * @return formated String
-   */
-  public String toJson() {
-    return Json.encodePrettily(this);
-  }
 
   @Override
   public boolean equals(final Object o) {

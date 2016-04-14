@@ -41,6 +41,7 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerR
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerReferenced;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.PointTypeHandlerJson;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.PriceTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ShortTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.StringTypeHandler;
@@ -74,33 +75,39 @@ public class JsonTypeHandlerFactory extends AbstractTypeHandlerFactory {
   protected void init() {
     getDefinedTypeHandlers().add(0, new IdTypeHandler(this));
 
-    getDefinedTypeHandlers().add(new FloatTypeHandler(this));
-    getDefinedTypeHandlers().add(new DateTypeHandler(this));
-    getDefinedTypeHandlers().add(new ShortTypeHandler(this));
-    getDefinedTypeHandlers().add(new IntegerTypeHandler(this));
-    getDefinedTypeHandlers().add(new LongTypeHandler(this));
-    getDefinedTypeHandlers().add(new CalendarTypeHandler(this));
-    getDefinedTypeHandlers().add(new PriceTypeHandler(this));
-    getDefinedTypeHandlers().add(new BigDecimalTypeHandler(this));
-    getDefinedTypeHandlers().add(new BigIntegerTypeHandler(this));
-    getDefinedTypeHandlers().add(new CharSequenceTypeHandler(this));
-    getDefinedTypeHandlers().add(new CharacterTypeHandler(this));
-    getDefinedTypeHandlers().add(new ByteTypeHandler(this));
-    getDefinedTypeHandlers().add(new URITypeHandler(this));
-    getDefinedTypeHandlers().add(new URLTypeHandler(this));
-    getDefinedTypeHandlers().add(new CollectionTypeHandler(this));
-    getDefinedTypeHandlers().add(new CollectionTypeHandlerEmbedded(this));
-    getDefinedTypeHandlers().add(new CollectionTypeHandlerReferenced(this));
-    getDefinedTypeHandlers().add(new ClassTypeHandler(this));
-    getDefinedTypeHandlers().add(new LocaleTypeHandler(this));
-    getDefinedTypeHandlers().add(new EnumTypeHandler(this));
-    getDefinedTypeHandlers().add(new MapTypeHandler(this));
-    getDefinedTypeHandlers().add(new MapTypeHandlerEmbedded(this));
-    getDefinedTypeHandlers().add(new MapTypeHandlerReferenced(this));
-    getDefinedTypeHandlers().add(new StringTypeHandler(this));
-    getDefinedTypeHandlers().add(new ArrayTypeHandler(this));
-    getDefinedTypeHandlers().add(new ArrayTypeHandlerEmbedded(this));
-    getDefinedTypeHandlers().add(new ArrayTypeHandlerReferenced(this));
+    add(new FloatTypeHandler(this));
+    add(new DateTypeHandler(this));
+    add(new ShortTypeHandler(this));
+    add(new IntegerTypeHandler(this));
+    add(new LongTypeHandler(this));
+    add(new CalendarTypeHandler(this));
+    add(new PriceTypeHandler(this));
+    add(new BigDecimalTypeHandler(this));
+    add(new BigIntegerTypeHandler(this));
+    add(new CharSequenceTypeHandler(this));
+    add(new CharacterTypeHandler(this));
+    add(new ByteTypeHandler(this));
+    add(new URITypeHandler(this));
+    add(new URLTypeHandler(this));
+    add(new PointTypeHandlerJson(this));
+
+    add(new CollectionTypeHandler(this));
+    add(new CollectionTypeHandlerEmbedded(this));
+    add(new CollectionTypeHandlerReferenced(this));
+    add(new ClassTypeHandler(this));
+    add(new LocaleTypeHandler(this));
+    add(new EnumTypeHandler(this));
+    add(new MapTypeHandler(this));
+    add(new MapTypeHandlerEmbedded(this));
+    add(new MapTypeHandlerReferenced(this));
+    add(new StringTypeHandler(this));
+    add(new ArrayTypeHandler(this));
+    add(new ArrayTypeHandlerEmbedded(this));
+    add(new ArrayTypeHandlerReferenced(this));
+  }
+
+  private void add(ITypeHandler th) {
+    getDefinedTypeHandlers().add(th);
   }
 
   @Override

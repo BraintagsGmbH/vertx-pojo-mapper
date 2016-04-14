@@ -25,6 +25,8 @@ import java.util.Locale;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.datatypes.Price;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.Point;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.Position;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.CalendarTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.DateTypeHandler;
@@ -249,6 +251,14 @@ public class StringTest extends AbstractStringTypehandlerTest {
     checkTypeHandler(context, source.getClass(), TimestampTypeHandler.class);
     toString(context, str, source);
     fromString(context, str, source);
+  }
+
+  @Test
+  public void testGeoPoint(TestContext context) {
+    Point point = new Point(new Position(14, 13));
+    String expectedString = "{\"type\":\"POINT\",\"coordinates\":[14.0,13.0]}";
+    toString(context, expectedString, point);
+    fromString(context, expectedString, point);
   }
 
   protected void fromStringDate(TestContext context, String str, Object expected) {

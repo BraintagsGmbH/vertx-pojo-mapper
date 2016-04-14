@@ -23,7 +23,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.init.MySqlDataStoreinit;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.BooleanTypeHandler;
-import de.braintags.io.vertx.pojomapper.mysql.typehandler.JsonTypeHandler;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlArrayTypeHandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlArrayTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlArrayTypehandler;
@@ -56,6 +55,9 @@ import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.Reference
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.ReferencedListTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.ReferencedMapTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.ReferencedSingleTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.geo.GeoPointTest;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.JsonTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.PointTypeHandler;
 import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.AsyncResult;
@@ -99,6 +101,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
     thMap.put(ReferencedArrayTest.class.getName(), SqlArrayTypeHandlerReferenced.class.getName());
     thMap.put(ReferencedListTest.class.getName(), SqlCollectionTypeHandlerReferenced.class.getName());
     thMap.put(ReferencedMapTest.class.getName(), SqlMapTypeHandlerReferenced.class.getName());
+    thMap.put(GeoPointTest.class.getName(), PointTypeHandler.class.getName());
   }
 
   @Override

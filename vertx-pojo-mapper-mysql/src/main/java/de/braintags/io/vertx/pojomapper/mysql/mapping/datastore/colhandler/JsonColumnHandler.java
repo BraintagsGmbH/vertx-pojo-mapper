@@ -36,6 +36,16 @@ public class JsonColumnHandler extends StringColumnHandler {
     super(JsonObject.class);
   }
 
+  /**
+   * Constructor for a extending classes
+   * 
+   * @param classesToDeal
+   *          the classes, which shall be handled
+   */
+  protected JsonColumnHandler(Class<?>... classesToDeal) {
+    super(classesToDeal);
+  }
+
   @Override
   public void applyMetaData(SqlColumnInfo ci) {
     if (ci.getLength() == Property.UNDEFINED_INTEGER)

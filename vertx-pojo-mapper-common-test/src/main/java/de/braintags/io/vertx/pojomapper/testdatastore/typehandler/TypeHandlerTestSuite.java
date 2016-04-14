@@ -19,6 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.JsonTypeHandlerTestSuite;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.JsonTypeHandlerTestSuiteEmbedded;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.JsonTypeHandlerTestSuiteReferenced;
+import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.geo.GeoTestSuite;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.stringbased.StringTypeHandlerTestSuite;
 
 /**
@@ -29,7 +30,7 @@ import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.stringbased.St
  */
 @RunWith(Suite.class)
 @SuiteClasses({ StringTypeHandlerTestSuite.class, JsonTypeHandlerTestSuite.class,
-    JsonTypeHandlerTestSuiteEmbedded.class, JsonTypeHandlerTestSuiteReferenced.class })
+    JsonTypeHandlerTestSuiteEmbedded.class, JsonTypeHandlerTestSuiteReferenced.class, GeoTestSuite.class })
 public class TypeHandlerTestSuite {
 
 }

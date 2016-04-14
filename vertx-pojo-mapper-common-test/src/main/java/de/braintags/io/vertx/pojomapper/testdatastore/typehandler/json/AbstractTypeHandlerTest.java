@@ -47,7 +47,8 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
     context.assertNotNull(th);
     String typeHandlerName = TestHelper.getDatastoreContainer(context).getExpectedTypehandlerName(getClass(),
         getExpectedTypeHandlerClassName());
-    context.assertEquals(typeHandlerName, th.getClass().getName());
+    String message = "Not the expected TypeHandler!! DID YOU OVERWRITE ONE AND DIDN'T YOU CHANGE LOOKUP IN MySqlDataStoreContainer?";
+    context.assertEquals(typeHandlerName, th.getClass().getName(), message);
   }
 
   /**

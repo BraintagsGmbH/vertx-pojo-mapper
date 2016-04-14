@@ -65,8 +65,8 @@ public class LocaleTypeHandler extends AbstractTypeHandler {
 
   public static Locale parseLocale(final String localeString) {
     if ((localeString != null) && (localeString.length() != 0)) {
-      final int index = localeString.indexOf("_");
-      final int index2 = localeString.indexOf("_", index + 1);
+      final int index = localeString.indexOf('_');
+      final int index2 = localeString.indexOf('_', index + 1);
       Locale resultLocale;
       if (index == -1) {
         resultLocale = new Locale(localeString);
