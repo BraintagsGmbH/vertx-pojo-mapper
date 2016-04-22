@@ -19,6 +19,8 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IRamblerSource;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.Position;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -232,6 +234,28 @@ public class FieldParameter<T extends IQueryContainer> implements IFieldParamete
   @Override
   public void setCloseParenthesis(boolean doClose) {
     this.closeParenthesis = doClose;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#near(double, double, int)
+   */
+  @Override
+  public T near(double x, double y, int maxDistance) {
+    return near(new GeoPoint(new Position(x, y)), maxDistance);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter#near(de.braintags.io.vertx.pojomapper.datatypes.
+   * geojson.GeoPoint, int)
+   */
+  @Override
+  public T near(GeoPoint point, int maxDistance) {
+    return addValue(QueryOperator.NEAR, new GeoSearchArgument(point, maxDistance));
   }
 
 }

@@ -20,6 +20,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.QueryCountResult;
+import de.braintags.io.vertx.pojomapper.exception.QueryException;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
 import io.vertx.core.AsyncResult;
@@ -120,7 +121,7 @@ public class MongoQuery<T> extends Query<T> {
     }
     mongoClient.findWithOptions(column, mq.getQueryDefinition(), fo, qResult -> {
       if (qResult.failed()) {
-        Future<IQueryResult<T>> future = Future.failedFuture(qResult.cause());
+        Future<IQueryResult<T>> future = Future.failedFuture(new QueryException(mq, qResult.cause()));
         resultHandler.handle(future);
       } else {
         createQueryResult(qResult.result(), rambler, resultHandler);

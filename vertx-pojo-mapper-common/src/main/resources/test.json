@@ -1,0 +1,1 @@
+{"position":{"$nearSphere":{"$geometry":{"type":"Point","coordinates":[13.408,52.518]}, "$minDistance" : 1000,  "$maxDistance" : 5000  } } }

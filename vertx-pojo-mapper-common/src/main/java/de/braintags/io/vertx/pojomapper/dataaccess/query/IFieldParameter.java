@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 
 /**
@@ -177,4 +178,29 @@ public interface IFieldParameter<T extends IQueryContainer> {
    *          true, if close is required
    */
   void setCloseParenthesis(boolean doClose);
+
+  /**
+   * Performs a GeoJson perimeter query
+   * 
+   * @param x
+   *          the coordinate x
+   * @param y
+   *          the coordinate y
+   * @param maxDistance
+   *          the maximum distance
+   * @return the parent {@link IQueryContainer} to enable chaining of commands
+   */
+  T near(double x, double y, int maxDistance);
+
+  /**
+   * Performs a GeoJson perimeter query
+   * 
+   * @param point
+   *          the start point of the query
+   * @param maxDistance
+   *          the maximum distance
+   * @return the parent {@link IQueryContainer} to enable chaining of commands
+   */
+  T near(GeoPoint point, int maxDistance);
+
 }

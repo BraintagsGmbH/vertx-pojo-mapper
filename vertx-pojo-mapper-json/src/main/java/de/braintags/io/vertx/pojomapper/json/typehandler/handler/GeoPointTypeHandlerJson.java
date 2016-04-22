@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.GeoSearchArgument;
 import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -40,6 +41,25 @@ public class GeoPointTypeHandlerJson extends GeoPointTypeHandler {
   /*
    * (non-Javadoc)
    * 
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
+   */
+  @Override
+  public final void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    if (source == null) {
+      success(null, resultHandler);
+    } else if (source instanceof GeoPoint) {
+      success(encode((GeoPoint) source), resultHandler);
+    } else if (source instanceof GeoSearchArgument) {
+      success(encode((GeoSearchArgument) source), resultHandler);
+    } else {
+      fail(new UnsupportedOperationException("unsupported type: " + source.getClass().getName()), resultHandler);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.PointTypeHandler#fromStore(java.lang.Object,
    * de.braintags.io.vertx.pojomapper.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
@@ -47,17 +67,6 @@ public class GeoPointTypeHandlerJson extends GeoPointTypeHandler {
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     success(source == null ? source : parse((JsonObject) source), resultHandler);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.PointTypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
-   */
-  @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : encode((GeoPoint) source), resultHandler);
   }
 
 }

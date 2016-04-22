@@ -30,7 +30,8 @@ public enum QueryOperator {
   NOT_IN,
   STARTS,
   ENDS,
-  CONTAINS;
+  CONTAINS,
+  NEAR;
 
 }
 

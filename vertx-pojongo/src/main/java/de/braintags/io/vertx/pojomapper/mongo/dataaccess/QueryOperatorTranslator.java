@@ -53,6 +53,8 @@ public class QueryOperatorTranslator implements IQueryOperatorTranslator {
       return "$in";
     case NOT_IN:
       return "$nin";
+    case NEAR:
+      return "$geoNear";
 
     default:
       throw new UnsupportedOperationException("No translator for " + op);

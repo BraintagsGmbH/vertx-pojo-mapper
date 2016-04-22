@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.GeoSearchArgument;
 import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
 import de.braintags.io.vertx.pojomapper.datatypes.geojson.Position;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -64,12 +65,27 @@ public class GeoPointTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : encode((GeoPoint) source).toString(), resultHandler);
+    if (source == null) {
+      success(null, resultHandler);
+    } else if (source instanceof GeoPoint) {
+      success(encode((GeoPoint) source).toString(), resultHandler);
+    } else if (source instanceof GeoSearchArgument) {
+      success(encode((GeoSearchArgument) source).toString(), resultHandler);
+    } else {
+      fail(new UnsupportedOperationException("unsupported type: " + source.getClass().getName()), resultHandler);
+    }
+  }
+
+  protected JsonObject encode(GeoSearchArgument source) {
+    JsonObject ret = new JsonObject();
+    ret.put("$geometry", encode((GeoPoint) source.getGeoJson()));
+    return ret;
   }
 
   protected JsonObject encode(GeoPoint source) {
     JsonObject result = new JsonObject();
-    result.put("type", (source).getType()).put(COORDINATES, new JsonArray(source.getCoordinates().getValues()));
+    result.put("type", (source).getType().getTypeName()).put(COORDINATES,
+        new JsonArray(source.getCoordinates().getValues()));
     return result;
   }
 
