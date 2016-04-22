@@ -13,13 +13,11 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.mapping;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
-import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.ISyncResult;
@@ -27,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.mapping.SyncAction;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
+import de.braintags.io.vertx.pojomapper.mapping.impl.AbstractDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultSyncResult;
 import de.braintags.io.vertx.pojomapper.mapping.impl.Mapper;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
@@ -47,11 +46,10 @@ import io.vertx.ext.sql.ResultSet;
  * 
  */
 
-public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> {
-  private static Logger LOGGER = LoggerFactory.getLogger(SqlDataStoreSynchronizer.class);
+public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<String> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(SqlDataStoreSynchronizer.class);
 
   private MySqlDataStore datastore;
-  private List<String> synchronizedInstances = new ArrayList<String>();
 
   private static final String TABLE_QUERY = "SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='%s' AND TABLE_NAME='%s'";
   private static final String COLUMN_QUERY = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA='%s' AND TABLE_NAME='%s'";
@@ -67,31 +65,16 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
     this.datastore = ds;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer#synchronize(de.braintags.io.vertx.pojomapper.
-   * mapping .IMapper, io.vertx.core.Handler)
-   */
   @Override
-  public void synchronize(IMapper mapper, Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
-    LOGGER.debug("starting synchronize");
-    if (synchronizedInstances.contains(mapper.getMapperClass().getName())) {
-      // was synced already
-      DefaultSyncResult syncResult = createSyncResult(mapper, SyncAction.NO_ACTION);
-      resultHandler.handle(Future.succeededFuture(syncResult));
-    } else {
-      LOGGER.debug("starting synchroniuzation for mapper " + mapper.getClass().getSimpleName());
-      readTableFromDatabase(mapper, res -> checkTable((Mapper) mapper, res, result -> {
-        if (result.failed()) {
-          resultHandler.handle(result);
-          return;
-        }
-        LOGGER.debug("finished synchronize");
-        synchronizedInstances.add(mapper.getMapperClass().getName());
+  public void internalSyncronize(IMapper mapper, Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
+    LOGGER.debug("starting synchroniuzation for mapper " + mapper.getClass().getSimpleName());
+    readTableFromDatabase(mapper, res -> checkTable((Mapper) mapper, res, result -> {
+      if (result.failed()) {
         resultHandler.handle(result);
-      }));
-    }
+      } else {
+        resultHandler.handle(result);
+      }
+    }));
   }
 
   private void checkTable(Mapper mapper, AsyncResult<SqlTableInfo> tableResult,
@@ -157,13 +140,12 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
     });
   }
 
-  private DefaultSyncResult createSyncResult(IMapper mapper, SyncAction action) {
+  protected DefaultSyncResult createSyncResult(IMapper mapper, SyncAction action) {
     String columnPart = generateColumnPart(mapper);
     String tableName = mapper.getTableInfo().getName();
     String database = datastore.getDatabase();
     String sqlCommand = String.format(CREATE_TABLE, database, tableName, columnPart);
-    DefaultSyncResult sr = new DefaultSyncResult(action, sqlCommand);
-    return sr;
+    return new DefaultSyncResult(action, sqlCommand);
   }
 
   /**
@@ -213,7 +195,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
           return;
         }
         String columnQuery = String.format(COLUMN_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
-        SqlUtil.query(datastore, columnQuery, colResult -> readColumns(mapper, tInfo, colResult, resultHandler));
+        SqlUtil.query(datastore, columnQuery, colResult -> readColumns(tInfo, colResult, resultHandler));
       }
     });
 
@@ -231,7 +213,7 @@ public class SqlDataStoreSynchronizer implements IDataStoreSynchronizer<String> 
    * @param resultHandler
    *          the handler to be called
    */
-  private void readColumns(IMapper mapper, SqlTableInfo tInfo, AsyncResult<ResultSet> result,
+  private void readColumns(SqlTableInfo tInfo, AsyncResult<ResultSet> result,
       Handler<AsyncResult<SqlTableInfo>> resultHandler) {
     if (result.failed()) {
       resultHandler.handle(Future.failedFuture(result.cause()));

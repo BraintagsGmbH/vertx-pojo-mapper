@@ -102,6 +102,8 @@ public class Mapper implements IMapper {
    */
   private final Map<Class<? extends Annotation>, List<IMethodProxy>> lifecycleMethods = new HashMap<>();
 
+  private Indexes indexes;
+
   /**
    * Creates a new definition for the given mapper class
    *
@@ -133,10 +135,18 @@ public class Mapper implements IMapper {
     computeLifeCycleAnnotations();
     computeClassAnnotations();
     computeEntity();
+    computeIndize();
     computeObjectFactory();
     computeKeyGenerator();
     generateTableInfo();
     validate();
+  }
+
+  private void computeIndize() {
+    if (mapperClass.isAnnotationPresent(Indexes.class)) {
+      indexes = mapperClass.getAnnotation(Indexes.class);
+    }
+
   }
 
   private void computeKeyGenerator() {
@@ -360,6 +370,11 @@ public class Mapper implements IMapper {
   @Override
   public Entity getEntity() {
     return this.entity;
+  }
+
+  @Override
+  public Indexes getIndexDefinitions() {
+    return indexes;
   }
 
   /*

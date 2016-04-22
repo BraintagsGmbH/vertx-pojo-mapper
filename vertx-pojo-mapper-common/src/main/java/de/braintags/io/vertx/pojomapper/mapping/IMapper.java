@@ -18,6 +18,7 @@ import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.annotation.Indexes;
 import de.braintags.io.vertx.pojomapper.annotation.KeyGenerator;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
@@ -100,6 +101,13 @@ public interface IMapper {
    * @return the defined {@link Entity} or null
    */
   public Entity getEntity();
+
+  /**
+   * Get the definitions about indexes, which shall be created for the current mapper
+   * 
+   * @return the index definitions
+   */
+  public Indexes getIndexDefinitions();
 
   /**
    * Get a defined {@link Annotation} of the given class

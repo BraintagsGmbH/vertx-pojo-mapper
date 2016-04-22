@@ -23,6 +23,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoDelete;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoQuery;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoWrite;
+import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapperFactory;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.datastore.MongoTableGenerator;
 import de.braintags.io.vertx.pojomapper.mongo.typehandler.MongoTypeHandlerFactory;
@@ -47,6 +48,7 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
   public static final String DATABASE_NAME = "db_name";
   private MongoClient client;
   private MongoMetaData metaData;
+  private MongoDataStoreSynchronizer sync;
 
   /**
    * Constructor using the given {@link MongoClient}
@@ -63,6 +65,7 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
     MongoMapperFactory mf = new MongoMapperFactory(this, new MongoTypeHandlerFactory(), new JsonPropertyMapperFactory(),
         new MongoStoreObjectFactory());
     setMapperFactory(mf);
+    setDataStoreSynchronizer(new MongoDataStoreSynchronizer(this));
     setTableGenerator(new MongoTableGenerator());
   }
 

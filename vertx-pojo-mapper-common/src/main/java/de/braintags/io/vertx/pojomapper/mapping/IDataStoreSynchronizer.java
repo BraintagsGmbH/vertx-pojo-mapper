@@ -26,7 +26,7 @@ import io.vertx.core.Handler;
  * @param <T>
  *          the dataformat which is used as sync command
  */
-
+@FunctionalInterface
 public interface IDataStoreSynchronizer<T> {
 
   /**

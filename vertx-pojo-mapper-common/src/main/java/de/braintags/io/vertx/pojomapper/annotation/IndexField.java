@@ -38,4 +38,15 @@ public @interface IndexField {
    */
   String fieldName();
 
+  /**
+   * The type of the index as {@link IndexType}
+   * 
+   * @see IndexType
+   */
+  IndexType type() default IndexType.ASC;
+
+  /**
+   * The weight to use when creating a text index. This value only makes sense when direction is {@link IndexType#TEXT}
+   */
+  int weight() default -1;
 }

@@ -60,31 +60,27 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   }
 
   @Override
-  public void save(Handler<AsyncResult<IWriteResult>> resultHandler) {
+  public void internalSave(Handler<AsyncResult<IWriteResult>> resultHandler) {
     saveSize = getObjectsToSave().size();
-    sync(syncResult -> {
-      if (syncResult.failed()) {
-        resultHandler.handle(Future.failedFuture(syncResult.cause()));
-        return;
-      }
-      if (getObjectsToSave().isEmpty()) {
-        resultHandler.handle(Future.succeededFuture(new SqlWriteResult()));
-        return;
-      }
-      getDataStore().getMapperFactory().getStoreObjectFactory().createStoreObjects(getMapper(), getObjectsToSave(),
-          stoResult -> {
-        if (stoResult.failed()) {
-          resultHandler.handle(Future.failedFuture(stoResult.cause()));
-          return;
-        }
-        if (stoResult.result().size() != saveSize) {
-          String message = String.format("Wrong number of StoreObjects created. Expected %d - created: %d", saveSize,
-              stoResult.result().size());
-          LOGGER.error(message);
-        }
-        save(stoResult.result(), resultHandler);
-      });
-    });
+    if (getObjectsToSave().isEmpty()) {
+      resultHandler.handle(Future.succeededFuture(new SqlWriteResult()));
+      return;
+    }
+    getDataStore().getMapperFactory().getStoreObjectFactory().createStoreObjects(getMapper(), getObjectsToSave(),
+        stoResult -> {
+          if (stoResult.failed()) {
+            resultHandler.handle(Future.failedFuture(stoResult.cause()));
+            return;
+          } else {
+            if (stoResult.result().size() != saveSize) {
+              String message = String.format("Wrong number of StoreObjects created. Expected %d - created: %d",
+                  saveSize, stoResult.result().size());
+              LOGGER.error(message);
+            }
+            save(stoResult.result(), resultHandler);
+          }
+        });
+
   }
 
   private void save(List<IStoreObject<?>> storeObjects, Handler<AsyncResult<IWriteResult>> resultHandler) {

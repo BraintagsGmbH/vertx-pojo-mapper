@@ -112,7 +112,7 @@ public class DummyDataStore implements IDataStore {
      * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
      */
     @Override
-    public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    public void internalExecute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
       setUnsupported(resultHandler);
     }
 
@@ -122,7 +122,7 @@ public class DummyDataStore implements IDataStore {
      * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
      */
     @Override
-    public void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+    public void internalExecuteCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
       setUnsupported(resultHandler);
     }
 

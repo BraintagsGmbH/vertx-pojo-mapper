@@ -21,7 +21,9 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IRamblerSource;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
@@ -41,7 +43,7 @@ import io.vertx.core.Handler;
 public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQuery<T> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory.getLogger(Query.class);
 
-  private List<Object> filters = new ArrayList<Object>();
+  private List<Object> filters = new ArrayList<>();
   private int limit = 500;
   private int start = 0;
   private boolean returnCompleteCount = false;
@@ -56,37 +58,92 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     super(mapperClass, datastore);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
+   */
+  @Override
+  public final void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    sync(syncResult -> {
+      if (syncResult.failed()) {
+        resultHandler.handle(Future.failedFuture(syncResult.cause()));
+      } else {
+        try {
+          internalExecute(resultHandler);
+        } catch (Exception e) {
+          LOGGER.debug("error occured", e);
+          resultHandler.handle(Future.failedFuture(e));
+        }
+      }
+    });
+  }
+
+  /**
+   * This method is called after the sync call to execute the query
+   * 
+   * @param resultHandler
+   */
+  protected abstract void internalExecute(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
+   */
+  @Override
+  public void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+    sync(syncResult -> {
+      if (syncResult.failed()) {
+        resultHandler.handle(Future.failedFuture(syncResult.cause()));
+      } else {
+        try {
+          internalExecuteCount(resultHandler);
+        } catch (Exception e) {
+          resultHandler.handle(Future.failedFuture(e));
+        }
+      }
+    });
+  }
+
+  /**
+   * This method is called after the sync call to execute count the query
+   * 
+   * @param resultHandler
+   */
+  protected abstract void internalExecuteCount(Handler<AsyncResult<IQueryCountResult>> resultHandler);
+
   @Override
   public IFieldParameter<Query<T>> field(String fieldName) {
-    FieldParameter<Query<T>> param = new FieldParameter<Query<T>>(this, getMapper().getField(fieldName));
+    FieldParameter<Query<T>> param = new FieldParameter<>(this, getMapper().getField(fieldName));
     filters.add(param);
     return param;
   }
 
   @Override
   public IFieldParameter<LogicContainer<Query<T>>> and(String fieldName) {
-    LogicContainer<Query<T>> container = new LogicContainer<Query<T>>(this, QueryLogic.AND);
+    LogicContainer<Query<T>> container = new LogicContainer<>(this, QueryLogic.AND);
     filters.add(container);
     return container.field(fieldName);
   }
 
   @Override
   public IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> andOpen(String fieldName) {
-    LogicContainer<IQueryContainer> container = new LogicContainer<IQueryContainer>(this, QueryLogic.AND_OPEN);
+    LogicContainer<IQueryContainer> container = new LogicContainer<>(this, QueryLogic.AND_OPEN);
     filters.add(container);
     return container.field(fieldName);
   }
 
   @Override
   public IFieldParameter<LogicContainer<Query<T>>> or(String fieldName) {
-    LogicContainer<Query<T>> container = new LogicContainer<Query<T>>(this, QueryLogic.OR);
+    LogicContainer<Query<T>> container = new LogicContainer<>(this, QueryLogic.OR);
     filters.add(container);
     return container.field(fieldName);
   }
 
   @Override
   public IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> orOpen(String fieldName) {
-    LogicContainer<IQueryContainer> container = new LogicContainer<IQueryContainer>(this, QueryLogic.OR_OPEN);
+    LogicContainer<IQueryContainer> container = new LogicContainer<>(this, QueryLogic.OR_OPEN);
     filters.add(container);
     return container.field(fieldName);
   }
@@ -133,7 +190,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   private void handleFilterList(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     if (!filters.isEmpty()) {
-      CounterObject<Void> co = new CounterObject<Void>(filters.size(), resultHandler);
+      CounterObject<Void> co = new CounterObject<>(filters.size(), resultHandler);
       for (Object filter : filters) {
         handleFilter(rambler, resultHandler, filter, co);
         if (co.isError()) {

@@ -54,24 +54,12 @@ public class SqlQuery<T> extends Query<T> {
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
    */
   @Override
-  public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    sync(syncResult -> {
-      if (syncResult.failed()) {
-        resultHandler.handle(Future.failedFuture(syncResult.cause()));
+  public void internalExecute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    createQueryDefinition(result -> {
+      if (result.failed()) {
+        resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
-        try {
-          createQueryDefinition(result -> {
-            if (result.failed()) {
-              resultHandler.handle(Future.failedFuture(result.cause()));
-              return;
-            }
-            doFind(result.result(), resultHandler);
-          });
-        } catch (Exception e) {
-          LOGGER.debug("error occured", e);
-          Future<IQueryResult<T>> future = Future.failedFuture(e);
-          resultHandler.handle(future);
-        }
+        doFind(result.result(), resultHandler);
       }
     });
   }
@@ -82,23 +70,12 @@ public class SqlQuery<T> extends Query<T> {
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
    */
   @Override
-  public void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
-    sync(syncResult -> {
-      if (syncResult.failed()) {
-        resultHandler.handle(Future.failedFuture(syncResult.cause()));
+  public void internalExecuteCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+    createQueryDefinition(result -> {
+      if (result.failed()) {
+        resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
-        try {
-          createQueryDefinition(result -> {
-            if (result.failed()) {
-              resultHandler.handle(Future.failedFuture(result.cause()));
-              return;
-            }
-            executeCount(result.result(), resultHandler);
-          });
-        } catch (Exception e) {
-          Future<IQueryCountResult> future = Future.failedFuture(e);
-          resultHandler.handle(future);
-        }
+        executeCount(result.result(), resultHandler);
       }
     });
   }

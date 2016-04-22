@@ -50,7 +50,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   }
 
   @Override
-  public void save(Handler<AsyncResult<IWriteResult>> resultHandler) {
+  public void internalSave(Handler<AsyncResult<IWriteResult>> resultHandler) {
     MongoWriteResult rr = new MongoWriteResult();
     if (getObjectsToSave().isEmpty()) {
       resultHandler.handle(Future.succeededFuture(rr));

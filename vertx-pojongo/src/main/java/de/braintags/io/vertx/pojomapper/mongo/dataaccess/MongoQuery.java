@@ -52,7 +52,7 @@ public class MongoQuery<T> extends Query<T> {
   }
 
   @Override
-  public void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  public void internalExecute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     try {
       createQueryDefinition(result -> {
         if (result.failed()) {
@@ -78,7 +78,7 @@ public class MongoQuery<T> extends Query<T> {
   }
 
   @Override
-  public void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+  public void internalExecuteCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     try {
       createQueryDefinition(result -> {
         if (result.failed()) {
@@ -131,7 +131,7 @@ public class MongoQuery<T> extends Query<T> {
 
   private void createQueryResult(List<JsonObject> findList, MongoQueryRambler rambler,
       Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    MongoQueryResult<T> qR = new MongoQueryResult<T>(findList, (MongoDataStore) getDataStore(),
+    MongoQueryResult<T> qR = new MongoQueryResult<>(findList, (MongoDataStore) getDataStore(),
         (MongoMapper) getMapper(), rambler);
     if (isReturnCompleteCount()) {
       if (getStart() == 0 && getLimit() > 0 && qR.size() < getLimit()) {

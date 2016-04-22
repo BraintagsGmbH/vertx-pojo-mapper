@@ -20,6 +20,7 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import io.vertx.core.AsyncResult;
@@ -35,7 +36,7 @@ import io.vertx.core.Handler;
  */
 
 public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> implements IWrite<T> {
-  private List<T> objectsToSave = new ArrayList<T>();
+  private List<T> objectsToSave = new ArrayList<>();
 
   /**
    * @param mapperClass
@@ -44,6 +45,28 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
   public AbstractWrite(final Class<T> mapperClass, IDataStore datastore) {
     super(mapperClass, datastore);
   }
+
+  @Override
+  public final void save(Handler<AsyncResult<IWriteResult>> resultHandler) {
+    sync(syncResult -> {
+      if (syncResult.failed()) {
+        resultHandler.handle(Future.failedFuture(syncResult.cause()));
+      } else {
+        try {
+          internalSave(resultHandler);
+        } catch (Exception e) {
+          resultHandler.handle(Future.failedFuture(e));
+        }
+      }
+    });
+  }
+
+  /**
+   * This method is called after the sync call to execute the write action
+   * 
+   * @param resultHandler
+   */
+  protected abstract void internalSave(Handler<AsyncResult<IWriteResult>> resultHandler);
 
   /**
    * Get the objects that shall be saved
