@@ -14,6 +14,7 @@ package de.braintags.io.vertx.pojomapper.testdatastore;
 
 import org.junit.Test;
 
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleIndexMapper;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -27,13 +28,13 @@ public class TestIndex extends DatastoreBaseTest {
 
   @Test
   public void testSimpleMapper(TestContext context) {
-    // clearTable(context, SimpleIndexMapper.class.getSimpleName());
-    // SimpleIndexMapper sm = new SimpleIndexMapper();
-    // sm.name = "testName";
-    // sm.setSecondProperty("my second property");
-    // ResultContainer resultContainer = saveRecord(context, sm);
-    // if (resultContainer.assertionError != null)
-    // throw resultContainer.assertionError;
+    clearTable(context, SimpleIndexMapper.class.getSimpleName());
+    SimpleIndexMapper sm = new SimpleIndexMapper();
+    sm.name = "testName";
+    sm.setSecondProperty("my second property");
+    ResultContainer resultContainer = saveRecord(context, sm);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
   }
 
 }
