@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.braintags.io.vertx.pojomapper.annotation.Index;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
@@ -68,13 +69,19 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
   }
 
   @Override
-  public void internalSyncronize(IMapper mapper, Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
+  protected void syncIndex(Index index, Future<Void> f) {
+    f.fail(new UnsupportedOperationException());
+  }
+
+  @Override
+  public void syncTable(IMapper mapper, Handler<AsyncResult<Void>> resultHandler) {
     LOGGER.debug("starting synchroniuzation for mapper " + mapper.getClass().getSimpleName());
     readTableFromDatabase(mapper, res -> checkTable((Mapper) mapper, res, result -> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
-        resultHandler.handle(Future.succeededFuture(internalSyncResult));
+        getSyncResult().addCommand(result.result());
+        resultHandler.handle(Future.succeededFuture());
       }
     }));
   }
