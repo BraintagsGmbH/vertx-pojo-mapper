@@ -42,7 +42,7 @@ public class GeoPointTest extends AbstractTypeHandlerTest {
 
   @Override
   protected String getExpectedTypeHandlerClassName() {
-    return "de.braintags.io.vertx.pojomapper.json.typehandler.handler.GeoPointTypeHandlerJson";
+    return "de.braintags.io.vertx.pojomapper.mongo.typehandler.GeoPointTypeHandlerMongo";
   }
 
 }
