@@ -14,8 +14,11 @@
 
 package de.braintags.io.vertx.pojomapper.mapping.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import de.braintags.io.vertx.pojomapper.mapping.ISyncCommand;
 import de.braintags.io.vertx.pojomapper.mapping.ISyncResult;
-import de.braintags.io.vertx.pojomapper.mapping.SyncAction;
 
 /**
  * The default implementation for all datastores, where String is used as native format to synchronize a connected table
@@ -25,62 +28,36 @@ import de.braintags.io.vertx.pojomapper.mapping.SyncAction;
  */
 
 public class DefaultSyncResult implements ISyncResult<String> {
-  private String syncCommand = null;
-  private SyncAction action;
+  private List<ISyncCommand<String>> commands = new ArrayList<>();
 
-  /**
-   * Creates a new instance with the given {@link SyncAction}
+  /*
+   * (non-Javadoc)
    * 
-   * @action the type od {@link SyncAction}
+   * @see de.braintags.io.vertx.pojomapper.mapping.ISyncResult#getCommands()
    */
-  public DefaultSyncResult(SyncAction action) {
-    this.action = action;
-  }
-
-  /**
-   * Creates a new instance with the given command
-   * 
-   * @action the type od {@link SyncAction}
-   * @param syncCommand
-   *          the command to be set
-   */
-  public DefaultSyncResult(SyncAction action, String syncCommand) {
-    this(action);
-    this.syncCommand = syncCommand;
+  @Override
+  public List<ISyncCommand<String>> getCommands() {
+    return commands;
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.ISyncResult#getSyncCommand()
+   * @see de.braintags.io.vertx.pojomapper.mapping.ISyncResult#addCommand(de.braintags.io.vertx.pojomapper.mapping.
+   * ISyncCommand)
    */
   @Override
-  public String getSyncCommand() {
-    return syncCommand;
+  public void addCommand(ISyncCommand<String> command) {
+    commands.add(command);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.ISyncResult#getAction()
+   * @see de.braintags.io.vertx.pojomapper.mapping.ISyncResult#isUnmodified()
    */
   @Override
-  public SyncAction getAction() {
-    return action;
-  }
-
-  /**
-   * Set the action, which was performed by a synchronization
-   * 
-   * @param action
-   *          the action
-   */
-  public void setAction(SyncAction action) {
-    this.action = action;
-  }
-
-  @Override
-  public String toString() {
-    return syncCommand + ": " + action;
+  public boolean isUnmodified() {
+    return commands.isEmpty();
   }
 }

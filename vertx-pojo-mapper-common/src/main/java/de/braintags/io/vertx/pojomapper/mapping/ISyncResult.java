@@ -14,7 +14,7 @@
 
 package de.braintags.io.vertx.pojomapper.mapping;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
+import java.util.List;
 
 /**
  * ISyncResult is the result, which is returned by the method
@@ -27,22 +27,27 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
  *          the dataformat which is used as sync command
  * 
  */
-
 public interface ISyncResult<T> {
 
   /**
-   * Retrieve the native object which was used as command to synchronize the connected table / column of the
-   * {@link IDataStore} If no synchronization was performed, then this will be null
-   * 
-   * @return the native object which was used to synchronize or null, if no synchronization was performed
-   */
-  public T getSyncCommand();
-
-  /**
-   * Get the {@link SyncAction} which was performed by a synchronization
+   * Get the list of commands, which were processed during initialization
    * 
    * @return
    */
-  public SyncAction getAction();
+  List<ISyncCommand<T>> getCommands();
 
+  /**
+   * Add a new command
+   * 
+   * @param command
+   *          the command to be added
+   */
+  void addCommand(ISyncCommand<T> command);
+
+  /**
+   * Returns true, if during initialization no modification on the underlaying table / collection was needed
+   * 
+   * @return true, if no modification needed
+   */
+  boolean isUnmodified();
 }

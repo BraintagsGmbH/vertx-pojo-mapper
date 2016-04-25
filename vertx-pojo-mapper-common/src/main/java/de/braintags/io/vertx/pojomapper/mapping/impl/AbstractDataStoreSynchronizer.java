@@ -43,7 +43,7 @@ public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSync
   @Override
   public final void synchronize(IMapper mapper, Handler<AsyncResult<ISyncResult<T>>> resultHandler) {
     if (synchronizedInstances.contains(mapper.getMapperClass().getName())) {
-      resultHandler.handle(Future.succeededFuture());
+      resultHandler.handle(Future.succeededFuture(getSyncResult()));
     } else {
       LOGGER.debug("starting synchronization for mapper " + mapper.getClass().getSimpleName());
       internalSyncronize(mapper, res -> {
@@ -65,4 +65,10 @@ public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSync
    */
   protected abstract void internalSyncronize(IMapper mapper, Handler<AsyncResult<ISyncResult<T>>> resultHandler);
 
+  /**
+   * Get the instance of ISyncResult, which is used by this implementation
+   * 
+   * @return the sync result
+   */
+  protected abstract ISyncResult<T> getSyncResult();
 }

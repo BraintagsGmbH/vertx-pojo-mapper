@@ -26,6 +26,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mapping.impl.AbstractDataStoreSynchronizer;
+import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultSyncCommand;
 import de.braintags.io.vertx.pojomapper.mapping.impl.DefaultSyncResult;
 import de.braintags.io.vertx.pojomapper.mapping.impl.Mapper;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
@@ -48,6 +49,7 @@ import io.vertx.ext.sql.ResultSet;
 
 public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<String> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SqlDataStoreSynchronizer.class);
+  private DefaultSyncResult internalSyncResult = new DefaultSyncResult();
 
   private MySqlDataStore datastore;
 
@@ -70,15 +72,15 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
     LOGGER.debug("starting synchroniuzation for mapper " + mapper.getClass().getSimpleName());
     readTableFromDatabase(mapper, res -> checkTable((Mapper) mapper, res, result -> {
       if (result.failed()) {
-        resultHandler.handle(result);
+        resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
-        resultHandler.handle(result);
+        resultHandler.handle(Future.succeededFuture(internalSyncResult));
       }
     }));
   }
 
   private void checkTable(Mapper mapper, AsyncResult<SqlTableInfo> tableResult,
-      Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
+      Handler<AsyncResult<DefaultSyncCommand>> resultHandler) {
     if (tableResult.failed()) {
       resultHandler.handle(Future.failedFuture(tableResult.cause()));
     } else {
@@ -97,16 +99,15 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
   }
 
   private void compareTables(IMapper mapper, SqlTableInfo currentDbTable,
-      Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
+      Handler<AsyncResult<DefaultSyncCommand>> resultHandler) {
     Map<String, SyncAction> syncMap = currentDbTable.compareColumns(mapper);
     if (!syncMap.isEmpty()) {
       logSyncMap(mapper, syncMap);
       throw new UnsupportedOperationException("Implement update of table structure in mapper "
           + mapper.getMapperClass().getName() + ": " + syncMap.toString());
     } else {
-      resultHandler.handle(Future.succeededFuture(new DefaultSyncResult(SyncAction.NO_ACTION)));
+      resultHandler.handle(Future.succeededFuture());
     }
-
   }
 
   private void logSyncMap(IMapper mapper, Map<String, SyncAction> syncMap) {
@@ -120,11 +121,11 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
    * ENGINE=InnoDB DEFAULT CHARSET=utf8;
    * 
    */
-  private void generateNewTable(Mapper mapper, Handler<AsyncResult<ISyncResult<String>>> resultHandler) {
-    DefaultSyncResult syncResult = createSyncResult(mapper, SyncAction.CREATE);
-    SqlUtil.query(datastore, syncResult.getSyncCommand(), exec -> {
+  private void generateNewTable(Mapper mapper, Handler<AsyncResult<DefaultSyncCommand>> resultHandler) {
+    DefaultSyncCommand syncCommand = createSyncCommand(mapper, SyncAction.CREATE);
+    SqlUtil.query(datastore, syncCommand.getCommand(), exec -> {
       if (exec.failed()) {
-        LOGGER.error("error in executing command: " + syncResult.getSyncCommand());
+        LOGGER.error("error in executing command: " + syncCommand.getCommand());
         resultHandler.handle(Future.failedFuture(exec.cause()));
       } else {
         readTableFromDatabase(mapper, tableResult -> {
@@ -132,7 +133,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
             resultHandler.handle(Future.failedFuture(tableResult.cause()));
           } else {
             tableResult.result().copyInto(mapper);
-            resultHandler.handle(Future.succeededFuture(syncResult));
+            resultHandler.handle(Future.succeededFuture(syncCommand));
           }
         });
 
@@ -140,12 +141,12 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
     });
   }
 
-  protected DefaultSyncResult createSyncResult(IMapper mapper, SyncAction action) {
+  private DefaultSyncCommand createSyncCommand(IMapper mapper, SyncAction action) {
     String columnPart = generateColumnPart(mapper);
     String tableName = mapper.getTableInfo().getName();
     String database = datastore.getDatabase();
     String sqlCommand = String.format(CREATE_TABLE, database, tableName, columnPart);
-    return new DefaultSyncResult(action, sqlCommand);
+    return new DefaultSyncCommand(action, sqlCommand);
   }
 
   /**
@@ -242,6 +243,16 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
     if (resultSet.getNumRows() == 0)
       return null;
     return new SqlTableInfo(mapper);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.impl.AbstractDataStoreSynchronizer#getSyncResult()
+   */
+  @Override
+  protected ISyncResult<String> getSyncResult() {
+    return internalSyncResult;
   }
 
 }
