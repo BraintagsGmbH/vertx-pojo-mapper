@@ -23,6 +23,7 @@ import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
 import de.braintags.io.vertx.util.CounterObject;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -273,6 +274,95 @@ public class TMongoDirect extends DatastoreBaseTest {
       }
     });
     as.await();
+  }
+
+  @Test
+  public void testIndexes(TestContext context) {
+    MongoDataStore ds = (MongoDataStore) getDataStore(context);
+    MongoClient client = (MongoClient) ds.getClient();
+    listCommands(context, client);
+    listIndexes(context, client, "XXCollection");
+    createCollection(context, client, "XXCollection");
+    createIndex(context, client, "XXCollection");
+  }
+
+  private void listIndexes(TestContext context, MongoClient client, String collection) {
+    Async as = context.async();
+    JsonObject jsonCommand = new JsonObject();
+    jsonCommand.put("listIndexes", collection);
+    client.runCommand("listIndexes", jsonCommand, result -> {
+      if (result.failed()) {
+        LOGGER.error("", result.cause());
+        as.complete();
+      } else {
+        LOGGER.info("success: " + result.result());
+        as.complete();
+      }
+    });
+    as.await();
+  }
+
+  private void listCommands(TestContext context, MongoClient client) {
+    Async as = context.async();
+    JsonObject jsonCommand = new JsonObject();
+    jsonCommand.put("listCommands", 1);
+    // jsonCommand.put("listCollections", "1");
+    client.runCommand("listCommands", jsonCommand, result -> {
+      if (result.failed()) {
+        LOGGER.error("", result.cause());
+        as.complete();
+      } else {
+        LOGGER.info("success: " + result.result());
+        as.complete();
+      }
+    });
+    as.await();
+  }
+
+  private void createCollection(TestContext context, MongoClient client, String collection) {
+    Async as = context.async();
+    JsonObject jsonCommand = new JsonObject();
+    jsonCommand.put("create", collection);
+    // jsonCommand.put("listCollections", "1");
+    client.runCommand("create", jsonCommand, result -> {
+      if (result.failed()) {
+        LOGGER.error("", result.cause());
+        as.complete();
+      } else {
+        LOGGER.info("success: " + result.result());
+        as.complete();
+      }
+    });
+    as.await();
+  }
+
+  private void createIndex(TestContext context, MongoClient client, String collection) {
+    Async as = context.async();
+    JsonObject jsonCommand = new JsonObject();
+    jsonCommand.put("createIndexes", collection);
+    JsonArray idx = new JsonArray();
+    idx.add(createIndexDefinition("testindex", "testFieldName"));
+    jsonCommand.put("indexes", idx);
+
+    client.runCommand("createIndexes", jsonCommand, result -> {
+      if (result.failed()) {
+        LOGGER.error("", result.cause());
+        as.complete();
+      } else {
+        LOGGER.info("success: " + result.result());
+        as.complete();
+      }
+    });
+    as.await();
+  }
+
+  private JsonObject createIndexDefinition(String indexName, String fieldName) {
+    JsonObject idxObject = new JsonObject();
+    idxObject.put("name", indexName);
+    JsonObject fieldDefs = new JsonObject();
+    fieldDefs.put(fieldName, 1);
+    idxObject.put("key", fieldDefs);
+    return idxObject;
   }
 
 }

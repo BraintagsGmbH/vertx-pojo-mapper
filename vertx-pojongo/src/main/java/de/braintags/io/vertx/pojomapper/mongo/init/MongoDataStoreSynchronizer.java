@@ -31,6 +31,7 @@ public class MongoDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Js
 
   @Override
   protected void syncIndex(Index index, Future<Void> f) {
+
     f.fail(new UnsupportedOperationException());
   }
 
