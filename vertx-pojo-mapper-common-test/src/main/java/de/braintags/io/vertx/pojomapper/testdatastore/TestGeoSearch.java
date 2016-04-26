@@ -41,7 +41,7 @@ public class TestGeoSearch extends DatastoreBaseTest {
     context.assertEquals(found.size(), 1, "wrong number of records");
   }
 
-  private void createDemoRecords(TestContext context) {
+  public static void createDemoRecords(TestContext context) {
     List<GeoMapper> list = new ArrayList<>();
     list.add(createPoint(6.81, 51.235, "Berlin"));
     list.add(createPoint(13.408, 52.518, "Düsseldorf"));
@@ -50,7 +50,7 @@ public class TestGeoSearch extends DatastoreBaseTest {
     // getDataStore(context).
   }
 
-  private GeoMapper createPoint(double x, double y, String name) {
+  private static GeoMapper createPoint(double x, double y, String name) {
     GeoPoint p = new GeoPoint(new Position(x, y));
     return new GeoMapper(p, name);
   }

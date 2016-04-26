@@ -28,6 +28,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.util.QueryHelper;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ExceptionUtil;
@@ -444,6 +445,28 @@ public abstract class DatastoreBaseTest {
     async.await();
     if (err.isError())
       throw err.getRuntimeException();
+  }
+
+  /**
+   * Validates the existence of an index
+   * 
+   * @param context
+   * @param q
+   */
+  protected void checkIndex(TestContext context, IMapper mapper, String indexName) {
+    Async async = context.async();
+    getDataStore(context).getMetaData().getIndexInfo(indexName, mapper, result -> {
+      if (result.failed()) {
+        context.fail(result.cause());
+        async.complete();
+      } else {
+        Object indexInfo = result.result();
+        logger.info("indexInfo: " + indexInfo);
+        context.assertNotNull(indexInfo, "Index wasn't created");
+        async.complete();
+      }
+    });
+    async.await();
   }
 
 }

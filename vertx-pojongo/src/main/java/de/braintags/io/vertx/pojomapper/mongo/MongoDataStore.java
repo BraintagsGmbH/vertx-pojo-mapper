@@ -42,13 +42,18 @@ import io.vertx.ext.mongo.MongoClient;
  */
 
 public class MongoDataStore extends AbstractDataStore implements IDataStore {
+
+  /**
+   * The minimal version of MongoDb, which is expected by the current implementation
+   */
+  public static final String EXPECTED_VERSION_STARTS_WITH = "3.2.";
+
   /**
    * The name of the property, which describes the database to be used
    */
   public static final String DATABASE_NAME = "db_name";
   private MongoClient client;
   private MongoMetaData metaData;
-  private MongoDataStoreSynchronizer sync;
 
   /**
    * Constructor using the given {@link MongoClient}
@@ -61,7 +66,7 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
   public MongoDataStore(Vertx vertx, MongoClient client, JsonObject properties) {
     super(vertx, properties);
     this.client = client;
-    metaData = new MongoMetaData(client);
+    metaData = new MongoMetaData(this);
     MongoMapperFactory mf = new MongoMapperFactory(this, new MongoTypeHandlerFactory(), new JsonPropertyMapperFactory(),
         new MongoStoreObjectFactory());
     setMapperFactory(mf);
@@ -76,7 +81,7 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
    */
   @Override
   public <T> IQuery<T> createQuery(Class<T> mapper) {
-    return new MongoQuery<T>(mapper, this);
+    return new MongoQuery<>(mapper, this);
   }
 
   /*
@@ -86,7 +91,7 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
    */
   @Override
   public <T> IWrite<T> createWrite(Class<T> mapper) {
-    return new MongoWrite<T>(mapper, this);
+    return new MongoWrite<>(mapper, this);
   }
 
   /*
@@ -97,14 +102,6 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
   @Override
   public <T> IDelete<T> createDelete(Class<T> mapper) {
     return new MongoDelete<>(mapper, this);
-  }
-
-  /**
-   * @deprecated use getClient() instead
-   */
-  @Deprecated
-  public MongoClient getMongoClient() {
-    return (MongoClient) getClient();
   }
 
   /**

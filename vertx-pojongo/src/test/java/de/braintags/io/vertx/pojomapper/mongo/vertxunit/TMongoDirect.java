@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
+import de.braintags.io.vertx.pojomapper.mongo.MongoUtil;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
@@ -41,6 +42,24 @@ import io.vertx.ext.unit.TestContext;
 public class TMongoDirect extends DatastoreBaseTest {
   private static Logger LOGGER = LoggerFactory.getLogger(TMongoDirect.class);
   private static final int LOOP = 5000;
+  private static final String EXPECTED_VERSION_STARTS_WITH = "3.2.";
+
+  @Test
+  public void checkVersion(TestContext context) {
+    MongoDataStore ds = (MongoDataStore) getDataStore(context);
+    Async async = context.async();
+    ds.getMetaData().getVersion(res -> {
+      if (res.failed()) {
+        context.fail(res.cause());
+      } else {
+        LOGGER.info("VERSION: " + res.result());
+        context.assertTrue(res.result().startsWith(EXPECTED_VERSION_STARTS_WITH),
+            "Mongo version must start with " + EXPECTED_VERSION_STARTS_WITH);
+      }
+      async.complete();
+    });
+    async.await();
+  }
 
   @Test
   public void executeNativeQuery(TestContext context) {
@@ -277,22 +296,58 @@ public class TMongoDirect extends DatastoreBaseTest {
   }
 
   @Test
-  public void testIndexes(TestContext context) {
-    MongoDataStore ds = (MongoDataStore) getDataStore(context);
-    MongoClient client = (MongoClient) ds.getClient();
-    listCommands(context, client);
-    listIndexes(context, client, "XXCollection");
-    createCollection(context, client, "XXCollection");
-    createIndex(context, client, "XXCollection");
+  public void listCollectionNames(TestContext context) {
+    Async as = context.async();
+    MongoUtil.getCollectionNames((MongoDataStore) getDataStore(context), result -> {
+      if (result.failed()) {
+        context.fail(new RuntimeException(result.cause()));
+        as.complete();
+      } else {
+        LOGGER.info("success: " + result.result());
+        as.complete();
+      }
+    });
+    as.await();
   }
 
-  private void listIndexes(TestContext context, MongoClient client, String collection) {
+  @Test
+  public void testIndexes(TestContext context) {
+    String collectionName = "XXCollection";
+    MongoDataStore ds = (MongoDataStore) getDataStore(context);
+    MongoClient client = (MongoClient) ds.getClient();
+    dropTable(context, collectionName);
+    listCommands(context, client);
+    createCollection(context, collectionName);
+    createIndex(context, client, collectionName);
+    listIndexes(context, collectionName);
+  }
+
+  @Test
+  public void listCollections(TestContext context) {
     Async as = context.async();
-    JsonObject jsonCommand = new JsonObject();
-    jsonCommand.put("listIndexes", collection);
-    client.runCommand("listIndexes", jsonCommand, result -> {
+    MongoUtil.getCollections((MongoDataStore) getDataStore(context), result -> {
       if (result.failed()) {
-        LOGGER.error("", result.cause());
+        context.fail(new RuntimeException(result.cause()));
+        as.complete();
+      } else {
+        LOGGER.info("success: " + result.result());
+        as.complete();
+      }
+    });
+    as.await();
+  }
+
+  /**
+   * 
+   * @param context
+   * @param client
+   * @param collection
+   */
+  private void listIndexes(TestContext context, String collection) {
+    Async as = context.async();
+    MongoUtil.getIndexes((MongoDataStore) getDataStore(context), collection, result -> {
+      if (result.failed()) {
+        context.fail(new RuntimeException(result.cause()));
         as.complete();
       } else {
         LOGGER.info("success: " + result.result());
@@ -306,10 +361,9 @@ public class TMongoDirect extends DatastoreBaseTest {
     Async as = context.async();
     JsonObject jsonCommand = new JsonObject();
     jsonCommand.put("listCommands", 1);
-    // jsonCommand.put("listCollections", "1");
     client.runCommand("listCommands", jsonCommand, result -> {
       if (result.failed()) {
-        LOGGER.error("", result.cause());
+        context.fail(new RuntimeException(result.cause()));
         as.complete();
       } else {
         LOGGER.info("success: " + result.result());
@@ -319,14 +373,11 @@ public class TMongoDirect extends DatastoreBaseTest {
     as.await();
   }
 
-  private void createCollection(TestContext context, MongoClient client, String collection) {
+  private void createCollection(TestContext context, String collection) {
     Async as = context.async();
-    JsonObject jsonCommand = new JsonObject();
-    jsonCommand.put("create", collection);
-    // jsonCommand.put("listCollections", "1");
-    client.runCommand("create", jsonCommand, result -> {
+    MongoUtil.createCollection((MongoDataStore) getDataStore(context), collection, result -> {
       if (result.failed()) {
-        LOGGER.error("", result.cause());
+        context.fail(new RuntimeException(result.cause()));
         as.complete();
       } else {
         LOGGER.info("success: " + result.result());
@@ -346,7 +397,7 @@ public class TMongoDirect extends DatastoreBaseTest {
 
     client.runCommand("createIndexes", jsonCommand, result -> {
       if (result.failed()) {
-        LOGGER.error("", result.cause());
+        context.fail(new RuntimeException(result.cause()));
         as.complete();
       } else {
         LOGGER.info("success: " + result.result());

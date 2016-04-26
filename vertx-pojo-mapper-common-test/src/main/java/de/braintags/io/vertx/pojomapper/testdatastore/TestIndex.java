@@ -14,7 +14,8 @@ package de.braintags.io.vertx.pojomapper.testdatastore;
 
 import org.junit.Test;
 
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleIndexMapper;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.GeoMapper;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -25,16 +26,15 @@ import io.vertx.ext.unit.TestContext;
  *
  */
 public class TestIndex extends DatastoreBaseTest {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(TestIndex.class);
 
   @Test
-  public void testSimpleMapper(TestContext context) {
-    clearTable(context, SimpleIndexMapper.class.getSimpleName());
-    SimpleIndexMapper sm = new SimpleIndexMapper();
-    sm.name = "testName";
-    sm.setSecondProperty("my second property");
-    ResultContainer resultContainer = saveRecord(context, sm);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
+  public void testGeoIndex(TestContext context) {
+    clearTable(context, GeoMapper.class.getSimpleName());
+    IQuery<GeoMapper> q = getDataStore(context).createQuery(GeoMapper.class);
+    findAll(context, q);
+    checkIndex(context, q.getMapper(), "testindex");
   }
 
 }

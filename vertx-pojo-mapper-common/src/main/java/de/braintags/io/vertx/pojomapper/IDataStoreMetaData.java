@@ -13,6 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper;
 
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -32,4 +33,13 @@ public interface IDataStoreMetaData {
    *          the handler, which will be called to receive the version number
    */
   public void getVersion(Handler<AsyncResult<String>> handler);
+
+  /**
+   * Get information about an index inside the database
+   * 
+   * @param indexName
+   *          the name of the index to be checked
+   * @return an object , describing the index, or null, if index does not exists
+   */
+  public void getIndexInfo(String indexName, IMapper mapper, Handler<AsyncResult<Object>> handler);
 }

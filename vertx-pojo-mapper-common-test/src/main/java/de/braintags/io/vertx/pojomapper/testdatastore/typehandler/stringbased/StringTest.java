@@ -256,7 +256,7 @@ public class StringTest extends AbstractStringTypehandlerTest {
   @Test
   public void testGeoPoint(TestContext context) {
     GeoPoint point = new GeoPoint(new Position(14, 13));
-    String expectedString = "{\"type\":\"POINT\",\"coordinates\":[14.0,13.0]}";
+    String expectedString = "{\"type\":\"Point\",\"coordinates\":[14.0,13.0]}";
     toString(context, expectedString, point);
     fromString(context, expectedString, point);
   }
