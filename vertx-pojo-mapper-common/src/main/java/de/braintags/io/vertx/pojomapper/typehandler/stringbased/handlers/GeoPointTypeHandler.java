@@ -79,6 +79,9 @@ public class GeoPointTypeHandler extends AbstractTypeHandler {
   protected JsonObject encode(GeoSearchArgument source) {
     JsonObject ret = new JsonObject();
     ret.put("$geometry", encode((GeoPoint) source.getGeoJson()));
+    if (source.getDistance() >= 0) {
+      ret.put("$maxDistance", source.getDistance());
+    }
     return ret;
   }
 

@@ -39,6 +39,12 @@ public class TestGeoSearch extends DatastoreBaseTest {
     query.field("position").near(13.408, 52.518, 10);
     List<GeoMapper> found = (List<GeoMapper>) findAll(context, query);
     context.assertEquals(found.size(), 1, "wrong number of records");
+
+    query = getDataStore(context).createQuery(GeoMapper.class);
+    query.field("position").near(13.408, 52.518, 700000);
+    found = (List<GeoMapper>) findAll(context, query);
+    context.assertEquals(found.size(), 3, "wrong number of records");
+
   }
 
   public static void createDemoRecords(TestContext context) {

@@ -22,7 +22,7 @@ import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoJsonObject;
  */
 public class GeoSearchArgument {
   private final GeoJsonObject geoJson;
-  private int distance;
+  private int distance = -1;
 
   public GeoSearchArgument(GeoJsonObject geoJson, int distance) {
     this.geoJson = geoJson;
