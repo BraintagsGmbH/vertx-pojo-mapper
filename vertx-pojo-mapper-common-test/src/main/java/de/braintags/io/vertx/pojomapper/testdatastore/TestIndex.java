@@ -12,10 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.GeoMapper;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.GeoMapper2;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -31,10 +32,14 @@ public class TestIndex extends DatastoreBaseTest {
 
   @Test
   public void testGeoIndex(TestContext context) {
-    clearTable(context, GeoMapper.class.getSimpleName());
-    IQuery<GeoMapper> q = getDataStore(context).createQuery(GeoMapper.class);
+    clearTable(context, GeoMapper2.class.getSimpleName());
+    IQuery<GeoMapper2> q = getDataStore(context).createQuery(GeoMapper2.class);
     findAll(context, q);
     checkIndex(context, q.getMapper(), "testindex");
   }
 
+  @BeforeClass
+  public static void beforeClass(TestContext context) {
+    dropTable(context, GeoMapper2.class.getSimpleName());
+  }
 }

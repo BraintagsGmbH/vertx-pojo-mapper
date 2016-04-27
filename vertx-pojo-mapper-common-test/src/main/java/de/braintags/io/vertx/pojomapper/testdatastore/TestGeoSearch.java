@@ -15,6 +15,7 @@ package de.braintags.io.vertx.pojomapper.testdatastore;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
@@ -32,7 +33,7 @@ import io.vertx.ext.unit.TestContext;
 public class TestGeoSearch extends DatastoreBaseTest {
 
   @Test
-  public void testSearch(TestContext context) {
+  public void testGeoSearch(TestContext context) {
     clearTable(context, GeoMapper.class.getSimpleName());
     createDemoRecords(context);
     IQuery<GeoMapper> query = getDataStore(context).createQuery(GeoMapper.class);
@@ -61,7 +62,8 @@ public class TestGeoSearch extends DatastoreBaseTest {
     return new GeoMapper(p, name);
   }
 
-  // db.GeoMapper.find( "position" : { "$geoNear" : { $geometry : {"type": "POINT", "coordinates":[6.959,50.943]}"} } }
-  // )
-
+  @BeforeClass
+  public static void beforeClass(TestContext context) {
+    dropTable(context, GeoMapper.class.getSimpleName());
+  }
 }
