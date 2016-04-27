@@ -14,6 +14,7 @@
 package de.braintags.io.vertx.pojomapper.mysql;
 
 import de.braintags.io.vertx.pojomapper.IDataStoreMetaData;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -61,6 +62,17 @@ public class MySqlMetaData implements IDataStoreMetaData {
         handler.handle(Future.succeededFuture(version));
       }
     });
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStoreMetaData#getIndexInfo(java.lang.String,
+   * de.braintags.io.vertx.pojomapper.mapping.IMapper, io.vertx.core.Handler)
+   */
+  @Override
+  public void getIndexInfo(String indexName, IMapper mapper, Handler<AsyncResult<Object>> handler) {
+    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
   }
 
 }

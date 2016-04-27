@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.braintags.io.vertx.pojomapper.annotation.Index;
+import de.braintags.io.vertx.pojomapper.annotation.Indexes;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
@@ -66,11 +66,6 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
    */
   public SqlDataStoreSynchronizer(MySqlDataStore ds) {
     this.datastore = ds;
-  }
-
-  @Override
-  protected void syncIndex(Index index, Future<Void> f) {
-    f.fail(new UnsupportedOperationException());
   }
 
   @Override
@@ -260,6 +255,17 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
   @Override
   protected ISyncResult<String> getSyncResult() {
     return internalSyncResult;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.impl.AbstractDataStoreSynchronizer#syncIndexes(de.braintags.io.vertx.
+   * pojomapper.mapping.IMapper, de.braintags.io.vertx.pojomapper.annotation.Indexes, io.vertx.core.Handler)
+   */
+  @Override
+  protected void syncIndexes(IMapper mapper, Indexes indexes, Handler<AsyncResult<Void>> resultHandler) {
+    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
   }
 
 }
