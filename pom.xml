@@ -22,8 +22,8 @@
 		<module>vertx-pojo-mapper-common-test</module>
 		<module>vertx-pojo-mapper-json</module>
 		<module>vertx-pojongo</module>
-		<module>vertx-pojo-mapper-mysql</module>
-	</modules>
+<!-- 		<module>vertx-pojo-mapper-mysql</module>
+ -->	</modules>
 
 	<properties>
 		<jacoco.haltOnFailure>false</jacoco.haltOnFailure>

@@ -446,13 +446,13 @@ public class Mapper implements IMapper {
   private void executeLifecycleMethods(Object entity, Handler<AsyncResult<Void>> handler, List<IMethodProxy> methods) {
     CounterObject<Void> co = new CounterObject<>(methods.size(), handler);
     for (IMethodProxy mp : methods) {
-      LOGGER.info("execute lifecycle method: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
+      LOGGER.debug("execute lifecycle method: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
       executeMethod(mp, entity, result -> {
         if (result.failed()) {
           co.setThrowable(result.cause());
         } else {
           if (co.reduce()) {
-            LOGGER.info("finished Lifecycle: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
+            LOGGER.debug("finished Lifecycle: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
             handler.handle(result);
           }
         }
@@ -478,7 +478,7 @@ public class Mapper implements IMapper {
         : new Object[] {
             getMapperFactory().getDataStore().getTriggerContextFactory().createTriggerContext(this, handler) };
     try {
-      LOGGER.info("invoking trigger method " + getMapperClass().getSimpleName() + " - " + method.getName());
+      LOGGER.debug("invoking trigger method " + getMapperClass().getSimpleName() + " - " + method.getName());
       method.invoke(entity, args);
       if (args == null) {
         // ONLY INFORM HANDLER, if no TriggerContext is given
