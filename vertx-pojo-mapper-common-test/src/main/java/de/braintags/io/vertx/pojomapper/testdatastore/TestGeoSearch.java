@@ -31,18 +31,25 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class TestGeoSearch extends DatastoreBaseTest {
+  private double sLong = 6.775763;
+  private double sLat = 51.224906;
 
   @Test
   public void testGeoSearch(TestContext context) {
     clearTable(context, GeoMapper.class.getSimpleName());
     createDemoRecords(context);
     IQuery<GeoMapper> query = getDataStore(context).createQuery(GeoMapper.class);
-    query.field("position").near(13.408, 52.518, 10);
+    query.field("position").near(sLong, sLat, 10);
     List<GeoMapper> found = (List<GeoMapper>) findAll(context, query);
     context.assertEquals(found.size(), 1, "wrong number of records");
 
     query = getDataStore(context).createQuery(GeoMapper.class);
-    query.field("position").near(13.408, 52.518, 700000);
+    query.field("position").near(sLong, sLat, 70000);
+    found = (List<GeoMapper>) findAll(context, query);
+    context.assertEquals(found.size(), 2, "wrong number of records");
+
+    query = getDataStore(context).createQuery(GeoMapper.class);
+    query.field("position").near(sLong, sLat, 700000);
     found = (List<GeoMapper>) findAll(context, query);
     context.assertEquals(found.size(), 3, "wrong number of records");
 
@@ -50,14 +57,14 @@ public class TestGeoSearch extends DatastoreBaseTest {
 
   public static void createDemoRecords(TestContext context) {
     List<GeoMapper> list = new ArrayList<>();
-    list.add(createPoint(6.81, 51.235, "Berlin"));
-    list.add(createPoint(13.408, 52.518, "Düsseldorf"));
-    list.add(createPoint(6.959, 50.943, "Köln"));
+    list.add(createPoint(13.4111, 52.5236, "Berlin"));
+    list.add(createPoint(6.775763, 51.224906, "Düsseldorf"));
+    list.add(createPoint(6.95982, 50.940906, "Köln"));
     saveRecords(context, list);
     // getDataStore(context).
   }
 
-  private static GeoMapper createPoint(double x, double y, String name) {
+  public static GeoMapper createPoint(double x, double y, String name) {
     GeoPoint p = new GeoPoint(new Position(x, y));
     return new GeoMapper(p, name);
   }

@@ -246,19 +246,21 @@ public abstract class DatastoreBaseTest {
     query.executeCount(result -> {
       try {
         resultContainer.queryResultCount = result.result();
+        logger.info(
+            resultContainer.queryResultCount.getOriginalQuery() + ": " + resultContainer.queryResultCount.getCount());
         checkQueryResultCount(context, result, expectedResult);
-        logger.info(resultContainer.queryResultCount.getOriginalQuery());
       } catch (AssertionError e) {
         resultContainer.assertionError = e;
       } catch (Throwable e) {
         resultContainer.assertionError = new AssertionError(e);
       } finally {
         async.complete();
-        ;
       }
     });
 
     async.await();
+    if (resultContainer.assertionError != null)
+      throw new RuntimeException(resultContainer.assertionError);
     return resultContainer;
   }
 

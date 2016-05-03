@@ -161,7 +161,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
   }
 
   /**
-   * Create the argument for query parts, which define one single argument
+   * Create the argument for query parts, which define multiple arguments
    * 
    * @param fieldParameter
    * @param resultHandler
@@ -184,8 +184,10 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
     }
     int count = Size.size((Iterable<?>) valueIterable);
     if (count == 0) {
-      resultHandler
-          .handle(Future.failedFuture(new QueryParameterException("multivalued argument but no values defined")));
+      String message = String.format(
+          "multivalued argument but no values defined for search in field %s.%s with operator '%s'",
+          field.getMapper().getMapperClass().getName(), field.getName(), fieldParameter.getOperator());
+      resultHandler.handle(Future.failedFuture(new QueryParameterException(message)));
       return;
     }
     iterateMultipleValues(field, ci, operator, count, (Iterable<?>) valueIterable, resultHandler);
