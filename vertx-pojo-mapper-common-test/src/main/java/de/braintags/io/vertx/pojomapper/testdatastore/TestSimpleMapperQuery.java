@@ -168,6 +168,20 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
    * Search:
    */
   @Test
+  public void testContainsCaseInsensitive(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    query.field("secondProperty").contains("AB");
+
+    ResultContainer resultContainer = find(context, query, 3);
+    if (resultContainer.assertionError != null)
+      throw resultContainer.assertionError;
+  }
+
+  /**
+   * Search:
+   */
+  @Test
   public void testStartsWith(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);

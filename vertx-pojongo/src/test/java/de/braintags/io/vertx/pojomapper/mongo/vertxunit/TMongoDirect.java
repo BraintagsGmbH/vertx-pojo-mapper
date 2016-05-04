@@ -42,7 +42,7 @@ import io.vertx.ext.unit.TestContext;
 public class TMongoDirect extends DatastoreBaseTest {
   private static Logger LOGGER = LoggerFactory.getLogger(TMongoDirect.class);
   private static final int LOOP = 500;
-  private static final String EXPECTED_VERSION_STARTS_WITH = "3.0.";
+  private static final String EXPECTED_VERSION_STARTS_WITH = "3.";
 
   @Test
   public void checkVersion(TestContext context) {

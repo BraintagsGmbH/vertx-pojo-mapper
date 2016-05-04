@@ -106,6 +106,9 @@ public class MongoQueryExpression implements IQueryExpression {
       add(fieldName, value);
     } else {
       JsonObject arg = new JsonObject().put(logic, value);
+      if ("$regex".equals(logic)) { // adding option for case insensitive query
+        arg.put("$options", "i");
+      }
       add(fieldName, arg);
     }
     return this;
@@ -135,7 +138,7 @@ public class MongoQueryExpression implements IQueryExpression {
 
   @Override
   public String toString() {
-    return String.valueOf(qDef);
+    return String.valueOf(qDef) + " | sort: " + String.valueOf(sortArguments);
   }
 
   /*
