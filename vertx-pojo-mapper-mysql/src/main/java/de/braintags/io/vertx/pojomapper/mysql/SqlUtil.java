@@ -16,13 +16,19 @@ package de.braintags.io.vertx.pojomapper.mysql;
 import java.util.Arrays;
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.annotation.Index;
+import de.braintags.io.vertx.pojomapper.annotation.Indexes;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mysql.exception.SqlException;
+import de.braintags.io.vertx.util.CounterObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
+import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
@@ -49,6 +55,118 @@ public class SqlUtil {
   private static final List<String> DATE_TYPES = Arrays.asList("DATE", "DATETIME", "TIMESTAMP", "TIME", "YEAR");
 
   private SqlUtil() {
+  }
+
+  /**
+   * Create indexes which are defined by the given {@link Index}
+   * 
+   * @param ds
+   *          the datastore
+   * @param collection
+   *          the name of the collection to be used
+   * @param indexes
+   *          the index definition
+   * @param handler
+   *          the handler to be informed
+   */
+  public static final void createIndexes(MySqlDataStore ds, String tableName, Indexes indexes,
+      Handler<AsyncResult<String>> handler) {
+    if (indexes == null || indexes.value().length == 0) {
+      handler.handle(Future.succeededFuture("No indexes defined"));
+    } else {
+      CounterObject<String> co = new CounterObject<>(indexes.value().length, handler);
+      Buffer returnBuffer = Buffer.buffer();
+      for (Index index : indexes.value()) {
+        if (co.isError()) {
+          break;
+        }
+        createIndex(ds, tableName, index, result -> {
+          if (result.failed()) {
+            co.setThrowable(result.cause());
+          } else {
+            returnBuffer.appendString(result.result());
+            if (co.reduce()) {
+              co.setResult(returnBuffer.toString());
+            }
+          }
+        });
+      }
+    }
+
+  }
+
+  public static final short INDEX_EXISTS = 0;
+  public static final short INDEX_NOT_EXISTS = 1;
+  public static final short INDEX_MODIFIED = 2;
+
+  private static final void createIndex(MySqlDataStore ds, String tableName, Index index,
+      Handler<AsyncResult<String>> handler) {
+
+    checkIndexExists(ds, tableName, index, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        switch (result.result().state) {
+        case INDEX_EXISTS:
+          handler.handle(Future.succeededFuture("Index exists: " + index.name()));
+          break;
+
+        case INDEX_NOT_EXISTS:
+          createIndex(ds, tableName, index, result.result(), handler);
+          break;
+
+        case INDEX_MODIFIED:
+          modifyIndex(ds, tableName, index, result.result(), handler);
+          break;
+
+        default:
+          handler
+              .handle(Future.failedFuture(new UnsupportedOperationException("unsupported result: " + result.result())));
+          break;
+        }
+      }
+    });
+  }
+
+  private static void createIndex(MySqlDataStore ds, String tableName, Index index, IndexResult res,
+      Handler<AsyncResult<String>> handler) {
+    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+  }
+
+  private static void modifyIndex(MySqlDataStore ds, String tableName, Index index, IndexResult res,
+      Handler<AsyncResult<String>> handler) {
+    handler.handle(Future.succeededFuture("Index NOT modified: " + index.name()));
+  }
+
+  private static final void checkIndexExists(MySqlDataStore ds, String tableName, Index index,
+      Handler<AsyncResult<IndexResult>> handler) {
+    String command = "SHOW INDEX FROM " + tableName;
+    MySQLClient client = (MySQLClient) ds.getClient();
+    query(client, command, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        List<JsonObject> results = result.result().getRows();
+        IndexResult res = null;
+        for (JsonObject entry : results) {
+          String indexName = entry.getString("Key_name");
+          if (indexName == null || indexName.hashCode() == 0) {
+            handler.handle(Future.failedFuture(new SqlException("Could not determine index name")));
+          } else if (indexName.equals(index.name())) {
+            res = compare(entry, index);
+            break;
+          }
+        }
+        res = res == null ? new IndexResult(INDEX_NOT_EXISTS) : res;
+        handler.handle(Future.succeededFuture(res));
+      }
+    });
+  }
+
+  private static IndexResult compare(JsonObject existingIndex, Index indexDef) {
+    IndexResult res = new IndexResult(INDEX_EXISTS);
+    res.read = existingIndex;
+    return res;
   }
 
   /**
@@ -389,5 +507,14 @@ public class SqlUtil {
         resultHandler.handle(Future.succeededFuture(qr.result()));
       }
     });
+  }
+
+  private static class IndexResult {
+    short state = -1;
+    JsonObject read;
+
+    IndexResult(short state) {
+      this.state = state;
+    }
   }
 }
