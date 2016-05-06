@@ -117,6 +117,18 @@ public final class MongoUtil {
     });
   }
 
+  /**
+   * Create indexes which are defined by the given {@link Index}
+   * 
+   * @param ds
+   *          the datastore
+   * @param collection
+   *          the name of the collection to be used
+   * @param indexes
+   *          the index definition
+   * @param handler
+   *          the handler to be informed with the result of the index creation
+   */
   public static final void createIndexes(MongoDataStore ds, String collection, Indexes indexes,
       Handler<AsyncResult<JsonObject>> handler) {
     try {

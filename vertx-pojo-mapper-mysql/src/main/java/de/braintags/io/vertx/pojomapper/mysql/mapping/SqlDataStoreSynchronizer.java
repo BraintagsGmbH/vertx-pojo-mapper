@@ -265,7 +265,13 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
    */
   @Override
   protected void syncIndexes(IMapper mapper, Indexes indexes, Handler<AsyncResult<Void>> resultHandler) {
-    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    SqlUtil.createIndexes(datastore, mapper.getTableInfo().getName(), mapper.getIndexDefinitions(), result -> {
+      if (result.failed()) {
+        resultHandler.handle(Future.failedFuture(result.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture());
+      }
+    });
   }
 
 }
