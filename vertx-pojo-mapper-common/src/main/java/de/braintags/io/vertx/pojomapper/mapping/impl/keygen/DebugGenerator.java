@@ -47,4 +47,8 @@ public class DebugGenerator extends AbstractKeyGenerator {
     handler.handle(Future.succeededFuture(new Key(++counter)));
   }
 
+  public void resetCounter() {
+    counter = 0;
+  }
+
 }
