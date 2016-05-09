@@ -16,8 +16,11 @@ package de.braintags.io.vertx.pojomapper.mysql;
 import java.util.Arrays;
 import java.util.List;
 
+import com.github.mauricio.async.db.mysql.exceptions.MySQLException;
+
 import de.braintags.io.vertx.pojomapper.annotation.Index;
 import de.braintags.io.vertx.pojomapper.annotation.Indexes;
+import de.braintags.io.vertx.pojomapper.exception.DuplicateKeyException;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mysql.exception.SqlException;
 import de.braintags.io.vertx.util.CounterObject;
@@ -496,10 +499,15 @@ public class SqlUtil {
       Handler<AsyncResult<UpdateResult>> resultHandler) {
     connection.updateWithParams(command, params, qr -> {
       if (qr.failed()) {
-        Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command + " | " + params, qr.cause());
-        LOGGER.error("", sqlEx);
         connection.close();
-        resultHandler.handle(Future.failedFuture(sqlEx));
+        Throwable error = qr.cause();
+        if (error instanceof MySQLException && error.getMessage().indexOf("Duplicate entry") >= 0
+            && error.getMessage().indexOf("for key 'PRIMARY'") >= 0) {
+          resultHandler.handle(Future.failedFuture(new DuplicateKeyException(error)));
+        } else {
+          Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command + " | " + params, error);
+          resultHandler.handle(Future.failedFuture(sqlEx));
+        }
       } else {
         LOGGER.debug(COMMAND_SUCCESS);
         connection.close();
