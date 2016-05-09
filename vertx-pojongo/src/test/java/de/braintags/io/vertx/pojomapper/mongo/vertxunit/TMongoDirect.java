@@ -63,12 +63,14 @@ public class TMongoDirect extends DatastoreBaseTest {
 
   @Test
   public void executeNativeQuery(TestContext context) {
+    LOGGER.info("executing executeNativeQuery");
     MongoDataStore ds = (MongoDataStore) getDataStore(context);
     clearTable(context, MiniMapper.class);
     List<MiniMapper> write = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
       write.add(new MiniMapper("native " + i));
     }
+    LOGGER.info("saving records");
     saveRecords(context, write);
     IQuery<MiniMapper> query = ds.createQuery(MiniMapper.class);
     String qs = "{\"name\":{\"$regex\":\".*native.*\"}}";
