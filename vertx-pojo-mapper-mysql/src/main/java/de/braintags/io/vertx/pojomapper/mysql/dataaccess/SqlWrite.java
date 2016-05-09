@@ -22,7 +22,9 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
+import de.braintags.io.vertx.pojomapper.exception.DuplicateKeyException;
 import de.braintags.io.vertx.pojomapper.exception.InsertException;
+import de.braintags.io.vertx.pojomapper.exception.WriteException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
@@ -89,6 +91,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     for (IStoreObject<?> sto : storeObjects) {
       saveStoreObject((SqlStoreObject) sto, rr, saveResult -> {
         if (saveResult.failed()) {
+          LOGGER.error("", saveResult.cause());
           co.setThrowable(saveResult.cause());
         } else if (co.reduce()) {
           if (rr.size() != saveSize) {
@@ -142,7 +145,6 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     } else {
       SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), seq.getSqlStatement(), seq.getParameters(),
           updateResult -> {
-
             checkUpdateResult(seq, updateResult, checkResult -> {
               if (checkResult.failed()) {
                 resultHandler.handle(checkResult);
@@ -218,12 +220,34 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         updateResult -> {
           checkUpdateResult(seq, updateResult, checkResult -> {
             if (checkResult.failed()) {
-              resultHandler.handle(checkResult);
+              handleInsertError(checkResult.cause(), storeObject, writeResult, resultHandler);
             } else {
               finishInsert(storeObject, writeResult, resultHandler);
             }
           });
         });
+  }
+
+  private void handleInsertError(Throwable t, SqlStoreObject storeObject, IWriteResult writeResult,
+      Handler<AsyncResult<Void>> resultHandler) {
+    if (t instanceof DuplicateKeyException) {
+      if (getMapper().getKeyGenerator() != null) {
+        LOGGER.info("duplicate key, regenerating a new key");
+        storeObject.generateSqlInsertStatement(niResult -> {
+          if (niResult.failed()) {
+            resultHandler.handle(Future.failedFuture(
+                new WriteException("Could not generate new ID after duplicate key error", niResult.cause())));
+          } else {
+            insertWithParameters(storeObject, writeResult, niResult.result(), resultHandler);
+          }
+        });
+      } else {
+        resultHandler.handle(Future
+            .failedFuture(new WriteException("Duplicate key error on insert, but no KeyGenerator is defined", t)));
+      }
+    } else {
+      resultHandler.handle(Future.failedFuture(new WriteException(t)));
+    }
   }
 
   /**
@@ -237,7 +261,9 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   private void checkUpdateResult(SqlSequence seq, AsyncResult<UpdateResult> updateResult,
       Handler<AsyncResult<Void>> resultHandler) {
     if (updateResult.failed()) {
-      resultHandler.handle(Future.failedFuture(updateResult.cause()));
+      Exception we = updateResult.cause() instanceof DuplicateKeyException
+          ? (DuplicateKeyException) updateResult.cause() : new WriteException(updateResult.cause());
+      resultHandler.handle(Future.failedFuture(we));
     } else {
       UpdateResult res = updateResult.result();
       if (res.getUpdated() != 1) {
