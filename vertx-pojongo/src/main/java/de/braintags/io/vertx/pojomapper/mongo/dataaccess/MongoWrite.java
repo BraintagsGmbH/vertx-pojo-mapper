@@ -16,6 +16,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
+import de.braintags.io.vertx.pojomapper.exception.WriteException;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.util.CounterObject;
@@ -75,10 +76,13 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   private void save(T entity, IWriteResult writeResult, Handler<AsyncResult<Void>> resultHandler) {
     getDataStore().getMapperFactory().getStoreObjectFactory().createStoreObject(getMapper(), entity, result -> {
       if (result.failed()) {
-        resultHandler.handle(Future.failedFuture(result.cause()));
+        WriteException we = new WriteException(result.cause());
+        LOG.info("failed", we);
+        resultHandler.handle(Future.failedFuture(we));
       } else {
         doSave(entity, (MongoStoreObject) result.result(), writeResult, sResult -> {
           if (sResult.failed()) {
+            LOG.info("failed", sResult.cause());
             resultHandler.handle(Future.failedFuture(sResult.cause()));
           } else {
             resultHandler.handle(Future.succeededFuture());
@@ -112,14 +116,35 @@ public class MongoWrite<T> extends AbstractWrite<T> {
     String collection = mapper.getTableInfo().getName();
     mongoClient.insert(collection, storeObject.getContainer(), result -> {
       if (result.failed()) {
-        LOG.info("failed", result.cause());
-        resultHandler.handle(Future.failedFuture(result.cause()));
+        handleInsertError(result.cause(), entity, storeObject, writeResult, resultHandler);
       } else {
         LOG.debug("inserted");
         Object id = result.result() == null ? storeObject.generatedId : result.result();
         finishInsert(id, entity, storeObject, writeResult, resultHandler);
       }
     });
+  }
+
+  private void handleInsertError(Throwable t, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
+      Handler<AsyncResult<Void>> resultHandler) {
+    if (t.getMessage().indexOf("duplicate key error index") >= 0) {
+      if (getMapper().getKeyGenerator() != null) {
+        LOG.info("duplicate key, regenerating a new key");
+        storeObject.getNextId(niResult -> {
+          if (niResult.failed()) {
+            resultHandler.handle(Future.failedFuture(
+                new WriteException("Could not generate new ID after duplicate key error", niResult.cause())));
+          } else {
+            doInsert(entity, storeObject, writeResult, resultHandler);
+          }
+        });
+      } else {
+        resultHandler.handle(Future
+            .failedFuture(new WriteException("Duplicate key error on insert, but no KeyGenerator is defined", t)));
+      }
+    } else {
+      resultHandler.handle(Future.failedFuture(new WriteException(t)));
+    }
   }
 
   private void doUpdate(T entity, MongoStoreObject storeObject, IWriteResult writeResult,
@@ -134,8 +159,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
 
     mongoClient.save(collection, storeObject.getContainer(), result -> {
       if (result.failed()) {
-        LOG.info("failed", result.cause());
-        resultHandler.handle(Future.failedFuture(result.cause()));
+        resultHandler.handle(Future.failedFuture(new WriteException(result.cause())));
       } else {
         LOG.debug("updated");
         finishUpdate(currentId, entity, storeObject, writeResult, resultHandler);

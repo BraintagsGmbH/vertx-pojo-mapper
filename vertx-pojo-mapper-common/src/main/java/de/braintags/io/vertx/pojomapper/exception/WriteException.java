@@ -15,32 +15,32 @@
 package de.braintags.io.vertx.pojomapper.exception;
 
 /**
- * An InsertException is thrown, when during insert of a record into the gateway an error occured
+ * An WriteException is thrown, when during writing a record into the gateway an error occured
  * 
  * @author Michael Remme
  * 
  */
 
-public class InsertException extends RuntimeException {
+public class WriteException extends RuntimeException {
 
   /**
    * 
    */
-  public InsertException() {
+  public WriteException() {
     super();
   }
 
   /**
    * @param message
    */
-  public InsertException(String message) {
+  public WriteException(String message) {
     super(message);
   }
 
   /**
    * @param cause
    */
-  public InsertException(Throwable cause) {
+  public WriteException(Throwable cause) {
     super(cause);
   }
 
@@ -48,7 +48,7 @@ public class InsertException extends RuntimeException {
    * @param message
    * @param cause
    */
-  public InsertException(String message, Throwable cause) {
+  public WriteException(String message, Throwable cause) {
     super(message, cause);
   }
 
@@ -58,7 +58,7 @@ public class InsertException extends RuntimeException {
    * @param enableSuppression
    * @param writableStackTrace
    */
-  public InsertException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+  public WriteException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 

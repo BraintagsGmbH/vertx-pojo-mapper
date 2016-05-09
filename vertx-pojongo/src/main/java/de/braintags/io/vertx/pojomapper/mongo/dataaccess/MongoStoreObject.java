@@ -80,7 +80,7 @@ public class MongoStoreObject extends JsonStoreObject {
    * 
    * @param handler
    */
-  private void getNextId(Handler<AsyncResult<Void>> handler) {
+  public void getNextId(Handler<AsyncResult<Void>> handler) {
     IKeyGenerator gen = getMapper().getKeyGenerator();
     gen.generateKey(getMapper(), keyResult -> {
       if (keyResult.failed()) {
