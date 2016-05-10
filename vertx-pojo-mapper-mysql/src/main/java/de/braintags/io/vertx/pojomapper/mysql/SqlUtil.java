@@ -31,7 +31,6 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
-import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
@@ -144,7 +143,7 @@ public class SqlUtil {
   private static final void checkIndexExists(MySqlDataStore ds, String tableName, Index index,
       Handler<AsyncResult<IndexResult>> handler) {
     String command = "SHOW INDEX FROM " + tableName;
-    MySQLClient client = (MySQLClient) ds.getClient();
+    AsyncSQLClient client = (AsyncSQLClient) ds.getClient();
     query(client, command, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
