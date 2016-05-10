@@ -37,6 +37,12 @@ public abstract class AbstractDateTypeHandler extends AbstractTypeHandler {
   private static DateFormat timeFormater = new SimpleDateFormat(TIME_FORMAT_PATTERN);
   private static DateFormat dateTimeFormater = new SimpleDateFormat(DATETIME_FORMAT_PATTERN);
 
+  public static final Calendar DEFAULT_CALENDER = Calendar.getInstance();
+
+  static {
+    DEFAULT_CALENDER.setTimeInMillis(0);
+  }
+
   /**
    * @param typeHandlerFactory
    * @param classesToDeal
@@ -62,13 +68,17 @@ public abstract class AbstractDateTypeHandler extends AbstractTypeHandler {
   }
 
   protected Calendar parseDate(String dateString) {
-    try {
-      Date date = dateFormater.parse(dateString);
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(date);
-      return cal;
-    } catch (ParseException e) {
-      throw new DateParseException(e);
+    if (dateString == null || dateString.trim().hashCode() == 0) {
+      return DEFAULT_CALENDER;
+    } else {
+      try {
+        Date date = dateFormater.parse(dateString);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal;
+      } catch (ParseException e) {
+        throw new DateParseException(e);
+      }
     }
   }
 
@@ -77,13 +87,17 @@ public abstract class AbstractDateTypeHandler extends AbstractTypeHandler {
   }
 
   protected Calendar parseTime(String dateString) {
-    try {
-      Date date = timeFormater.parse(dateString);
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(date);
-      return cal;
-    } catch (ParseException e) {
-      throw new DateParseException(e);
+    if (dateString == null || dateString.trim().hashCode() == 0) {
+      return DEFAULT_CALENDER;
+    } else {
+      try {
+        Date date = timeFormater.parse(dateString);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal;
+      } catch (ParseException e) {
+        throw new DateParseException(e);
+      }
     }
   }
 
@@ -92,13 +106,17 @@ public abstract class AbstractDateTypeHandler extends AbstractTypeHandler {
   }
 
   protected Calendar parseDateTime(String dateString) {
-    try {
-      Date date = dateTimeFormater.parse(dateString);
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(date);
-      return cal;
-    } catch (ParseException e) {
-      throw new DateParseException(e);
+    if (dateString == null || dateString.trim().hashCode() == 0) {
+      return DEFAULT_CALENDER;
+    } else {
+      try {
+        Date date = dateTimeFormater.parse(dateString);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal;
+      } catch (ParseException e) {
+        throw new DateParseException(e);
+      }
     }
   }
 
