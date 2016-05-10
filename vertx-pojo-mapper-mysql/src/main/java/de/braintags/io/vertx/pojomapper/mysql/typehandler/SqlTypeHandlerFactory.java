@@ -26,15 +26,14 @@ import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeH
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.DateTypeHandler;
+import de.braintags.io.vertx.pojomapper.json.typehandler.handler.GeoPointTypeHandlerJson;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.IdTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandler;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandler;
-import de.braintags.io.vertx.pojomapper.json.typehandler.handler.GeoPointTypeHandlerJson;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
-import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.GeoPointTypeHandler;
 
 /**
  * {@link ITypeHandlerFactory} for use with Sql
@@ -74,7 +73,7 @@ public class SqlTypeHandlerFactory extends JsonTypeHandlerFactory {
         .add(new de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.JsonTypeHandler(this));
 
     remove(GeoPointTypeHandlerJson.class);
-    getDefinedTypeHandlers().add(new GeoPointTypeHandler(this));
+    getDefinedTypeHandlers().add(new SqlGeoPointTypeHandler(this));
 
     remove(ArrayTypeHandler.class);
     getDefinedTypeHandlers().add(new SqlArrayTypehandler(this));

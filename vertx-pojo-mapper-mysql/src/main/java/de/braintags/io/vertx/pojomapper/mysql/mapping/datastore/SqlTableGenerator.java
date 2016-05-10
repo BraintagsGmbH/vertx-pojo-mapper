@@ -31,7 +31,6 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.DateC
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.DoubleColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.EmbeddedColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.EnumColumnHandler;
-import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.GeoJsonColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.IntegerColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.JsonColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.LocaleColumnHandler;
@@ -42,6 +41,7 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.Refer
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.ShortColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.StringColumnHandler;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.UriColumnHandler;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.geo.GeoPointColumnHandler;
 
 /**
  * An implementation for SQL datastores
@@ -68,7 +68,7 @@ public class SqlTableGenerator extends DefaultTableGenerator {
     definedColumnHandlers.add(new ClassColumnHandler());
     definedColumnHandlers.add(new UriColumnHandler());
     definedColumnHandlers.add(new JsonColumnHandler());
-    definedColumnHandlers.add(new GeoJsonColumnHandler());
+    definedColumnHandlers.add(new GeoPointColumnHandler());
     definedColumnHandlers.add(new CollectionColumnHandler());
     definedColumnHandlers.add(new MapColumnHandler());
     definedColumnHandlers.add(new ArrayColumnHandler());
