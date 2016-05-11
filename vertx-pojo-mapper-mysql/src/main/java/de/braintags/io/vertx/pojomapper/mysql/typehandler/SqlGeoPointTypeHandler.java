@@ -15,6 +15,7 @@ import io.vertx.core.Handler;
  * 
  */
 public class SqlGeoPointTypeHandler extends AbstractTypeHandler {
+  private static final String CREATE_STRING = "ST_GeomFromText('POINT( %s %s)')";
 
   /**
    * Constructor with parent {@link ITypeHandlerFactory}
@@ -46,8 +47,28 @@ public class SqlGeoPointTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    String createString = "10 10";
-    success(source == null ? source : createString, resultHandler);
+    if (source != null && ((GeoPoint) source).getCoordinates() != null
+        && ((GeoPoint) source).getCoordinates().getValues().size() == 2) {
+      String content = String.format(CREATE_STRING, ((GeoPoint) source).getCoordinates().getValues().get(0),
+          ((GeoPoint) source).getCoordinates().getValues().get(1));
+      success(new SqlFunction("ST_GeomFromText", content), resultHandler);
+    } else {
+      success(null, resultHandler);
+    }
   }
 
+  public static class SqlFunction {
+    private String functionName;
+    private String content;
+
+    public SqlFunction(String name, String content) {
+      this.functionName = name;
+      this.content = content;
+    }
+
+    @Override
+    public String toString() {
+      throw new UnsupportedOperationException();
+    }
+  }
 }

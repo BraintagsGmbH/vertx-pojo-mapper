@@ -232,4 +232,41 @@ public class TestSqlExpressions extends DatastoreBaseTest {
     });
   }
 
+  @Test
+  public void testGeoDirect(TestContext context) {
+    Async async = context.async();
+    String insertExpression = "insert into GeoPointRecord set id=9, point = GeomFromText('POINT(18 -63)')";
+
+    SqlUtil.update((MySqlDataStore) getDataStore(context), insertExpression, ur -> {
+      if (ur.failed()) {
+        LOGGER.error("Error deleting", ur.cause());
+        async.complete();
+      } else {
+        UpdateResult res = ur.result();
+        LOGGER.info("deleted: " + res.getUpdated());
+        async.complete();
+      }
+    });
+  }
+
+  @Test
+  public void testGeo(TestContext context) {
+    Async async = context.async();
+    // JsonArray array = new JsonArray().add(9).add(new SqlGeoPointTypeHandler.SqlFunction("GeomFromText", "POINT(18
+    // -63)"));
+    JsonArray array = new JsonArray().add(9).add("GeomFromText('POINT(18 -63)')");
+    String insertExpression = "insert into GeoPointRecord set id=?, point = ? ";
+
+    SqlUtil.updateWithParams((MySqlDataStore) getDataStore(context), insertExpression, array, ur -> {
+      if (ur.failed()) {
+        LOGGER.error("Error deleting", ur.cause());
+        async.complete();
+      } else {
+        UpdateResult res = ur.result();
+        LOGGER.info("deleted: " + res.getUpdated());
+        async.complete();
+      }
+    });
+  }
+
 }
