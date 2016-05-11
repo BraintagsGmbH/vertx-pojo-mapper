@@ -20,7 +20,6 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.AbstractStoreObjectFactory;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
 
 /**
  * 
@@ -50,7 +49,7 @@ public class SqlStoreObjectFactory extends AbstractStoreObjectFactory {
 
   @Override
   public void createStoreObject(Object storedObject, IMapper mapper, Handler<AsyncResult<IStoreObject<?>>> handler) {
-    SqlStoreObject storeObject = new SqlStoreObject((JsonObject) storedObject, mapper);
+    SqlStoreObject storeObject = new SqlStoreObject(storedObject, mapper);
     storeObject.initToEntity(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));

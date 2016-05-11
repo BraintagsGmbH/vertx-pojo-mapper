@@ -13,15 +13,18 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-import de.braintags.io.vertx.pojomapper.json.dataaccess.JsonStoreObject;
+import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
+import de.braintags.io.vertx.pojomapper.mapping.impl.AbstractStoreObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -35,26 +38,74 @@ import io.vertx.core.json.JsonObject;
  * 
  */
 
-public class SqlStoreObject extends JsonStoreObject {
+public class SqlStoreObject extends AbstractStoreObject<Object> {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(SqlStoreObject.class);
 
   /**
-   * Creates a new instance by using a POJO. This constructor is usually used, when a pojo shall be stored
-   * 
    * @param mapper
    * @param entity
+   * @param container
    */
   public SqlStoreObject(IMapper mapper, Object entity) {
-    super(mapper, entity);
+    super(mapper, entity, new HashMap<>());
   }
 
   /**
-   * Creates a new instance by using the result of a query inside the database
-   * 
-   * @param rowResult
+   * @param container
    * @param mapper
    */
-  public SqlStoreObject(JsonObject rowResult, IMapper mapper) {
-    super(rowResult, mapper);
+  public SqlStoreObject(Object container, IMapper mapper) {
+    super(container, mapper);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#get(de.braintags.io.vertx.pojomapper.mapping.IField)
+   */
+  @Override
+  public Object get(IField field) {
+    String colName = field.getColumnInfo().getName();
+    Object container = getContainer();
+    return container instanceof JsonObject ? ((JsonObject) container).getValue(colName)
+        : ((Map<String, Object>) container).get(colName);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.mapping.IStoreObject#hasProperty(de.braintags.io.vertx.pojomapper.mapping.IField)
+   */
+  @Override
+  public boolean hasProperty(IField field) {
+    String colName = field.getColumnInfo().getName();
+    return container instanceof JsonObject ? ((JsonObject) container).containsKey(colName)
+        : ((Map<String, Object>) container).containsKey(colName);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#put(de.braintags.io.vertx.pojomapper.mapping.IField,
+   * java.lang.Object)
+   */
+  @Override
+  public IStoreObject<Object> put(IField field, Object value) {
+    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
+    if (ci == null) {
+      throw new MappingException("Can't find columninfo for field " + field.getFullName());
+    }
+    if (field.isIdField() && value != null) {
+      setNewInstance(false);
+    }
+    if (container instanceof JsonObject) {
+      ((JsonObject) container).put(ci.getName(), value);
+    } else {
+      ((Map<String, Object>) container).put(ci.getName(), value);
+    }
+    return this;
   }
 
   /**
@@ -73,13 +124,13 @@ public class SqlStoreObject extends JsonStoreObject {
           sequence.addEntry(field.getColumnInfo().getName(), get(field));
         }
       }
-      getNextId(tInfo, sequence, resultHandler);
+      getNextId(sequence, resultHandler);
     } catch (Exception e) {
       resultHandler.handle(Future.failedFuture(e));
     }
   }
 
-  private void getNextId(ITableInfo tInfo, SqlSequence sequence, Handler<AsyncResult<SqlSequence>> resultHandler) {
+  private void getNextId(SqlSequence sequence, Handler<AsyncResult<SqlSequence>> resultHandler) {
     IKeyGenerator gen = this.getMapper().getKeyGenerator();
     if (gen == null) {
       throw new UnsupportedOperationException(String.format(

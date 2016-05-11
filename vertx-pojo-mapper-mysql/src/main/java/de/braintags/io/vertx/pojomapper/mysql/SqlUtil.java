@@ -407,7 +407,7 @@ public class SqlUtil {
    */
   public static void update(MySqlDataStore datastore, String command,
       Handler<AsyncResult<UpdateResult>> resultHandler) {
-    update((MySqlDataStore) datastore.getClient(), command, resultHandler);
+    update((AsyncSQLClient) datastore.getClient(), command, resultHandler);
   }
 
   /**
