@@ -300,7 +300,7 @@ public class Mapper implements IMapper {
     return new MappedField(field, accessor, this);
   }
 
-  private void addMappedField(String name, MappedField mf) {
+  protected void addMappedField(String name, MappedField mf) {
     if (mf.hasAnnotation(Id.class)) {
       if (idField != null)
         throw new MappingException("duplicate Id field definition found for mapper " + getMapperClass());

@@ -20,13 +20,13 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
-import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlDelete;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQuery;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlWrite;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlDataStoreSynchronizer;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlMapperFactory;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlTableGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlTypeHandlerFactory;
 import io.vertx.core.AsyncResult;
@@ -62,7 +62,7 @@ public class MySqlDataStore extends AbstractDataStore {
     super(vertx, properties);
     this.sqlClient = sqlClient;
     metaData = new MySqlMetaData(sqlClient);
-    setMapperFactory(new MapperFactory(this, new SqlTypeHandlerFactory(), new JsonPropertyMapperFactory(),
+    setMapperFactory(new SqlMapperFactory(this, new SqlTypeHandlerFactory(), new JsonPropertyMapperFactory(),
         new SqlStoreObjectFactory()));
     setDataStoreSynchronizer(new SqlDataStoreSynchronizer(this));
     setTableGenerator(new SqlTableGenerator());

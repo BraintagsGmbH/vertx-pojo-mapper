@@ -1,3 +1,16 @@
+/*
+ * #%L
+ * vertx-pojo-mapper-common
+ * %%
+ * Copyright (C) 2015 Braintags GmbH
+ * %%
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * #L%
+ */
+
 package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
 import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
@@ -15,7 +28,7 @@ import io.vertx.core.Handler;
  * 
  */
 public class SqlGeoPointTypeHandler extends AbstractTypeHandler {
-  private static final String CREATE_STRING = "ST_GeomFromText('POINT( %s %s)')";
+  private static final String CREATE_STRING = " POINT( %s %s) ";
 
   /**
    * Constructor with parent {@link ITypeHandlerFactory}
@@ -54,21 +67,6 @@ public class SqlGeoPointTypeHandler extends AbstractTypeHandler {
       success(new SqlFunction("ST_GeomFromText", content), resultHandler);
     } else {
       success(null, resultHandler);
-    }
-  }
-
-  public static class SqlFunction {
-    private String functionName;
-    private String content;
-
-    public SqlFunction(String name, String content) {
-      this.functionName = name;
-      this.content = content;
-    }
-
-    @Override
-    public String toString() {
-      throw new UnsupportedOperationException();
     }
   }
 }

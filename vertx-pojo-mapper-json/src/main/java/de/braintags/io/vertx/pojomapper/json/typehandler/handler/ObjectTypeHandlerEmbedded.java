@@ -72,15 +72,30 @@ public class ObjectTypeHandlerEmbedded extends ObjectTypeHandler {
 
   protected void readSingleValueAsMapper(IDataStore store, Class<?> internalMapperClass, Object dbValue,
       Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    IMapper mapper = store.getMapperFactory().getMapper(internalMapperClass);
-    store.getMapperFactory().getStoreObjectFactory().createStoreObject(dbValue, mapper, result -> {
-      if (result.failed()) {
-        fail(result.cause(), handler);
+    try {
+      IMapper mapper = store.getMapperFactory().getMapper(internalMapperClass);
+      JsonObject job;
+      if (dbValue == null) {
+        job = null;
+      } else if (dbValue instanceof String) {
+        job = new JsonObject((String) dbValue);
+      } else if (dbValue instanceof JsonObject) {
+        job = (JsonObject) dbValue;
       } else {
-        Object jo = result.result().getEntity();
-        success(jo, handler);
+        fail(new UnsupportedOperationException("only String and JsonObject allowed here"), handler);
+        return;
       }
-    });
+      store.getMapperFactory().getStoreObjectFactory().createStoreObject(job, mapper, result -> {
+        if (result.failed()) {
+          fail(result.cause(), handler);
+        } else {
+          Object jo = result.result().getEntity();
+          success(jo, handler);
+        }
+      });
+    } catch (Throwable e) {
+      fail(e, handler);
+    }
   }
 
   /*

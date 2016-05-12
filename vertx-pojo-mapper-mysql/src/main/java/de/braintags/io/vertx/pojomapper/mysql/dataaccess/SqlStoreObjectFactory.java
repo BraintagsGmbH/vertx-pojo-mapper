@@ -13,6 +13,8 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
+import java.util.Map;
+
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
@@ -20,6 +22,7 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.AbstractStoreObjectFactory;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
 /**
  * 
@@ -29,6 +32,12 @@ import io.vertx.core.Handler;
 
 public class SqlStoreObjectFactory extends AbstractStoreObjectFactory {
 
+  /**
+   * Craetes a new instance of IStoreObject by using a {@link Map} as internal format
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory#createStoreObject(de.braintags.io.vertx.pojomapper.mapping.IMapper,
+   *      java.lang.Object, io.vertx.core.Handler)
+   */
   @Override
   public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler) {
     mapper.executeLifecycle(BeforeSave.class, entity, lcr -> {
@@ -49,7 +58,7 @@ public class SqlStoreObjectFactory extends AbstractStoreObjectFactory {
 
   @Override
   public void createStoreObject(Object storedObject, IMapper mapper, Handler<AsyncResult<IStoreObject<?>>> handler) {
-    SqlStoreObject storeObject = new SqlStoreObject(storedObject, mapper);
+    SqlStoreObject storeObject = new SqlStoreObject((JsonObject) storedObject, mapper);
     storeObject.initToEntity(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
