@@ -234,19 +234,38 @@ public class TestSqlExpressions extends DatastoreBaseTest {
 
   @Test
   public void testGeoDirect(TestContext context) {
-    Async async = context.async();
-    String insertExpression = "insert into GeoPointRecord set id=9, point = GeomFromText('POINT(18 -63)')";
+    final Async async1 = context.async();
+    String insertExpression = "insert into GeoPointRecord set id=10, point = GeomFromText('POINT(18 -63)')";
 
     SqlUtil.update((MySqlDataStore) getDataStore(context), insertExpression, ur -> {
       if (ur.failed()) {
         LOGGER.error("Error deleting", ur.cause());
-        async.complete();
+        async1.complete();
       } else {
         UpdateResult res = ur.result();
         LOGGER.info("deleted: " + res.getUpdated());
-        async.complete();
+        async1.complete();
       }
     });
+    async1.await();
+
+    final Async async2 = context.async();
+
+    String queryExpression = "SELECT id, AsText(point)  from GeoPointRecord; ";
+
+    SqlUtil.query((MySqlDataStore) getDataStore(context), queryExpression, ur -> {
+      if (ur.failed()) {
+        LOGGER.error("ERror searching", ur.cause());
+        context.fail(ur.cause());
+        async2.complete();
+      } else {
+        ResultSet res = ur.result();
+        LOGGER.info("found records: " + res.getNumRows());
+        async2.complete();
+      }
+    });
+    async2.await();
+
   }
 
   @Test
@@ -254,8 +273,10 @@ public class TestSqlExpressions extends DatastoreBaseTest {
     Async async = context.async();
     // JsonArray array = new JsonArray().add(9).add(new SqlGeoPointTypeHandler.SqlFunction("GeomFromText", "POINT(18
     // -63)"));
-    JsonArray array = new JsonArray().add(9).add("GeomFromText('POINT(18 -63)')");
-    String insertExpression = "insert into GeoPointRecord set id=?, point = ? ";
+    JsonArray array = new JsonArray().add(11).add("POINT(18 -63)");
+    String insertExpression = "insert into GeoPointRecord set id=?, point = GeomFromText(?) ";
+
+    // "insert into GeoPointRecord set id=?, point = GeomFromText(?) ";
 
     SqlUtil.updateWithParams((MySqlDataStore) getDataStore(context), insertExpression, array, ur -> {
       if (ur.failed()) {

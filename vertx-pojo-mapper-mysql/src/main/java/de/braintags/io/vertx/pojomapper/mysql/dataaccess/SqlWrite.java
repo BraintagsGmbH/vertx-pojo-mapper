@@ -139,9 +139,15 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlUpdateStatement();
     if (seq.getParameters().isEmpty()) {
-      // should not happen, but ...
-      resultHandler
-          .handle(Future.failedFuture("Update without parameters should not happen normally: " + seq.toString()));
+      SqlUtil.update((MySqlDataStore) getDataStore(), seq.getSqlStatement(), updateResult -> {
+        checkUpdateResult(seq, updateResult, checkResult -> {
+          if (checkResult.failed()) {
+            resultHandler.handle(checkResult);
+          } else {
+            finishUpdate(storeObject, writeResult, resultHandler);
+          }
+        });
+      });
     } else {
       SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), seq.getSqlStatement(), seq.getParameters(),
           updateResult -> {

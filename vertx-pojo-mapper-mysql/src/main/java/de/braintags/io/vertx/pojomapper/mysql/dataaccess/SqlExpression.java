@@ -21,6 +21,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition.SortArgument;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlMapper;
 import io.vertx.core.json.JsonArray;
 
 /**
@@ -32,7 +33,7 @@ import io.vertx.core.json.JsonArray;
  */
 
 public class SqlExpression implements IQueryExpression {
-  private static final String SELECT_STATEMENT = "SELECT * from %s";
+  private static final String SELECT_STATEMENT = "SELECT %s from %s";
   private static final String DELETE_STATEMENT = "DELETE from %s";
   private static final String COUNT_STATEMENT = "SELECT count(*) from %s";
   private IMapper mapper;
@@ -63,7 +64,8 @@ public class SqlExpression implements IQueryExpression {
   @Override
   public void setMapper(IMapper mapper) {
     this.mapper = mapper;
-    select.append(String.format(SELECT_STATEMENT, mapper.getTableInfo().getName()));
+    select.append(
+        String.format(SELECT_STATEMENT, ((SqlMapper) mapper).getQueryFieldNames(), mapper.getTableInfo().getName()));
     delete.append(String.format(DELETE_STATEMENT, mapper.getTableInfo().getName()));
     count.append(String.format(COUNT_STATEMENT, mapper.getTableInfo().getName()));
   }

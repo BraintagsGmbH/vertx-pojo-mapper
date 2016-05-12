@@ -220,8 +220,7 @@ public class MappedField implements IField {
       }
 
       // get the subtype T, T[]/List<T>/Map<?,T>; subtype of Long[], List<Long> is Long
-      subType = (realType.isArray()) ? realType.getComponentType()
-          : ClassUtil.getParameterizedType(field, isMap ? 1 : 0);
+      subType = realType.isArray() ? realType.getComponentType() : ClassUtil.getParameterizedType(field, isMap ? 1 : 0);
 
       if (isMap) {
         mapKeyType = ClassUtil.getParameterizedType(field, 0);

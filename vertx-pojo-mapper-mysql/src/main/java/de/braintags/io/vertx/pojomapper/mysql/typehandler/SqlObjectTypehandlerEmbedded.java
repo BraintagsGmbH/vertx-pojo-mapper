@@ -12,8 +12,12 @@
  */
 package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.ObjectTypeHandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObject;
+import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
@@ -65,15 +69,27 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
       if (result.failed()) {
         handler.handle(result);
       }
-
       try {
-        JsonObject json = (JsonObject) result.result().getResult();
-        String newResult = json.encode();
+        String newResult = ((JsonObject) result.result().getResult()).encode();
         success(newResult, handler);
       } catch (Exception e) {
         fail(e, handler);
       }
     });
+  }
+
+  @Override
+  protected void writeSingleValueAsMapper(IDataStore store, Object embeddedObject, IField field,
+      Handler<AsyncResult<ITypeHandlerResult>> handler) {
+    IMapper mapper = store.getMapperFactory().getMapper(embeddedObject.getClass());
+    ((SqlStoreObjectFactory) store.getMapperFactory().getStoreObjectFactory()).createStoreObject(mapper, embeddedObject,
+        result -> {
+          if (result.failed()) {
+            fail(result.cause(), handler);
+          } else {
+            success(((SqlStoreObject) result.result()).getContainerAsJson(), handler);
+          }
+        });
   }
 
 }

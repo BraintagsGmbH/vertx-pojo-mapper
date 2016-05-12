@@ -14,6 +14,7 @@ package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
@@ -27,6 +28,7 @@ import io.vertx.core.json.JsonArray;
  */
 
 public class SqlMapTypeHandlerEmbedded extends MapTypeHandlerEmbedded {
+  private ITypeHandler th = new SqlObjectTypehandlerEmbedded(getTypeHandlerFactory());
 
   /**
    * @param typeHandlerFactory
@@ -72,6 +74,18 @@ public class SqlMapTypeHandlerEmbedded extends MapTypeHandlerEmbedded {
         fail(e, handler);
       }
     });
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.MapTypeHandlerEmbedded#getValueTypeHandler(java.lang.
+   * Object, de.braintags.io.vertx.pojomapper.mapping.IField)
+   */
+  @Override
+  protected ITypeHandler getValueTypeHandler(Object value, IField field) {
+    return th;
   }
 
 }

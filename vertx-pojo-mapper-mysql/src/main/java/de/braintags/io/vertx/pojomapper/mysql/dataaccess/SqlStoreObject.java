@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.pojomapper.mapping.impl.AbstractStoreObject;
+import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlFunction;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -43,6 +44,8 @@ public class SqlStoreObject extends AbstractStoreObject<Object> {
       .getLogger(SqlStoreObject.class);
 
   /**
+   * Creates a new instance of SqlStoreObject with a {@link Map} as internal format
+   * 
    * @param mapper
    * @param entity
    * @param container
@@ -52,10 +55,12 @@ public class SqlStoreObject extends AbstractStoreObject<Object> {
   }
 
   /**
+   * Creates a new instance of SqlStoreObject with the given container as internal format.
+   * 
    * @param container
    * @param mapper
    */
-  public SqlStoreObject(Object container, IMapper mapper) {
+  public SqlStoreObject(JsonObject container, IMapper mapper) {
     super(container, mapper);
   }
 
@@ -67,9 +72,24 @@ public class SqlStoreObject extends AbstractStoreObject<Object> {
   @Override
   public Object get(IField field) {
     String colName = field.getColumnInfo().getName();
-    Object container = getContainer();
     return container instanceof JsonObject ? ((JsonObject) container).getValue(colName)
-        : ((Map<String, Object>) container).get(colName);
+        : ((Map) container).get(colName);
+  }
+
+  /**
+   * If the internal format is a Map, it is converted as JsonObject and returned, otherwise the internal already
+   * existing JsoObject is returned
+   * 
+   * @return
+   */
+  public JsonObject getContainerAsJson() {
+    return container instanceof JsonObject ? (JsonObject) container : convert();
+  }
+
+  private JsonObject convert() {
+    JsonObject jo = new JsonObject();
+    ((Map<String, Object>) container).entrySet().forEach(entry -> jo.put(entry.getKey(), entry.getValue()));
+    return jo;
   }
 
   /*
@@ -82,7 +102,7 @@ public class SqlStoreObject extends AbstractStoreObject<Object> {
   public boolean hasProperty(IField field) {
     String colName = field.getColumnInfo().getName();
     return container instanceof JsonObject ? ((JsonObject) container).containsKey(colName)
-        : ((Map<String, Object>) container).containsKey(colName);
+        : ((Map) container).containsKey(colName);
   }
 
   /*
@@ -103,7 +123,7 @@ public class SqlStoreObject extends AbstractStoreObject<Object> {
     if (container instanceof JsonObject) {
       ((JsonObject) container).put(ci.getName(), value);
     } else {
-      ((Map<String, Object>) container).put(ci.getName(), value);
+      ((Map) container).put(ci.getName(), value);
     }
     return this;
   }
@@ -220,8 +240,13 @@ public class SqlStoreObject extends AbstractStoreObject<Object> {
         return;
       if (added)
         setStatement.append(", ");
-      setStatement.append(colName).append(" = ?");
-      parameters.add(value);
+      if (value instanceof SqlFunction) {
+        setStatement.append(colName).append(" = ").append(((SqlFunction) value).getFunctionName()).append(" ( ? )");
+        parameters.add(((SqlFunction) value).getContent());
+      } else {
+        setStatement.append(colName).append(" = ?");
+        parameters.add(value);
+      }
       added = true;
     }
 
