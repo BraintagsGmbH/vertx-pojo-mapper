@@ -61,7 +61,7 @@ public class MySqlDataStore extends AbstractDataStore {
   public MySqlDataStore(Vertx vertx, AsyncSQLClient sqlClient, JsonObject properties) {
     super(vertx, properties);
     this.sqlClient = sqlClient;
-    metaData = new MySqlMetaData(sqlClient);
+    metaData = new MySqlMetaData(this);
     setMapperFactory(new SqlMapperFactory(this, new SqlTypeHandlerFactory(), new JsonPropertyMapperFactory(),
         new SqlStoreObjectFactory()));
     setDataStoreSynchronizer(new SqlDataStoreSynchronizer(this));

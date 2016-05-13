@@ -19,6 +19,7 @@ import java.util.List;
 import com.github.mauricio.async.db.mysql.exceptions.MySQLException;
 
 import de.braintags.io.vertx.pojomapper.annotation.Index;
+import de.braintags.io.vertx.pojomapper.annotation.IndexField;
 import de.braintags.io.vertx.pojomapper.annotation.Indexes;
 import de.braintags.io.vertx.pojomapper.exception.DuplicateKeyException;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
@@ -55,6 +56,10 @@ public class SqlUtil {
       "SMALLINT", "MEDIUMINT", "FLOAT", "REAL", "DECIMAL", "NUMERIC");
   private static final List<String> CHARACTER_TYPES = Arrays.asList("CHAR", "VARCHAR", "LONGTEXT", "TEXT");
   private static final List<String> DATE_TYPES = Arrays.asList("DATE", "DATETIME", "TIMESTAMP", "TIME", "YEAR");
+  private static final String GEO_INDEX = "CREATE SPATIAL INDEX %s ON %s (%s)";
+  public static final short INDEX_EXISTS = 0;
+  public static final short INDEX_NOT_EXISTS = 1;
+  public static final short INDEX_MODIFIED = 2;
 
   private SqlUtil() {
   }
@@ -97,10 +102,6 @@ public class SqlUtil {
 
   }
 
-  public static final short INDEX_EXISTS = 0;
-  public static final short INDEX_NOT_EXISTS = 1;
-  public static final short INDEX_MODIFIED = 2;
-
   private static final void createIndex(MySqlDataStore ds, String tableName, Index index,
       Handler<AsyncResult<String>> handler) {
 
@@ -132,16 +133,56 @@ public class SqlUtil {
 
   private static void createIndex(MySqlDataStore ds, String tableName, Index index, IndexResult res,
       Handler<AsyncResult<String>> handler) {
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    IndexField[] fields = index.fields();
+    if (fields.length > 1) {
+      handler.handle(
+          Future.failedFuture(new UnsupportedOperationException("Not yet supported: more than one field in index")));
+      return;
+    }
+    for (IndexField field : fields) {
+      switch (field.type()) {
+      case GEO2DSPHERE:
+      case GEO2D:
+        createGeoIndex(ds, index.name(), tableName, field, handler);
+        break;
+
+      default:
+        handler.handle(
+            Future.failedFuture(new UnsupportedOperationException("Index type not supported: " + field.type())));
+      }
+    }
+
+  }
+
+  private static void createGeoIndex(MySqlDataStore ds, String indexName, String tableName, IndexField field,
+      Handler<AsyncResult<String>> handler) {
+    String createString = String.format(GEO_INDEX, indexName, tableName, field.fieldName());
+    execute(ds, createString, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        handler.handle(Future.succeededFuture("Index successfully created: " + createString));
+      }
+    });
   }
 
   private static void modifyIndex(MySqlDataStore ds, String tableName, Index index, IndexResult res,
       Handler<AsyncResult<String>> handler) {
-    handler.handle(Future.succeededFuture("Index NOT modified: " + index.name()));
+    handler.handle(Future.succeededFuture("Indexdefinition is modified and should be adapted in the database for table "
+        + tableName + " | " + index.name()));
   }
 
-  private static final void checkIndexExists(MySqlDataStore ds, String tableName, Index index,
-      Handler<AsyncResult<IndexResult>> handler) {
+  /**
+   * Get information about an index with the given name
+   * 
+   * @param ds
+   * @param tableName
+   * @param index
+   * @param handler
+   *          handler to be informed about existing index or null, if none with that name
+   */
+  public static final void getIndexInfo(MySqlDataStore ds, String tableName, String index,
+      Handler<AsyncResult<JsonObject>> handler) {
     String command = "SHOW INDEX FROM " + tableName;
     AsyncSQLClient client = (AsyncSQLClient) ds.getClient();
     query(client, command, result -> {
@@ -149,20 +190,38 @@ public class SqlUtil {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
         List<JsonObject> results = result.result().getRows();
-        IndexResult res = null;
+        JsonObject res = null;
         for (JsonObject entry : results) {
           String indexName = entry.getString("Key_name");
           if (indexName == null || indexName.hashCode() == 0) {
             handler.handle(Future.failedFuture(new SqlException("Could not determine index name")));
-          } else if (indexName.equals(index.name())) {
-            res = compare(entry, index);
+          } else if (indexName.equals(index)) {
+            res = entry;
             break;
           }
         }
-        res = res == null ? new IndexResult(INDEX_NOT_EXISTS) : res;
         handler.handle(Future.succeededFuture(res));
       }
     });
+  }
+
+  private static final void checkIndexExists(MySqlDataStore ds, String tableName, Index index,
+      Handler<AsyncResult<IndexResult>> handler) {
+    getIndexInfo(ds, tableName, index.name(), result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        IndexResult res = null;
+        JsonObject entry = result.result();
+        if (entry == null) {
+          res = new IndexResult(INDEX_NOT_EXISTS);
+        } else {
+          res = compare(entry, index);
+        }
+        handler.handle(Future.succeededFuture(res));
+      }
+    });
+
   }
 
   private static IndexResult compare(JsonObject existingIndex, Index indexDef) {

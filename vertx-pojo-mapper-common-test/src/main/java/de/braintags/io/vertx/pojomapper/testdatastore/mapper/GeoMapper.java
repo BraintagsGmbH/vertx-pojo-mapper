@@ -13,18 +13,22 @@
 package de.braintags.io.vertx.pojomapper.testdatastore.mapper;
 
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.annotation.EntityOption;
 import de.braintags.io.vertx.pojomapper.annotation.Index;
 import de.braintags.io.vertx.pojomapper.annotation.IndexField;
 import de.braintags.io.vertx.pojomapper.annotation.IndexType;
 import de.braintags.io.vertx.pojomapper.annotation.Indexes;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
 
-@Entity
+@Entity(options = { @EntityOption(key = "ENGINE", value = "MyISAM") })
 @Indexes(@Index(name = "testindex", fields = { @IndexField(fieldName = "position", type = IndexType.GEO2DSPHERE) }))
 public class GeoMapper {
   @Id
   public String id;
+
+  @Property(nullable = false)
   public GeoPoint position;
   public String name;
 

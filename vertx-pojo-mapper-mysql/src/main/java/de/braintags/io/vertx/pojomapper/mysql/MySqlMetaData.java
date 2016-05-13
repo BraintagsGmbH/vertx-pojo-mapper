@@ -18,7 +18,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.ext.asyncsql.AsyncSQLClient;
 
 /**
  * Meta information about the connected database
@@ -29,7 +28,7 @@ import io.vertx.ext.asyncsql.AsyncSQLClient;
 
 public class MySqlMetaData implements IDataStoreMetaData {
   private static final String SELECT_VERSION = "SELECT VERSION()";
-  private AsyncSQLClient sqlClient;
+  private MySqlDataStore datastore;
   private String version;
 
   /**
@@ -38,8 +37,8 @@ public class MySqlMetaData implements IDataStoreMetaData {
    * @param sqlClient
    *          the client to be used
    */
-  public MySqlMetaData(AsyncSQLClient sqlClient) {
-    this.sqlClient = sqlClient;
+  public MySqlMetaData(MySqlDataStore datastore) {
+    this.datastore = datastore;
   }
 
   /*
@@ -54,7 +53,7 @@ public class MySqlMetaData implements IDataStoreMetaData {
       return;
     }
 
-    SqlUtil.query(sqlClient, SELECT_VERSION, result -> {
+    SqlUtil.query(datastore.getSqlClient(), SELECT_VERSION, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
@@ -72,7 +71,13 @@ public class MySqlMetaData implements IDataStoreMetaData {
    */
   @Override
   public void getIndexInfo(String indexName, IMapper mapper, Handler<AsyncResult<Object>> handler) {
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    SqlUtil.getIndexInfo(datastore, mapper.getTableInfo().getName(), indexName, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        handler.handle(Future.succeededFuture(result.result()));
+      }
+    });
   }
 
 }

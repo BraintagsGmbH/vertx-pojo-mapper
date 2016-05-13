@@ -42,4 +42,11 @@ public @interface Entity {
    * @return
    */
   String name() default UNDEFINED_NAME;
+
+  /**
+   * Define some specific options, which can be interpreted by the implementation of the IDataStore
+   * 
+   * @return
+   */
+  EntityOption[] options() default {};
 }
