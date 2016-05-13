@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.braintags.io.vertx.pojomapper.annotation.EntityOption;
 import de.braintags.io.vertx.pojomapper.annotation.Indexes;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -36,6 +37,7 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlTableInfo;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -56,7 +58,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
 
   private static final String TABLE_QUERY = "SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='%s' AND TABLE_NAME='%s'";
   private static final String COLUMN_QUERY = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA='%s' AND TABLE_NAME='%s'";
-  private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS %s.%s ( %s )";
+  private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS %s.%s ( %s ) %s";
 
   /**
    * Create a new instance
@@ -147,8 +149,20 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
     String columnPart = generateColumnPart(mapper);
     String tableName = mapper.getTableInfo().getName();
     String database = datastore.getDatabase();
-    String sqlCommand = String.format(CREATE_TABLE, database, tableName, columnPart);
+    String sqlCommand = String.format(CREATE_TABLE, database, tableName, columnPart, getOptions(mapper));
     return new DefaultSyncCommand(action, sqlCommand);
+  }
+
+  private String getOptions(IMapper mapper) {
+    Buffer buffer = Buffer.buffer();
+    for (EntityOption option : mapper.getEntity().options()) {
+      if ("ENGINE".equalsIgnoreCase(option.key()) || "DEFAULT CHARSET".equalsIgnoreCase(option.key())) {
+        buffer.appendString(option.key()).appendString("=").appendString(option.value()).appendString(" ");
+      } else {
+        LOGGER.info("UNHANDLED OPTION: " + option.key());
+      }
+    }
+    return buffer.toString();
   }
 
   /**
@@ -269,6 +283,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
+        LOGGER.info(result.result());
         resultHandler.handle(Future.succeededFuture());
       }
     });
