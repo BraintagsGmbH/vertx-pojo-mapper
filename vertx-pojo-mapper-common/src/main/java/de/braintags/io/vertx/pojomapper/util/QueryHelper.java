@@ -30,6 +30,8 @@ import io.vertx.core.Handler;
  * 
  */
 public class QueryHelper {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(QueryHelper.class);
 
   private QueryHelper() {
   }
@@ -97,6 +99,7 @@ public class QueryHelper {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
+        LOGGER.info("executed query: " + result.result().toString());
         queryResultToList(result.result(), handler);
       }
     });
