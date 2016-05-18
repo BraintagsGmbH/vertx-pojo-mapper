@@ -25,6 +25,7 @@ import de.braintags.io.vertx.pojomapper.exception.QueryParameterException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
+import de.braintags.io.vertx.pojomapper.typehandler.IFieldParameterResult;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.Size;
 import io.vertx.core.AsyncResult;
@@ -225,6 +226,15 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    * @param resultHandler
    */
   private final void handleSingleValue(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
+    fieldParameter.getField().getTypeHandler().handleFieldParameter(fieldParameter, result -> {
+      if (result.failed()) {
+        resultHandler.handle(Future.failedFuture(result.cause()));
+      } else {
+        add(result.result());
+        resultHandler.handle(Future.succeededFuture());
+      }
+    });
+
     IField field = fieldParameter.getField();
     IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     if (ci == null) {
@@ -246,12 +256,12 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
     });
   }
 
-  protected Object translateValue(QueryOperator operator, Object value) {
-    return value;
+  protected void add(IFieldParameterResult fr) {
+    queryExpression.addQuery(fr);
   }
 
-  private final void add(String colName, String operator, Object objectToAdd) {
-    queryExpression.addQuery(colName, operator, objectToAdd);
+  protected Object translateValue(QueryOperator operator, Object value) {
+    return value;
   }
 
   /*

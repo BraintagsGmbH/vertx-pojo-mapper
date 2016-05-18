@@ -22,6 +22,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition.SortArgument;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlMapper;
+import de.braintags.io.vertx.pojomapper.typehandler.IFieldParameterResult;
 import io.vertx.core.json.JsonArray;
 
 /**
@@ -182,6 +183,18 @@ public class SqlExpression implements IQueryExpression {
       parameters.add(values.getValue(i));
     }
     whereClause.append(" ) ");
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#addQuery(de.braintags.io.vertx.pojomapper.
+   * typehandler.IFieldParameterResult)
+   */
+  @Override
+  public IQueryExpression addQuery(IFieldParameterResult fpr) {
+    return addQuery(fpr.getColName(), fpr.getOperator(), fpr.getValue());
   }
 
   /**

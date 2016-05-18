@@ -19,6 +19,7 @@ import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
@@ -40,7 +41,7 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
   private ITypeHandlerFactory typeHandlerFactory;
 
   /**
-   * Constructor
+   * Constructor for an implementation
    * 
    * @param typeHandlerFactory
    *          the parent factory
@@ -50,6 +51,17 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
   public AbstractTypeHandler(ITypeHandlerFactory typeHandlerFactory, Class<?>... classesToDeal) {
     this.typeHandlerFactory = typeHandlerFactory;
     classesToHandle = Arrays.asList(classesToDeal);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#handle(de.braintags.io.vertx.pojomapper.dataaccess.query.
+   * IFieldParameter, io.vertx.core.Handler)
+   */
+  @Override
+  public void handleFieldParameter(IFieldParameter<?> param, Handler<AsyncResult<IFieldParameterResult>> handler) {
   }
 
   /*

@@ -19,6 +19,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.typehandler.IFieldParameterResult;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -179,5 +180,17 @@ public class MongoQueryExpression implements IQueryExpression {
     } else {
       throw new UnsupportedOperationException("the mongo datastore needs a Jsonobject as native format");
     }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#addQuery(de.braintags.io.vertx.pojomapper.
+   * typehandler.IFieldParameterResult)
+   */
+  @Override
+  public IQueryExpression addQuery(IFieldParameterResult fpr) {
+    return addQuery(fpr.getColName(), fpr.getOperator(), fpr.getValue());
   }
 }

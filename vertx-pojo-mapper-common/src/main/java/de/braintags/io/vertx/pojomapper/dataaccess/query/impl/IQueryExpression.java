@@ -14,6 +14,8 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.typehandler.IFieldParameterResult;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 
 /**
  * IQueryExpression is the datastore specific result of an executed {@link AbstractQueryRambler}, which later on is used
@@ -76,6 +78,16 @@ public interface IQueryExpression {
    * @return the IQueryExpression itself for fluent usage
    */
   IQueryExpression addQuery(String fieldName, String logic, Object value);
+
+  /**
+   * add a query expression
+   * 
+   * @param fpr
+   *          the instance of {@link IFieldParameterResult} which was processed by
+   *          {@link ITypeHandler#handleFieldParameter(de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter, io.vertx.core.Handler)}
+   * @return the IQueryExpression itself for fluent usage
+   */
+  IQueryExpression addQuery(IFieldParameterResult fpr);
 
   /**
    * Set the {@link IMapper} to be used
