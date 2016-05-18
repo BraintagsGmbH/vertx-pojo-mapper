@@ -1,0 +1,2 @@
+select ST_DISTANCE_SPHERE( position, ST_GeomFromText( 'POINT(6.775763 51.224906)' ) ) AS DISTANCE from GeoMapper
+where ST_DISTANCE_SPHERE( position, ST_GeomFromText( 'POINT(6.775763 51.224906)' ) ) <= 40000;

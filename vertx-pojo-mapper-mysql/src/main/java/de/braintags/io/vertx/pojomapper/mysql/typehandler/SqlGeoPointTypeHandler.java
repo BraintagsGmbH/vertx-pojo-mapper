@@ -13,12 +13,14 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.GeoSearchArgument;
 import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 /**
@@ -60,13 +62,28 @@ public class SqlGeoPointTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    if (source != null && ((GeoPoint) source).getCoordinates() != null
-        && ((GeoPoint) source).getCoordinates().getValues().size() == 2) {
-      String content = String.format(CREATE_STRING, ((GeoPoint) source).getCoordinates().getValues().get(0),
-          ((GeoPoint) source).getCoordinates().getValues().get(1));
+    if (source instanceof GeoPoint) {
+      encode((GeoPoint) source, resultHandler);
+    } else if (source instanceof GeoSearchArgument) {
+      encode((GeoSearchArgument) source, resultHandler);
+    } else {
+      fail(new UnsupportedOperationException("unsupported type: " + source.getClass().getName()), resultHandler);
+    }
+
+  }
+
+  private void encode(GeoPoint source, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    if (source != null && source.getCoordinates() != null && source.getCoordinates().getValues().size() == 2) {
+      String content = String.format(CREATE_STRING, source.getCoordinates().getValues().get(0),
+          source.getCoordinates().getValues().get(1));
       success(new SqlFunction("ST_GeomFromText", content), resultHandler);
     } else {
       success(null, resultHandler);
     }
   }
+
+  private void encode(GeoSearchArgument source, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+  }
+
 }

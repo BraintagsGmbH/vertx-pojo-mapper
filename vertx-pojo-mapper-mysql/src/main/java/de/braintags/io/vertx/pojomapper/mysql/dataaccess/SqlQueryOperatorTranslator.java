@@ -54,6 +54,8 @@ public class SqlQueryOperatorTranslator implements IQueryOperatorTranslator {
     case STARTS:
     case ENDS:
       return "LIKE";
+    case NEAR:
+      return "<=";
 
     default:
       throw new UnsupportedOperationException("No translator for " + op);
