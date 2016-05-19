@@ -211,7 +211,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
 
           if (co.reduce()) {
             String colName = ci.getName();
-            add(colName, operator, resultArray);
+            queryExpression.addQuery(colName, operator, resultArray);
             resultHandler.handle(Future.succeededFuture());
           }
         }
