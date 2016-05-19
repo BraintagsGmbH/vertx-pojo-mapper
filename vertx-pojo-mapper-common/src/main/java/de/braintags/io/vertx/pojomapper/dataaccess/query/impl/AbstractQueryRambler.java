@@ -19,7 +19,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.exception.QueryParameterException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -42,24 +41,15 @@ import io.vertx.core.json.JsonArray;
  */
 public abstract class AbstractQueryRambler implements IQueryRambler {
   private IQueryExpression queryExpression;
-  private IQueryLogicTranslator logicTranslator;
-  private IQueryOperatorTranslator queryOperatorTranslator;
   private IMapper mapper;
 
   /**
    * 
    * @param queryExpression
    *          the {@link IQueryExpression} to be used
-   * @param logicTranslator
-   *          responsible to translate logic idioms for the current implementation
-   * @param queryOperatorTranslator
-   *          responsible to translate query operators for the current implementation
    */
-  public AbstractQueryRambler(IQueryExpression queryExpression, IQueryLogicTranslator logicTranslator,
-      IQueryOperatorTranslator queryOperatorTranslator) {
+  public AbstractQueryRambler(IQueryExpression queryExpression) {
     this.queryExpression = queryExpression;
-    this.logicTranslator = logicTranslator;
-    this.queryOperatorTranslator = queryOperatorTranslator;
   }
 
   /*
@@ -101,6 +91,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    */
   @Override
   public final void start(ILogicContainer<?> container) {
+    IQueryLogicTranslator logicTranslator = mapper.getMapperFactory().getDataStore().getQueryLogicTranslator();
     String logic = logicTranslator.translate(container.getLogic());
     queryExpression.startConnectorBlock(logic, logicTranslator.opensParenthesis(container.getLogic()));
   }
@@ -169,14 +160,15 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    */
   private final void handleMultipleValues(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
     IField field = fieldParameter.getField();
-    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
+    IColumnInfo ci = field.getColumnInfo();
     if (ci == null) {
       resultHandler
           .handle(Future.failedFuture(new MappingException("Can't find columninfo for field " + field.getFullName())));
       return;
     }
 
-    String operator = queryOperatorTranslator.translate(fieldParameter.getOperator());
+    String operator = field.getMapper().getMapperFactory().getDataStore().getQueryOperatorTranslator()
+        .translate(fieldParameter.getOperator());
     Object valueIterable = fieldParameter.getValue();
     if (!(valueIterable instanceof Iterable)) {
       resultHandler.handle(
@@ -234,34 +226,10 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
         resultHandler.handle(Future.succeededFuture());
       }
     });
-
-    IField field = fieldParameter.getField();
-    IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
-    if (ci == null) {
-      resultHandler
-          .handle(Future.failedFuture(new MappingException("Can't find columninfo for field " + field.getFullName())));
-      return;
-    }
-    String operator = queryOperatorTranslator.translate(fieldParameter.getOperator());
-    Object value = translateValue(fieldParameter.getOperator(), fieldParameter.getValue());
-
-    field.getTypeHandler().intoStore(value, field, result -> {
-      if (result.failed()) {
-        resultHandler.handle(Future.failedFuture(result.cause()));
-      } else {
-        Object storeObject = result.result().getResult();
-        add(ci.getName(), operator, storeObject);
-        resultHandler.handle(Future.succeededFuture());
-      }
-    });
   }
 
   protected void add(IFieldParameterResult fr) {
     queryExpression.addQuery(fr);
-  }
-
-  protected Object translateValue(QueryOperator operator, Object value) {
-    return value;
   }
 
   /*

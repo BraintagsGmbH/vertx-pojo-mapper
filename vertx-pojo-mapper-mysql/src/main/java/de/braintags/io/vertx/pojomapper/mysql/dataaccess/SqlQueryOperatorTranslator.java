@@ -61,4 +61,28 @@ public class SqlQueryOperatorTranslator implements IQueryOperatorTranslator {
       throw new UnsupportedOperationException("No translator for " + op);
     }
   }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTranslator#translateValue(de.braintags.io.
+   * vertx.pojomapper.dataaccess.query.QueryOperator, java.lang.Object)
+   */
+  @Override
+  public Object translateValue(QueryOperator operator, Object value) {
+    switch (operator) {
+    case CONTAINS:
+      return "%" + value + "%";
+
+    case STARTS:
+      return value + "%";
+
+    case ENDS:
+      return "%" + value;
+
+    default:
+      return value;
+    }
+  }
 }

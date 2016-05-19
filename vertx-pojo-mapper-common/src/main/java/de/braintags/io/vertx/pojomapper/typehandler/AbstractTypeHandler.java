@@ -20,9 +20,11 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTranslator;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
+import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultFieldParameterResult;
 import de.braintags.io.vertx.pojomapper.typehandler.impl.DefaultTypeHandlerResult;
 import de.braintags.io.vertx.util.ClassUtil;
 import de.braintags.io.vertx.util.ExceptionUtil;
@@ -65,20 +67,20 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
   public void handleFieldParameter(IFieldParameter<?> param, Handler<AsyncResult<IFieldParameterResult>> handler) {
     IField field = param.getField();
     IColumnInfo ci = field.getColumnInfo();
+    IQueryOperatorTranslator queryOperatorTranslator = field.getMapper().getMapperFactory().getDataStore()
+        .getQueryOperatorTranslator();
     if (ci == null) {
       handler
           .handle(Future.failedFuture(new MappingException("Can't find columninfo for field " + field.getFullName())));
     } else {
-      String operator = queryOperatorTranslator.translate(fieldParameter.getOperator());
-      Object value = translateValue(fieldParameter.getOperator(), fieldParameter.getValue());
-
-      field.getTypeHandler().intoStore(value, field, result -> {
+      String operator = queryOperatorTranslator.translate(param.getOperator());
+      Object value = queryOperatorTranslator.translateValue(param.getOperator(), param.getValue());
+      intoStore(value, field, result -> {
         if (result.failed()) {
-          resultHandler.handle(Future.failedFuture(result.cause()));
+          handler.handle(Future.failedFuture(result.cause()));
         } else {
-          Object storeObject = result.result().getResult();
-          add(ci.getName(), operator, storeObject);
-          resultHandler.handle(Future.succeededFuture());
+          handler.handle(Future
+              .succeededFuture(new DefaultFieldParameterResult(ci.getName(), operator, result.result().getResult())));
         }
       });
     }

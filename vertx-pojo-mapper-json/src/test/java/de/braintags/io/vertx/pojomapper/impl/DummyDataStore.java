@@ -18,6 +18,8 @@ import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryLogicTranslator;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTranslator;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
@@ -258,6 +260,26 @@ public class DummyDataStore implements IDataStore {
    */
   @Override
   public Object getClient() {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getQueryLogicTranslator()
+   */
+  @Override
+  public IQueryLogicTranslator getQueryLogicTranslator() {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getQueryOperatorTranslator()
+   */
+  @Override
+  public IQueryOperatorTranslator getQueryOperatorTranslator() {
     return null;
   }
 

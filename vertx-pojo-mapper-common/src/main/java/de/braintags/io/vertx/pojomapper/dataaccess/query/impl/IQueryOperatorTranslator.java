@@ -31,4 +31,15 @@ public interface IQueryOperatorTranslator {
    */
   String translate(QueryOperator op);
 
+  /**
+   * Translates the value in dependency to the operator
+   * 
+   * @param operator
+   *          the opertator for decision
+   * @param value
+   *          the value
+   * @return a value, which might be transformed depending on the given operator
+   */
+  Object translateValue(QueryOperator operator, Object value);
+
 }
