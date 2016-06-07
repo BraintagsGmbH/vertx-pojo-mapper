@@ -65,7 +65,7 @@ public class SqlGeoPointTypeHandler extends AbstractTypeHandler {
     if (source instanceof GeoPoint) {
       encode((GeoPoint) source, resultHandler);
     } else if (source instanceof GeoSearchArgument) {
-      encode((GeoSearchArgument) source, resultHandler);
+      encode((GeoSearchArgument) source, field, resultHandler);
     } else {
       fail(new UnsupportedOperationException("unsupported type: " + source.getClass().getName()), resultHandler);
     }
@@ -82,8 +82,12 @@ public class SqlGeoPointTypeHandler extends AbstractTypeHandler {
     }
   }
 
-  private void encode(GeoSearchArgument source, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+  private void encode(GeoSearchArgument source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    try {
+      success(new SqlDistanceSearchFunction(source, field), resultHandler);
+    } catch (Exception e) {
+      resultHandler.handle(Future.failedFuture(e));
+    }
   }
 
 }

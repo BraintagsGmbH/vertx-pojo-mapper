@@ -22,6 +22,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition.SortArgument;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlMapper;
+import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlDistanceSearchFunction;
 import de.braintags.io.vertx.pojomapper.typehandler.IFieldParameterResult;
 import io.vertx.core.json.JsonArray;
 
@@ -168,6 +169,9 @@ public class SqlExpression implements IQueryExpression {
       whereClause.append(" ").append(conn.conn);
     if (logic.equalsIgnoreCase("IN") || logic.equalsIgnoreCase("NOT IN")) {
       addQueryIn(fieldName, logic, (JsonArray) value);
+    } else if (value instanceof SqlDistanceSearchFunction) {
+      whereClause.append(" ").append(((SqlDistanceSearchFunction) value).getFunctionSequence());
+      parameters.add(((SqlDistanceSearchFunction) value).getValue());
     } else {
       whereClause.append(" ").append(fieldName).append(" ").append(logic).append(" ?");
       parameters.add(value);
