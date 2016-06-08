@@ -26,6 +26,7 @@ import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.util.ExceptionUtil;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -40,15 +41,21 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
 
   @Test
   public final void testTypeHandler(TestContext context) {
-    BaseRecord record = createInstance(null);
-    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(record.getClass());
-    IField field = mapper.getField(getTestFieldName());
-    ITypeHandler th = field.getTypeHandler();
-    context.assertNotNull(th);
-    String typeHandlerName = TestHelper.getDatastoreContainer(context).getExpectedTypehandlerName(getClass(),
-        getExpectedTypeHandlerClassName());
-    String message = "Not the expected TypeHandler!! DID YOU OVERWRITE ONE AND DIDN'T YOU CHANGE LOOKUP IN MySqlDataStoreContainer?";
-    context.assertEquals(typeHandlerName, th.getClass().getName(), message);
+    try {
+      LOGGER.info("executing testTypeHandler");
+      BaseRecord record = createInstance(null);
+      IMapper mapper = getDataStore(context).getMapperFactory().getMapper(record.getClass());
+      IField field = mapper.getField(getTestFieldName());
+      ITypeHandler th = field.getTypeHandler();
+      context.assertNotNull(th);
+      String typeHandlerName = TestHelper.getDatastoreContainer(context).getExpectedTypehandlerName(getClass(),
+          getExpectedTypeHandlerClassName());
+      String message = "Not the expected TypeHandler!! DID YOU OVERWRITE ONE AND DIDN'T YOU CHANGE LOOKUP IN MySqlDataStoreContainer?";
+      context.assertEquals(typeHandlerName, th.getClass().getName(), message);
+    } catch (Exception e) {
+      LOGGER.info("", e);
+      throw ExceptionUtil.createRuntimeException(e);
+    }
   }
 
   /**
@@ -67,31 +74,36 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
 
   @Test
   public final void testSaveAndReadRecord(TestContext context) {
-    BaseRecord record = createInstance(context);
-    dropTables(context, record);
+    try {
+      BaseRecord record = createInstance(context);
+      dropTables(context, record);
 
-    ResultContainer resultContainer = saveRecord(context, record);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
-    Iterator<IWriteEntry> it = resultContainer.writeResult.iterator();
-    while (it.hasNext()) {
-      IWriteEntry we = it.next();
-      IStoreObject<?> entry = we.getStoreObject();
-      LOGGER.info("written entry: " + entry.toString() + " | " + we.getAction());
-    }
-
-    // SimpleQuery for all records
-    IQuery<? extends BaseRecord> query = getDataStore(context).createQuery(record.getClass());
-    resultContainer = find(context, query, 1);
-    verifyResult(context, record, resultContainer);
-    resultContainer.queryResult.iterator().next(result -> {
-      if (result.failed()) {
-        result.cause().printStackTrace();
-      } else {
-        context.assertTrue(record.equals(result.result()));
-        LOGGER.info("finished!");
+      ResultContainer resultContainer = saveRecord(context, record);
+      if (resultContainer.assertionError != null)
+        throw resultContainer.assertionError;
+      Iterator<IWriteEntry> it = resultContainer.writeResult.iterator();
+      while (it.hasNext()) {
+        IWriteEntry we = it.next();
+        IStoreObject<?> entry = we.getStoreObject();
+        LOGGER.info("written entry: " + entry.toString() + " | " + we.getAction());
       }
-    });
+
+      // SimpleQuery for all records
+      IQuery<? extends BaseRecord> query = getDataStore(context).createQuery(record.getClass());
+      resultContainer = find(context, query, 1);
+      verifyResult(context, record, resultContainer);
+      resultContainer.queryResult.iterator().next(result -> {
+        if (result.failed()) {
+          result.cause().printStackTrace();
+        } else {
+          context.assertTrue(record.equals(result.result()));
+          LOGGER.info("finished!");
+        }
+      });
+    } catch (Exception e) {
+      LOGGER.info("", e);
+      throw ExceptionUtil.createRuntimeException(e);
+    }
   }
 
   /**

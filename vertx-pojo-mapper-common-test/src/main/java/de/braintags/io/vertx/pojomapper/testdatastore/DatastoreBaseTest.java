@@ -61,7 +61,7 @@ public abstract class DatastoreBaseTest {
   public static IDataStore EXTERNAL_DATASTORE;
 
   @Rule
-  public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "20")));
+  public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "40")));
 
   public static IDataStore getDataStore(TestContext context) {
     return EXTERNAL_DATASTORE == null ? TestHelper.getDatastoreContainer(context).getDataStore() : EXTERNAL_DATASTORE;
@@ -97,8 +97,10 @@ public abstract class DatastoreBaseTest {
           resultContainer.writeResult = result.result();
           checkWriteResult(context, result, records.size());
         } catch (AssertionError e) {
+          logger.error("", e); // logging in case the ResultContainer is not handled in caller
           resultContainer.assertionError = e;
         } catch (Throwable e) {
+          logger.error("", e);// logging in case the ResultContainer is not handled in caller
           resultContainer.assertionError = new AssertionError(e);
         } finally {
           async.complete();
@@ -110,6 +112,9 @@ public abstract class DatastoreBaseTest {
       async.await();
     } else {
       async.await(waittime);
+    }
+    if (resultContainer.assertionError != null) {
+      throw resultContainer.assertionError;
     }
     return resultContainer;
   }
@@ -420,6 +425,7 @@ public abstract class DatastoreBaseTest {
    * @param tableName
    */
   public static void clearTable(TestContext context, String tableName) {
+    logger.info("clearing table " + tableName);
     Async async = context.async();
     ErrorObject<Void> err = new ErrorObject<Void>(null);
     TestHelper.getDatastoreContainer(context).clearTable(tableName, result -> {
@@ -430,6 +436,7 @@ public abstract class DatastoreBaseTest {
     });
 
     async.await();
+    logger.info("finished clearing table " + tableName);
     if (err.isError())
       throw err.getRuntimeException();
   }
