@@ -72,12 +72,6 @@ public class DefaultPropertyMapper implements IPropertyMapper {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
         Object dbValue = result.result().getResult();
-        if (javaValue != null && javaValue.hashCode() != 0 && dbValue == null) {
-          Future<Void> future = Future.failedFuture(new TypeHandlerException(
-              String.format("Value conversion failed: original = %s, conversion = NULL", String.valueOf(javaValue))));
-          handler.handle(future);
-          return;
-        }
         if (dbValue != null)
           storeObject.put(field, dbValue);
         handler.handle(Future.succeededFuture());
