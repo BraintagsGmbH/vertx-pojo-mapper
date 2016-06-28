@@ -129,6 +129,10 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
 
   private DataStoreSettings createSettings() {
     String database = "test";
+    String host = System.getProperty("MySqlDataStoreContainer.host", null);
+    if (host == null) {
+      throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.host'");
+    }
     String username = System.getProperty("MySqlDataStoreContainer.username", null);
     if (username == null) {
       throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.username'");
@@ -139,7 +143,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
     }
     DataStoreSettings settings = MySqlDataStoreinit.createDefaultSettings();
     settings.setDatabaseName(database);
-    settings.getProperties().put(MySqlDataStoreinit.HOST_PROPERTY, "localhost");
+    settings.getProperties().put(MySqlDataStoreinit.HOST_PROPERTY, host);
     settings.getProperties().put(MySqlDataStoreinit.PORT_PROPERTY, MySqlDataStoreinit.DEFAULT_PORT);
     settings.getProperties().put(MySqlDataStoreinit.USERNAME_PROPERTY, username);
     settings.getProperties().put(MySqlDataStoreinit.PASSWORD_PROPERTY, password);
