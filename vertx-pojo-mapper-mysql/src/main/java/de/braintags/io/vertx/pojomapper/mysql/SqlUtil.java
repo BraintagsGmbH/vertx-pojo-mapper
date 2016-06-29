@@ -400,6 +400,8 @@ public class SqlUtil {
    *          a resulthandler to be informed
    */
   public static void execute(MySqlDataStore datastore, String command, Handler<AsyncResult<Void>> resultHandler) {
+    if (datastore == null)
+      throw new NullPointerException("datastore is null");
     execute((AsyncSQLClient) datastore.getClient(), command, resultHandler);
   }
 

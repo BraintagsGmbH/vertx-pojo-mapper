@@ -12,12 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore;
 
-import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
 import de.braintags.io.vertx.BtVertxTestBase;
-import de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle;
 import de.braintags.io.vertx.keygenerator.KeyGeneratorSettings;
+import de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle;
 import de.braintags.io.vertx.keygenerator.impl.MongoKeyGenerator;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.util.ErrorObject;
@@ -77,16 +76,20 @@ public class TestHelper {
     datastoreContainer.startup(vertx, result -> {
       if (result.failed()) {
         err.setThrowable(result.cause());
+      } else if (getDataStore() == null) {
+        err.setThrowable(new NullPointerException("The datastore must not be null"));
+      } else {
+        logger.info("datastore started");
       }
-      logger.info("datastore started");
-      Objects.requireNonNull(getDataStore(), "The datastore must not be null");
       latch.countDown();
     });
-
     latch.await();
-    startKeyGeneratorVerticle(context);
-    if (err.isError())
+    if (err.isError()) {
       throw err.getRuntimeException();
+    } else {
+      startKeyGeneratorVerticle(context);
+    }
+
   }
 
   /**

@@ -106,6 +106,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
 
   @Override
   public void startup(Vertx vertx, Handler<AsyncResult<Void>> handler) {
+    LOGGER.info("Startup of " + getClass().getSimpleName());
     try {
       if (datastore == null) {
         DataStoreSettings settings = createSettings();
@@ -123,16 +124,13 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
         handler.handle(Future.succeededFuture());
       }
     } catch (Exception e) {
+      LOGGER.error("", e);
       handler.handle(Future.failedFuture(e));
     }
   }
 
   private DataStoreSettings createSettings() {
     String database = "test";
-    String host = System.getProperty("MySqlDataStoreContainer.host", null);
-    if (host == null) {
-      throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.host'");
-    }
     String username = System.getProperty("MySqlDataStoreContainer.username", null);
     if (username == null) {
       throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.username'");
@@ -140,6 +138,10 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
     String password = System.getProperty("MySqlDataStoreContainer.password", null);
     if (password == null) {
       throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.password'");
+    }
+    String host = System.getProperty("MySqlDataStoreContainer.host", null);
+    if (host == null) {
+      throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.host'");
     }
     DataStoreSettings settings = MySqlDataStoreinit.createDefaultSettings();
     settings.setDatabaseName(database);
@@ -150,6 +152,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
     settings.getProperties().put(MySqlDataStoreinit.SHARED_PROP, "true");
     settings.getProperties().put(MySqlDataStoreinit.HANDLE_REFERENCED_RECURSIVE_PROP, handleReferencedRecursive);
     settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
+    LOGGER.info("SETTINGS ARE: " + settings.toString());
     return settings;
   }
 

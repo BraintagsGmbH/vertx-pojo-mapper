@@ -82,7 +82,8 @@ public class SqlExpression implements IQueryExpression {
     if (nativeCommand instanceof CharSequence) {
       this.nativeCommand = nativeCommand.toString();
     } else {
-      throw new UnsupportedOperationException("the dql datastore needs a CharSequence as native format");
+      throw new UnsupportedOperationException(
+          "the sql datastore needs a CharSequence as native format, but is " + nativeCommand.getClass().getName());
     }
   }
 

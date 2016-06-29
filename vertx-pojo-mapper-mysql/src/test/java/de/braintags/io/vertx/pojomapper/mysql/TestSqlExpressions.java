@@ -78,6 +78,10 @@ public class TestSqlExpressions extends DatastoreBaseTest {
   @Test
   public void testConnection(TestContext context) {
     Vertx vertx = Vertx.vertx();
+    String host = System.getProperty("MySqlDataStoreContainer.host", null);
+    if (host == null) {
+      throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.host'");
+    }
     String username = System.getProperty("MySqlDataStoreContainer.username", null);
     if (username == null) {
       throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.username'");
@@ -87,7 +91,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
       throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.password'");
     }
 
-    JsonObject mySQLClientConfig = new JsonObject().put("host", "localhost").put("username", username)
+    JsonObject mySQLClientConfig = new JsonObject().put("host", host).put("username", username)
         .put("password", password).put("database", "test").put("port", 3306);
     AsyncSQLClient client = MySQLClient.createNonShared(vertx, mySQLClientConfig);
     client.getConnection(res -> {

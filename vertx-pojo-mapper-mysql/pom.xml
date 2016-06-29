@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>vertx-pojo-mapper</artifactId>
 		<groupId>de.braintags</groupId>
-		<version>1.2.0-SNAPSHOT</version>
+		<version>1.2.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -64,6 +64,7 @@
 						<systemPropertyVariables>
 							<io.netty.leakDetectionLevel>PARANOID</io.netty.leakDetectionLevel>
 							<IDatastoreContainer>de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer</IDatastoreContainer>
+                			<MySqlDataStoreContainer.host>${MySqlDataStoreContainer.host}</MySqlDataStoreContainer.host>
 							<MySqlDataStoreContainer.username>${MySqlDataStoreContainer.username}</MySqlDataStoreContainer.username>
                 			<MySqlDataStoreContainer.password>${MySqlDataStoreContainer.password}</MySqlDataStoreContainer.password>
 							
