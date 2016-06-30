@@ -39,7 +39,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   private static final io.vertx.core.logging.Logger logger = io.vertx.core.logging.LoggerFactory
       .getLogger(MongoDataStoreContainer.class);
 
-  private static final int LOCAL_PORT = 27018;
+  private static final int LOCAL_PORT = 27017;
   private static final String START_MONGO_LOCAL_PROP = "startMongoLocal";
   public static final String CONNECTION_STRING_PROPERTY = "connection_string";
   public static final String DEFAULT_CONNECTION = "mongodb://localhost:27017";

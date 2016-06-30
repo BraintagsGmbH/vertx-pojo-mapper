@@ -55,7 +55,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
   public static final String START_MONGO_LOCAL_PROP = "startMongoLocal";
 
   /**
-   * If START_MONGO_LOCAL_PROP is set to true, then this defines the local port to be used. Default is 27018
+   * If START_MONGO_LOCAL_PROP is set to true, then this defines the local port to be used. Default is 27017
    */
   public static final String LOCAL_PORT_PROP = "localPort";
 
@@ -68,7 +68,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
   boolean startMongoLocal = false;
   private MongoClient mongoClient;
   private MongoDataStore mongoDataStore;
-  protected int localPort = 27018;
+  protected int localPort = 27017;
 
   /**
    * Helper method which creates the default settings for an instance of {@link MongoDataStore}
@@ -79,7 +79,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     DataStoreSettings settings = new DataStoreSettings(MongoDataStoreInit.class, "testdatabase");
     settings.getProperties().put(CONNECTION_STRING_PROPERTY, DEFAULT_CONNECTION);
     settings.getProperties().put(START_MONGO_LOCAL_PROP, "false");
-    settings.getProperties().put(LOCAL_PORT_PROP, "27018");
+    settings.getProperties().put(LOCAL_PORT_PROP, "27017");
     settings.getProperties().put(SHARED_PROP, "false");
     settings.getProperties().put(HANDLE_REFERENCED_RECURSIVE_PROP, "true");
     return settings;
