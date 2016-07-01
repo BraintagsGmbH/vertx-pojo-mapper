@@ -72,6 +72,7 @@
 							<startMongoLocal>true</startMongoLocal>
 							<db_name>PojongoTestDatabase</db_name>
 						</systemPropertyVariables>
+						<testFailureIgnore>true</testFailureIgnore>					
 						<argLine>-server -Xmx1200M</argLine>
 						<forkCount>1</forkCount>
 						<reuseForks>true</reuseForks>
