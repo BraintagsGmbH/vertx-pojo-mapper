@@ -143,6 +143,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
     if (host == null) {
       throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.host'");
     }
+    String keyGenerator = System.getProperty(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
     DataStoreSettings settings = MySqlDataStoreinit.createDefaultSettings();
     settings.setDatabaseName(database);
     settings.getProperties().put(MySqlDataStoreinit.HOST_PROPERTY, host);
@@ -151,7 +152,7 @@ public class MySqlDataStoreContainer implements IDatastoreContainer {
     settings.getProperties().put(MySqlDataStoreinit.PASSWORD_PROPERTY, password);
     settings.getProperties().put(MySqlDataStoreinit.SHARED_PROP, "true");
     settings.getProperties().put(MySqlDataStoreinit.HANDLE_REFERENCED_RECURSIVE_PROP, handleReferencedRecursive);
-    settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
+    settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, keyGenerator);
     LOGGER.info("SETTINGS ARE: " + settings.toString());
     return settings;
   }

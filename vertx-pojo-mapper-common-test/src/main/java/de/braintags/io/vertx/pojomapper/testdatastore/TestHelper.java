@@ -19,6 +19,7 @@ import de.braintags.io.vertx.keygenerator.KeyGeneratorSettings;
 import de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle;
 import de.braintags.io.vertx.keygenerator.impl.MongoKeyGenerator;
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ExceptionUtil;
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
@@ -87,7 +88,9 @@ public class TestHelper {
     if (err.isError()) {
       throw err.getRuntimeException();
     } else {
-      startKeyGeneratorVerticle(context);
+      if (datastoreContainer.getDataStore().getDefaultKeyGenerator() instanceof DefaultKeyGenerator) {
+        startKeyGeneratorVerticle(context);
+      }
     }
 
   }

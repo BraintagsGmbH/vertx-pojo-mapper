@@ -18,6 +18,8 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.init.AbstractDataStoreInit;
 import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
+import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.util.exception.InitException;
 import de.flapdoodle.embed.mongo.MongodExecutable;
@@ -63,6 +65,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
    * The default connection to be used, if CONNECTION_STRING_PROPERTY is undefined
    */
   public static final String DEFAULT_CONNECTION = "mongodb://localhost:27017";
+  private static final String DEFAULT_KEY_GENERATOR = DefaultKeyGenerator.NAME;
 
   private static MongodExecutable exe;
   boolean startMongoLocal = false;
@@ -82,6 +85,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     settings.getProperties().put(LOCAL_PORT_PROP, "27017");
     settings.getProperties().put(SHARED_PROP, "false");
     settings.getProperties().put(HANDLE_REFERENCED_RECURSIVE_PROP, "true");
+    settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
     return settings;
   }
 

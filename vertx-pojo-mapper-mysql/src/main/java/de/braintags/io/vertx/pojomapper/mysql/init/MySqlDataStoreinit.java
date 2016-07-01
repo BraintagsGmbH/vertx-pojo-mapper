@@ -103,7 +103,7 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
     return new JsonObject().put(HOST_PROPERTY, getHostName()).put(USERNAME_PROPERTY, getUserName())
         .put(IDataStore.HANDLE_REFERENCED_RECURSIVE, handleReferencedRecursive).put(PASSWORD_PROPERTY, getPassword())
         .put("database", getDatabaseName()).put(PORT_PROPERTY, getPort(DEFAULT_PORT))
-        .put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
+        .put(IKeyGenerator.DEFAULT_KEY_GENERATOR, getKeygeneratorName());
   }
 
   private int getPort(int defaultPort) {
@@ -115,6 +115,10 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
     } else {
       return (Integer) p;
     }
+  }
+
+  private String getKeygeneratorName() {
+    return getProperty(IKeyGenerator.DEFAULT_KEY_GENERATOR, null);
   }
 
   private String getHostName() {

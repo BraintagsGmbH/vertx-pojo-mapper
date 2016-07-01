@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
+import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DebugGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
@@ -33,12 +34,31 @@ public class TestKeyGenerator extends DatastoreBaseTest {
 
   @Test
   public void testKeyGenerator(TestContext context) {
-    clearTable(context, "KeyGeneratorMapper");
+    if (getDataStore(context).getClass().getName().equals("de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore")) {
+      // all fine
+    } else if (getDataStore(context).getClass().getName()
+        .equals("de.braintags.io.vertx.pojomapper.mongo.MongoDataStore")) {
+      testKeyGeneratorMongo(context);
+    } else {
+      context.fail(new UnsupportedOperationException(
+          "unsupported datastore in test: " + getDataStore(context).getClass().getName()));
+    }
+  }
+
+  /**
+   * @param context
+   * @throws AssertionError
+   */
+  private void testKeyGeneratorMongo(TestContext context) throws AssertionError {
+    IKeyGenerator keyGen = getDataStore(context).getDefaultKeyGenerator();
+    context.assertNotNull(keyGen, "keygenerator must not be null");
+    context.assertTrue(keyGen instanceof DefaultKeyGenerator,
+        "not an instance of DefaultKeyGenerator: " + String.valueOf(keyGen.getName()));
 
     IMapper mapper = getDataStore(context).getMapperFactory().getMapper(KeyGeneratorMapper.class);
     context.assertTrue(mapper.getKeyGenerator() instanceof DefaultKeyGenerator,
         "not an instance of DefaultKeyGenerator: " + String.valueOf(mapper.getKeyGenerator()));
-
+    clearTable(context, "KeyGeneratorMapper");
     KeyGeneratorMapper sm = new KeyGeneratorMapper();
     sm.name = "testName";
     ResultContainer resultContainer = saveRecord(context, sm);
@@ -68,6 +88,7 @@ public class TestKeyGenerator extends DatastoreBaseTest {
   public void testKeyExists(TestContext context) {
     clearTable(context, "KeyGeneratorMapperDebugGenerator");
     DebugGenerator gen = (DebugGenerator) getDataStore(context).getKeyGenerator(DebugGenerator.NAME);
+    gen.resetCounter();
 
     KeyGeneratorMapperDebugGenerator km = new KeyGeneratorMapperDebugGenerator();
     km.name = "testName";
