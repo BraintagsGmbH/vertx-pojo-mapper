@@ -68,7 +68,8 @@
 							<MySqlDataStoreContainer.username>${MySqlDataStoreContainer.username}</MySqlDataStoreContainer.username>
                 			<MySqlDataStoreContainer.password>${MySqlDataStoreContainer.password}</MySqlDataStoreContainer.password>
 							<startMongoLocal>true</startMongoLocal>
-							<defaultKeyGenerator>DEBUG</defaultKeyGenerator>						
+							<defaultKeyGenerator>DEBUG</defaultKeyGenerator>
+							<testFailureIgnore>true</testFailureIgnore>					
 						</systemPropertyVariables>
 						<argLine>-server -Xmx1200M</argLine>
 						<forkCount>1</forkCount>
