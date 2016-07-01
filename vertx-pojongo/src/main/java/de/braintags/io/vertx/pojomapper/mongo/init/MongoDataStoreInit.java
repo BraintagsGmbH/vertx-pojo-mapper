@@ -123,7 +123,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
    * 
    * @return the instance of MongodExecutable or null, if not used
    */
-  public MongodExecutable getMongodExecutable() {
+  public static MongodExecutable getMongodExecutable() {
     return exe;
   }
 
