@@ -20,7 +20,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
-import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoDelete;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoQuery;
 import de.braintags.io.vertx.pojomapper.mongo.dataaccess.MongoWrite;
@@ -157,7 +156,7 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
    */
   @Override
   public final IKeyGenerator getDefaultKeyGenerator() {
-    String genName = getProperties().getString(IKeyGenerator.DEFAULT_KEY_GENERATOR, DefaultKeyGenerator.NAME);
+    String genName = getProperties().getString(IKeyGenerator.DEFAULT_KEY_GENERATOR);
     return genName == null ? null : getKeyGenerator(genName);
   }
 

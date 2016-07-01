@@ -156,6 +156,9 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     config.put("connection_string", getConnectionString());
     config.put(DBNAME_PROP, getDatabaseName());
     config.put(IDataStore.HANDLE_REFERENCED_RECURSIVE, handleReferencedRecursive);
+    String prop = getProperty(IKeyGenerator.DEFAULT_KEY_GENERATOR, null);
+    config.put(IKeyGenerator.DEFAULT_KEY_GENERATOR, prop);
+
     return config;
   }
 

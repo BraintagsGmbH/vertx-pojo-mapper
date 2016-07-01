@@ -12,9 +12,9 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleMapper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EmbeddedMapper_Single;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.SimpleMapperEmbedded;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -39,7 +39,7 @@ public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
   @Override
   public BaseRecord createInstance(TestContext context) {
     EmbeddedMapper_Single mapper = new EmbeddedMapper_Single();
-    mapper.simpleMapper = new SimpleMapper("testname", "secnd prop");
+    mapper.simpleMapper = new SimpleMapperEmbedded("testname", "secnd prop");
     return mapper;
   }
 }

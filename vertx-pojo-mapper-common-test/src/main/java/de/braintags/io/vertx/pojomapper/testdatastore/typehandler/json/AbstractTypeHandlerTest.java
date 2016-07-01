@@ -81,6 +81,7 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
       ResultContainer resultContainer = saveRecord(context, record);
       if (resultContainer.assertionError != null)
         throw resultContainer.assertionError;
+      validateAfterSave(context, record, resultContainer);
       Iterator<IWriteEntry> it = resultContainer.writeResult.iterator();
       while (it.hasNext()) {
         IWriteEntry we = it.next();
@@ -104,6 +105,17 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
       LOGGER.info("", e);
       throw ExceptionUtil.createRuntimeException(e);
     }
+  }
+
+  /**
+   * Validates a record after it was written into the datastore
+   * 
+   * @param context
+   * @param record
+   * @param resultContainer
+   */
+  protected void validateAfterSave(TestContext context, Object record, ResultContainer resultContainer) {
+
   }
 
   /**

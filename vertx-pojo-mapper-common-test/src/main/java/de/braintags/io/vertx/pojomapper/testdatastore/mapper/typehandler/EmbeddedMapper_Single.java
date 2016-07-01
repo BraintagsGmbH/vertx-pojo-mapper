@@ -15,7 +15,6 @@ package de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleMapper;
 
 /**
  * Mapper to test {@link Referenced} annotation
@@ -28,7 +27,7 @@ import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleMapper;
 public class EmbeddedMapper_Single extends BaseRecord {
 
   @Embedded
-  public SimpleMapper simpleMapper;
+  public SimpleMapperEmbedded simpleMapper;
 
   /**
    * 

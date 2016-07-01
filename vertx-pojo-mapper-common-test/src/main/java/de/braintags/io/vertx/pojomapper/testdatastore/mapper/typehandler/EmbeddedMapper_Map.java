@@ -18,7 +18,6 @@ import java.util.Map;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleMapper;
 
 /**
  * Mapper to test {@link Referenced} annotation
@@ -31,15 +30,15 @@ import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleMapper;
 public class EmbeddedMapper_Map extends BaseRecord {
 
   @Embedded
-  public Map<Integer, SimpleMapper> simpleMapper;
+  public Map<Integer, SimpleMapperEmbedded> simpleMapper;
 
   /**
    * 
    */
   public EmbeddedMapper_Map() {
-    simpleMapper = new HashMap<Integer, SimpleMapper>();
+    simpleMapper = new HashMap<Integer, SimpleMapperEmbedded>();
     for (int i = 0; i < 5; i++) {
-      simpleMapper.put(i, new SimpleMapper("name " + i, "sec prop " + i));
+      simpleMapper.put(i, new SimpleMapperEmbedded("name " + i, "sec prop " + i));
     }
   }
 

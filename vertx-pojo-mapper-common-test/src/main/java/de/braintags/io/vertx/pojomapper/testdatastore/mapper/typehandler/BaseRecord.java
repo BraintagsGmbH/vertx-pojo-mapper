@@ -89,8 +89,14 @@ public class BaseRecord {
       return compareMaps((Map) value, (Map) compareValue, fieldName);
     }
 
-    if (!value.equals(compareValue))
-      throw new MappingException("Contents are not equal: " + fieldName + ": " + value + " / " + compareValue);
+    if (!value.equals(compareValue)) {
+      if (!value.getClass().equals(compareValue.getClass())) {
+        throw new MappingException("Contents are not equal cause of class differences: field: " + fieldName + ": "
+            + value.getClass() + " / " + compareValue.getClass());
+      } else {
+        throw new MappingException("Contents are not equal: " + fieldName + ": " + value + " / " + compareValue);
+      }
+    }
     return true;
   }
 

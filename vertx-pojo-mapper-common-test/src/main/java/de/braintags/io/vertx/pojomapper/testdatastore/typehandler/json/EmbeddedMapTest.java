@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EmbeddedMapper_Map;
 import io.vertx.ext.unit.TestContext;
@@ -38,6 +39,13 @@ public class EmbeddedMapTest extends AbstractTypeHandlerTest {
   @Override
   protected String getTestFieldName() {
     return "simpleMapper";
+  }
+
+  @Override
+  protected void validateAfterSave(TestContext context, Object record, ResultContainer resultContainer) {
+    EmbeddedMapper_Map mapper = (EmbeddedMapper_Map) record;
+    context.assertNotNull(mapper.id);
+
   }
 
   @Override
