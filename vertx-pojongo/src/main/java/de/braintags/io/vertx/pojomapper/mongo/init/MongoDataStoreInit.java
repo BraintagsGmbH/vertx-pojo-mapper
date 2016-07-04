@@ -193,9 +193,9 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
    * @param localPort
    *          the port where to start the instance
    */
-  public static void startMongoExe(boolean startMongoLocal, int localPort) {
-    LOGGER.info("STARTING MONGO");
-    if (startMongoLocal) {
+  private static void startMongoExe(boolean startMongoLocal, int localPort) {
+    if (exe == null && startMongoLocal) {
+      LOGGER.info("STARTING LOCAL MONGO");
       try {
         IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
             .net(new Net(localPort, Network.localhostIsIPv6())).build();
