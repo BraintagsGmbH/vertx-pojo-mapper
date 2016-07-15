@@ -23,7 +23,7 @@ To use this project, add the following dependency to the _dependencies_ section 
 <dependency>
   <groupId>de.braintags</groupId>
 <artifactId>vertx-pojo-mapper-common</artifactId>
-<version>1.3.1</version>
+<version>1.3.2-SNAPSHOT</version>
 </dependency>
 ----
 
@@ -32,7 +32,7 @@ To use this project, add the following dependency to the _dependencies_ section 
 [source,groovy,subs="+attributes"]
 ----
 dependencies {
-compile 'de.braintags:vertx-pojo-mapper-common:1.3.1'
+compile 'de.braintags:vertx-pojo-mapper-common:1.3.2-SNAPSHOT'
 }
 ----
 
