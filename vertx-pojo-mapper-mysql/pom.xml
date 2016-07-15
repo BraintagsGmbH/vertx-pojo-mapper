@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>vertx-pojo-mapper</artifactId>
 		<groupId>de.braintags</groupId>
-		<version>1.3.0-SNAPSHOT</version>
+		<version>1.3.1</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -68,7 +68,7 @@
 							<MySqlDataStoreContainer.username>${MySqlDataStoreContainer.username}</MySqlDataStoreContainer.username>
                 			<MySqlDataStoreContainer.password>${MySqlDataStoreContainer.password}</MySqlDataStoreContainer.password>
 							<startMongoLocal>true</startMongoLocal>
-							<defaultKeyGenerator>DEBUG</defaultKeyGenerator>
+							<defaultKeyGenerator>DEBUG</defaultKeyGenerator>						
 						</systemPropertyVariables>
 						<testFailureIgnore>true</testFailureIgnore>					
 						<argLine>-server -Xmx1200M</argLine>
