@@ -86,21 +86,30 @@ public class TestKeyGenerator extends DatastoreBaseTest {
     DebugGenerator gen = (DebugGenerator) getDataStore(context).getKeyGenerator(DebugGenerator.NAME);
     gen.resetCounter();
 
-    KeyGeneratorMapperDebugGenerator km = new KeyGeneratorMapperDebugGenerator();
-    km.name = "testName";
-    ResultContainer resultContainer = saveRecord(context, km);
-    checkWriteAction(context, resultContainer, WriteAction.INSERT);
+    KeyGeneratorMapperDebugGenerator km = doInsert(context, "testName");
     int id = Integer.parseInt(km.id);
     context.assertEquals(id, 1, "expected first id as 1");
+    km = doInsert(context, "testName2");
+    km = doInsert(context, "testName3");
+    id = Integer.parseInt(km.id);
+    context.assertEquals(id, 3, "expected id as 3");
 
     gen.resetCounter();
-    km = new KeyGeneratorMapperDebugGenerator();
-    km.name = "testId Exists";
-    resultContainer = saveRecord(context, km);
-    checkWriteAction(context, resultContainer, WriteAction.INSERT);
+    km = doInsert(context, "testId Exists");
     id = Integer.parseInt(km.id);
-    context.assertEquals(id, 2, "expected first id as 2 cause of existing record");
+    context.assertEquals(id, 4, "expected first id as 4 cause of existing record");
+  }
 
+  /**
+   * @param context
+   * @return
+   */
+  private KeyGeneratorMapperDebugGenerator doInsert(TestContext context, String name) {
+    KeyGeneratorMapperDebugGenerator km = new KeyGeneratorMapperDebugGenerator();
+    km.name = name;
+    ResultContainer resultContainer = saveRecord(context, km);
+    checkWriteAction(context, resultContainer, WriteAction.INSERT);
+    return km;
   }
 
   private void checkWriteAction(TestContext context, ResultContainer resultContainer, WriteAction we) {

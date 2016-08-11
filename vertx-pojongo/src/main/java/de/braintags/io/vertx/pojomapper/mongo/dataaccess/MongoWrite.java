@@ -127,7 +127,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
 
   private void handleInsertError(Throwable t, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
-    if (t.getMessage().indexOf("duplicate key error index") >= 0) {
+    if (t.getMessage().indexOf("duplicate key error") >= 0) {
       if (getMapper().getKeyGenerator() != null) {
         LOG.info("duplicate key, regenerating a new key");
         storeObject.getNextId(niResult -> {
