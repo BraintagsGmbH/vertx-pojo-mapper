@@ -43,14 +43,10 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.field("name").is("Dublette");
     ResultContainer resultContainer = find(context, query, 2);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
 
     query = getDataStore(context).createQuery(SimpleMapper.class);
     query.or("secondProperty").is("erste").field("secondProperty").is("zweite");
     resultContainer = find(context, query, 2);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   @Test
@@ -61,8 +57,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.and("name").is("Dublette").field("secondProperty").is("erste");
     ResultContainer resultContainer = find(context, query, 1);
     logger.info(resultContainer.queryResult.getOriginalQuery().toString());
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   @Test
@@ -72,8 +66,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.and("name").is("Dublette").field("secondProperty").is("erste");
     ResultContainer resultContainer = findCount(context, query, 1);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   @Test
@@ -82,13 +74,9 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.field("name").is("Dublette");
     ResultContainer resultContainer = find(context, query, 2);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
 
     query.field("secondProperty").is("erste");
     resultContainer = find(context, query, 1);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   /**
@@ -102,8 +90,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.and("name").is("AndOr").field("secondProperty").is("AndOr 1").or("secondProperty").is("AndOr 2");
 
     ResultContainer resultContainer = find(context, query, -1);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   /**
@@ -117,8 +103,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.field("name").in(it);
 
     ResultContainer resultContainer = find(context, query, 5);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   /**
@@ -132,8 +116,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.field("secondProperty").notIn(it);
 
     ResultContainer resultContainer = find(context, query, 3);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   /**
@@ -146,8 +128,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.field("name").isNot("Dublette");
 
     ResultContainer resultContainer = find(context, query, 3);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   /**
@@ -160,8 +140,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.field("secondProperty").contains("ab");
 
     ResultContainer resultContainer = find(context, query, 3);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   /**
@@ -174,8 +152,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.field("secondProperty").contains("AB");
 
     ResultContainer resultContainer = find(context, query, 3);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   /**
@@ -188,8 +164,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.field("secondProperty").contains("aa");
 
     ResultContainer resultContainer = find(context, query, 3);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   @Test
@@ -199,8 +173,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.field("secondProperty").contains("cc");
 
     ResultContainer resultContainer = find(context, query, 3);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   @Test
@@ -211,8 +183,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.setLimit(2);
 
     ResultContainer resultContainer = find(context, query, 2);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
     context.assertEquals(2, resultContainer.queryResult.size());
     context.assertEquals((long) -1, resultContainer.queryResult.getCompleteResult());
   }
@@ -226,8 +196,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.setReturnCompleteCount(true);
 
     ResultContainer resultContainer = find(context, query, 2);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
     context.assertEquals((long) 3, resultContainer.queryResult.getCompleteResult());
   }
 
@@ -241,8 +209,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.setReturnCompleteCount(true);
 
     ResultContainer resultContainer = find(context, query, 1);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
     context.assertEquals((long) 3, resultContainer.queryResult.getCompleteResult(), "incorrect complete result");
   }
 
@@ -293,16 +259,12 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
       sm.setSecondProperty("erste");
       sm.intValue = 10;
       ResultContainer resultContainer = saveRecord(context, sm);
-      if (resultContainer.assertionError != null)
-        throw resultContainer.assertionError;
 
       sm = new SimpleMapper();
       sm.name = "Dublette";
       sm.setSecondProperty("zweite");
       sm.intValue = 11;
       resultContainer = saveRecord(context, sm);
-      if (resultContainer.assertionError != null)
-        throw resultContainer.assertionError;
 
       for (int i = 0; i < 3; i++) {
         sm = new SimpleMapper();
@@ -310,8 +272,6 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
         sm.setSecondProperty("AndOr " + i);
         sm.intValue = i + 1;
         resultContainer = saveRecord(context, sm);
-        if (resultContainer.assertionError != null)
-          throw resultContainer.assertionError;
       }
 
       sm = new SimpleMapper();
@@ -319,42 +279,30 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
       sm.setSecondProperty("aabbcc");
       sm.intValue = 11;
       resultContainer = saveRecord(context, sm);
-      if (resultContainer.assertionError != null)
-        throw resultContainer.assertionError;
 
       sm = new SimpleMapper();
       sm.name = "startswith";
       sm.setSecondProperty("aabbcc");
       sm.intValue = 11;
       resultContainer = saveRecord(context, sm);
-      if (resultContainer.assertionError != null)
-        throw resultContainer.assertionError;
 
       sm = new SimpleMapper();
       sm.name = "startswith";
       sm.setSecondProperty("aabbcc");
       sm.intValue = 11;
       resultContainer = saveRecord(context, sm);
-      if (resultContainer.assertionError != null)
-        throw resultContainer.assertionError;
 
       EnumRecord en = new EnumRecord();
       en.enumEnum = WriteAction.INSERT;
       resultContainer = saveRecord(context, en);
-      if (resultContainer.assertionError != null)
-        throw resultContainer.assertionError;
 
       en = new EnumRecord();
       en.enumEnum = WriteAction.UNKNOWN;
       resultContainer = saveRecord(context, en);
-      if (resultContainer.assertionError != null)
-        throw resultContainer.assertionError;
 
       en = new EnumRecord();
       en.enumEnum = WriteAction.UPDATE;
       resultContainer = saveRecord(context, en);
-      if (resultContainer.assertionError != null)
-        throw resultContainer.assertionError;
 
     }
 

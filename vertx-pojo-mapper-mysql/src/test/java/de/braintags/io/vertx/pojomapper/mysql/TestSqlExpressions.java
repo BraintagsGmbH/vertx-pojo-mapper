@@ -59,8 +59,6 @@ public class TestSqlExpressions extends DatastoreBaseTest {
     query.setNativeCommand(qs);
 
     ResultContainer resultContainer = find(context, query, 10);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
 
   }
 
@@ -70,9 +68,12 @@ public class TestSqlExpressions extends DatastoreBaseTest {
     IQuery<MiniMapper> query = ds.createQuery(MiniMapper.class);
     JsonObject qs = new JsonObject();
     query.setNativeCommand(qs);
-    ResultContainer resultContainer = find(context, query, -1);
-    if (resultContainer.assertionError == null)
+    try {
+      ResultContainer resultContainer = find(context, query, -1);
       context.fail("Expected an exception here");
+    } catch (Throwable e) {
+      // all fine - expected
+    }
   }
 
   @Test

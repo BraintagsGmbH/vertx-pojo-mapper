@@ -40,8 +40,6 @@ public class TestSimpleMapper extends DatastoreBaseTest {
     sm.name = "testName";
     sm.setSecondProperty("my second property");
     ResultContainer resultContainer = saveRecord(context, sm);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
     IWriteEntry we = resultContainer.writeResult.iterator().next();
     context.assertEquals(we.getAction(), WriteAction.INSERT);
     context.assertNotNull(sm.id);
@@ -50,16 +48,12 @@ public class TestSimpleMapper extends DatastoreBaseTest {
     sm.name = "testNameModified";
     sm.setSecondProperty("my modified property");
     resultContainer = saveRecord(context, sm);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
     we = resultContainer.writeResult.iterator().next();
     context.assertEquals(we.getAction(), WriteAction.UPDATE);
 
     // SimpleQuery for all records
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     resultContainer = find(context, query, 1);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
 
     resultContainer.queryResult.iterator().next(result -> {
       if (result.failed()) {
@@ -70,22 +64,24 @@ public class TestSimpleMapper extends DatastoreBaseTest {
 
         // search inside name field
         query.field("name").is("testNameModified");
-        ResultContainer resultContainer2 = find(context, query, 1);
-        if (resultContainer2.assertionError != null)
-          throw resultContainer2.assertionError;
-
-        resultContainer2.queryResult.iterator().next(res2 -> {
-          if (res2.failed()) {
-            logger.error("", result.cause());
-            context.fail(result.cause().toString());
-          } else {
-            SimpleMapper rsm = (SimpleMapper) result.result();
-            context.assertTrue(sm.equals(rsm));
-            context.assertEquals("succeeded", rsm.beforeSave);
-            context.assertEquals("succeeded", rsm.afterSave);
-            context.assertEquals("succeeded", rsm.afterLoad);
-          }
-        });
+        try {
+          ResultContainer resultContainer2 = find(context, query, 1);
+          resultContainer2.queryResult.iterator().next(res2 -> {
+            if (res2.failed()) {
+              logger.error("", result.cause());
+              context.fail(result.cause().toString());
+            } else {
+              SimpleMapper rsm = (SimpleMapper) result.result();
+              context.assertTrue(sm.equals(rsm));
+              context.assertEquals("succeeded", rsm.beforeSave);
+              context.assertEquals("succeeded", rsm.afterSave);
+              context.assertEquals("succeeded", rsm.afterLoad);
+            }
+          });
+        } catch (Throwable e) {
+          logger.error("", result.cause());
+          context.fail(e);
+        }
       }
     });
   }

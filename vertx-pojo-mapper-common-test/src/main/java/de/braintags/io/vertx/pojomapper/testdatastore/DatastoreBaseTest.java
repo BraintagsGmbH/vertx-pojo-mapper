@@ -84,13 +84,14 @@ public abstract class DatastoreBaseTest {
   public static ResultContainer saveRecords(TestContext context, List<?> records, int waittime) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
+    ErrorObject err = new ErrorObject<>(null);
     IWrite<Object> write = (IWrite<Object>) getDataStore(context).createWrite(records.get(0).getClass());
     for (Object record : records) {
       write.add(record);
     }
     write.save(result -> {
       if (result.failed()) {
-        resultContainer.assertionError = new AssertionError(result.cause());
+        err.setThrowable(result.cause());
         async.complete();
       } else {
         try {
@@ -98,10 +99,10 @@ public abstract class DatastoreBaseTest {
           checkWriteResult(context, result, records.size());
         } catch (AssertionError e) {
           logger.error("", e); // logging in case the ResultContainer is not handled in caller
-          resultContainer.assertionError = e;
+          err.setThrowable(e);
         } catch (Throwable e) {
           logger.error("", e);// logging in case the ResultContainer is not handled in caller
-          resultContainer.assertionError = new AssertionError(e);
+          err.setThrowable(e);
         } finally {
           async.complete();
         }
@@ -113,8 +114,8 @@ public abstract class DatastoreBaseTest {
     } else {
       async.await(waittime);
     }
-    if (resultContainer.assertionError != null) {
-      throw resultContainer.assertionError;
+    if (err.isError()) {
+      throw new AssertionError(err.getThrowable());
     }
     return resultContainer;
   }
@@ -155,24 +156,24 @@ public abstract class DatastoreBaseTest {
   public static ResultContainer find(TestContext context, IQuery<?> query, int expectedResult) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
+    ErrorObject err = new ErrorObject<>(null);
     query.execute(result -> {
       try {
         resultFine(result);
         resultContainer.queryResult = result.result();
         logger.info("performed find with: " + resultContainer.queryResult.getOriginalQuery());
-      } catch (AssertionError e) {
-        resultContainer.assertionError = e;
       } catch (Throwable e) {
-        resultContainer.assertionError = new AssertionError(e);
+        err.setThrowable(e);
       } finally {
         async.complete();
       }
     });
 
     async.await();
-    if (resultContainer.assertionError == null) {
-      checkQueryResult(context, resultContainer.queryResult, expectedResult);
+    if (err.isError()) {
+      throw new AssertionError(err.getThrowable());
     }
+    checkQueryResult(context, resultContainer.queryResult, expectedResult);
     return resultContainer;
   }
 
@@ -248,24 +249,24 @@ public abstract class DatastoreBaseTest {
   public static ResultContainer findCount(TestContext context, IQuery<?> query, int expectedResult) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
+    ErrorObject err = new ErrorObject<>(null);
     query.executeCount(result -> {
       try {
         resultContainer.queryResultCount = result.result();
         logger.info(
             resultContainer.queryResultCount.getOriginalQuery() + ": " + resultContainer.queryResultCount.getCount());
         checkQueryResultCount(context, result, expectedResult);
-      } catch (AssertionError e) {
-        resultContainer.assertionError = e;
       } catch (Throwable e) {
-        resultContainer.assertionError = new AssertionError(e);
+        err.setThrowable(e);
       } finally {
         async.complete();
       }
     });
 
     async.await();
-    if (resultContainer.assertionError != null)
-      throw new RuntimeException(resultContainer.assertionError);
+    if (err.isError()) {
+      throw new AssertionError(err.getThrowable());
+    }
     return resultContainer;
   }
 
@@ -284,25 +285,26 @@ public abstract class DatastoreBaseTest {
       int expectedResult) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
+    ErrorObject err = new ErrorObject<>(null);
     delete.delete(result -> {
       try {
         resultContainer.deleteResult = result.result();
         checkDeleteResult(context, result);
-      } catch (AssertionError e) {
-        resultContainer.assertionError = e;
       } catch (Throwable e) {
-        resultContainer.assertionError = new AssertionError(e);
+        err.setThrowable(e);
       } finally {
         async.complete();
       }
     });
 
     async.await();
+    if (err.isError()) {
+      throw new AssertionError(err.getThrowable());
+    }
 
     // Now perform the query check
     if (checkQuery != null) {
       ResultContainer queryResult = find(context, checkQuery, expectedResult);
-      resultContainer.assertionError = queryResult.assertionError;
       resultContainer.queryResult = queryResult.queryResult;
       return resultContainer;
     }

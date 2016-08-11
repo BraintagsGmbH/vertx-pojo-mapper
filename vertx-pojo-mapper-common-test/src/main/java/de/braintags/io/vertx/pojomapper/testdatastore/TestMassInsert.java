@@ -42,8 +42,6 @@ public class TestMassInsert extends DatastoreBaseTest {
       mapperList.add(new MiniNumberMapper("looper " + i, i));
     }
     ResultContainer resultContainer = saveRecords(context, mapperList, 0);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
 
     IWriteResult wr = resultContainer.writeResult;
     if (LOOP != wr.size()) {

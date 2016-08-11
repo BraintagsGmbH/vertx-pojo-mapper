@@ -27,7 +27,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
  */
 
 public class ResultContainer {
-  public AssertionError assertionError;
+  // public AssertionError assertionError;
   public IWriteResult writeResult;
   public IQueryResult<?> queryResult;
   public IQueryCountResult queryResultCount;

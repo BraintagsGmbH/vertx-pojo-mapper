@@ -62,8 +62,6 @@ public class TestKeyGenerator extends DatastoreBaseTest {
     KeyGeneratorMapper sm = new KeyGeneratorMapper();
     sm.name = "testName";
     ResultContainer resultContainer = saveRecord(context, sm);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
     IWriteEntry we1 = resultContainer.writeResult.iterator().next();
     context.assertEquals(we1.getAction(), WriteAction.INSERT);
     context.assertNotNull(sm.id);
@@ -76,8 +74,6 @@ public class TestKeyGenerator extends DatastoreBaseTest {
 
     sm.name = "testNameModified";
     resultContainer = saveRecord(context, sm);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
     IWriteEntry we = resultContainer.writeResult.iterator().next();
     context.assertEquals(we.getAction(), WriteAction.UPDATE);
     context.assertEquals(String.valueOf(we1.getId()), String.valueOf(we.getId()),
@@ -93,8 +89,6 @@ public class TestKeyGenerator extends DatastoreBaseTest {
     KeyGeneratorMapperDebugGenerator km = new KeyGeneratorMapperDebugGenerator();
     km.name = "testName";
     ResultContainer resultContainer = saveRecord(context, km);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
     checkWriteAction(context, resultContainer, WriteAction.INSERT);
     int id = Integer.parseInt(km.id);
     context.assertEquals(id, 1, "expected first id as 1");
@@ -103,8 +97,6 @@ public class TestKeyGenerator extends DatastoreBaseTest {
     km = new KeyGeneratorMapperDebugGenerator();
     km.name = "testId Exists";
     resultContainer = saveRecord(context, km);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
     checkWriteAction(context, resultContainer, WriteAction.INSERT);
     id = Integer.parseInt(km.id);
     context.assertEquals(id, 2, "expected first id as 2 cause of existing record");

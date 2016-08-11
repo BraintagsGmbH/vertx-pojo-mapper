@@ -79,8 +79,6 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
       dropTables(context, record);
 
       ResultContainer resultContainer = saveRecord(context, record);
-      if (resultContainer.assertionError != null)
-        throw resultContainer.assertionError;
       validateAfterSave(context, record, resultContainer);
       Iterator<IWriteEntry> it = resultContainer.writeResult.iterator();
       while (it.hasNext()) {
@@ -128,8 +126,7 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
    */
   protected void verifyResult(TestContext context, BaseRecord record, ResultContainer resultContainer)
       throws AssertionError {
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
+
   }
 
   protected void dropTables(TestContext context, BaseRecord record) {

@@ -37,8 +37,6 @@ public class TestTrigger extends DatastoreBaseTest {
     clearTable(context, MultipleTriggerMapper.class.getSimpleName());
     MultipleTriggerMapper source = new MultipleTriggerMapper("multi");
     ResultContainer resultContainer = saveRecord(context, source);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
     source.validate(context);
 
     IQuery<MultipleTriggerMapper> query = getDataStore(context).createQuery(MultipleTriggerMapper.class);
@@ -54,8 +52,6 @@ public class TestTrigger extends DatastoreBaseTest {
     TriggerMapper source = new TriggerMapper();
     context.assertEquals("testName", source.name);
     ResultContainer resultContainer = saveRecord(context, source);
-    if (resultContainer.assertionError != null)
-      throw resultContainer.assertionError;
     context.assertEquals("beforeSave", source.name);
     context.assertEquals("beforeSaveWithDataStore", source.beforeSaveWithDataStore);
 
