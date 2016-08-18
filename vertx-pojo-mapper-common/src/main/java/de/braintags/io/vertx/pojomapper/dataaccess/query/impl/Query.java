@@ -337,4 +337,14 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     return nativeCommand;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#hasQueryArguments()
+   */
+  @Override
+  public boolean hasQueryArguments() {
+    return !filters.isEmpty();
+  }
+
 }

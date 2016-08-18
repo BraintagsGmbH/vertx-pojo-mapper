@@ -115,4 +115,11 @@ public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
    * @return the command or null, if none defined
    */
   Object getNativeCommand();
+
+  /**
+   * Returns true, if the current query definition contains arguments
+   * 
+   * @return
+   */
+  boolean hasQueryArguments();
 }
