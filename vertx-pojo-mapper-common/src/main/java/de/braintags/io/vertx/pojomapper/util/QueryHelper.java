@@ -18,6 +18,7 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.pojomapper.exception.NoSuchRecordException;
 import de.braintags.io.vertx.util.IteratorAsync;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -56,8 +57,9 @@ public class QueryHelper {
   }
 
   /**
-   * Executes the given {@link IQuery} and returns teh first record directly to the handler. This method can be used,
-   * when only one record is expected to be found, like an ID query, for instance
+   * Executes the given {@link IQuery} and returns the first record directly to the handler. This method can be used,
+   * when only one record is expected to be found, like an ID query, for instance. The same than
+   * executeToFirstRecord(query, false, handler)
    * 
    * @param query
    *          the query to be executed
@@ -65,6 +67,21 @@ public class QueryHelper {
    *          the handler, which will receive the first object
    */
   public static void executeToFirstRecord(IQuery<?> query, Handler<AsyncResult<?>> handler) {
+    executeToFirstRecord(query, false, handler);
+  }
+
+  /**
+   * Executes the given {@link IQuery} and returns the first record directly to the handler. This method can be used,
+   * when only one record is expected to be found, like an ID query, for instance
+   * 
+   * @param query
+   *          the query to be executed
+   * @param required
+   *          defines wether at least one record must exist
+   * @param handler
+   *          the handler, which will receive the first object
+   */
+  public static void executeToFirstRecord(IQuery<?> query, boolean required, Handler<AsyncResult<?>> handler) {
     query.execute(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -79,7 +96,12 @@ public class QueryHelper {
             }
           });
         } else {
-          handler.handle(Future.succeededFuture(null));
+          if (required) {
+            handler.handle(Future.failedFuture(new NoSuchRecordException(
+                "expected record not found for query " + result.result().getOriginalQuery().toString())));
+          } else {
+            handler.handle(Future.succeededFuture(null));
+          }
         }
       }
     });

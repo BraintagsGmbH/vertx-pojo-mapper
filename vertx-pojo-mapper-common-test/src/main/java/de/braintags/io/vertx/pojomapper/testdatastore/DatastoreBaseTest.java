@@ -53,6 +53,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 public abstract class DatastoreBaseTest {
   private static final Logger logger = LoggerFactory.getLogger(DatastoreBaseTest.class);
 
+  @SuppressWarnings("unused")
   private static final String COLLECTION = "MySequenceCollection";
 
   /**
@@ -80,7 +81,7 @@ public abstract class DatastoreBaseTest {
    *          the time to wait for saving
    * @return the result
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public static ResultContainer saveRecords(TestContext context, List<?> records, int waittime) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
@@ -153,6 +154,7 @@ public abstract class DatastoreBaseTest {
    *          the expected number of records
    * @return ResultContainer with certain informations
    */
+  @SuppressWarnings("rawtypes")
   public static ResultContainer find(TestContext context, IQuery<?> query, int expectedResult) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
@@ -178,6 +180,35 @@ public abstract class DatastoreBaseTest {
   }
 
   /**
+   * Executes a query for a record with the given ID
+   * 
+   * @param context
+   * @param mapperClass
+   * @param id
+   * @return
+   */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public static Object findRecordByID(TestContext context, Class mapperClass, String id) {
+    Async async = context.async();
+    ResultObject res = new ResultObject(null);
+    QueryHelper.findRecordById(getDataStore(context), mapperClass, id, result -> {
+      if (result.failed()) {
+        res.setThrowable(result.cause());
+        async.complete();
+      } else {
+        res.setResult(result.result());
+        async.complete();
+      }
+    });
+    async.await();
+    if (res.isError()) {
+      throw res.getRuntimeException();
+    } else {
+      return res.getResult();
+    }
+  }
+
+  /**
    * Executes a query and returns directly the first record
    * 
    * @param context
@@ -186,6 +217,7 @@ public abstract class DatastoreBaseTest {
    *          the query to be executed
    * @return Object the first instance found or null if none
    */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public static Object findFirst(TestContext context, IQuery<?> query) {
     Async async = context.async();
     ResultObject res = new ResultObject(null);
@@ -246,6 +278,7 @@ public abstract class DatastoreBaseTest {
    *          the expected number of records
    * @return ResultContainer with certain informations
    */
+  @SuppressWarnings("rawtypes")
   public static ResultContainer findCount(TestContext context, IQuery<?> query, int expectedResult) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
@@ -281,6 +314,7 @@ public abstract class DatastoreBaseTest {
    *          the expected result of checkQuery
    * @return {@link ResultContainer} with deleteResult and queryResult
    */
+  @SuppressWarnings("rawtypes")
   public static ResultContainer delete(TestContext context, IDelete<?> delete, IQuery<?> checkQuery,
       int expectedResult) {
     Async async = context.async();
@@ -329,7 +363,7 @@ public abstract class DatastoreBaseTest {
     }
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({ "rawtypes" })
   public static void checkQueryResult(TestContext context, IQueryResult qr, int expectedResult) {
     Async async = context.async();
 
