@@ -262,13 +262,11 @@ public class SqlExpression implements IQueryExpression {
   }
 
   private void appendLimitClause(StringBuilder complete) {
-    if (whereClause.length() > 0) {
-      if (limit > 0) {
-        complete.append(" LIMIT ").append(limit);
-      }
-      if (offset > 0) {
-        complete.append(" OFFSET ").append(offset);
-      }
+    if (limit > 0) {
+      complete.append(" LIMIT ").append(limit);
+    }
+    if (offset > 0) {
+      complete.append(" OFFSET ").append(offset);
     }
   }
 

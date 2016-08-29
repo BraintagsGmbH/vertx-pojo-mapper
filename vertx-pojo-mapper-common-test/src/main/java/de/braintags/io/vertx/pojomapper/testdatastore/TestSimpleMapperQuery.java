@@ -188,6 +188,17 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   }
 
   @Test
+  public void testFindLimitWithoutQueryArgs(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    query.setLimit(2);
+
+    ResultContainer resultContainer = find(context, query, 2);
+    context.assertEquals(2, resultContainer.queryResult.size());
+    context.assertEquals((long) -1, resultContainer.queryResult.getCompleteResult());
+  }
+
+  @Test
   public void testFindLimitGetCompleteCount(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
