@@ -74,6 +74,31 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
   protected int localPort = 27017;
 
   /**
+   * This method creates new datastore settings for mongo by using system properties
+   * 
+   * @return
+   */
+  public static DataStoreSettings createSettings() {
+    DataStoreSettings settings = createDefaultSettings();
+    String connectionString = System.getProperty(MongoDataStoreInit.CONNECTION_STRING_PROPERTY, null);
+    if (connectionString != null) {
+      settings.getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY, connectionString);
+    }
+    String sl = System.getProperty(MongoDataStoreInit.START_MONGO_LOCAL_PROP, null);
+    if (sl != null) {
+      settings.getProperties().put(MongoDataStoreInit.START_MONGO_LOCAL_PROP, sl);
+    }
+    String localPort = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, null);
+    if (localPort != null) {
+      settings.getProperties().put(MongoDataStoreInit.LOCAL_PORT_PROP, localPort);
+    }
+    String keyGenerator = System.getProperty(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
+    settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, keyGenerator);
+    LOGGER.info("SETTINGS ARE: " + settings.toString());
+    return settings;
+  }
+
+  /**
    * Helper method which creates the default settings for an instance of {@link MongoDataStore}
    * 
    * @return default instance of {@link DataStoreSettings} to init a {@link MongoDataStore}

@@ -18,6 +18,7 @@ import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
+import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -32,6 +33,9 @@ import io.vertx.ext.asyncsql.MySQLClient;
  * 
  */
 public class MySqlDataStoreinit extends AbstractDataStoreInit {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(MySqlDataStoreinit.class);
+  private static boolean handleReferencedRecursive = true;
 
   /**
    * The property which defines the host of the database
@@ -74,6 +78,48 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }
+  }
+
+  /**
+   * Returns true, if there are existing system properties, by which {@link DataStoreSettings} for MySql can be created
+   * 
+   * @return true, if available
+   */
+  public static boolean hasSystemProperties() {
+    return System.getProperty("MySqlDataStoreContainer.username", null) != null;
+  }
+
+  /**
+   * This method creates new datastore settings for MySql by using system properties
+   * 
+   * @return
+   */
+  public static DataStoreSettings createSettings() {
+    String database = "test";
+    String username = System.getProperty("MySqlDataStoreContainer.username", null);
+    if (username == null) {
+      throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.username'");
+    }
+    String password = System.getProperty("MySqlDataStoreContainer.password", null);
+    if (password == null) {
+      throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.password'");
+    }
+    String host = System.getProperty("MySqlDataStoreContainer.host", null);
+    if (host == null) {
+      throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.host'");
+    }
+    String keyGenerator = System.getProperty(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
+    DataStoreSettings settings = createDefaultSettings();
+    settings.setDatabaseName(database);
+    settings.getProperties().put(MySqlDataStoreinit.HOST_PROPERTY, host);
+    settings.getProperties().put(MySqlDataStoreinit.PORT_PROPERTY, MySqlDataStoreinit.DEFAULT_PORT);
+    settings.getProperties().put(MySqlDataStoreinit.USERNAME_PROPERTY, username);
+    settings.getProperties().put(MySqlDataStoreinit.PASSWORD_PROPERTY, password);
+    settings.getProperties().put(MySqlDataStoreinit.SHARED_PROP, "true");
+    settings.getProperties().put(MySqlDataStoreinit.HANDLE_REFERENCED_RECURSIVE_PROP, handleReferencedRecursive);
+    settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, keyGenerator);
+    LOGGER.info("SETTINGS ARE: " + settings.toString());
+    return settings;
   }
 
   /**
