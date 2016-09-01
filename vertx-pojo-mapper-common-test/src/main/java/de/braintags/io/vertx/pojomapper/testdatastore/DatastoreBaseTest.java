@@ -386,6 +386,14 @@ public abstract class DatastoreBaseTest {
         async.complete();
       }
     } else {
+      try {
+        context.assertEquals(expectedResult, qr.size(), "Not the expected number of records");
+      } catch (Exception e) {
+        logger.error("", e);
+        async.complete();
+        throw ExceptionUtil.createRuntimeException(e);
+      }
+
       IteratorAsync<?> itr = qr.iterator();
       try {
         context.assertTrue(itr.hasNext(), "No record in selection");

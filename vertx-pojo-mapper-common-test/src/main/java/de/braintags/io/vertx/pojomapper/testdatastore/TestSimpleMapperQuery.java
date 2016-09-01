@@ -115,7 +115,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     List<String> it = Arrays.asList("erste", "zweite");
     query.field("secondProperty").notIn(it);
 
-    ResultContainer resultContainer = find(context, query, 3);
+    ResultContainer resultContainer = find(context, query, 6);
   }
 
   /**
@@ -127,7 +127,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.field("name").isNot("Dublette");
 
-    ResultContainer resultContainer = find(context, query, 3);
+    ResultContainer resultContainer = find(context, query, 6);
   }
 
   /**
