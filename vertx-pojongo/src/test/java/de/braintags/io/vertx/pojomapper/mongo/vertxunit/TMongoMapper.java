@@ -18,13 +18,18 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
+import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
+import de.braintags.io.vertx.pojomapper.init.EncoderSettings;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
+import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
+import de.braintags.io.vertx.util.security.crypt.impl.StandardEncoder;
+import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.TestContext;
@@ -37,17 +42,34 @@ import io.vertx.ext.unit.TestContext;
  */
 
 public class TMongoMapper extends DatastoreBaseTest {
-  private static Logger log = LoggerFactory.getLogger(TMongoMapper.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(TMongoMapper.class);
+
+  @Test
+  public void storeDatastoreSettings(TestContext context) {
+    DataStoreSettings ds = MongoDataStoreInit.createDefaultSettings();
+    String serialized = Json.encodePrettily(ds);
+    LOGGER.info(serialized);
+    DataStoreSettings ds2 = Json.decodeValue(serialized, DataStoreSettings.class);
+    context.assertNotNull(ds2);
+    context.assertNotNull(ds2.getEncoders());
+    context.assertEquals(1, ds2.getEncoders().size());
+    EncoderSettings enc1 = ds.getEncoders().get(0);
+    EncoderSettings enc2 = ds2.getEncoders().get(0);
+    context.assertEquals(enc1.getEncoderClass(), enc2.getEncoderClass());
+    context.assertEquals(enc1.getName(), enc2.getName());
+    context.assertEquals(enc1.getProperties().get(StandardEncoder.SALT_PROPERTY),
+        enc2.getProperties().get(StandardEncoder.SALT_PROPERTY));
+  }
 
   @Test
   public void simpleTest(TestContext context) {
-    log.info("-->>test");
+    LOGGER.info("-->>test");
     context.assertNotNull(TestHelper.getDatastoreContainer(context));
   }
 
   @Test
   public void testId(TestContext context) {
-    log.info("-->> testId");
+    LOGGER.info("-->> testId");
     IMapper mapper = getDataStore(context).getMapperFactory().getMapper(MiniMapper.class);
     IField idField = mapper.getField("id");
     context.assertNotNull(idField); // "Improve that the name of the id field is 'id'",
@@ -91,7 +113,7 @@ public class TMongoMapper extends DatastoreBaseTest {
 
   @Test
   public void testMetaData(TestContext context) {
-    log.info("-->> testMetaData");
+    LOGGER.info("-->> testMetaData");
     IMapper mapper = getDataStore(context).getMapperFactory().getMapper(MiniMapper.class);
     ITableInfo ti = mapper.getTableInfo();
     context.assertNotNull(ti);

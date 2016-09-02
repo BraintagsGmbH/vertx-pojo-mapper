@@ -30,6 +30,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.ITriggerContextFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
+import de.braintags.io.vertx.util.security.crypt.IEncoder;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -280,6 +281,16 @@ public class DummyDataStore implements IDataStore {
    */
   @Override
   public IQueryOperatorTranslator getQueryOperatorTranslator() {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getEncoder(java.lang.String)
+   */
+  @Override
+  public IEncoder getEncoder(String name) {
     return null;
   }
 

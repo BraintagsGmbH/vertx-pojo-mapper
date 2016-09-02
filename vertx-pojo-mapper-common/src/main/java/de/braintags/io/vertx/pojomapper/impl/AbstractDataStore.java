@@ -29,6 +29,7 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.TriggerContextFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DebugGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
+import de.braintags.io.vertx.util.security.crypt.IEncoder;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
@@ -49,6 +50,7 @@ public abstract class AbstractDataStore implements IDataStore {
   private ITriggerContextFactory triggerContextFactory = new TriggerContextFactory();
   private IQueryLogicTranslator logicTranslator;
   private IQueryOperatorTranslator queryOperatorTranslator;
+  private Map<String, IEncoder> encoderMap = new HashMap<>();
 
   /**
    * Create a new instance. The possible properties are defined by its concete implementation
@@ -198,6 +200,25 @@ public abstract class AbstractDataStore implements IDataStore {
   @Override
   public IQueryOperatorTranslator getQueryOperatorTranslator() {
     return queryOperatorTranslator;
+  }
+
+  /**
+   * The map contains the {@link IEncoder} which are defined for the current instance
+   * 
+   * @return the encoderMap
+   */
+  public Map<String, IEncoder> getEncoderMap() {
+    return encoderMap;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getEncoder(java.lang.String)
+   */
+  @Override
+  public IEncoder getEncoder(String name) {
+    return getEncoderMap().get(name);
   }
 
 }

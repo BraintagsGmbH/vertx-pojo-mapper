@@ -12,9 +12,12 @@
  */
 package de.braintags.io.vertx.pojomapper.init;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.util.security.crypt.IEncoder;
 
 /**
  * Preferences to initialize an {@link IDataStore}
@@ -28,6 +31,7 @@ public class DataStoreSettings {
   private Class<? extends IDataStoreInit> datastoreInit;
   private Properties properties = new Properties();
   private String databaseName;
+  private List<EncoderSettings> encoders = new ArrayList<>();
 
   /**
    * Standard constructor needed for saving as local file
@@ -113,5 +117,26 @@ public class DataStoreSettings {
   @Override
   public String toString() {
     return "database: " + databaseName + "\n " + String.valueOf(properties);
+  }
+
+  /**
+   * The list of EncoderSettings, which are defined by the current application. This list is used to generate the
+   * {@link IEncoder}, which shall be usable by the {@link IDataStore#getEncoder(String)}
+   * 
+   * @return the encoders
+   */
+  public List<EncoderSettings> getEncoders() {
+    return encoders;
+  }
+
+  /**
+   * The list of EncoderSettings, which are defined by the current application. This list is used to generate the
+   * {@link IEncoder}, which shall be usable by the {@link IDataStore#getEncoder(String)}
+   * 
+   * @param encoders
+   *          the encoders to set
+   */
+  public void setEncoders(List<EncoderSettings> encoders) {
+    this.encoders = encoders;
   }
 }

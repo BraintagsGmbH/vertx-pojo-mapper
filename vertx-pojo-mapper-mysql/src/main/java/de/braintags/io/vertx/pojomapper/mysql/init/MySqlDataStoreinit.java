@@ -15,10 +15,12 @@ package de.braintags.io.vertx.pojomapper.mysql.init;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.init.AbstractDataStoreInit;
 import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
+import de.braintags.io.vertx.pojomapper.init.EncoderSettings;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
+import de.braintags.io.vertx.util.security.crypt.impl.StandardEncoder;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -136,6 +138,13 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
     settings.getProperties().put(SHARED_PROP, "false");
     settings.getProperties().put(HANDLE_REFERENCED_RECURSIVE_PROP, "true");
     settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
+
+    EncoderSettings es = new EncoderSettings();
+    es.setName(StandardEncoder.class.getSimpleName());
+    es.setEncoderClass(StandardEncoder.class);
+    es.getProperties().put(StandardEncoder.SALT_PROPERTY, StandardEncoder.generateSalt());
+    settings.getEncoders().add(es);
+
     return settings;
   }
 

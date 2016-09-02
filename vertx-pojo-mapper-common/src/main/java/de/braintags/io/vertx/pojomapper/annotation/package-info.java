@@ -2,7 +2,7 @@
 /**
  * 
  * AS explained above, the definition of the mapping is currently done by using annotations, which are added to class
- * header of the pojo or to the single properties, to defins the behaviour of this class in terms of mapping.
+ * header of the pojo or to the single properties, to define the behavior of this class in terms of mapping.
  * 
  * Existing annotations are:
  * 
@@ -22,7 +22,7 @@
  * ===== {@link de.braintags.io.vertx.pojomapper.annotation.field.Property}
  * 
  * Properties of a mapper are stored inside the {@link de.braintags.io.vertx.pojomapper.IDataStore} by using the
- * fieldname by default. By annotating a field with the annotation Property, you are able to modify the name of the
+ * field name by default. By annotating a field with the annotation Property, you are able to modify the name of the
  * column in the table. Additionally you are able to define other attributes, which are very datastore specific, so you
  * should use them never or only very carefully:
  * 
@@ -31,7 +31,7 @@
  * When you define a mapper, which internally references with one property to another mapper ( see example Person and
  * his animals ), then you can define the way, how subobjects are stored inside the datastore. With this annotation you
  * define, that the subobjects are stored inside a separate table, and in the field itself only a reference - typically
- * the identifyer - is saved. When reading the instance then from the datastore, the references are resolved
+ * the identifier - is saved. When reading the instance then from the datastore, the references are resolved
  * automatically.
  * 
  * ===== {@link de.braintags.io.vertx.pojomapper.annotation.field.Embedded}

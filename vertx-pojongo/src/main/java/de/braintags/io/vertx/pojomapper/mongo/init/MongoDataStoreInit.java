@@ -17,11 +17,13 @@ import java.io.IOException;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.init.AbstractDataStoreInit;
 import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
+import de.braintags.io.vertx.pojomapper.init.EncoderSettings;
 import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.util.exception.InitException;
+import de.braintags.io.vertx.util.security.crypt.impl.StandardEncoder;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
 import de.flapdoodle.embed.mongo.config.IMongodConfig;
@@ -111,6 +113,11 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     settings.getProperties().put(SHARED_PROP, "false");
     settings.getProperties().put(HANDLE_REFERENCED_RECURSIVE_PROP, "true");
     settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
+    EncoderSettings es = new EncoderSettings();
+    es.setName(StandardEncoder.class.getSimpleName());
+    es.setEncoderClass(StandardEncoder.class);
+    es.getProperties().put(StandardEncoder.SALT_PROPERTY, StandardEncoder.generateSalt());
+    settings.getEncoders().add(es);
     return settings;
   }
 

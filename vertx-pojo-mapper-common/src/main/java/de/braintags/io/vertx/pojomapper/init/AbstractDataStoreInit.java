@@ -12,10 +12,13 @@
  */
 package de.braintags.io.vertx.pojomapper.init;
 
+import java.util.List;
 import java.util.Properties;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -53,7 +56,23 @@ public abstract class AbstractDataStoreInit implements IDataStoreInit {
   public final void initDataStore(Vertx vertx, DataStoreSettings settings, Handler<AsyncResult<IDataStore>> handler) {
     this.vertx = vertx;
     this.settings = settings;
-    internalInit(handler);
+    internalInit(result -> {
+      if (result.failed()) {
+        handler.handle(result);
+      } else {
+        try {
+          initEncoder(settings, result.result());
+        } catch (Exception e) {
+          handler.handle(Future.failedFuture(e));
+        }
+        handler.handle(result);
+      }
+    });
+  }
+
+  protected void initEncoder(DataStoreSettings settings, IDataStore ds) {
+    List<EncoderSettings> esl = settings.getEncoders();
+    esl.forEach(es -> ((AbstractDataStore) ds).getEncoderMap().put(es.getName(), es.toEncoder()));
   }
 
   protected abstract void internalInit(Handler<AsyncResult<IDataStore>> handler);

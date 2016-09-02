@@ -21,6 +21,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryLogicTransla
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTranslator;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.exception.UnsupportedKeyGenerator;
+import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
@@ -28,6 +29,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.ITriggerContext;
 import de.braintags.io.vertx.pojomapper.mapping.ITriggerContextFactory;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
+import de.braintags.io.vertx.util.security.crypt.IEncoder;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -190,5 +192,15 @@ public interface IDataStore {
    * @return
    */
   IQueryOperatorTranslator getQueryOperatorTranslator();
+
+  /**
+   * Get an instance of {@link IEncoder} with the given name. Encoders to be used can be defined by the
+   * {@link DataStoreSettings}
+   * 
+   * @param name
+   *          the name of the encoder
+   * @return a valid instance of null
+   */
+  IEncoder getEncoder(String name);
 
 }
