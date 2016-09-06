@@ -35,6 +35,7 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.field.ConcreteClass;
 import de.braintags.io.vertx.pojomapper.annotation.field.ConstructorArguments;
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Encoder;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Property;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
@@ -46,6 +47,7 @@ import de.braintags.io.vertx.pojomapper.mapping.IPropertyMapper;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.util.ClassUtil;
+import de.braintags.io.vertx.util.security.crypt.IEncoder;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
@@ -66,13 +68,14 @@ public class MappedField implements IField {
   private ITypeHandler subTypeHandler;
   private boolean subTypeHandlerComputed = false;
   private IPropertyMapper propertyMapper;
-  private final List<IField> typeParameters = new ArrayList<IField>();
+  private final List<IField> typeParameters = new ArrayList<>();
+  private IEncoder encoder;
 
   /**
    * Annotations which shall be checked for a field definition
    */
   private static final List<Class<? extends Annotation>> FIELD_ANNOTATIONS = Arrays.asList(Id.class, Property.class,
-      Referenced.class, Embedded.class, ConcreteClass.class);
+      Referenced.class, Embedded.class, ConcreteClass.class, Encoder.class);
   /**
    * If for the current field an Annotation {@link Embedded} or {@link Referenced} is defined, then it is stored in here
    */
@@ -81,7 +84,7 @@ public class MappedField implements IField {
   /**
    * Class annotations which were found inside the current definition
    */
-  private final Map<Class<? extends Annotation>, Annotation> existingClassAnnotations = new HashMap<Class<? extends Annotation>, Annotation>();
+  private final Map<Class<? extends Annotation>, Annotation> existingClassAnnotations = new HashMap<>();
   private Class<?> realType;
   private Type genericType;
   private boolean isSet;
@@ -92,7 +95,7 @@ public class MappedField implements IField {
 
   private Type mapKeyType;
   private Type subType;
-  private Map<String, Constructor<?>> constructors = new HashMap<String, Constructor<?>>();
+  private Map<String, Constructor<?>> constructors = new HashMap<>();
 
   /**
    * Constructor which creates a new instance by reading informations from the given {@link Field}
@@ -126,7 +129,6 @@ public class MappedField implements IField {
     this.mapper = mapper;
     genericType = type;
     computeType();
-    // computeSubTypeHandler();
   }
 
   protected void init() {
@@ -134,7 +136,6 @@ public class MappedField implements IField {
     propertyMapper = computePropertyMapper();
     computeType();
     computeMultivalued();
-    // computeSubTypeHandler();
   }
 
   private void computeSubTypeHandler() {
@@ -279,10 +280,30 @@ public class MappedField implements IField {
       if (ann != null)
         existingClassAnnotations.put(annClass, ann);
     }
-    if (hasAnnotation(Referenced.class))
+    if (hasAnnotation(Referenced.class)) {
       embedRef = getAnnotation(Referenced.class);
-    else if (hasAnnotation(Embedded.class))
+    } else if (hasAnnotation(Embedded.class)) {
       embedRef = getAnnotation(Embedded.class);
+    }
+    computeEncoder();
+  }
+
+  private void computeEncoder() {
+    if (hasAnnotation(Encoder.class)) {
+      String encoderName = ((Encoder) getAnnotation(Encoder.class)).name();
+      IEncoder enc = getMapper().getMapperFactory().getDataStore().getEncoder(encoderName);
+      if (enc == null) {
+        throw new UnsupportedOperationException("The encoder with name " + encoderName
+            + " does not exist. You need to add it into the datastore. Field: " + getFullName());
+      }
+      if (CharSequence.class.isAssignableFrom(getType())) {
+        this.encoder = enc;
+      } else {
+        throw new UnsupportedOperationException(
+            "Annotation Encoded can only be used for fields instance of CharSequence. Field: " + getFullName());
+      }
+
+    }
   }
 
   /*
@@ -585,5 +606,21 @@ public class MappedField implements IField {
   @Override
   public boolean isIdField() {
     return hasAnnotation(Id.class);
+  }
+
+  /**
+   * @return the encoder
+   */
+  @Override
+  public IEncoder getEncoder() {
+    return encoder;
+  }
+
+  /**
+   * @param encoder
+   *          the encoder to set
+   */
+  public void setEncoder(IEncoder encoder) {
+    this.encoder = encoder;
   }
 }

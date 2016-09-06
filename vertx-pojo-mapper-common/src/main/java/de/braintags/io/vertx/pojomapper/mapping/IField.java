@@ -22,10 +22,12 @@ import java.util.Map;
 import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
+import de.braintags.io.vertx.pojomapper.annotation.field.Encoder;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.util.security.crypt.IEncoder;
 
 /**
  * Describes a java field of an {@link IMapper}
@@ -211,4 +213,12 @@ public interface IField {
    * @return
    */
   public boolean isIdField();
+
+  /**
+   * If an {@link IEncoder} was defined by the annotation {@link Encoder}, it is returned here
+   * 
+   * @return valid instance of {@link IEncoder} or null, if not defined
+   */
+  IEncoder getEncoder();
+
 }

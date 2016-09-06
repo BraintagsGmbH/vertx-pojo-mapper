@@ -19,8 +19,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
+
 /**
  * Specifies that the content of the field shall be encoded. The name of the annotation references
+ * {@link IDataStore#getEncoder(String)}
  * 
  * @author Michael Remme
  * 

@@ -47,6 +47,10 @@ public class DefaultPropertyMapper implements IPropertyMapper {
     if (javaValue == null) {
       handler.handle(Future.succeededFuture());
     } else {
+      if (field.getEncoder() != null) {
+        javaValue = field.getEncoder().encode((CharSequence) javaValue);
+        pAcc.writeData(mapper, javaValue);
+      }
       intoStoreObject(storeObject, field, th, javaValue, handler);
     }
   }
