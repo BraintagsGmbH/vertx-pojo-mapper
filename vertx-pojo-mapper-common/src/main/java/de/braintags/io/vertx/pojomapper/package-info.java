@@ -326,6 +326,23 @@
  * {@link examples.mapper.LifecycleMapper#afterLoad(de.braintags.io.vertx.pojomapper.mapping.ITriggerContext)}
  * ----
  *
+ * ==== Encryption
+ * By using the annotation {@link de.braintags.io.vertx.pojomapper.annotation.field.Encoder} you can encrypt field
+ * contents like passwords for instance.
+ * 
+ * [source,java]
+ * ----
+ * {@link examples.mapper.MiniMapperEncoded}
+ * ----
+ *
+ * In the above example the field password is annotated with
+ * {@link de.braintags.io.vertx.pojomapper.annotation.field.Encoder}, which is getting the name of the encoder as
+ * reference. Each datastore integrates one decoder by default,
+ * {@link de.braintags.io.vertx.util.security.crypt.impl.StandardEncoder} with the name StandardEncoder, which we are
+ * referencing here. If you want to add another encoder, you can do that by modifying the
+ * {@link de.braintags.io.vertx.pojomapper.init.DataStoreSettings} by adding an instance of
+ * {@link de.braintags.io.vertx.pojomapper.init.EncoderSettings}
+ *
  * === Working with geodata
  * {@link de.braintags.io.vertx.pojomapper.datatypes.geojson}
  *
