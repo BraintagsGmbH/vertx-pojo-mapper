@@ -158,4 +158,9 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
     this.completeResult = completeResult;
   }
 
+  @Override
+  public String toString() {
+    return String.valueOf(originalQuery);
+  }
+
 }

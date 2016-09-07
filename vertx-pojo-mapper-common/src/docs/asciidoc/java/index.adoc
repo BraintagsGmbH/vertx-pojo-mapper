@@ -620,6 +620,44 @@ q.execute(qr -> {
 });
 ----
 
+==== Encryption
+By using the annotation `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Encoder.html[@Encoder]` you can encrypt field
+contents like passwords for instance.
+
+[source,java]
+----
+package examples.mapper;
+
+import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.annotation.field.Encoder;
+import de.braintags.io.vertx.pojomapper.annotation.field.Id;
+import io.vertx.docgen.Source;
+
+@Source(translate = false)
+@Entity
+public class MiniMapperEncoded {
+  @Id
+  public String id;
+  public String name;
+  public int number;
+  @Encoder(name = "StandardEncoder")
+  public String password;
+
+  public MiniMapperEncoded() {
+  }
+
+}
+
+----
+
+In the above example the field password is annotated with
+`link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Encoder.html[@Encoder]`, which is getting the name of the encoder as
+reference. Each datastore integrates one decoder by default,
+`link:../../apidocs/de/braintags/io/vertx/util/security/crypt/impl/StandardEncoder.html[StandardEncoder]` with the name StandardEncoder, which we are
+referencing here. If you want to add another encoder, you can do that by modifying the
+`link:../../apidocs/de/braintags/io/vertx/pojomapper/init/DataStoreSettings.html[DataStoreSettings]` by adding an instance of
+`link:../../apidocs/de/braintags/io/vertx/pojomapper/init/EncoderSettings.html[EncoderSettings]`
+
 === Working with geodata
 Specification of datatypes following the GeoJSON spec from http://geojson.org/
 Searching and saving geodata following the GeoJSON spec
@@ -749,7 +787,7 @@ Michael Remme
 
 === Existing annotations
 AS explained above, the definition of the mapping is currently done by using annotations, which are added to class
-header of the pojo or to the single properties, to defins the behaviour of this class in terms of mapping.
+header of the pojo or to the single properties, to define the behavior of this class in terms of mapping.
 
 Existing annotations are:
 
@@ -769,7 +807,7 @@ will mark the annotated field as primary key
 ===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Property.html[@Property]`
 
 Properties of a mapper are stored inside the `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` by using the
-fieldname by default. By annotating a field with the annotation Property, you are able to modify the name of the
+field name by default. By annotating a field with the annotation Property, you are able to modify the name of the
 column in the table. Additionally you are able to define other attributes, which are very datastore specific, so you
 should use them never or only very carefully:
 
@@ -778,7 +816,7 @@ should use them never or only very carefully:
 When you define a mapper, which internally references with one property to another mapper ( see example Person and
 his animals ), then you can define the way, how subobjects are stored inside the datastore. With this annotation you
 define, that the subobjects are stored inside a separate table, and in the field itself only a reference - typically
-the identifyer - is saved. When reading the instance then from the datastore, the references are resolved
+the identifier - is saved. When reading the instance then from the datastore, the references are resolved
 automatically.
 
 ===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Embedded.html[@Embedded]`
