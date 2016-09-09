@@ -103,7 +103,9 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
   private void checkId(IDataStore store, Object embeddedObject, IMapper mapper, Handler<AsyncResult<Void>> handler) {
     IField field = mapper.getIdField();
     Object id = field.getPropertyAccessor().readData(embeddedObject);
-    if (id == null) {
+    if (id != null) {
+      handler.handle(Future.succeededFuture());
+    } else {
       store.getDefaultKeyGenerator().generateKey(mapper, keyResult -> {
         if (keyResult.failed()) {
           handler.handle(Future.failedFuture(keyResult.cause()));

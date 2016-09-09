@@ -12,6 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
+import java.util.Collection;
+
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
@@ -59,6 +61,11 @@ public class SqlCollectionTypeHandlerEmbedded extends CollectionTypeHandlerEmbed
    */
   @Override
   public void intoStore(Object javaValues, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+    if (javaValues == null || ((Collection<?>) javaValues).isEmpty()) {
+      success(null, handler);
+      return;
+    }
+
     super.intoStore(javaValues, field, result -> {
       if (result.failed()) {
         handler.handle(result);

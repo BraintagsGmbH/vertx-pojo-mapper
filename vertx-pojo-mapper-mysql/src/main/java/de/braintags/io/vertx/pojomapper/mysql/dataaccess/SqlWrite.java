@@ -273,8 +273,9 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     } else {
       UpdateResult res = updateResult.result();
       if (res.getUpdated() != 1) {
-        String message = String.format("Error inserting a record, expected %d records saved, but was %d", 1,
-            res.getUpdated());
+        String message = String.format(
+            "Error inserting a record, expected %d records saved, but was %d With sequence %s", 1, res.getUpdated(),
+            seq);
         resultHandler.handle(Future.failedFuture(new InsertException(message)));
       } else {
         resultHandler.handle(Future.succeededFuture());

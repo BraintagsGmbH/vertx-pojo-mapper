@@ -51,7 +51,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
 public abstract class DatastoreBaseTest {
-  private static final Logger logger = LoggerFactory.getLogger(DatastoreBaseTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DatastoreBaseTest.class);
 
   @SuppressWarnings("unused")
   private static final String COLLECTION = "MySequenceCollection";
@@ -99,10 +99,10 @@ public abstract class DatastoreBaseTest {
           resultContainer.writeResult = result.result();
           checkWriteResult(context, result, records.size());
         } catch (AssertionError e) {
-          logger.error("", e); // logging in case the ResultContainer is not handled in caller
+          LOGGER.error("", e); // logging in case the ResultContainer is not handled in caller
           err.setThrowable(e);
         } catch (Throwable e) {
-          logger.error("", e);// logging in case the ResultContainer is not handled in caller
+          LOGGER.error("", e);// logging in case the ResultContainer is not handled in caller
           err.setThrowable(e);
         } finally {
           async.complete();
@@ -116,6 +116,7 @@ public abstract class DatastoreBaseTest {
       async.await(waittime);
     }
     if (err.isError()) {
+      LOGGER.error("", err.getThrowable());
       throw new AssertionError(err.getThrowable());
     }
     return resultContainer;
@@ -140,7 +141,7 @@ public abstract class DatastoreBaseTest {
 
   public static void resultFine(AsyncResult<?> result) {
     if (result.failed()) {
-      logger.error("", result.cause());
+      LOGGER.error("", result.cause());
       throw new AssertionError("result failed", result.cause());
     }
   }
@@ -163,7 +164,7 @@ public abstract class DatastoreBaseTest {
       try {
         resultFine(result);
         resultContainer.queryResult = result.result();
-        logger.info("performed find with: " + resultContainer.queryResult.getOriginalQuery());
+        LOGGER.info("performed find with: " + resultContainer.queryResult.getOriginalQuery());
       } catch (Throwable e) {
         err.setThrowable(e);
       } finally {
@@ -286,7 +287,7 @@ public abstract class DatastoreBaseTest {
     query.executeCount(result -> {
       try {
         resultContainer.queryResultCount = result.result();
-        logger.info(
+        LOGGER.info(
             resultContainer.queryResultCount.getOriginalQuery() + ": " + resultContainer.queryResultCount.getCount());
         checkQueryResultCount(context, result, expectedResult);
       } catch (Throwable e) {
@@ -350,7 +351,7 @@ public abstract class DatastoreBaseTest {
     IDeleteResult dr = dResult.result();
     context.assertNotNull(dr);
     context.assertNotNull(dr.getOriginalCommand());
-    logger.info(dr.getOriginalCommand());
+    LOGGER.info(dr.getOriginalCommand());
   }
 
   public static void checkQueryResultCount(TestContext context, AsyncResult<? extends IQueryCountResult> qResult,
@@ -370,7 +371,7 @@ public abstract class DatastoreBaseTest {
     try {
       context.assertNotNull(qr);
     } catch (Exception e) {
-      logger.error("", e);
+      LOGGER.error("", e);
       async.complete();
       throw ExceptionUtil.createRuntimeException(e);
     }
@@ -389,7 +390,7 @@ public abstract class DatastoreBaseTest {
       try {
         context.assertEquals(expectedResult, qr.size(), "Not the expected number of records");
       } catch (Exception e) {
-        logger.error("", e);
+        LOGGER.error("", e);
         async.complete();
         throw ExceptionUtil.createRuntimeException(e);
       }
@@ -398,7 +399,7 @@ public abstract class DatastoreBaseTest {
       try {
         context.assertTrue(itr.hasNext(), "No record in selection");
       } catch (Exception e) {
-        logger.error("", e);
+        LOGGER.error("", e);
         async.complete();
         throw ExceptionUtil.createRuntimeException(e);
       }
@@ -406,7 +407,7 @@ public abstract class DatastoreBaseTest {
       itr.next(nitr -> {
         try {
           if (nitr.failed()) {
-            logger.error("", nitr.cause());
+            LOGGER.error("", nitr.cause());
             throw ExceptionUtil.createRuntimeException(nitr.cause());
           }
           context.assertNotNull(nitr.result());
@@ -469,7 +470,7 @@ public abstract class DatastoreBaseTest {
    * @param tableName
    */
   public static void clearTable(TestContext context, String tableName) {
-    logger.info("clearing table " + tableName);
+    LOGGER.info("clearing table " + tableName);
     Async async = context.async();
     ErrorObject<Void> err = new ErrorObject<Void>(null);
     TestHelper.getDatastoreContainer(context).clearTable(tableName, result -> {
@@ -480,7 +481,7 @@ public abstract class DatastoreBaseTest {
     });
 
     async.await();
-    logger.info("finished clearing table " + tableName);
+    LOGGER.info("finished clearing table " + tableName);
     if (err.isError())
       throw err.getRuntimeException();
   }
@@ -514,7 +515,7 @@ public abstract class DatastoreBaseTest {
         async.complete();
       } else {
         Object indexInfo = result.result();
-        logger.info("indexInfo: " + indexInfo);
+        LOGGER.info("indexInfo: " + indexInfo);
         context.assertNotNull(indexInfo, "Index wasn't created");
         async.complete();
       }
