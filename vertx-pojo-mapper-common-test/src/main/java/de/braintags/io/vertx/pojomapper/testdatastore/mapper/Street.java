@@ -7,4 +7,11 @@ import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRec
 public class Street extends BaseRecord {
   public String name;
 
+  public Street() {
+  }
+
+  public Street(String string) {
+    this.name = name;
+  }
+
 }

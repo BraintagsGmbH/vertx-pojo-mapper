@@ -131,7 +131,7 @@ public class MongoDataStore extends AbstractDataStore implements IDataStore {
    */
   @Override
   public final String getDatabase() {
-    return getProperties().getString(DATABASE_NAME);
+    return getProperties().getString(DATABASE_NAME).toLowerCase();
   }
 
   /*
