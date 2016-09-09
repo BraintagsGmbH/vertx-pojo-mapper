@@ -31,15 +31,34 @@ public class TestListExtrems extends DatastoreBaseTest {
       .getLogger(TestListExtrems.class);
 
   @Test
-  public void testWriteRead1(TestContext context) {
-    clearTable(context, ListMapperNoAnnotation.class.getSimpleName());
+  public void testWriteRead_Unnotated1(TestContext context) {
     ListMapperNoAnnotation sm = new ListMapperNoAnnotation();
+    saveAndRead(context, sm, true);
+  }
+
+  @Test
+  public void testWriteRead_Unnotated2(TestContext context) {
+    ListMapperNoAnnotation sm = new ListMapperNoAnnotation();
+    sm.simplemapper = null;
+    saveAndRead(context, sm, true);
+  }
+
+  @Test
+  public void testWriteRead_Unnotated3(TestContext context) {
+    ListMapperNoAnnotation sm = new ListMapperNoAnnotation(5);
+    saveAndRead(context, sm, true);
+  }
+
+  private void saveAndRead(TestContext context, ListMapperNoAnnotation sm, boolean clearTable) {
+    if (clearTable) {
+      clearTable(context, ListMapperNoAnnotation.class.getSimpleName());
+    }
     saveRecord(context, sm);
     IQuery<ListMapperNoAnnotation> query = getDataStore(context).createQuery(ListMapperNoAnnotation.class);
     List list = findAll(context, query);
     context.assertEquals(1, list.size());
     ListMapperNoAnnotation loaded = (ListMapperNoAnnotation) list.get(0);
-    context.assertEquals(sm.simpleMapper, loaded.simpleMapper);
+    context.assertEquals(sm.simplemapper, loaded.simplemapper);
   }
 
   /**
@@ -50,7 +69,12 @@ public class TestListExtrems extends DatastoreBaseTest {
    */
   @Test
   public void testDeleteListEntryAndUpdate(TestContext context) {
-    context.fail("unimplemented");
+    ListMapperNoAnnotation sm = new ListMapperNoAnnotation(2);
+    saveAndRead(context, sm, true);
+    sm.simplemapper.remove(0);
+    saveAndRead(context, sm, false);
+    sm.simplemapper.remove(0);
+    saveAndRead(context, sm, false);
   }
 
 }

@@ -30,16 +30,16 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
 public class ListMapperNoAnnotation {
   @Id
   public String id;
-  public List<String> simpleMapper = new ArrayList<>();
+  public List<String> simplemapper = new ArrayList<>();
 
   public ListMapperNoAnnotation() {
 
   }
 
   public ListMapperNoAnnotation(int count) {
-    simpleMapper = new ArrayList<>();
+    simplemapper = new ArrayList<>();
     for (int i = 0; i < count; i++) {
-      simpleMapper.add("name " + i);
+      simplemapper.add("name " + i);
     }
   }
 

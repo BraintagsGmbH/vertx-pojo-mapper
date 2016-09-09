@@ -12,6 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import org.junit.Test;
+
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.StringTestMapper;
 import io.vertx.ext.unit.TestContext;
@@ -23,6 +25,31 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class StringTest extends AbstractTypeHandlerTest {
+
+  @Test
+  public final void testExtrems(TestContext context) {
+    StringTestMapper mapper = new StringTestMapper();
+    mapper.stringField = null;
+    saveLoadAndCompare(context, mapper);
+  }
+
+  @Test
+  public final void testExtrems2(TestContext context) {
+    StringTestMapper mapper = new StringTestMapper();
+    mapper.stringField = "testtect";
+    saveLoadAndCompare(context, mapper);
+    mapper.stringField = "";
+    saveLoadAndCompare(context, mapper);
+    mapper.stringField = null;
+    saveLoadAndCompare(context, mapper);
+
+  }
+
+  private void saveLoadAndCompare(TestContext context, StringTestMapper mapper) {
+    saveRecord(context, mapper);
+    StringTestMapper loaded = (StringTestMapper) findRecordByID(context, mapper.getClass(), mapper.id);
+    context.assertEquals(mapper.stringField, loaded.stringField);
+  }
 
   /*
    * (non-Javadoc)
