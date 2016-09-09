@@ -21,6 +21,7 @@ import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 
@@ -82,14 +83,42 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
   protected void writeSingleValueAsMapper(IDataStore store, Object embeddedObject, IField field,
       Handler<AsyncResult<ITypeHandlerResult>> handler) {
     IMapper mapper = store.getMapperFactory().getMapper(embeddedObject.getClass());
-    ((SqlStoreObjectFactory) store.getMapperFactory().getStoreObjectFactory()).createStoreObject(mapper, embeddedObject,
-        result -> {
-          if (result.failed()) {
-            fail(result.cause(), handler);
-          } else {
-            success(((SqlStoreObject) result.result()).getContainerAsJson(), handler);
-          }
-        });
+    checkId(store, embeddedObject, mapper, idResult -> {
+      if (idResult.failed()) {
+        fail(idResult.cause(), handler);
+      } else {
+        ((SqlStoreObjectFactory) store.getMapperFactory().getStoreObjectFactory()).createStoreObject(mapper,
+            embeddedObject, result -> {
+              if (result.failed()) {
+                fail(result.cause(), handler);
+              } else {
+                success(((SqlStoreObject) result.result()).getContainerAsJson(), handler);
+              }
+            });
+      }
+    });
+
   }
 
+  private void checkId(IDataStore store, Object embeddedObject, IMapper mapper, Handler<AsyncResult<Void>> handler) {
+    IField field = mapper.getIdField();
+    Object id = field.getPropertyAccessor().readData(embeddedObject);
+    if (id == null) {
+      store.getDefaultKeyGenerator().generateKey(mapper, keyResult -> {
+        if (keyResult.failed()) {
+          handler.handle(Future.failedFuture(keyResult.cause()));
+        } else {
+          field.getTypeHandler().fromStore(keyResult.result().getKey(), field, null, result -> {
+            if (result.failed()) {
+              handler.handle(Future.failedFuture(result.cause()));
+            } else {
+              Object javaValue = result.result().getResult();
+              field.getPropertyAccessor().writeData(embeddedObject, javaValue);
+              handler.handle(Future.succeededFuture());
+            }
+          });
+        }
+      });
+    }
+  }
 }
