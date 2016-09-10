@@ -90,7 +90,11 @@ public class JsonStoreObject extends AbstractStoreObject<JsonObject> {
     if (field.isIdField() && value != null) {
       setNewInstance(false);
     }
-    getContainer().put(ci.getName(), value);
+    if (value == null) {
+      getContainer().putNull(ci.getName());
+    } else {
+      getContainer().put(ci.getName(), value);
+    }
     return this;
   }
 

@@ -80,14 +80,13 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
   }
 
   @Override
-  protected void writeSingleValueAsMapper(IDataStore store, Object embeddedObject, IField field,
+  protected void writeSingleValueAsMapper(IDataStore store, Object embeddedObject, IMapper embeddedMapper, IField field,
       Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    IMapper mapper = store.getMapperFactory().getMapper(embeddedObject.getClass());
-    checkId(store, embeddedObject, mapper, idResult -> {
+    checkId(store, embeddedObject, embeddedMapper, idResult -> {
       if (idResult.failed()) {
         fail(idResult.cause(), handler);
       } else {
-        ((SqlStoreObjectFactory) store.getMapperFactory().getStoreObjectFactory()).createStoreObject(mapper,
+        ((SqlStoreObjectFactory) store.getMapperFactory().getStoreObjectFactory()).createStoreObject(embeddedMapper,
             embeddedObject, result -> {
               if (result.failed()) {
                 fail(result.cause(), handler);

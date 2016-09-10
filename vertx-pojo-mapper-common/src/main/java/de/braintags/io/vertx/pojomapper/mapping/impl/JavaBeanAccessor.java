@@ -44,7 +44,7 @@ public class JavaBeanAccessor implements IPropertyAccessor {
   @Override
   public Object readData(Object record) {
     try {
-      return this.getReadMethod().invoke(record, new Object[0]);
+      return record == null ? null : this.getReadMethod().invoke(record, new Object[0]);
     } catch (Exception e) {
       throw new PropertyAccessException("Cannot read data from property " + this.name, e);
     }

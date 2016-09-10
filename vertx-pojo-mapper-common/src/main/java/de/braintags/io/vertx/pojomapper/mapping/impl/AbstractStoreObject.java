@@ -53,8 +53,6 @@ public abstract class AbstractStoreObject<T> implements IStoreObject<T> {
   public AbstractStoreObject(T container, IMapper mapper) {
     if (mapper == null)
       throw new NullPointerException("Mapper must not be null");
-    if (container == null)
-      throw new NullPointerException("container must not be null");
     this.mapper = mapper;
     this.container = container;
   }

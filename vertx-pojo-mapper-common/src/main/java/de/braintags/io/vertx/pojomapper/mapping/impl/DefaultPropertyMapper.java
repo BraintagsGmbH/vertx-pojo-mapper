@@ -43,16 +43,11 @@ public class DefaultPropertyMapper implements IPropertyMapper {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object javaValue = pAcc.readData(mapper);
-
-    if (javaValue == null) {
-      handler.handle(Future.succeededFuture());
-    } else {
-      if (field.getEncoder() != null) {
-        javaValue = field.getEncoder().encode((CharSequence) javaValue);
-        pAcc.writeData(mapper, javaValue);
-      }
-      intoStoreObject(storeObject, field, th, javaValue, handler);
+    if (field.getEncoder() != null) {
+      javaValue = field.getEncoder().encode((CharSequence) javaValue);
+      pAcc.writeData(mapper, javaValue);
     }
+    intoStoreObject(storeObject, field, th, javaValue, handler);
   }
 
   /**
@@ -76,8 +71,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
         Object dbValue = result.result().getResult();
-        if (dbValue != null)
-          storeObject.put(field, dbValue);
+        storeObject.put(field, dbValue);
         handler.handle(Future.succeededFuture());
       }
     });
@@ -111,25 +105,21 @@ public class DefaultPropertyMapper implements IPropertyMapper {
     LOGGER.debug("starting fromStoreObject for field " + field.getFullName());
     ITypeHandler th = field.getTypeHandler();
     Object dbValue = storeObject.get(field);
-    if (dbValue == null) { // nothing to work with? Must null be set?
-      LOGGER.debug("value is null - nothing to do");
-      handler.handle(Future.succeededFuture());
-    } else {
-      LOGGER.debug("fetching result from typehandler");
-      try {
-        th.fromStore(dbValue, field, null, result -> {
-          if (result.failed()) {
-            handler.handle(Future.failedFuture(result.cause()));
-            return;
-          }
+    LOGGER.debug("fetching result from typehandler");
+    try {
+      th.fromStore(dbValue, field, null, result -> {
+        if (result.failed()) {
+          handler.handle(Future.failedFuture(result.cause()));
+        } else {
           Object javaValue = result.result().getResult();
           handleInstanceFromStore(storeObject, mapper, javaValue, dbValue, field, handler);
-        });
-      } catch (Exception e) {
-        handler.handle(Future.failedFuture(
-            new PropertyAccessException("Error with reading from store in field " + field.getFullName(), e)));
-      }
+        }
+      });
+    } catch (Exception e) {
+      handler.handle(Future.failedFuture(
+          new PropertyAccessException("Error with reading from store in field " + field.getFullName(), e)));
     }
+
   }
 
   private void handleInstanceFromStore(IStoreObject<?> storeObject, Object mapper, Object javaValue, Object dbValue,
@@ -138,7 +128,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
       if (javaValue instanceof IObjectReference) {
         storeObject.getObjectReferences().add((IObjectReference) javaValue);
         LOGGER.debug("added ObjectReference");
-      } else if (javaValue != null) {
+      } else {
         IPropertyAccessor pAcc = field.getPropertyAccessor();
         pAcc.writeData(mapper, javaValue);
         LOGGER.debug("writing data");

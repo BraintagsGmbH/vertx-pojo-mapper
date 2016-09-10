@@ -42,7 +42,7 @@ public class JavaFieldAccessor implements IPropertyAccessor {
   @Override
   public Object readData(Object record) {
     try {
-      return field.get(record);
+      return record == null ? null : field.get(record);
     } catch (Exception e) {
       throw new PropertyAccessException("Cannot read data from property " + name, e);
     }
