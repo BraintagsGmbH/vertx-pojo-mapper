@@ -72,24 +72,27 @@ public class MapTypeHandler extends AbstractTypeHandler {
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     JsonArray jsonArray = (JsonArray) source;
-    if (jsonArray == null || jsonArray.isEmpty())
-      resultHandler.handle(Future.succeededFuture());
-
-    CounterObject<ITypeHandlerResult> co = new CounterObject<>(jsonArray.size(), resultHandler);
-    final MapEntry[] resultArray = new MapEntry[jsonArray.size()];
-    int counter = 0;
-    for (Object jo : jsonArray) {
-      CurrentCounter cc = new CurrentCounter(counter++, jo);
-      handleOneEntryFromStore(field, cc, resultArray, result -> {
-        if (result.failed()) {
-          co.setThrowable(result.cause());
+    if (jsonArray == null) {
+      success(null, resultHandler);
+    } else if (jsonArray.isEmpty()) {
+      success(field.getMapper().getObjectFactory().createMap(field), resultHandler);
+    } else {
+      CounterObject<ITypeHandlerResult> co = new CounterObject<>(jsonArray.size(), resultHandler);
+      final MapEntry[] resultArray = new MapEntry[jsonArray.size()];
+      int counter = 0;
+      for (Object jo : jsonArray) {
+        CurrentCounter cc = new CurrentCounter(counter++, jo);
+        handleOneEntryFromStore(field, cc, resultArray, result -> {
+          if (result.failed()) {
+            co.setThrowable(result.cause());
+            return;
+          } else {
+            checkSuccessFromStore(field, co, resultArray, resultHandler);
+          }
+        });
+        if (co.isError())
           return;
-        } else {
-          checkSuccessFromStore(field, co, resultArray, resultHandler);
-        }
-      });
-      if (co.isError())
-        return;
+      }
     }
   }
 
@@ -171,25 +174,29 @@ public class MapTypeHandler extends AbstractTypeHandler {
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     Map<?, ?> map = (Map<?, ?>) source;
     int size = map == null ? 0 : map.size();
-    if (size == 0)
-      resultHandler.handle(Future.succeededFuture());
-    CounterObject<ITypeHandlerResult> co = new CounterObject<>(size, resultHandler);
-    JsonArray[] resultArray = new JsonArray[size];
-    Iterator<?> it = map.entrySet().iterator();
-    int counter = 0;
-    while (it.hasNext() && !co.isError()) {
-      // trying to write the array in the order like it is
-      Entry entry = (Entry) it.next();
-      CurrentCounter cc = new CurrentCounter(counter++, entry);
+    if (map == null) {
+      success(null, resultHandler);
+    } else if (map.size() == 0) {
+      success(new JsonArray(), resultHandler);
+    } else {
+      CounterObject<ITypeHandlerResult> co = new CounterObject<>(size, resultHandler);
+      JsonArray[] resultArray = new JsonArray[size];
+      Iterator<?> it = map.entrySet().iterator();
+      int counter = 0;
+      while (it.hasNext() && !co.isError()) {
+        // trying to write the array in the order like it is
+        Entry entry = (Entry) it.next();
+        CurrentCounter cc = new CurrentCounter(counter++, entry);
 
-      valueIntoStore(field, cc, resultArray, result -> {
-        if (result.failed()) {
-          co.setThrowable(result.cause());
-          return;
-        } else {
-          checkSuccessIntoStore(co, resultArray, resultHandler);
-        }
-      });
+        valueIntoStore(field, cc, resultArray, result -> {
+          if (result.failed()) {
+            co.setThrowable(result.cause());
+            return;
+          } else {
+            checkSuccessIntoStore(co, resultArray, resultHandler);
+          }
+        });
+      }
     }
   }
 

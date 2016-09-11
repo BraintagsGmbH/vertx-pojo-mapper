@@ -26,7 +26,6 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 
@@ -79,27 +78,31 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     JsonArray jsonArray = (JsonArray) source;
-    if (jsonArray == null || jsonArray.isEmpty())
-      handler.handle(Future.succeededFuture());
-    CounterObject<ITypeHandlerResult> co = new CounterObject<>(jsonArray.size(), handler);
-    final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
-    int counter = 0;
-    for (Object jo : jsonArray) {
-      CurrentCounter cc = new CurrentCounter(counter++, jo);
-      ITypeHandler subTypehandler = field.getSubTypeHandler();
-      subTypehandler.fromStore(cc.value, field, field.getSubClass(), result -> {
-        if (result.failed()) {
-          co.setThrowable(result.cause());
-          return;
-        }
-        Object javaValue = result.result().getResult();
-        if (javaValue != null)
-          Array.set(resultArray, cc.i, javaValue);
-        if (co.reduce()) {
-          success(resultArray, handler);
-        }
+    if (jsonArray == null) {
+      success(null, handler);
+    } else if (jsonArray.isEmpty()) {
+      success(Array.newInstance(field.getSubClass(), 0), handler);
+    } else {
+      CounterObject<ITypeHandlerResult> co = new CounterObject<>(jsonArray.size(), handler);
+      final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
+      int counter = 0;
+      for (Object jo : jsonArray) {
+        CurrentCounter cc = new CurrentCounter(counter++, jo);
+        ITypeHandler subTypehandler = field.getSubTypeHandler();
+        subTypehandler.fromStore(cc.value, field, field.getSubClass(), result -> {
+          if (result.failed()) {
+            co.setThrowable(result.cause());
+            return;
+          }
+          Object javaValue = result.result().getResult();
+          if (javaValue != null)
+            Array.set(resultArray, cc.i, javaValue);
+          if (co.reduce()) {
+            success(resultArray, handler);
+          }
 
-      });
+        });
+      }
     }
   }
 
@@ -112,8 +115,10 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
   @Override
   public void intoStore(Object javaValues, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     int length = javaValues == null ? 0 : Array.getLength(javaValues);
-    if (length == 0) {
-      handler.handle(Future.succeededFuture());
+    if (javaValues == null) {
+      success(null, handler);
+    } else if (length == 0) {
+      success(new JsonArray(), handler);
     } else {
       ITypeHandler subTypehandler = field.getSubTypeHandler();
       CounterObject<ITypeHandlerResult> co = new CounterObject<>(length, handler);

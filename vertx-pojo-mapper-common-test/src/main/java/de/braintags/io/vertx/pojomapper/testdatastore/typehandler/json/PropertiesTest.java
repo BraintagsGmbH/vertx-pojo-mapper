@@ -12,8 +12,16 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import java.util.List;
+import java.util.Properties;
+
+import org.junit.Test;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.PropertiesRecord;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -23,6 +31,38 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class PropertiesTest extends AbstractTypeHandlerTest {
+
+  @Test
+  public void testJsonArray(TestContext context) {
+    JsonObject jo = new JsonObject();
+    JsonArray array = new JsonArray();
+    array.add(true);
+    jo.put("array1", jo);
+    JsonArray array2 = new JsonArray();
+    jo.put("array2", array2);
+  }
+
+  @Test
+  public void extreme(TestContext context) {
+    clearTable(context, PropertiesRecord.class.getSimpleName());
+    PropertiesRecord record = new PropertiesRecord();
+    record.properties = null;
+    saveRecord(context, record);
+    IQuery<PropertiesRecord> query = getDataStore(context).createQuery(PropertiesRecord.class);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    PropertiesRecord loaded = (PropertiesRecord) list.get(0);
+    context.assertNull(loaded.properties);
+
+    record.properties = new Properties();
+    saveRecord(context, record);
+    query = getDataStore(context).createQuery(PropertiesRecord.class);
+    list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    loaded = (PropertiesRecord) list.get(0);
+    context.assertNotNull(loaded.properties);
+    context.assertEquals(0, loaded.properties.size());
+  }
 
   /*
    * (non-Javadoc)

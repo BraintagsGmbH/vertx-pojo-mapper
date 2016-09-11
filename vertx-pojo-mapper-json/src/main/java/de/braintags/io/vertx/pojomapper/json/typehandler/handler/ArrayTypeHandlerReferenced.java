@@ -28,7 +28,6 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import de.braintags.io.vertx.util.CounterObject;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 
@@ -92,28 +91,32 @@ public class ArrayTypeHandlerReferenced extends ArrayTypeHandler implements ITyp
     IField field = reference.getField();
     IMapper subMapper = mf.getMapper(field.getSubClass());
     JsonArray jsonArray = (JsonArray) reference.getDbSource();
-    if (jsonArray == null || jsonArray.isEmpty())
-      handler.handle(Future.succeededFuture());
-    CounterObject<ITypeHandlerResult> co = new CounterObject<>(jsonArray.size(), handler);
-    final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
-    int counter = 0;
-    for (Object jo : jsonArray) {
-      CurrentCounter cc = new CurrentCounter(counter++, jo);
-      ObjectTypeHandlerReferenced subTypehandler = (ObjectTypeHandlerReferenced) field.getSubTypeHandler();
-      subTypehandler.getReferencedObjectById(store, subMapper, jo, result -> {
-        if (result.failed()) {
-          co.setThrowable(result.cause());
-          return;
-        }
-        Object javaValue = result.result().getResult();
-        if (javaValue != null) {
-          Array.set(resultArray, cc.i, javaValue);
-        }
-        if (co.reduce()) {
-          success(resultArray, handler);
-        }
-      });
+    if (jsonArray == null) {
+      success(null, handler);
+    } else if (jsonArray.isEmpty()) {
+      success(Array.newInstance(field.getSubClass(), 0), handler);
+    } else {
+      CounterObject<ITypeHandlerResult> co = new CounterObject<>(jsonArray.size(), handler);
+      final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
+      int counter = 0;
+      for (Object jo : jsonArray) {
+        CurrentCounter cc = new CurrentCounter(counter++, jo);
+        ObjectTypeHandlerReferenced subTypehandler = (ObjectTypeHandlerReferenced) field.getSubTypeHandler();
+        subTypehandler.getReferencedObjectById(store, subMapper, jo, result -> {
+          if (result.failed()) {
+            co.setThrowable(result.cause());
+            return;
+          }
+          Object javaValue = result.result().getResult();
+          if (javaValue != null) {
+            Array.set(resultArray, cc.i, javaValue);
+          }
+          if (co.reduce()) {
+            success(resultArray, handler);
+          }
+        });
 
+      }
     }
   }
 

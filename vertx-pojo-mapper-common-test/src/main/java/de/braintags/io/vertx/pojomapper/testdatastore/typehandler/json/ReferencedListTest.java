@@ -12,6 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import java.util.List;
+
+import org.junit.Test;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.ReferenceMapper_List;
 import io.vertx.ext.unit.TestContext;
@@ -23,6 +28,19 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class ReferencedListTest extends AbstractTypeHandlerTest {
+
+  @Test
+  public void extreme(TestContext context) {
+    clearTable(context, ReferenceMapper_List.class.getSimpleName());
+    ReferenceMapper_List record = new ReferenceMapper_List();
+    record.simpleMapper = null;
+    saveRecord(context, record);
+    IQuery<ReferenceMapper_List> query = getDataStore(context).createQuery(ReferenceMapper_List.class);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    ReferenceMapper_List loaded = (ReferenceMapper_List) list.get(0);
+    context.assertNull(loaded.simpleMapper);
+  }
 
   /*
    * (non-Javadoc)

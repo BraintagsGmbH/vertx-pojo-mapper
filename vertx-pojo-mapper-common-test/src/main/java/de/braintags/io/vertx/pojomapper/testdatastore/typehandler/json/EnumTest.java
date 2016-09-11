@@ -12,6 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import java.util.List;
+
+import org.junit.Test;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EnumRecord;
 import io.vertx.ext.unit.TestContext;
@@ -24,10 +29,17 @@ import io.vertx.ext.unit.TestContext;
  */
 public class EnumTest extends AbstractTypeHandlerTest {
 
-  /**
-   * 
-   */
-  public EnumTest() {
+  @Test
+  public void extreme(TestContext context) {
+    clearTable(context, EnumRecord.class.getSimpleName());
+    EnumRecord record = new EnumRecord();
+    record.enumEnum = null;
+    saveRecord(context, record);
+    IQuery<EnumRecord> query = getDataStore(context).createQuery(EnumRecord.class);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    EnumRecord loaded = (EnumRecord) list.get(0);
+    context.assertNull(loaded.enumEnum);
   }
 
   /*

@@ -12,6 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import java.util.List;
+
+import org.junit.Test;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.MapRecord;
 import io.vertx.ext.unit.TestContext;
@@ -23,6 +28,19 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class MapTest extends AbstractTypeHandlerTest {
+
+  @Test
+  public void extreme(TestContext context) {
+    clearTable(context, MapRecord.class.getSimpleName());
+    MapRecord record = new MapRecord();
+    record.map = null;
+    saveRecord(context, record);
+    IQuery<MapRecord> query = getDataStore(context).createQuery(MapRecord.class);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    MapRecord loaded = (MapRecord) list.get(0);
+    context.assertNull(loaded.map);
+  }
 
   /*
    * (non-Javadoc)

@@ -12,6 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import java.util.List;
+
+import org.junit.Test;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.ArrayRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import io.vertx.ext.unit.TestContext;
@@ -23,6 +28,22 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class ArrayTest extends AbstractTypeHandlerTest {
+
+  @Test
+  public void extreme(TestContext context) {
+    clearTable(context, ArrayRecord.class.getSimpleName());
+    ArrayRecord record = new ArrayRecord();
+    record.array = null;
+    record.arrayWithEqualValues = new String[0];
+    saveRecord(context, record);
+    IQuery<ArrayRecord> query = getDataStore(context).createQuery(ArrayRecord.class);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    ArrayRecord loaded = (ArrayRecord) list.get(0);
+    context.assertNull(loaded.array);
+    context.assertNotNull(loaded.arrayWithEqualValues);
+    context.assertTrue(record.arrayWithEqualValues.length == 0);
+  }
 
   /*
    * (non-Javadoc)

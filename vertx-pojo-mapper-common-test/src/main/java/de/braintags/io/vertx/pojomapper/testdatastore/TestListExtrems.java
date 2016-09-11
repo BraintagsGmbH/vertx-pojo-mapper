@@ -49,7 +49,7 @@ public class TestListExtrems extends DatastoreBaseTest {
     saveAndRead(context, sm, true);
   }
 
-  private void saveAndRead(TestContext context, ListMapperNoAnnotation sm, boolean clearTable) {
+  protected void saveAndRead(TestContext context, ListMapperNoAnnotation sm, boolean clearTable) {
     if (clearTable) {
       clearTable(context, ListMapperNoAnnotation.class.getSimpleName());
     }

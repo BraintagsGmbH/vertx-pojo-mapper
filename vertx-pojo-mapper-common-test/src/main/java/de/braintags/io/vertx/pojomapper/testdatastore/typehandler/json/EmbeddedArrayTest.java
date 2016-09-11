@@ -12,6 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import java.util.List;
+
+import org.junit.Test;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EmbeddedMapper_Array;
 import io.vertx.ext.unit.TestContext;
@@ -23,6 +28,19 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class EmbeddedArrayTest extends AbstractTypeHandlerTest {
+
+  @Test
+  public void extreme(TestContext context) {
+    clearTable(context, EmbeddedMapper_Array.class.getSimpleName());
+    EmbeddedMapper_Array record = new EmbeddedMapper_Array();
+    record.simpleMapper = null;
+    saveRecord(context, record);
+    IQuery<EmbeddedMapper_Array> query = getDataStore(context).createQuery(EmbeddedMapper_Array.class);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    EmbeddedMapper_Array loaded = (EmbeddedMapper_Array) list.get(0);
+    context.assertNull(loaded.simpleMapper);
+  }
 
   /*
    * (non-Javadoc)

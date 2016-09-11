@@ -14,7 +14,11 @@ package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 
+import org.junit.Test;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.NumericMapper;
 import io.vertx.ext.unit.TestContext;
@@ -26,6 +30,31 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class NumericTest extends AbstractTypeHandlerTest {
+
+  @Test
+  public void extreme(TestContext context) {
+    clearTable(context, NumericMapper.class.getSimpleName());
+    NumericMapper record = new NumericMapper();
+    record.bigDecimal = null;
+    record.bigInteger = null;
+    record.myDouble = null;
+    record.myFloatOb = null;
+    record.myInteger = null;
+    record.myLongOb = null;
+    record.myShort = null;
+    saveRecord(context, record);
+    IQuery<NumericMapper> query = getDataStore(context).createQuery(NumericMapper.class);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    NumericMapper loaded = (NumericMapper) list.get(0);
+    context.assertNull(loaded.bigDecimal);
+    context.assertNull(loaded.bigInteger);
+    context.assertNull(loaded.myDouble);
+    context.assertNull(loaded.myFloatOb);
+    context.assertNull(loaded.myInteger);
+    context.assertNull(loaded.myLongOb);
+    context.assertNull(loaded.myShort);
+  }
 
   /*
    * (non-Javadoc)

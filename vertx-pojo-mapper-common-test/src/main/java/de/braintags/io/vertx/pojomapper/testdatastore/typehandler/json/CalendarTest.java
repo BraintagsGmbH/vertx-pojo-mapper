@@ -13,7 +13,11 @@
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
 import java.util.Calendar;
+import java.util.List;
 
+import org.junit.Test;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.CalendarMapper;
 import io.vertx.ext.unit.TestContext;
@@ -25,6 +29,19 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class CalendarTest extends AbstractTypeHandlerTest {
+
+  @Test
+  public void extreme(TestContext context) {
+    clearTable(context, CalendarMapper.class.getSimpleName());
+    CalendarMapper record = new CalendarMapper();
+    record.myCal = null;
+    saveRecord(context, record);
+    IQuery<CalendarMapper> query = getDataStore(context).createQuery(CalendarMapper.class);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    CalendarMapper loaded = (CalendarMapper) list.get(0);
+    context.assertNull(loaded.myCal);
+  }
 
   /*
    * (non-Javadoc)

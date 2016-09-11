@@ -12,6 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import java.util.List;
+
+import org.junit.Test;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.datatypes.Price;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.PriceMapper;
@@ -24,6 +29,19 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class PriceTest extends AbstractTypeHandlerTest {
+
+  @Test
+  public void extreme(TestContext context) {
+    clearTable(context, PriceMapper.class.getSimpleName());
+    PriceMapper record = new PriceMapper();
+    record.price = null;
+    saveRecord(context, record);
+    IQuery<PriceMapper> query = getDataStore(context).createQuery(PriceMapper.class);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    PriceMapper loaded = (PriceMapper) list.get(0);
+    context.assertNull(loaded.price);
+  }
 
   /*
    * (non-Javadoc)

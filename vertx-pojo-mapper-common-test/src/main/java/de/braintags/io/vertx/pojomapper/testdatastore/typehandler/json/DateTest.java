@@ -12,6 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import java.util.List;
+
+import org.junit.Test;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.DateMapper;
 import io.vertx.ext.unit.TestContext;
@@ -23,6 +28,25 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class DateTest extends AbstractTypeHandlerTest {
+
+  @Test
+  public void extreme(TestContext context) {
+    clearTable(context, DateMapper.class.getSimpleName());
+    DateMapper record = new DateMapper();
+    record.javaDate = null;
+    record.myTime = null;
+    record.myTimeStamp = null;
+    record.sqlDate = null;
+    saveRecord(context, record);
+    IQuery<DateMapper> query = getDataStore(context).createQuery(DateMapper.class);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    DateMapper loaded = (DateMapper) list.get(0);
+    context.assertNull(loaded.javaDate);
+    context.assertNull(loaded.myTime);
+    context.assertNull(loaded.myTimeStamp);
+    context.assertNull(loaded.sqlDate);
+  }
 
   /*
    * (non-Javadoc)

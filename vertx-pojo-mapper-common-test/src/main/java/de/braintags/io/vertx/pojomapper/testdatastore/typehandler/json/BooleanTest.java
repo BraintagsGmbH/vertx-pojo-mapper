@@ -12,6 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import java.util.List;
+
+import org.junit.Test;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BooleanMapper;
 import io.vertx.ext.unit.TestContext;
@@ -23,6 +28,19 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class BooleanTest extends AbstractTypeHandlerTest {
+
+  @Test
+  public void extreme(TestContext context) {
+    clearTable(context, BooleanMapper.class.getSimpleName());
+    BooleanMapper record = new BooleanMapper();
+    record.myBooloean = null;
+    saveRecord(context, record);
+    IQuery<BooleanMapper> query = getDataStore(context).createQuery(BooleanMapper.class);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    BooleanMapper loaded = (BooleanMapper) list.get(0);
+    context.assertNull(loaded.myBooloean);
+  }
 
   /*
    * (non-Javadoc)

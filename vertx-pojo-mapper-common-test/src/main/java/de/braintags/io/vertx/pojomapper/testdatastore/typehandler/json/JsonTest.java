@@ -12,6 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import java.util.List;
+
+import org.junit.Test;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.JsonMapper;
 import io.vertx.ext.unit.TestContext;
@@ -23,6 +28,19 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class JsonTest extends AbstractTypeHandlerTest {
+
+  @Test
+  public void extreme(TestContext context) {
+    clearTable(context, JsonMapper.class.getSimpleName());
+    JsonMapper record = new JsonMapper();
+    record.json = null;
+    saveRecord(context, record);
+    IQuery<JsonMapper> query = getDataStore(context).createQuery(JsonMapper.class);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    JsonMapper loaded = (JsonMapper) list.get(0);
+    context.assertNull(loaded.json);
+  }
 
   /*
    * (non-Javadoc)

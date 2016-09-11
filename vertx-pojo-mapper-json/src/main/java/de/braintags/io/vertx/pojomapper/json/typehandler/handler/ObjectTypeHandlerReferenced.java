@@ -71,7 +71,9 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    */
   @Override
   public void fromStore(Object id, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    if (field.getMapper().handleReferencedRecursive()) {
+    if (id == null) {
+      success(null, resultHandler);
+    } else if (field.getMapper().handleReferencedRecursive()) {
       IDataStore store = field.getMapper().getMapperFactory().getDataStore();
       ObjectReference objectReference = new ObjectReference(field, id);
       resolveReferencedObject(store, objectReference, resultHandler);
@@ -140,13 +142,17 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
   @Override
   public void intoStore(Object referencedObject, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     IDataStore store = field.getMapper().getMapperFactory().getDataStore();
-    saveReferencedObject(store, referencedObject, storeResult -> {
-      if (storeResult.failed()) {
-        fail(storeResult.cause(), resultHandler);
-      }
-      Object id = storeResult.result();
-      storeId(store, field, id, resultHandler);
-    });
+    if (referencedObject == null) {
+      success(null, resultHandler);
+    } else {
+      saveReferencedObject(store, referencedObject, storeResult -> {
+        if (storeResult.failed()) {
+          fail(storeResult.cause(), resultHandler);
+        }
+        Object id = storeResult.result();
+        storeId(store, field, id, resultHandler);
+      });
+    }
   }
 
   private void storeId(IDataStore store, IField field, Object id,
