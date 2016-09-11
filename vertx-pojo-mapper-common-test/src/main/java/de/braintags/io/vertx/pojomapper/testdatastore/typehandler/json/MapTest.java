@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Test;
@@ -40,6 +41,16 @@ public class MapTest extends AbstractTypeHandlerTest {
     context.assertEquals(1, list.size());
     MapRecord loaded = (MapRecord) list.get(0);
     context.assertNull(loaded.map);
+
+    record.map = new HashMap<>();
+    saveRecord(context, record);
+    query = getDataStore(context).createQuery(MapRecord.class);
+    list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    loaded = (MapRecord) list.get(0);
+    context.assertNotNull(loaded.map);
+    context.assertEquals(0, loaded.map.size());
+
   }
 
   /*

@@ -66,11 +66,14 @@ public class DefaultPropertyMapper implements IPropertyMapper {
    */
   public static void intoStoreObject(IStoreObject<?> storeObject, IField field, ITypeHandler th, Object javaValue,
       Handler<AsyncResult<Void>> handler) {
+    LOGGER.debug(
+        "starting intoStoreObject for field " + field.getFullName() + " with typehandler " + th.getClass().getName());
     th.intoStore(javaValue, field, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
         Object dbValue = result.result().getResult();
+        LOGGER.debug("received result from typehandler: " + String.valueOf(dbValue));
         storeObject.put(field, dbValue);
         handler.handle(Future.succeededFuture());
       }
@@ -102,16 +105,17 @@ public class DefaultPropertyMapper implements IPropertyMapper {
   @Override
   public void fromStoreObject(Object mapper, IStoreObject<?> storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
-    LOGGER.debug("starting fromStoreObject for field " + field.getFullName());
     ITypeHandler th = field.getTypeHandler();
+    LOGGER.debug(
+        "starting fromStoreObject for field " + field.getFullName() + " with typehandler " + th.getClass().getName());
     Object dbValue = storeObject.get(field);
-    LOGGER.debug("fetching result from typehandler");
     try {
       th.fromStore(dbValue, field, null, result -> {
         if (result.failed()) {
           handler.handle(Future.failedFuture(result.cause()));
         } else {
           Object javaValue = result.result().getResult();
+          LOGGER.debug("received result from typehandler: " + String.valueOf(javaValue));
           handleInstanceFromStore(storeObject, mapper, javaValue, dbValue, field, handler);
         }
       });

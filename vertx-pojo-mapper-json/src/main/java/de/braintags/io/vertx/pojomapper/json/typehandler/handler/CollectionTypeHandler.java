@@ -69,29 +69,29 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    if (source == null || ((JsonArray) source).isEmpty()) {
+    if (source == null) {
       success(null, resultHandler);
-      return;
-    }
-
-    CounterObject<ITypeHandlerResult> co = new CounterObject<>(((JsonArray) source).size(), resultHandler);
-    @SuppressWarnings("rawtypes")
-    Collection coll = field.getMapper().getObjectFactory().createCollection(field);
-    Iterator<?> ji = ((JsonArray) source).iterator();
-    ITypeHandler subHandler = field.getSubTypeHandler();
-    while (ji.hasNext() && !co.isError()) {
-      Object o = ji.next();
-      handleObjectFromStore(o, subHandler, coll, field, result -> {
-        if (result.failed()) {
-          co.setThrowable(result.cause());
-          return;
-        } else {
-          if (co.reduce()) {
-            success(coll, resultHandler);
+    } else if (((JsonArray) source).isEmpty()) {
+      success(field.getMapper().getObjectFactory().createCollection(field), resultHandler);
+    } else {
+      CounterObject<ITypeHandlerResult> co = new CounterObject<>(((JsonArray) source).size(), resultHandler);
+      Collection coll = field.getMapper().getObjectFactory().createCollection(field);
+      Iterator<?> ji = ((JsonArray) source).iterator();
+      ITypeHandler subHandler = field.getSubTypeHandler();
+      while (ji.hasNext() && !co.isError()) {
+        Object o = ji.next();
+        handleObjectFromStore(o, subHandler, coll, field, result -> {
+          if (result.failed()) {
+            co.setThrowable(result.cause());
             return;
+          } else {
+            if (co.reduce()) {
+              success(coll, resultHandler);
+              return;
+            }
           }
-        }
-      });
+        });
+      }
     }
   }
 
@@ -137,43 +137,42 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    if (source == null || ((Collection<?>) source).isEmpty()) {
+    if (source == null) {
       success(null, resultHandler);
-      return;
-    }
-
-    JsonArray jsonArray = new JsonArray();
-    CounterObject<ITypeHandlerResult> co = new CounterObject<>(((Collection<?>) source).size(), resultHandler);
-    Iterator<?> sourceIt = ((Collection<?>) source).iterator();
-    ITypeHandler subHandler = field.getSubTypeHandler();
-    // no generics were defined, so that subhandler could not be defined from mapping
-    boolean determineSubhandler = subHandler == null;
-    Class<?> valueClass = null;
-    while (sourceIt.hasNext() && !co.isError()) {
-      Object value = sourceIt.next();
-
-      if (determineSubhandler) {
-        boolean valueClassChanged = valueClass != null && value.getClass() != valueClass;
-        valueClass = value.getClass();
-        if (subHandler == null || valueClassChanged) {
-          subHandler = getSubTypeHandler(value.getClass(), field.getEmbedRef());
-          // TODO could it be useful to write the class of the value into the field, to restore it proper from
-          // datastore?
-        }
-      }
-      subHandler.intoStore(value, field, tmpResult -> {
-        if (tmpResult.failed()) {
-          co.setThrowable(tmpResult.cause());
-          return;
-        } else {
-          ITypeHandlerResult thResult = tmpResult.result();
-          jsonArray.add(thResult.getResult());
-          if (co.reduce()) {
-            success(jsonArray, resultHandler);
+    } else if (((Collection<?>) source).isEmpty()) {
+      success(new JsonArray(), resultHandler);
+    } else {
+      JsonArray jsonArray = new JsonArray();
+      CounterObject<ITypeHandlerResult> co = new CounterObject<>(((Collection<?>) source).size(), resultHandler);
+      Iterator<?> sourceIt = ((Collection<?>) source).iterator();
+      ITypeHandler subHandler = field.getSubTypeHandler();
+      // no generics were defined, so that subhandler could not be defined from mapping
+      boolean determineSubhandler = subHandler == null;
+      Class<?> valueClass = null;
+      while (sourceIt.hasNext() && !co.isError()) {
+        Object value = sourceIt.next();
+        if (determineSubhandler) {
+          boolean valueClassChanged = valueClass != null && value.getClass() != valueClass;
+          valueClass = value.getClass();
+          if (subHandler == null || valueClassChanged) {
+            subHandler = getSubTypeHandler(value.getClass(), field.getEmbedRef());
+            // TODO could it be useful to write the class of the value into the field, to restore it proper from
+            // datastore?
           }
         }
-      });
-
+        subHandler.intoStore(value, field, tmpResult -> {
+          if (tmpResult.failed()) {
+            co.setThrowable(tmpResult.cause());
+            return;
+          } else {
+            ITypeHandlerResult thResult = tmpResult.result();
+            jsonArray.add(thResult.getResult());
+            if (co.reduce()) {
+              success(jsonArray, resultHandler);
+            }
+          }
+        });
+      }
     }
   }
 

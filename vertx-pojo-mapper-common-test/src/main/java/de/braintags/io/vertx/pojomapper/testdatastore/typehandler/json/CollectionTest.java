@@ -12,6 +12,7 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -40,6 +41,16 @@ public class CollectionTest extends AbstractTypeHandlerTest {
     context.assertEquals(1, list.size());
     CollectionRecord loaded = (CollectionRecord) list.get(0);
     context.assertNull(loaded.collection);
+
+    record.collection = new ArrayList<>();
+    saveRecord(context, record);
+    query = getDataStore(context).createQuery(CollectionRecord.class);
+    list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    loaded = (CollectionRecord) list.get(0);
+    context.assertNotNull(loaded.collection);
+    context.assertEquals(0, loaded.collection.size());
+
   }
 
   /*
