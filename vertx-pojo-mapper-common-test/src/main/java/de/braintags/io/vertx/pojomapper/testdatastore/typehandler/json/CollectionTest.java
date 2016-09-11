@@ -50,7 +50,6 @@ public class CollectionTest extends AbstractTypeHandlerTest {
     loaded = (CollectionRecord) list.get(0);
     context.assertNotNull(loaded.collection);
     context.assertEquals(0, loaded.collection.size());
-
   }
 
   /*

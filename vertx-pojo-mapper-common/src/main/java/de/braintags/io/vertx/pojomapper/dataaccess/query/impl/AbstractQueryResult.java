@@ -31,6 +31,9 @@ import io.vertx.core.Handler;
  */
 
 public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> implements IQueryResult<T> {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(AbstractQueryResult.class);
+
   private IMapper mapper;
   private IDataStore datastore;
   private T[] pojoResult;
@@ -122,21 +125,25 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
 
     @Override
     public void next(Handler<AsyncResult<T>> handler) {
-      if (pojoResult[currentIndex] == null) {
-        generatePojo(currentIndex, result -> {
+      int thisIndex = currentIndex++;
+      if (pojoResult[thisIndex] == null) {
+        LOGGER
+            .debug("generating pojo on index " + thisIndex + " for mapper " + mapper.getMapperClass().getSimpleName());
+        generatePojo(thisIndex, result -> {
           try {
             if (result.failed()) {
               handler.handle(Future.failedFuture(result.cause()));
             } else {
-              pojoResult[currentIndex] = result.result();
-              handler.handle(Future.succeededFuture(pojoResult[currentIndex++]));
+              pojoResult[thisIndex] = result.result();
+              handler.handle(Future.succeededFuture(pojoResult[thisIndex]));
             }
           } catch (Exception e) {
             handler.handle(Future.failedFuture(e));
           }
         });
       } else {
-        handler.handle(Future.succeededFuture(pojoResult[currentIndex++]));
+        LOGGER.debug("reusing pojo on index " + thisIndex + " for mapper " + mapper.getMapperClass().getSimpleName());
+        handler.handle(Future.succeededFuture(pojoResult[thisIndex]));
       }
     }
 

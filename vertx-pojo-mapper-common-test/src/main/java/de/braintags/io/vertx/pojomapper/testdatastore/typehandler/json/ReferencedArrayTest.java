@@ -17,6 +17,7 @@ import java.util.List;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleMapper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.ReferenceMapper_Array;
@@ -30,6 +31,7 @@ import io.vertx.ext.unit.TestContext;
  */
 public class ReferencedArrayTest extends AbstractTypeHandlerTest {
 
+  @SuppressWarnings("rawtypes")
   @Test
   public void extreme(TestContext context) {
     clearTable(context, ReferenceMapper_Array.class.getSimpleName());
@@ -52,6 +54,41 @@ public class ReferencedArrayTest extends AbstractTypeHandlerTest {
     context.assertEquals(0, loaded.simpleMapper.length);
   }
 
+  /**
+   * Save the list of subobject, save, delete one, save again.
+   * 
+   * @param context
+   */
+  @SuppressWarnings({ "unused", "rawtypes" })
+  @Test
+  public void reduceMembers(TestContext context) {
+    clearTable(context, ReferenceMapper_Array.class.getSimpleName());
+    ReferenceMapper_Array record = new ReferenceMapper_Array(3);
+    saveRecord(context, record);
+    IQuery<ReferenceMapper_Array> query = getDataStore(context).createQuery(ReferenceMapper_Array.class);
+
+    ResultContainer rc = find(context, query, 1);
+    Object result = findFirst(context, query);
+    List list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    ReferenceMapper_Array loaded = (ReferenceMapper_Array) list.get(0);
+    context.assertNotNull(loaded.simpleMapper);
+    context.assertEquals(3, loaded.simpleMapper.length);
+
+    SimpleMapper[] old = record.simpleMapper;
+    record.simpleMapper = new SimpleMapper[2];
+    record.simpleMapper[0] = old[1];
+    record.simpleMapper[1] = old[2];
+
+    saveRecord(context, record);
+    query = getDataStore(context).createQuery(ReferenceMapper_Array.class);
+    list = findAll(context, query);
+    context.assertEquals(1, list.size());
+    loaded = (ReferenceMapper_Array) list.get(0);
+    context.assertNotNull(loaded.simpleMapper);
+    context.assertEquals(2, loaded.simpleMapper.length);
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -59,7 +96,7 @@ public class ReferencedArrayTest extends AbstractTypeHandlerTest {
    */
   @Override
   public BaseRecord createInstance(TestContext context) {
-    BaseRecord mapper = new ReferenceMapper_Array(5);
+    BaseRecord mapper = new ReferenceMapper_Array(3);
     return mapper;
   }
 

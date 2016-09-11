@@ -16,6 +16,7 @@ import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryResult;
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.mapper.MongoMapper;
 import io.vertx.core.AsyncResult;
@@ -57,7 +58,8 @@ public class MongoQueryResult<T> extends AbstractQueryResult<T> {
   @Override
   protected void generatePojo(int i, Handler<AsyncResult<T>> handler) {
     JsonObject sourceObject = jsonResult.get(i);
-    getDataStore().getMapperFactory().getStoreObjectFactory().createStoreObject(sourceObject, getMapper(), result -> {
+    IStoreObjectFactory sf = getDataStore().getMapperFactory().getStoreObjectFactory();
+    sf.createStoreObject(sourceObject, getMapper(), result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
