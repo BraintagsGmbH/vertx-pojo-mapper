@@ -92,7 +92,13 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
   }
 
   /**
-   * This method creates new datastore settings for MySql by using system properties
+   * This method creates new datastore settings for MySql by using system properties:
+   * <UL>
+   * <LI>MySqlDataStoreContainer.username to set the username of the database
+   * <LI>MySqlDataStoreContainer.password to set the password of the database
+   * <LI>MySqlDataStoreContainer.host to set the host of the database
+   * <LI>defaultKeyGenerator to set the name of the default keygenerator to be used
+   * </UL>
    * 
    * @return
    */

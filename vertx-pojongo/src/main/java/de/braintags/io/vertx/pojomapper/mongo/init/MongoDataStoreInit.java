@@ -77,6 +77,13 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
 
   /**
    * This method creates new datastore settings for mongo by using system properties
+   * <UL>
+   * <LI>{@value #CONNECTION_STRING_PROPERTY} to set the connection of the database
+   * <LI>{@value #START_MONGO_LOCAL_PROP} wether to start mongo temporary local or expecting a running instance
+   * <LI>{@value #LOCAL_PORT_PROP} If START_MONGO_LOCAL_PROP is set to true, then this defines the local port to be
+   * used. Default is 27017
+   * <LI>defaultKeyGenerator to set the name of the default keygenerator to be used
+   * </UL>
    * 
    * @return
    */

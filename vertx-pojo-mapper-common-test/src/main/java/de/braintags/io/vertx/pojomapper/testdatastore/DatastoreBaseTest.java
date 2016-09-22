@@ -43,6 +43,8 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
+ * Base test to init an IDataStore for working with an {@link IDataStore}. See method {@link #getDataStore(TestContext)}
+ * on how to init
  * 
  * 
  * @author Michael Remme
@@ -64,6 +66,22 @@ public abstract class DatastoreBaseTest {
   @Rule
   public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "40")));
 
+  /**
+   * Retrive a datastore to work with. If the datastore is not yet initialized, it is done by reading several system
+   * properties:<br/>
+   * <UL>
+   * <LI>IDatastoreContainer: defines the container class to be used. Currently possible is
+   * de.braintags.io.vertx.pojomapper.mongo.vertxunit.MongoDataStoreContainer for mongodb and
+   * de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer for mysql
+   * 
+   * </UL>
+   * For datastore specific system properties to be set see MySqlDataStoreinit.createSettings() or
+   * MongoDataStoreInit.createSettings()
+   * 
+   * 
+   * @param context
+   * @return
+   */
   public static IDataStore getDataStore(TestContext context) {
     return EXTERNAL_DATASTORE == null ? TestHelper.getDatastoreContainer(context).getDataStore() : EXTERNAL_DATASTORE;
   }
