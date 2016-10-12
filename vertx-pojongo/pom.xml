@@ -17,6 +17,7 @@
 		<source.skip>false</source.skip>
 		<testjar.skip>false</testjar.skip>
 		<maven.test.skip>false</maven.test.skip>
+	    <ignoreFailedTests>true</ignoreFailedTests>
 	</properties>
 
 	<dependencies>

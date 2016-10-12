@@ -81,6 +81,7 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
 
   private DataStoreSettings createSettings() {
     DataStoreSettings settings = MongoDataStoreInit.createDefaultSettings();
+    settings.setDatabaseName("UnitTestDatabase");
     settings.getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY,
         getProperty(CONNECTION_STRING_PROPERTY, DEFAULT_CONNECTION));
     settings.getProperties().put(MongoDataStoreInit.START_MONGO_LOCAL_PROP,

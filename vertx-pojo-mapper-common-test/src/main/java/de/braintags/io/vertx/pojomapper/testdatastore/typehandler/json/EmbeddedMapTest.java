@@ -61,9 +61,9 @@ public class EmbeddedMapTest extends AbstractTypeHandlerTest {
 
   @Override
   protected void validateAfterSave(TestContext context, Object record, ResultContainer resultContainer) {
+    super.validateAfterSave(context, record, resultContainer);
     EmbeddedMapper_Map mapper = (EmbeddedMapper_Map) record;
     context.assertNotNull(mapper.id);
-
   }
 
   @Override

@@ -80,6 +80,8 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
 
       ResultContainer resultContainer = saveRecord(context, record);
       validateAfterSave(context, record, resultContainer);
+      context.assertNotNull(resultContainer.writeResult, "write result is null");
+
       Iterator<IWriteEntry> it = resultContainer.writeResult.iterator();
       while (it.hasNext()) {
         IWriteEntry we = it.next();
@@ -113,7 +115,7 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
    * @param resultContainer
    */
   protected void validateAfterSave(TestContext context, Object record, ResultContainer resultContainer) {
-
+    context.assertNotNull(resultContainer, "resultContainer must not be null");
   }
 
   /**
