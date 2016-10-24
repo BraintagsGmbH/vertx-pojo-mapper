@@ -1,0 +1,26 @@
+dependencies {
+  compile project(':vertx-pojo-mapper-common')
+  compile project(':vertx-pojo-mapper-common-test')
+  compile project(':vertx-pojo-mapper-json')
+
+  compile group: 'io.vertx', name: 'vertx-mysql-postgresql-client', version:vertxVersion
+
+  testCompile project(':vertx-pojo-mapper-json').sourceSets.test.output
+
+  provided group: 'org.slf4j', name: 'slf4j-api', version: '1.6.2'
+}
+
+test {
+  systemProperty 'IDatastoreContainer', 'de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer'
+  systemProperty 'startMongoLocal', 'true'
+  systemProperty 'defaultKeyGenerator', 'DEBUG'
+  systemProperty 'MySqlDataStoreContainer.host', System.properties['MySqlDataStoreContainer.host']
+  systemProperty 'MySqlDataStoreContainer.username', System.properties['MySqlDataStoreContainer.username']
+  systemProperty 'MySqlDataStoreContainer.password', System.properties['MySqlDataStoreContainer.password']
+}
+
+sonarqube{
+  properties {
+    property 'sonar.projectName', 'vertx-pojo-mapper-mysql'
+  }
+}

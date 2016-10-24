@@ -1,0 +1,14 @@
+dependencies {
+  compile group: 'io.vertx', name:'vertx-mongo-embedded-db', version:vertxVersion
+  compile group: 'io.vertx', name:'vertx-mongo-client', version:vertxVersion
+  compile group: 'io.vertx', name:'vertx-mongo-service', version:vertxVersion
+
+  testCompile group: 'io.vertx', name:'vertx-mongo-service', version:vertxVersion, classifier:'tests'
+  testCompile group: 'org.slf4j', name:'slf4j-simple', version:'1.7.12'
+}
+
+sonarqube{
+  properties {
+    property 'sonar.projectName', 'vertx-pojo-mapper-common'
+  }
+}

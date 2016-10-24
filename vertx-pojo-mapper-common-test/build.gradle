@@ -1,0 +1,12 @@
+dependencies {
+  compile project(':vertx-pojo-mapper-common')
+  compile group: 'junit', name: 'junit', version:'4.11'
+  compile group: 'io.vertx', name:'vertx-unit', version:vertxVersion
+}
+
+sonarqube{
+  properties {
+    property 'sonar.exclusions', 'src/main/java/**'
+    property 'sonar.projectName', 'vertx-pojo-mapper-common-test'
+  }
+}
