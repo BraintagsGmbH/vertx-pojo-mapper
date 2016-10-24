@@ -1,0 +1,14 @@
+if (!JavaVersion.current().java8Compatible) {
+  throw new IllegalStateException('''A Haiku:
+                                    |  This needs Java 8,
+                                    |  You are using something else,
+                                    |  Refresh. Try again.'''.stripMargin())
+}
+
+rootProject.name = 'vertx-pojo-mapper'
+
+include 'vertx-pojo-mapper-common'
+include 'vertx-pojo-mapper-common-test'
+include 'vertx-pojo-mapper-json'
+include 'vertx-pojo-mapper-mysql'
+include 'vertx-pojongo'

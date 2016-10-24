@@ -1,0 +1,24 @@
+subprojects {
+  apply from: file(rootDir.path + '/gradle/vertx/vertxbase.gradle')
+  dependencies {
+    compile group: 'de.braintags', name:'vertx-util', version:btVertxVersion
+    compile group: 'de.braintags', name:'vertx-key-generator', version:btVertxVersion
+
+    testCompile group: 'de.braintags', name:'vertx-util', version:btVertxVersion, classifier:'tests'
+    testCompile group: 'de.braintags', name:'vertx-key-generator', version:btVertxVersion, classifier:'tests'
+  }
+}
+
+apply from: file(rootDir.path + '/gradle/sonar.gradle')
+apply from: file(rootDir.path + '/gradle/maven.gradle')
+apply from: file(rootDir.path + '/gradle/release.gradle')
+
+sonarqube{
+  properties {
+    property 'sonar.projectKey' , 'de.braintags.vertx:vertx-pojo-mapper'
+    property 'sonar.projectName', 'Vert.x Pojo Mapper'
+
+    // List of the module identifiers
+    property 'sonar.modules', 'vertx-pojo-mapper-common,vertx-pojo-mapper-json, vertx-pojongo, vertx-pojo-mapper-mysql'
+   }
+}

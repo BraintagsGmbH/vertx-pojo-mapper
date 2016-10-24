@@ -1,0 +1,21 @@
+dependencies {
+  compile project(':vertx-pojo-mapper-common')
+  compile project(':vertx-pojo-mapper-common-test')
+  compile project(':vertx-pojo-mapper-json')
+  compile group: 'io.vertx', name: 'vertx-mongo-embedded-db', version:vertxVersion
+  
+  testCompile project(':vertx-pojo-mapper-json').sourceSets.test.output
+  testCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.12'
+}
+
+test {
+  systemProperty 'IDatastoreContainer', 'de.braintags.io.vertx.pojomapper.mongo.vertxunit.MongoDataStoreContainer'
+  systemProperty 'startMongoLocal', 'true'
+  systemProperty 'db_name', 'PojongoTestDatabase'
+}
+
+sonarqube{
+  properties {
+    property 'sonar.projectName', 'vertx-pojongo'
+  }
+}
