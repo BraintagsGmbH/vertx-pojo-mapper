@@ -95,7 +95,7 @@ public class ObjectTypeHandlerEmbedded extends ObjectTypeHandler {
           }
         });
       }
-    } catch (Throwable e) {
+    } catch (Exception e) {
       fail(e, handler);
     }
   }
