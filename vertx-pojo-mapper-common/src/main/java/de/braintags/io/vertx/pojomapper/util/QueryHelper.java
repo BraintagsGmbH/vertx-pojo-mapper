@@ -49,9 +49,9 @@ public class QueryHelper {
    * @param handler
    *          the handler to be informed
    */
-  public static final void findRecordById(IDataStore datastore, Class<?> mapperClass, String id,
-      Handler<AsyncResult<?>> handler) {
-    IQuery<?> query = datastore.createQuery(mapperClass);
+  public static final <T> void findRecordById(IDataStore datastore, Class<T> mapperClass, String id,
+      Handler<AsyncResult<T>> handler) {
+    IQuery<T> query = datastore.createQuery(mapperClass);
     query.field(query.getMapper().getIdField().getName()).is(id);
     executeToFirstRecord(query, handler);
   }
@@ -66,7 +66,7 @@ public class QueryHelper {
    * @param handler
    *          the handler, which will receive the first object
    */
-  public static void executeToFirstRecord(IQuery<?> query, Handler<AsyncResult<?>> handler) {
+  public static <T> void executeToFirstRecord(IQuery<T> query, Handler<AsyncResult<T>> handler) {
     executeToFirstRecord(query, false, handler);
   }
 
@@ -81,12 +81,12 @@ public class QueryHelper {
    * @param handler
    *          the handler, which will receive the first object
    */
-  public static void executeToFirstRecord(IQuery<?> query, boolean required, Handler<AsyncResult<?>> handler) {
+  public static <T> void executeToFirstRecord(IQuery<T> query, boolean required, Handler<AsyncResult<T>> handler) {
     query.execute(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
-        IteratorAsync<?> it = result.result().iterator();
+        IteratorAsync<T> it = result.result().iterator();
         if (it.hasNext()) {
           it.next(itResult -> {
             if (itResult.failed()) {
