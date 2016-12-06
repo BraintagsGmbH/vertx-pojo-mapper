@@ -118,12 +118,6 @@ Creating a mapper is very simple:
 
 [source, java]
 ----
-package examples.mapper;
-
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
-import io.vertx.docgen.Source;
-
 @Source(translate = false)
 @Entity
 public class MiniMapper {
@@ -136,7 +130,6 @@ public class MiniMapper {
   }
 
 }
-
 ----
 As you can see, you can specify any java class as a mapper by adding two annotations:
 
@@ -365,13 +358,6 @@ To define, that a subobject shall be saved embedded is simply done by adding the
 
 [source,java]
 ----
-package examples.mapper;
-
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
-import io.vertx.docgen.Source;
-
 @Source(translate = false)
 @Entity
 public class PersonEmbed {
@@ -385,7 +371,6 @@ public class PersonEmbed {
   }
 
 }
-
 ----
 
 How the embedding is technically processed, is decided by the `IDataStore`. In
@@ -395,13 +380,6 @@ Subobjects as array of Animal:
 
 [source,java]
 ----
-package examples.mapper;
-
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
-import io.vertx.docgen.Source;
-
 @Source(translate = false)
 @Entity
 public class PersonEmbedArray {
@@ -415,22 +393,12 @@ public class PersonEmbedArray {
   }
 
 }
-
 ----
 
 Subobjects as List of Animal:
 
 [source,java]
 ----
-package examples.mapper;
-
-import java.util.List;
-
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
-import io.vertx.docgen.Source;
-
 @Source(translate = false)
 @Entity
 public class PersonEmbedList {
@@ -444,22 +412,12 @@ public class PersonEmbedList {
   }
 
 }
-
 ----
 
 Subobjects as Map of Animal:
 
 [source,java]
 ----
-package examples.mapper;
-
-import java.util.Map;
-
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
-import io.vertx.docgen.Source;
-
 @Source(translate = false)
 @Entity
 public class PersonEmbedMap {
@@ -473,7 +431,6 @@ public class PersonEmbedMap {
   }
 
 }
-
 ----
 
 ===== Storing subobjects referenced
@@ -484,13 +441,6 @@ mapper. Of course here, too, you are able to store lists, maps and arrays either
 
 [source,java]
 ----
-package examples.mapper;
-
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
-import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
-import io.vertx.docgen.Source;
-
 @Source(translate = false)
 @Entity
 public class PersonRef {
@@ -504,7 +454,6 @@ public class PersonRef {
   }
 
 }
-
 ----
 
 ==== Lifecycle methods
@@ -515,21 +464,6 @@ one of the lifecycle annotations, then those method(s) are executed inside the s
 
 [source,java]
 ----
-package examples.mapper;
-
-import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeDelete;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.mapping.ITriggerContext;
-import io.vertx.docgen.Source;
-
 @Source(translate = false)
 @Entity
 public class LifecycleMapper {
@@ -582,7 +516,6 @@ public class LifecycleMapper {
   }
 
 }
-
 ----
 
 Currently are existing 6 lifecycle annotations
@@ -626,13 +559,6 @@ contents like passwords for instance.
 
 [source,java]
 ----
-package examples.mapper;
-
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Encoder;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
-import io.vertx.docgen.Source;
-
 @Source(translate = false)
 @Entity
 public class MiniMapperEncoded {
@@ -647,7 +573,6 @@ public class MiniMapperEncoded {
   }
 
 }
-
 ----
 
 In the above example the field password is annotated with
@@ -872,13 +797,6 @@ are defining the name of the IKeyGenerator, which shall be used
 
 [source, java]
 ----
-package examples.mapper;
-
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.KeyGenerator;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
-import io.vertx.docgen.Source;
-
 @Source(translate = false)
 @Entity
 @KeyGenerator
@@ -887,7 +805,6 @@ public class KeyGeneratorMapper {
  public String id;
 
 }
-
 ----
 
 == Creating a new implementation
