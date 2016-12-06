@@ -17,9 +17,18 @@
 		<source.skip>false</source.skip>
 		<testjar.skip>false</testjar.skip>
 		<skipAssembly>false</skipAssembly>
+        <ignoreFailedTests>true</ignoreFailedTests>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-sql-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-mysql-postgresql-client</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-json</artifactId>
@@ -28,10 +37,6 @@
 	  		<groupId>de.braintags</groupId>
 	  		<artifactId>vertx-pojo-mapper-common</artifactId>
 	  	</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-mysql-postgresql-client</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-common-test</artifactId>
@@ -70,8 +75,7 @@
 							<startMongoLocal>true</startMongoLocal>
 							<defaultKeyGenerator>DEBUG</defaultKeyGenerator>						
 						</systemPropertyVariables>
-						<testFailureIgnore>true</testFailureIgnore>					
-						<argLine>-server -Xmx1200M</argLine>
+                        <testFailureIgnore>${ignoreFailedTests}</testFailureIgnore>                    						<argLine>-server -Xmx1200M</argLine>
 						<forkCount>1</forkCount>
 						<reuseForks>true</reuseForks>
 					</configuration>

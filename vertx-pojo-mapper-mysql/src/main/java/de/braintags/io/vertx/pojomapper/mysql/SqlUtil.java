@@ -295,7 +295,7 @@ public class SqlUtil {
         LOGGER.error("", sqlEx);
         resultHandler.handle(Future.failedFuture(sqlEx));
         return;
-      }
+      } 
       SQLConnection connection = cr.result();
       LOGGER.debug(GAINED_SUCCESSFULLY_A_CONNECTION);
       doQuery(command, resultHandler, connection);
