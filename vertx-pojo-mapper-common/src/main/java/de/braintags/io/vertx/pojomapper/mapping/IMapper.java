@@ -38,7 +38,7 @@ import io.vertx.core.Handler;
  * 
  */
 
-public interface IMapper {
+public interface IMapper<T> {
 
   /**
    * Get information about the table / collection inside the connected datastore
@@ -52,7 +52,7 @@ public interface IMapper {
    * 
    * @return the class
    */
-  public Class<?> getMapperClass();
+  public Class<T> getMapperClass();
 
   /**
    * Get the {@link IObjectFactory} which is defined for the current mapper. To define the {@link IObjectFactory} for
