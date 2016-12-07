@@ -44,6 +44,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
     context.assertEquals(we.getAction(), WriteAction.INSERT);
     context.assertNotNull(sm.id);
     context.assertTrue(sm.id.hashCode() != 0); // "ID wasn't set by insert statement",
+    logger.info("ID is: " + sm.id);
 
     sm.name = "testNameModified";
     sm.setSecondProperty("my modified property");

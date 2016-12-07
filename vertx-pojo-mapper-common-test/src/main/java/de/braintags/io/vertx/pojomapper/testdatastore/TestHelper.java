@@ -72,7 +72,7 @@ public class TestHelper {
           + ". Start the test with -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer for instance");
     }
     datastoreContainer = (IDatastoreContainer) Class.forName(property).newInstance();
-    ErrorObject<Void> err = new ErrorObject<Void>(null);
+    ErrorObject<Void> err = new ErrorObject<>(null);
     logger.info("wait for startup of datastore");
     datastoreContainer.startup(vertx, result -> {
       if (result.failed()) {
@@ -99,7 +99,7 @@ public class TestHelper {
    * shutdown datastore
    */
   public static final void shutdown() throws Exception {
-    ErrorObject<Void> err = new ErrorObject<Void>(null);
+    ErrorObject<Void> err = new ErrorObject<>(null);
     CountDownLatch latch = new CountDownLatch(1);
     datastoreContainer.shutdown(result -> {
       if (result.failed()) {
@@ -142,6 +142,8 @@ public class TestHelper {
     KeyGeneratorSettings settings = new KeyGeneratorSettings();
     settings.setKeyGeneratorClass(MongoKeyGenerator.class);
     settings.getGeneratorProperties().put(MongoKeyGenerator.COLLECTTION_PROP, "keyGenSequence");
+    settings.getGeneratorProperties().put(MongoKeyGenerator.START_MONGO_LOCAL_PROP,
+        System.getProperty(MongoKeyGenerator.START_MONGO_LOCAL_PROP));
     return new KeyGeneratorVerticle(settings);
   }
 
