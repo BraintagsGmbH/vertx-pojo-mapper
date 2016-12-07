@@ -136,7 +136,7 @@ public interface IMapper<T> {
    * @param entity
    *          the entity to be handled
    */
-  public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity,
+  public void executeLifecycle(Class< ? extends Annotation> annotationClass, T entity,
       Handler<AsyncResult<Void>> handler);
 
   /**

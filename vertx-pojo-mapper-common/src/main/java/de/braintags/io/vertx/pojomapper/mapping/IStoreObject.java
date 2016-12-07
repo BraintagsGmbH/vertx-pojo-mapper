@@ -23,11 +23,11 @@ import io.vertx.codegen.annotations.Fluent;
  * instance
  * 
  * @author Michael Remme
- * @param <T>
+ * @param <F>
  *          the type, which is used internally as format, like Json for instance
  */
 
-public interface IStoreObject<T> {
+public interface IStoreObject<F> {
 
   /**
    * Checks wether for the given IField an entry is defined inside the current instance
@@ -57,14 +57,14 @@ public interface IStoreObject<T> {
    * @return a reference to itself
    */
   @Fluent
-  IStoreObject<T> put(IField field, Object value);
+  IStoreObject<F> put(IField field, Object value);
 
   /**
    * Get the raw container, which stores the information
    * 
    * @return the container
    */
-  T getContainer();
+  F getContainer();
 
   /**
    * Get the POJO entity, whihc was created from the stored information in the {@link IDataStore}

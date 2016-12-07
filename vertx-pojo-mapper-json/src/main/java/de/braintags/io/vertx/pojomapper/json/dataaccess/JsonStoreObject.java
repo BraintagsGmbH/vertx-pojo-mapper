@@ -26,7 +26,7 @@ import io.vertx.core.json.JsonObject;
  * @author Michael Remme
  */
 
-public class JsonStoreObject extends AbstractStoreObject<JsonObject> {
+public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
 
   /**
    * Constructor
@@ -36,7 +36,7 @@ public class JsonStoreObject extends AbstractStoreObject<JsonObject> {
    * @param entity
    *          the entity to be used
    */
-  public JsonStoreObject(IMapper mapper, Object entity) {
+  public JsonStoreObject(IMapper<T> mapper, T entity) {
     super(mapper, entity, new JsonObject());
   }
 
@@ -48,7 +48,7 @@ public class JsonStoreObject extends AbstractStoreObject<JsonObject> {
    * @param mapper
    *          the mapper to be used
    */
-  public JsonStoreObject(JsonObject jsonObject, IMapper mapper) {
+  public JsonStoreObject(JsonObject jsonObject, IMapper<T> mapper) {
     super(jsonObject, mapper);
   }
 

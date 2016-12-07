@@ -28,7 +28,7 @@ import io.vertx.core.json.JsonObject;
  * @author Michael Remme
  */
 
-public class MongoStoreObject extends JsonStoreObject {
+public class MongoStoreObject<T> extends JsonStoreObject<T> {
   protected Object generatedId = null;
 
   /**
@@ -39,7 +39,7 @@ public class MongoStoreObject extends JsonStoreObject {
    * @param entity
    *          the entity
    */
-  public MongoStoreObject(IMapper mapper, Object entity) {
+  public MongoStoreObject(IMapper<T> mapper, T entity) {
     super(mapper, entity);
   }
 
@@ -51,7 +51,7 @@ public class MongoStoreObject extends JsonStoreObject {
    * @param mapper
    *          the mapper to be used
    */
-  public MongoStoreObject(JsonObject json, IMapper mapper) {
+  public MongoStoreObject(JsonObject json, IMapper<T> mapper) {
     super(json, mapper);
   }
 

@@ -38,7 +38,7 @@ public interface IStoreObjectFactory {
    * @param handler
    *          the handler to be recalled
    */
-  public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler);
+  public <T> void createStoreObject(IMapper<T> mapper, T entity, Handler<AsyncResult<IStoreObject< ? >>> handler);
 
   /**
    * Creates a {@link List} of {@link IStoreObject} by using the informations of the given instances. All entities are
@@ -51,7 +51,8 @@ public interface IStoreObjectFactory {
    * @param handler
    *          the handler to be recalled
    */
-  public void createStoreObjects(IMapper mapper, List<?> entities, Handler<AsyncResult<List<IStoreObject<?>>>> handler);
+  public <T> void createStoreObjects(IMapper<T> mapper, List<T> entities,
+      Handler<AsyncResult<List<IStoreObject< ? >>>> handler);
 
   /**
    * Creates a new instance of {@link IStoreObject} by using the information from the given stored object from the
@@ -64,6 +65,7 @@ public interface IStoreObjectFactory {
    * @param handler
    *          the handler to be recalled
    */
-  public void createStoreObject(Object storedObject, IMapper mapper, Handler<AsyncResult<IStoreObject<?>>> handler);
+  public <T> void createStoreObject(T storedObject, IMapper<T> mapper,
+      Handler<AsyncResult<IStoreObject< ? >>> handler);
 
 }

@@ -182,7 +182,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     }
   }
 
-  private void handleInsert(SqlStoreObject storeObject, IWriteResult writeResult,
+  private void handleInsert(SqlStoreObject<T> storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     storeObject.generateSqlInsertStatement(isr -> {
       if (isr.failed()) {
@@ -234,7 +234,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         });
   }
 
-  private void handleInsertError(Throwable t, SqlStoreObject storeObject, IWriteResult writeResult,
+  private void handleInsertError(Throwable t, SqlStoreObject<T> storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     if (t instanceof DuplicateKeyException) {
       if (getMapper().getKeyGenerator() != null) {

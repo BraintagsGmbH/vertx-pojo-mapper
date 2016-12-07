@@ -37,7 +37,6 @@ public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSync
 
   /*
    * (non-Javadoc)
-   * 
    * @see de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer#synchronize(de.braintags.io.vertx.pojomapper.
    * mapping .IMapper, io.vertx.core.Handler)
    */

@@ -32,12 +32,12 @@ import io.vertx.core.json.JsonObject;
 public class MongoStoreObjectFactory extends AbstractStoreObjectFactory {
 
   @Override
-  public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler) {
+  public <T> void createStoreObject(IMapper<T> mapper, T entity, Handler<AsyncResult<IStoreObject< ? >>> handler) {
     mapper.executeLifecycle(BeforeSave.class, entity, lcr -> {
       if (lcr.failed()) {
         handler.handle(Future.failedFuture(lcr.cause()));
       } else {
-        MongoStoreObject storeObject = new MongoStoreObject(mapper, entity);
+        MongoStoreObject<T> storeObject = new MongoStoreObject<>(mapper, entity);
         storeObject.initFromEntity(initResult -> {
           if (initResult.failed()) {
             handler.handle(Future.failedFuture(initResult.cause()));
@@ -50,8 +50,9 @@ public class MongoStoreObjectFactory extends AbstractStoreObjectFactory {
   }
 
   @Override
-  public void createStoreObject(Object storedObject, IMapper mapper, Handler<AsyncResult<IStoreObject<?>>> handler) {
-    MongoStoreObject storeObject = new MongoStoreObject((JsonObject) storedObject, mapper);
+  public <T> void createStoreObject(T storedObject, IMapper<T> mapper,
+      Handler<AsyncResult<IStoreObject< ? >>> handler) {
+    MongoStoreObject<T> storeObject = new MongoStoreObject<>((JsonObject) storedObject, mapper);
     storeObject.initToEntity(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));

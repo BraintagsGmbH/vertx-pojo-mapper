@@ -33,7 +33,7 @@ public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T
 
   private Class<T> mapperClass;
   private IDataStore datastore;
-  private IMapper mapper;
+  private IMapper<T> mapper;
 
   /**
    * Creates an instance for the given mapper class and requests an {@link IMapper} definition from
@@ -76,7 +76,7 @@ public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T
    * @see de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject#getMapper()
    */
   @Override
-  public IMapper getMapper() {
+  public IMapper<T> getMapper() {
     return mapper;
   }
 

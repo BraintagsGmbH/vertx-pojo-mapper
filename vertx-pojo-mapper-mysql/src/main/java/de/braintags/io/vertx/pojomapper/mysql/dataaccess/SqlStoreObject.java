@@ -39,7 +39,7 @@ import io.vertx.core.json.JsonObject;
  * 
  */
 
-public class SqlStoreObject extends AbstractStoreObject<Object> {
+public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(SqlStoreObject.class);
 
@@ -50,7 +50,7 @@ public class SqlStoreObject extends AbstractStoreObject<Object> {
    * @param entity
    * @param container
    */
-  public SqlStoreObject(IMapper mapper, Object entity) {
+  public SqlStoreObject(IMapper<T> mapper, T entity) {
     super(mapper, entity, new HashMap<>());
   }
 
@@ -60,7 +60,7 @@ public class SqlStoreObject extends AbstractStoreObject<Object> {
    * @param container
    * @param mapper
    */
-  public SqlStoreObject(JsonObject container, IMapper mapper) {
+  public SqlStoreObject(JsonObject container, IMapper<T> mapper) {
     super(container, mapper);
   }
 
