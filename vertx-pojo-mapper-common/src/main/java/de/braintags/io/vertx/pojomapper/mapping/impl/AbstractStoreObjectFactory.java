@@ -49,9 +49,9 @@ public abstract class AbstractStoreObjectFactory implements IStoreObjectFactory 
    */
   @Override
   public <T> void createStoreObjects(IMapper<T> mapper, List<T> entities,
-      Handler<AsyncResult<List<IStoreObject<?>>>> handler) {
-    CounterObject<List<IStoreObject<?>>> co = new CounterObject<>(entities.size(), handler);
-    List<IStoreObject<?>> returnList = new ArrayList<IStoreObject<?>>();
+      Handler<AsyncResult<List<IStoreObject<T, ? >>>> handler) {
+    CounterObject<List<IStoreObject<T, ? >>> co = new CounterObject<>(entities.size(), handler);
+    List<IStoreObject<T, ? >> returnList = new ArrayList<>();
     for (T entity : entities) {
       createStoreObject(mapper, entity, result -> {
         if (result.failed()) {

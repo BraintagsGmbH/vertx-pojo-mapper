@@ -27,7 +27,7 @@ import io.vertx.codegen.annotations.Fluent;
  *          the type, which is used internally as format, like Json for instance
  */
 
-public interface IStoreObject<F> {
+public interface IStoreObject<T, F> {
 
   /**
    * Checks wether for the given IField an entry is defined inside the current instance
@@ -57,7 +57,7 @@ public interface IStoreObject<F> {
    * @return a reference to itself
    */
   @Fluent
-  IStoreObject<F> put(IField field, Object value);
+  IStoreObject<T, F> put(IField field, Object value);
 
   /**
    * Get the raw container, which stores the information
@@ -71,7 +71,7 @@ public interface IStoreObject<F> {
    * 
    * @return the entity
    */
-  Object getEntity();
+  T getEntity();
 
   @Override
   String toString();

@@ -32,7 +32,7 @@ import io.vertx.core.Handler;
  * @author Michael Remme
  * 
  */
-public abstract class AbstractStoreObject<T, F> implements IStoreObject<F> {
+public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(AbstractStoreObject.class);
 
@@ -133,7 +133,7 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<F> {
     getMapper().executeLifecycle(AfterLoad.class, entity, handler);
   }
 
-  protected final void iterateFields(Object tmpObject, Handler<AsyncResult<Void>> handler) {
+  protected final void iterateFields(T tmpObject, Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start iterateFields");
     Set<String> fieldNames = getMapper().getFieldNames();
     CounterObject<Void> co = new CounterObject<>(fieldNames.size(), handler);

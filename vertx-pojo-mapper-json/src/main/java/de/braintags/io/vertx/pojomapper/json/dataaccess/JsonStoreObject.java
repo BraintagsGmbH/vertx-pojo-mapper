@@ -82,7 +82,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * java.lang.Object)
    */
   @Override
-  public IStoreObject<JsonObject> put(IField field, Object value) {
+  public IStoreObject<T, JsonObject> put(IField field, Object value) {
     IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     if (ci == null) {
       throw new MappingException("Can't find columninfo for field " + field.getFullName());

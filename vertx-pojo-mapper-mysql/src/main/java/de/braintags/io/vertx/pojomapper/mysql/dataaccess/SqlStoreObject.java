@@ -112,7 +112,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    * java.lang.Object)
    */
   @Override
-  public IStoreObject<Object> put(IField field, Object value) {
+  public IStoreObject<T, Object> put(IField field, Object value) {
     IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     if (ci == null) {
       throw new MappingException("Can't find columninfo for field " + field.getFullName());

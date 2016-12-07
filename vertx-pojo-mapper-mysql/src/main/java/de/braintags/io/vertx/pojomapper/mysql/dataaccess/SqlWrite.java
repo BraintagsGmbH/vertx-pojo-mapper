@@ -85,11 +85,11 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   }
 
-  private void save(List<IStoreObject<?>> storeObjects, Handler<AsyncResult<IWriteResult>> resultHandler) {
+  private void save(List<IStoreObject<T, ? >> storeObjects, Handler<AsyncResult<IWriteResult>> resultHandler) {
     CounterObject<IWriteResult> co = new CounterObject<>(storeObjects.size(), resultHandler);
     WriteResult rr = new SqlWriteResult();
-    for (IStoreObject<?> sto : storeObjects) {
-      saveStoreObject((SqlStoreObject) sto, rr, saveResult -> {
+    for (IStoreObject<T, ? > sto : storeObjects) {
+      saveStoreObject((SqlStoreObject<T>) sto, rr, saveResult -> {
         if (saveResult.failed()) {
           LOGGER.error("", saveResult.cause());
           co.setThrowable(saveResult.cause());
@@ -114,7 +114,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param storeObject
    * @param resultHandler
    */
-  private void saveStoreObject(SqlStoreObject storeObject, IWriteResult writeResult,
+  private void saveStoreObject(SqlStoreObject<T> storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     Object currentId = storeObject.get(getMapper().getIdField());
     if (currentId == null || (currentId instanceof Number && ((Number) currentId).intValue() == 0)) {
@@ -135,7 +135,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param resultHandler
    *          the {@link Handler} to be informed
    */
-  private void handleUpdate(SqlStoreObject storeObject, IWriteResult writeResult,
+  private void handleUpdate(SqlStoreObject<T> storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlUpdateStatement();
     if (seq.getParameters().isEmpty()) {
@@ -315,7 +315,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * {@link IStoreObject}
    */
   @Override
-  protected void setIdValue(Object id, IStoreObject<?> storeObject, Handler<AsyncResult<Void>> resultHandler) {
+  protected void setIdValue(Object id, IStoreObject<T, ? > storeObject, Handler<AsyncResult<Void>> resultHandler) {
     IField idField = getMapper().getIdField();
     idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
   }

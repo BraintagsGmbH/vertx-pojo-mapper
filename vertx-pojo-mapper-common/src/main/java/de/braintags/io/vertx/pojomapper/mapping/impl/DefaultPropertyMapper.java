@@ -38,7 +38,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
       .getLogger(DefaultPropertyMapper.class);
 
   @Override
-  public void intoStoreObject(Object mapper, IStoreObject<?> storeObject, IField field,
+  public <T> void intoStoreObject(T mapper, IStoreObject<T, ? > storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
@@ -64,7 +64,8 @@ public class DefaultPropertyMapper implements IPropertyMapper {
    * @param handler
    *          the handler to be informed
    */
-  public static void intoStoreObject(IStoreObject<?> storeObject, IField field, ITypeHandler th, Object javaValue,
+  public static <T> void intoStoreObject(IStoreObject<T, ? > storeObject, IField field, ITypeHandler th,
+      Object javaValue,
       Handler<AsyncResult<Void>> handler) {
     LOGGER.debug(
         "starting intoStoreObject for field " + field.getFullName() + " with typehandler " + th.getClass().getName());
@@ -81,7 +82,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
   }
 
   @Override
-  public void readForStore(Object mapper, IField field, Handler<AsyncResult<Object>> handler) {
+  public <T> void readForStore(T mapper, IField field, Handler<AsyncResult<Object>> handler) {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object javaValue = pAcc.readData(mapper);
@@ -103,7 +104,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
   }
 
   @Override
-  public void fromStoreObject(Object mapper, IStoreObject<?> storeObject, IField field,
+  public <T> void fromStoreObject(T mapper, IStoreObject<T, ? > storeObject, IField field,
       Handler<AsyncResult<Void>> handler) {
     ITypeHandler th = field.getTypeHandler();
     LOGGER.debug(
@@ -126,7 +127,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
 
   }
 
-  private void handleInstanceFromStore(IStoreObject<?> storeObject, Object mapper, Object javaValue, Object dbValue,
+  private <T> void handleInstanceFromStore(IStoreObject<T, ? > storeObject, T mapper, Object javaValue, Object dbValue,
       IField field, Handler<AsyncResult<Void>> handler) {
     try {
       if (javaValue instanceof IObjectReference) {
