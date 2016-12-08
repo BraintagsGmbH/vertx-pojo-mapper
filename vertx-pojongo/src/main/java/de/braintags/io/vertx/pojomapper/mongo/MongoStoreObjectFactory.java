@@ -29,10 +29,10 @@ import io.vertx.core.json.JsonObject;
  * 
  */
 
-public class MongoStoreObjectFactory extends AbstractStoreObjectFactory {
+public class MongoStoreObjectFactory extends AbstractStoreObjectFactory<JsonObject> {
 
   @Override
-  public <T> void createStoreObject(IMapper<T> mapper, T entity, Handler<AsyncResult<IStoreObject<T, ? >>> handler) {
+  public <T> void createStoreObject(IMapper<T> mapper, T entity, Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
     mapper.executeLifecycle(BeforeSave.class, entity, lcr -> {
       if (lcr.failed()) {
         handler.handle(Future.failedFuture(lcr.cause()));
@@ -50,9 +50,9 @@ public class MongoStoreObjectFactory extends AbstractStoreObjectFactory {
   }
 
   @Override
-  public <T> void createStoreObject(T storedObject, IMapper<T> mapper,
-      Handler<AsyncResult<IStoreObject<T, ? >>> handler) {
-    MongoStoreObject<T> storeObject = new MongoStoreObject<>((JsonObject) storedObject, mapper);
+  public <T> void createStoreObject(JsonObject storedObject, IMapper<T> mapper,
+      Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
+    MongoStoreObject<T> storeObject = new MongoStoreObject<>(storedObject, mapper);
     storeObject.initToEntity(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));

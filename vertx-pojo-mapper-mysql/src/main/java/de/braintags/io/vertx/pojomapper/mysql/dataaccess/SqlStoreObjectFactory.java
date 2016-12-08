@@ -30,7 +30,7 @@ import io.vertx.core.json.JsonObject;
  * 
  */
 
-public class SqlStoreObjectFactory extends AbstractStoreObjectFactory {
+public class SqlStoreObjectFactory extends AbstractStoreObjectFactory<Object> {
 
   /**
    * Craetes a new instance of IStoreObject by using a {@link Map} as internal format
@@ -39,7 +39,7 @@ public class SqlStoreObjectFactory extends AbstractStoreObjectFactory {
    *      java.lang.Object, io.vertx.core.Handler)
    */
   @Override
-  public <T> void createStoreObject(IMapper<T> mapper, T entity, Handler<AsyncResult<IStoreObject<T, ? >>> handler) {
+  public <T> void createStoreObject(IMapper<T> mapper, T entity, Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
     mapper.executeLifecycle(BeforeSave.class, entity, lcr -> {
       if (lcr.failed()) {
         handler.handle(Future.failedFuture(lcr.cause()));
@@ -57,8 +57,8 @@ public class SqlStoreObjectFactory extends AbstractStoreObjectFactory {
   }
 
   @Override
-  public <T> void createStoreObject(T storedObject, IMapper<T> mapper,
-      Handler<AsyncResult<IStoreObject<T, ? >>> handler) {
+  public <T> void createStoreObject(Object storedObject, IMapper<T> mapper,
+      Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
     SqlStoreObject<T> storeObject = new SqlStoreObject<>((JsonObject) storedObject, mapper);
     storeObject.initToEntity(result -> {
       if (result.failed()) {

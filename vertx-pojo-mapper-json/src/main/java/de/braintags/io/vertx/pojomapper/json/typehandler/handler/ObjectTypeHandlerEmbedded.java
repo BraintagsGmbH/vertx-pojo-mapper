@@ -19,6 +19,7 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
@@ -76,7 +77,7 @@ public class ObjectTypeHandlerEmbedded extends ObjectTypeHandler {
       if (dbValue == null) {
         success(null, handler);
       } else {
-        IMapper mapper = store.getMapperFactory().getMapper(internalMapperClass);
+        IMapper<?> mapper = store.getMapperFactory().getMapper(internalMapperClass);
         JsonObject job;
         if (dbValue instanceof String) {
           job = new JsonObject((String) dbValue);
@@ -86,7 +87,9 @@ public class ObjectTypeHandlerEmbedded extends ObjectTypeHandler {
           fail(new UnsupportedOperationException("only String and JsonObject allowed here"), handler);
           return;
         }
-        store.getMapperFactory().getStoreObjectFactory().createStoreObject(job, mapper, result -> {
+        IStoreObjectFactory<JsonObject> jd = (IStoreObjectFactory<JsonObject>) store.getMapperFactory()
+            .getStoreObjectFactory();
+        jd.createStoreObject(job, mapper, result -> {
           if (result.failed()) {
             fail(result.cause(), handler);
           } else {

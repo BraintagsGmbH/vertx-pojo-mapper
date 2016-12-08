@@ -25,7 +25,7 @@ import io.vertx.core.Handler;
  * 
  */
 
-public interface IStoreObjectFactory {
+public interface IStoreObjectFactory<F> {
 
   /**
    * Creates a new instance of {@link IStoreObject} by using the information from the given entity. The entity is
@@ -38,7 +38,7 @@ public interface IStoreObjectFactory {
    * @param handler
    *          the handler to be recalled
    */
-  public <T> void createStoreObject(IMapper<T> mapper, T entity, Handler<AsyncResult<IStoreObject<T, ? >>> handler);
+  public <T> void createStoreObject(IMapper<T> mapper, T entity, Handler<AsyncResult<IStoreObject<T, ?>>> handler);
 
   /**
    * Creates a {@link List} of {@link IStoreObject} by using the informations of the given instances. All entities are
@@ -52,7 +52,7 @@ public interface IStoreObjectFactory {
    *          the handler to be recalled
    */
   public <T> void createStoreObjects(IMapper<T> mapper, List<T> entities,
-      Handler<AsyncResult<List<IStoreObject<T, ? >>>> handler);
+      Handler<AsyncResult<List<IStoreObject<T, ?>>>> handler);
 
   /**
    * Creates a new instance of {@link IStoreObject} by using the information from the given stored object from the
@@ -65,7 +65,7 @@ public interface IStoreObjectFactory {
    * @param handler
    *          the handler to be recalled
    */
-  public <T> void createStoreObject(T storedObject, IMapper<T> mapper,
-      Handler<AsyncResult<IStoreObject<T, ? >>> handler);
+  public <T> void createStoreObject(F storedObject, IMapper<T> mapper,
+      Handler<AsyncResult<IStoreObject<T, ?>>> handler);
 
 }

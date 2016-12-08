@@ -71,6 +71,6 @@ public interface IMapperFactory {
    * 
    * @return the instance of {@link IStoreObjectFactory}
    */
-  public IStoreObjectFactory getStoreObjectFactory();
+  public IStoreObjectFactory<?> getStoreObjectFactory();
 
 }
