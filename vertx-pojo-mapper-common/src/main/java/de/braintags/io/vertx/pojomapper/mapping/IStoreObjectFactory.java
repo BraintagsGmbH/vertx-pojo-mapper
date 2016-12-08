@@ -23,6 +23,8 @@ import io.vertx.core.Handler;
  * 
  * @author Michael Remme
  * 
+ * @param F
+ *          defines the format, which is used to save into and to read from the underlaying datastore
  */
 
 public interface IStoreObjectFactory<F> {
