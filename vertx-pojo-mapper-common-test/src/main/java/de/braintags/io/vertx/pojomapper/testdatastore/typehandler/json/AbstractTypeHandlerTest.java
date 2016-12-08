@@ -85,7 +85,7 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
       Iterator<IWriteEntry> it = resultContainer.writeResult.iterator();
       while (it.hasNext()) {
         IWriteEntry we = it.next();
-        IStoreObject<?> entry = we.getStoreObject();
+        IStoreObject< ? , ? > entry = we.getStoreObject();
         LOGGER.info("written entry: " + entry.toString() + " | " + we.getAction());
       }
 
