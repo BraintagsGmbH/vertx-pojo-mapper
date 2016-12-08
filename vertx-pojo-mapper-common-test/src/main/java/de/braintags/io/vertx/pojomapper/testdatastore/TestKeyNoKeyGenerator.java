@@ -12,52 +12,53 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DebugGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.KeyGeneratorMapper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.KeyGeneratorMapperDebugGenerator;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.KeyGeneratorMapper_NULLKeyGenerator;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleMapper;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * 
+ * Tests, where the default keygenerator is set to NULL
  * 
  * @author mremme
  * 
  */
-public class TestKeyGenerator extends DatastoreBaseTest {
+public class TestKeyNoKeyGenerator extends DatastoreBaseTest {
 
   @Test
   public void testKeyGeneratorNoKeyGenerator(TestContext context) {
     // check that default keygenerator is defined
     IKeyGenerator keyGen = getDataStore(context).getDefaultKeyGenerator();
-    context.assertNotNull(keyGen, "keygenerator must not be null");
-    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(KeyGeneratorMapper.class);
+    context.assertNull(keyGen, "the default keygenerator must be null, but is " + keyGen);
+    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
+    context.assertNull(mapper.getKeyGenerator(), "the keygenerator must be null, but is " + mapper.getKeyGenerator());
+
+    mapper = getDataStore(context).getMapperFactory().getMapper(KeyGeneratorMapper.class);
     context.assertTrue(mapper.getKeyGenerator() instanceof DefaultKeyGenerator,
         "not an instance of DefaultKeyGenerator: " + String.valueOf(mapper.getKeyGenerator()));
 
-    mapper = getDataStore(context).getMapperFactory().getMapper(KeyGeneratorMapper_NULLKeyGenerator.class);
-    context.assertTrue(mapper.getKeyGenerator() == null, "no keygenerator should be defined");
-
-  }
-
-  @Test
-  public void testKeyGenerator(TestContext context) {
-    if (getDataStore(context).getClass().getName().equals("de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore")) {
-      // all fine
-    } else if (getDataStore(context).getClass().getName()
-        .equals("de.braintags.io.vertx.pojomapper.mongo.MongoDataStore")) {
-      testKeyGeneratorMongo(context);
-    } else {
-      context.fail(new UnsupportedOperationException(
-          "unsupported datastore in test: " + getDataStore(context).getClass().getName()));
+    clearTable(context, "SimpleMapper");
+    SimpleMapper sm = new SimpleMapper();
+    sm.name = "testName";
+    ResultContainer resultContainer = saveRecord(context, sm);
+    IWriteEntry we1 = resultContainer.writeResult.iterator().next();
+    context.assertEquals(we1.getAction(), WriteAction.INSERT);
+    context.assertNotNull(sm.id);
+    context.assertTrue(sm.id.hashCode() != 0); // "ID wasn't set by insert statement",
+    try {
+      Integer.parseInt(sm.id);
+    } catch (NumberFormatException e) {
+      context.fail("Not a numeric ID: " + sm.id);
     }
+
   }
 
   /**
@@ -95,26 +96,6 @@ public class TestKeyGenerator extends DatastoreBaseTest {
         "id must not change after update: " + we1.getId() + " | " + we.getId());
   }
 
-  @Test
-  public void testKeyExists(TestContext context) {
-    clearTable(context, "KeyGeneratorMapperDebugGenerator");
-    DebugGenerator gen = (DebugGenerator) getDataStore(context).getKeyGenerator(DebugGenerator.NAME);
-    gen.resetCounter();
-
-    KeyGeneratorMapperDebugGenerator km = doInsert(context, "testName");
-    int id = Integer.parseInt(km.id);
-    context.assertEquals(id, 1, "expected first id as 1");
-    km = doInsert(context, "testName2");
-    km = doInsert(context, "testName3");
-    id = Integer.parseInt(km.id);
-    context.assertEquals(id, 3, "expected id as 3");
-
-    gen.resetCounter();
-    km = doInsert(context, "testId Exists");
-    id = Integer.parseInt(km.id);
-    context.assertEquals(id, 4, "expected first id as 4 cause of existing record");
-  }
-
   /**
    * @param context
    * @return
@@ -132,4 +113,8 @@ public class TestKeyGenerator extends DatastoreBaseTest {
     context.assertEquals(we1.getAction(), we);
   }
 
+  @BeforeClass
+  public static void beforeClass() {
+    AbstractDataStoreContainer.DEFAULT_KEY_GENERATOR = null;
+  }
 }

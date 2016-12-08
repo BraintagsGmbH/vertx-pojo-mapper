@@ -19,7 +19,6 @@ import java.util.Map;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
-import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mysql.init.MySqlDataStoreinit;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.BooleanTypeHandler;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlArrayTypeHandlerEmbedded;
@@ -36,7 +35,7 @@ import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlMapTypeHandlerEmbed
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlMapTypeHandlerReferenced;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlObjectTypehandlerEmbedded;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlObjectTypehandlerReferenced;
-import de.braintags.io.vertx.pojomapper.testdatastore.IDatastoreContainer;
+import de.braintags.io.vertx.pojomapper.testdatastore.AbstractDataStoreContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.AbstractTypeHandlerTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.ArrayTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.BooleanTest;
@@ -69,13 +68,12 @@ import io.vertx.core.Vertx;
  * 
  */
 
-public class MySqlDataStoreContainer implements IDatastoreContainer {
+public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(MySqlDataStoreContainer.class);
 
   private MySqlDataStore datastore;
-  private Map<String, String> thMap = new HashMap<String, String>();
-  private static final String DEFAULT_KEY_GENERATOR = DefaultKeyGenerator.NAME;
+  private Map<String, String> thMap = new HashMap<>();
 
   /**
    * 

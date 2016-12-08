@@ -16,10 +16,9 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
-import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
-import de.braintags.io.vertx.pojomapper.testdatastore.IDatastoreContainer;
+import de.braintags.io.vertx.pojomapper.testdatastore.AbstractDataStoreContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.AbstractTypeHandlerTest;
 import de.braintags.io.vertx.util.exception.InitException;
 import de.flapdoodle.embed.mongo.MongodExecutable;
@@ -35,7 +34,7 @@ import io.vertx.ext.mongo.MongoClient;
  * @author Michael Remme
  * 
  */
-public class MongoDataStoreContainer implements IDatastoreContainer {
+public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   private static final io.vertx.core.logging.Logger logger = io.vertx.core.logging.LoggerFactory
       .getLogger(MongoDataStoreContainer.class);
 
@@ -44,7 +43,6 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
   public static final String CONNECTION_STRING_PROPERTY = "connection_string";
   public static final String DEFAULT_CONNECTION = "mongodb://localhost:27017";
   private static boolean handleReferencedRecursive = true;
-  private static final String DEFAULT_KEY_GENERATOR = DefaultKeyGenerator.NAME;
 
   private static MongodExecutable exe;
   private MongoDataStore mongoDataStore;
@@ -90,7 +88,11 @@ public class MongoDataStoreContainer implements IDatastoreContainer {
     settings.getProperties().put(MongoDataStoreInit.SHARED_PROP, "false");
     settings.getProperties().put(MongoDataStoreInit.HANDLE_REFERENCED_RECURSIVE_PROP,
         String.valueOf(handleReferencedRecursive));
-    settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
+    if (DEFAULT_KEY_GENERATOR != null) {
+      settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
+    } else {
+      settings.getProperties().remove(IKeyGenerator.DEFAULT_KEY_GENERATOR);
+    }
     return settings;
   }
 
