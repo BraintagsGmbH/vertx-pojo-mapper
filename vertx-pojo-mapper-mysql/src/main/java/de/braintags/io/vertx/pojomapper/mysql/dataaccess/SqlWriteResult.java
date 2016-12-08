@@ -31,7 +31,7 @@ public class SqlWriteResult extends WriteResult {
    * mapping.IStoreObject, java.lang.Object, de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction)
    */
   @Override
-  public synchronized void addEntry(IStoreObject<?> sto, Object id, WriteAction action) {
+  public synchronized void addEntry(IStoreObject< ? , ? > sto, Object id, WriteAction action) {
     super.addEntry(sto, id, action);
   }
 

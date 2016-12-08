@@ -32,17 +32,17 @@ import io.vertx.core.Handler;
  * @author Michael Remme
  * 
  */
-public abstract class AbstractStoreObject<T> implements IStoreObject<T> {
+public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(AbstractStoreObject.class);
 
-  private IMapper mapper;
-  private Object entity = null;
+  private IMapper<T>                                mapper;
+  private T                                         entity           = null;
   private Collection<IObjectReference> objectReferences = new ArrayList<>();
   private boolean newInstance = true;
-  protected T container;
+  protected F container;
 
-  public AbstractStoreObject(IMapper mapper, Object entity, T container) {
+  public AbstractStoreObject(IMapper<T> mapper, T entity, F container) {
     if (mapper == null)
       throw new NullPointerException("Mapper must not be null");
     this.mapper = mapper;
@@ -50,7 +50,7 @@ public abstract class AbstractStoreObject<T> implements IStoreObject<T> {
     this.container = container;
   }
 
-  public AbstractStoreObject(T container, IMapper mapper) {
+  public AbstractStoreObject(F container, IMapper<T> mapper) {
     if (mapper == null)
       throw new NullPointerException("Mapper must not be null");
     this.mapper = mapper;
@@ -76,12 +76,12 @@ public abstract class AbstractStoreObject<T> implements IStoreObject<T> {
   /**
    * @return the mapper
    */
-  public final IMapper getMapper() {
+  public final IMapper<T> getMapper() {
     return mapper;
   }
 
   @Override
-  public final Object getEntity() {
+  public final T getEntity() {
     if (entity == null) {
       String message = String.format("Internal Entity is not initialized; call method %s.initToEntity first ",
           getClass().getName());
@@ -96,7 +96,7 @@ public abstract class AbstractStoreObject<T> implements IStoreObject<T> {
   }
 
   @Override
-  public final T getContainer() {
+  public final F getContainer() {
     return container;
   }
 
@@ -107,7 +107,7 @@ public abstract class AbstractStoreObject<T> implements IStoreObject<T> {
    */
   public final void initToEntity(Handler<AsyncResult<Void>> handler) {
     try {
-      Object tmpObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
+      T tmpObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
       LOGGER.debug("start initToEntity");
       iterateFields(tmpObject, fieldResult -> {
         if (fieldResult.failed()) {
@@ -128,12 +128,12 @@ public abstract class AbstractStoreObject<T> implements IStoreObject<T> {
     }
   }
 
-  protected void finishToEntity(Object tmpObject, Handler<AsyncResult<Void>> handler) {
+  protected void finishToEntity(T tmpObject, Handler<AsyncResult<Void>> handler) {
     this.entity = tmpObject;
     getMapper().executeLifecycle(AfterLoad.class, entity, handler);
   }
 
-  protected final void iterateFields(Object tmpObject, Handler<AsyncResult<Void>> handler) {
+  protected final void iterateFields(T tmpObject, Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start iterateFields");
     Set<String> fieldNames = getMapper().getFieldNames();
     CounterObject<Void> co = new CounterObject<>(fieldNames.size(), handler);

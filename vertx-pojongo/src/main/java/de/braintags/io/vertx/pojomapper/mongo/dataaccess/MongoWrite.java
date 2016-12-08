@@ -109,10 +109,10 @@ public class MongoWrite<T> extends AbstractWrite<T> {
 
   }
 
-  private void doInsert(T entity, MongoStoreObject storeObject, IWriteResult writeResult,
+  private void doInsert(T entity, MongoStoreObject<T> storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
-    IMapper mapper = getMapper();
+    IMapper<T> mapper = getMapper();
     String collection = mapper.getTableInfo().getName();
     mongoClient.insert(collection, storeObject.getContainer(), result -> {
       if (result.failed()) {
@@ -125,7 +125,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
     });
   }
 
-  private void handleInsertError(Throwable t, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
+  private void handleInsertError(Throwable t, T entity, MongoStoreObject<T> storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     if (t.getMessage().indexOf("duplicate key error") >= 0) {
       if (getMapper().getKeyGenerator() != null) {
@@ -147,10 +147,10 @@ public class MongoWrite<T> extends AbstractWrite<T> {
     }
   }
 
-  private void doUpdate(T entity, MongoStoreObject storeObject, IWriteResult writeResult,
+  private void doUpdate(T entity, MongoStoreObject<T> storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
-    IMapper mapper = getMapper();
+    IMapper<T> mapper = getMapper();
     String collection = mapper.getTableInfo().getName();
     final Object currentId = storeObject.get(mapper.getIdField());
     String idFieldName = mapper.getIdField().getColumnInfo().getName();

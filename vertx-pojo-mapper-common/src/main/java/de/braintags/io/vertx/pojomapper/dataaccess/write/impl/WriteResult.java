@@ -70,7 +70,7 @@ public class WriteResult implements IWriteResult {
   }
 
   @Override
-  public void addEntry(IStoreObject<?> sto, Object id, WriteAction action) {
+  public void addEntry(IStoreObject< ? , ? > sto, Object id, WriteAction action) {
     addEntry(new WriteEntry(sto, id, action));
   }
 

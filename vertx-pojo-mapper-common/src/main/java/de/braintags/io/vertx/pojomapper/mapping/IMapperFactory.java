@@ -33,7 +33,7 @@ public interface IMapperFactory {
    * @throws Exception
    *           any Exception which can occur in the init process
    */
-  IMapper getMapper(Class<?> mapperClass);
+  <T> IMapper<T> getMapper(Class<T> mapperClass);
 
   /**
    * Returns true, if the given class specifies a mappable class. At a minimum whic method will have to check, wether
@@ -71,6 +71,6 @@ public interface IMapperFactory {
    * 
    * @return the instance of {@link IStoreObjectFactory}
    */
-  public IStoreObjectFactory getStoreObjectFactory();
+  public IStoreObjectFactory<?> getStoreObjectFactory();
 
 }

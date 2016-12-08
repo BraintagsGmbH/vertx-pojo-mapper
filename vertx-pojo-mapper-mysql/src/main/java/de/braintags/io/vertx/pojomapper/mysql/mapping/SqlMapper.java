@@ -11,7 +11,7 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
  * @author Michael Remme
  * 
  */
-public class SqlMapper extends Mapper {
+public class SqlMapper<T> extends Mapper<T> {
   private boolean queryWithFieldNames = false;
   private String queryFieldList = null;
 
@@ -19,7 +19,7 @@ public class SqlMapper extends Mapper {
    * @param mapperClass
    * @param mapperFactory
    */
-  public SqlMapper(Class<?> mapperClass, MapperFactory mapperFactory) {
+  public SqlMapper(Class<T> mapperClass, MapperFactory mapperFactory) {
     super(mapperClass, mapperFactory);
   }
 

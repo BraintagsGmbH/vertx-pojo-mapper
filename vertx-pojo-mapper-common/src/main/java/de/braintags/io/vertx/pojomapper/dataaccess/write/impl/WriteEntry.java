@@ -24,11 +24,11 @@ import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
  */
 
 public class WriteEntry implements IWriteEntry {
-  private final IStoreObject<?> sto;
+  private final IStoreObject< ? , ? > sto;
   private final Object id;
   private final WriteAction action;
 
-  WriteEntry(IStoreObject<?> sto, Object id, WriteAction action) {
+  WriteEntry(IStoreObject< ? , ? > sto, Object id, WriteAction action) {
     this.sto = sto;
     this.id = id;
     this.action = action;
@@ -40,7 +40,7 @@ public class WriteEntry implements IWriteEntry {
    * @see de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry#getStoreObject()
    */
   @Override
-  public IStoreObject<?> getStoreObject() {
+  public IStoreObject< ? , ? > getStoreObject() {
     return sto;
   }
 

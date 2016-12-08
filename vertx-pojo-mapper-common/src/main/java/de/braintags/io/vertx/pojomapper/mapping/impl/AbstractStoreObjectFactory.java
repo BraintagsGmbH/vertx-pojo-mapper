@@ -32,7 +32,7 @@ import io.vertx.core.Handler;
  * 
  */
 
-public abstract class AbstractStoreObjectFactory implements IStoreObjectFactory {
+public abstract class AbstractStoreObjectFactory<F> implements IStoreObjectFactory<F> {
 
   /**
    * 
@@ -48,11 +48,11 @@ public abstract class AbstractStoreObjectFactory implements IStoreObjectFactory 
    * mapping.IMapper, java.util.List, io.vertx.core.Handler)
    */
   @Override
-  public void createStoreObjects(IMapper mapper, List<?> entities,
-      Handler<AsyncResult<List<IStoreObject<?>>>> handler) {
-    CounterObject<List<IStoreObject<?>>> co = new CounterObject<>(entities.size(), handler);
-    List<IStoreObject<?>> returnList = new ArrayList<IStoreObject<?>>();
-    for (Object entity : entities) {
+  public <T> void createStoreObjects(IMapper<T> mapper, List<T> entities,
+      Handler<AsyncResult<List<IStoreObject<T, ?>>>> handler) {
+    CounterObject<List<IStoreObject<T, ?>>> co = new CounterObject<>(entities.size(), handler);
+    List<IStoreObject<T, ?>> returnList = new ArrayList<>();
+    for (T entity : entities) {
       createStoreObject(mapper, entity, result -> {
         if (result.failed()) {
           co.setThrowable(result.cause());

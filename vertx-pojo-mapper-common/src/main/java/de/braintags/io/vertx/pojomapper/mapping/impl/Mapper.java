@@ -65,20 +65,20 @@ import io.vertx.core.Handler;
  *
  */
 
-public class Mapper implements IMapper {
+public class Mapper<T> implements IMapper<T> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(Mapper.class);
 
-  private IObjectFactory objectFactory;
-  private Map<String, MappedField> mappedFields = new HashMap<>();
-  private IField idField;
-  private MapperFactory mapperFactory;
-  private Class<?> mapperClass;
-  private Entity entity;
-  private Map<Class<? extends Annotation>, IField[]> fieldCache = new HashMap<>();
-  private ITableInfo tableInfo;
-  private boolean syncNeeded = true;
-  private IKeyGenerator keyGenerator;
+  private IObjectFactory                                              objectFactory;
+  private Map<String, MappedField>                                    mappedFields             = new HashMap<>();
+  private IField                                                      idField;
+  private MapperFactory                                               mapperFactory;
+  private Class<T>                                                    mapperClass;
+  private Entity                                                      entity;
+  private Map<Class< ? extends Annotation>, IField[]>                 fieldCache               = new HashMap<>();
+  private ITableInfo                                                  tableInfo;
+  private boolean                                                     syncNeeded               = true;
+  private IKeyGenerator                                               keyGenerator;
 
   /**
    * all annotations which shall be examined for the mapper class itself
@@ -112,7 +112,7 @@ public class Mapper implements IMapper {
    * @param mapperFactory
    *          the parent {@link MapperFactory}
    */
-  public Mapper(Class<?> mapperClass, MapperFactory mapperFactory) {
+  public Mapper(Class<T> mapperClass, MapperFactory mapperFactory) {
     this.mapperFactory = mapperFactory;
     this.mapperClass = mapperClass;
     this.objectFactory = new DefaultObjectFactory();
@@ -348,7 +348,7 @@ public class Mapper implements IMapper {
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#getMapperClass()
    */
   @Override
-  public Class<?> getMapperClass() {
+  public Class<T> getMapperClass() {
     return mapperClass;
   }
 
@@ -426,7 +426,7 @@ public class Mapper implements IMapper {
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#executeLifecycle(java.lang.Class, java.lang.Object)
    */
   @Override
-  public void executeLifecycle(Class<? extends Annotation> annotationClass, Object entity,
+  public void executeLifecycle(Class< ? extends Annotation> annotationClass, T entity,
       Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start executing Lifecycle " + annotationClass.getSimpleName());
     List<IMethodProxy> methods = getLifecycleMethods(annotationClass);

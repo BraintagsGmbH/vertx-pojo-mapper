@@ -47,7 +47,7 @@ public interface IPropertyMapper {
    * @param handler
    *          the handler to be called
    */
-  void intoStoreObject(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler);
+  <T> void intoStoreObject(T entity, IStoreObject<T, ? > storeObject, IField field, Handler<AsyncResult<Void>> handler);
 
   /**
    * This method reads the field value of the entity and converts the value into a suitable format for the datastore
@@ -59,7 +59,7 @@ public interface IPropertyMapper {
    * @param handler
    *          the handler to be informed about the result
    */
-  void readForStore(Object entity, IField field, Handler<AsyncResult<Object>> handler);
+  <T> void readForStore(T entity, IField field, Handler<AsyncResult<Object>> handler);
 
   /**
    * This method fetches the content for the given field from the {@link IStoreObject}, changes it into the propriate
@@ -74,7 +74,7 @@ public interface IPropertyMapper {
    * @param handler
    *          the handler to be called
    */
-  void fromStoreObject(Object entity, IStoreObject<?> storeObject, IField field, Handler<AsyncResult<Void>> handler);
+  <T> void fromStoreObject(T entity, IStoreObject<T, ? > storeObject, IField field, Handler<AsyncResult<Void>> handler);
 
   /**
    * This method resolves the given {@link IObjectReference} into the real value and stores this value inside the
