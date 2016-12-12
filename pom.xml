@@ -8,7 +8,7 @@
 	<packaging>pom</packaging>
 
 	<artifactId>vertx-pojo-mapper</artifactId>
-	<version>1.3.2-SNAPSHOT</version>
+	<version>1.4.0-SNAPSHOT</version>
 	<name>Vert.x Pojo Mapper</name>
 
 	<parent>
