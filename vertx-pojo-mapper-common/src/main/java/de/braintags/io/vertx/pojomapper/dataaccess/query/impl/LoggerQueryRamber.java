@@ -72,7 +72,7 @@ public class LoggerQueryRamber implements IQueryRambler {
   @Override
   public void start(ILogicContainer<?> container) {
     raiseLevel();
-    log(container.getLogic().toString());
+    log(container.getOperator().toString());
   }
 
   @Override
