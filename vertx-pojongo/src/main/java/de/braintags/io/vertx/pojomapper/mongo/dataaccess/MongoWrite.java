@@ -118,7 +118,6 @@ public class MongoWrite<T> extends AbstractWrite<T> {
       if (result.failed()) {
         handleInsertError(result.cause(), entity, storeObject, writeResult, resultHandler);
       } else {
-        LOG.debug("inserted");
         Object id = result.result() == null ? storeObject.generatedId : result.result();
         finishInsert(id, entity, storeObject, writeResult, resultHandler);
       }

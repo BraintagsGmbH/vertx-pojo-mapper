@@ -68,6 +68,8 @@ public class MongoStoreObject<T> extends JsonStoreObject<T> {
       } else {
         if (isNewInstance() && getMapper().getKeyGenerator() != null) {
           getNextId(handler);
+        } else if (isNewInstance()) {
+          handler.handle(Future.failedFuture(new UnsupportedOperationException()));
         } else {
           handler.handle(res);
         }

@@ -24,6 +24,7 @@ import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
 import de.braintags.io.vertx.util.CounterObject;
+import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -141,23 +142,71 @@ public class TMongoDirect extends DatastoreBaseTest {
   }
 
   @Test
-  public void simpleTest(TestContext context) {
-    LOGGER.info("-->>test");
+  public void simpleInsert(TestContext context) {
+    ErrorObject err = new ErrorObject<>(null);
+    Async async = context.async();
     MongoDataStore ds = (MongoDataStore) getDataStore(context);
     MongoClient client = (MongoClient) ds.getClient();
     JsonObject jsonCommand = new JsonObject();
-    // getNextSequenceValue("productid")
-    // jsonCommand.put("_id", "getNextSequenceValue(\"productid\")".getBytes());
     jsonCommand.put("name", "testName");
     client.insert("nativeCommandCollection", jsonCommand, result -> {
       if (result.failed()) {
-        context.fail(result.cause());
+        err.setThrowable(result.cause());
         LOGGER.error("", result.cause());
+        async.complete();
       } else {
         LOGGER.info("executed: " + result.result());
+        try {
+          context.assertNotNull(result.result(), "no identifyer returned");
+        } catch (Exception e) {
+          err.setThrowable(e);
+        } finally {
+          async.complete();
+        }
       }
     });
+    async.await();
+    if (err.isError()) {
+      context.fail(err.getThrowable());
+    }
   }
+
+  /**
+   * Insert a record, where the field _id is specified, but as null
+   * 
+   * @param context
+   */
+  @Test
+  public void insertWithIdNull(TestContext context) {
+    ErrorObject err = new ErrorObject<>(null);
+    Async async = context.async();
+    LOGGER.info("-->>test");
+    MongoDataStore ds = (MongoDataStore) getDataStore(context);
+    MongoClient client = (MongoClient) ds.getClient();
+    JsonObject jsonCommand = new JsonObject("{\"name\":\"testName\",\"_id\":null}");
+    client.insert("nativeCommandCollection", jsonCommand, result -> {
+      if (result.failed()) {
+        err.setThrowable(result.cause());
+        LOGGER.error("", result.cause());
+        async.complete();
+      } else {
+        LOGGER.info("executed: " + result.result());
+        try {
+          context.assertNull(result.result(), "This should result in NULL");
+        } catch (Throwable e) {
+          err.setThrowable(e);
+        } finally {
+          async.complete();
+        }
+      }
+    });
+    async.await();
+    if (err.isError()) {
+      context.fail(err.getThrowable());
+    }
+  }
+
+  //
 
   @Test
   public void testUpdate(TestContext context) {
