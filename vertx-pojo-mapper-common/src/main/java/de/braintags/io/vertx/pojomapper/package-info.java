@@ -382,7 +382,9 @@
  * primary key. All databases can generate such a key in an automatic manner, but not every database is returning the
  * generated key. For those databases, which don't return the generated key, like MySql, the concept of
  * {@link de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator} was implemented to allow a key generation with local
- * access before a new instance is saved into the datastore.
+ * access before a new instance is saved into the datastore. Another use case is, when the datastore itself creates a
+ * cryptic ID and a numeric one is needed +
+ * The config below defines a default datastore, which is used for all mappers, where no KeyGenerator is defined.
  * 
  * [source,java]
  * ----
@@ -396,7 +398,7 @@
  * {@link de.braintags.io.vertx.pojomapper.annotation.KeyGenerator} to the classes head and optionally define the type
  * of keygenerator, which shall be used.
  * 
- * Currently there are existing two implementations of {@link de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator}:
+ * Currently there are existing three implementations of {@link de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator}:
  * 
  * * {@link de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator} +
  * an implementation which uses the eventbus to request a key from
@@ -407,6 +409,11 @@
  * 
  * * {@link de.braintags.io.vertx.keygenerator.impl.DebugGenerator} +
  * a local implementation which starts at zero by each launch and maybe useful for unint tests etc.
+ * 
+ * * NULL as a special solution +
+ * use {@link de.braintags.io.vertx.pojomapper.annotation.KeyGenerator#NULL_KEY_GENERATOR} as value to define, that no
+ * keygenerator shall be used. This value is useful, when a default keygenerator is set and a certain class shal not use
+ * one.
  * 
  * An {@link de.braintags.io.vertx.pojomapper.IDataStore} implementation might contain a set of
  * {@link de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator}, which are supported by this implementation.

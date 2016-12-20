@@ -38,6 +38,8 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 public @interface KeyGenerator {
   public static final String UNDEFINED_NAME = "";
 
+  public static final String NULL_KEY_GENERATOR = "NULL";
+
   /**
    * Defines the name of the IKeyGenerator for an {@link IMapper}
    * 
