@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.annotation.KeyGenerator;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryLogicTranslator;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTranslator;
 import de.braintags.io.vertx.pojomapper.exception.UnsupportedKeyGenerator;
@@ -154,6 +155,9 @@ public abstract class AbstractDataStore implements IDataStore {
    */
   @Override
   public final IKeyGenerator getKeyGenerator(String generatorName) {
+    if (generatorName.equals(KeyGenerator.NULL_KEY_GENERATOR)) {
+      return null;
+    }
     if (keyGeneratorMap.containsKey(generatorName)) {
       return keyGeneratorMap.get(generatorName);
     }

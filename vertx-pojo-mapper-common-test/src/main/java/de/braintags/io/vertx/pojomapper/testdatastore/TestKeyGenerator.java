@@ -22,6 +22,7 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DebugGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.KeyGeneratorMapper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.KeyGeneratorMapperDebugGenerator;
+import de.braintags.io.vertx.pojomapper.testdatastore.mapper.NoKeyGeneratorMapper;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -31,6 +32,23 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class TestKeyGenerator extends DatastoreBaseTest {
+
+  /**
+   * If a default keygenerator is set, it must be possible to define a mapper, which has NO keygenerator.
+   * We are checking only that here, NOT wether the correct key is generated. This is following in another test
+   * 
+   * @param context
+   */
+  @Test
+  public void testNullKeyGenerator(TestContext context) {
+    IKeyGenerator keyGen = getDataStore(context).getDefaultKeyGenerator();
+    context.assertNotNull(keyGen, "keygenerator must not be null");
+    context.assertTrue(keyGen instanceof DefaultKeyGenerator,
+        "not an instance of DefaultKeyGenerator: " + String.valueOf(keyGen.getName()));
+
+    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(NoKeyGeneratorMapper.class);
+    context.assertNull(mapper.getKeyGenerator(), "keygenerator must be null");
+  }
 
   @Test
   public void testKeyGenerator(TestContext context) {

@@ -23,7 +23,7 @@ To use this project, add the following dependency to the _dependencies_ section 
 <dependency>
   <groupId>de.braintags</groupId>
 <artifactId>vertx-pojo-mapper-common</artifactId>
-<version>1.3.2-SNAPSHOT</version>
+<version>1.4.0-SNAPSHOT</version>
 </dependency>
 ----
 
@@ -32,7 +32,7 @@ To use this project, add the following dependency to the _dependencies_ section 
 [source,groovy,subs="+attributes"]
 ----
 dependencies {
-compile 'de.braintags:vertx-pojo-mapper-common:1.3.2-SNAPSHOT'
+compile 'de.braintags:vertx-pojo-mapper-common:1.4.0-SNAPSHOT'
 }
 ----
 
@@ -68,18 +68,18 @@ a local file.
 [source, java]
 ----
 try {
- DataStoreSettings settings = loadDataStoreSettings(vertx, "/some/path/to/settings.json");
- IDataStoreInit dsInit = settings.getDatastoreInit().newInstance();
- dsInit.initDataStore(vertx, settings, initResult -> {
-   if (initResult.failed()) {
-     logger.error("could not start mongo client", initResult.cause());
-     handler.handle(Future.failedFuture(new InitException(initResult.cause())));
-   } else {
-     handler.handle(Future.succeededFuture(initResult.result()));
-   }
- });
+  DataStoreSettings settings = loadDataStoreSettings(vertx, "/some/path/to/settings.json");
+  IDataStoreInit dsInit = settings.getDatastoreInit().newInstance();
+  dsInit.initDataStore(vertx, settings, initResult -> {
+    if (initResult.failed()) {
+      logger.error("could not start mongo client", initResult.cause());
+      handler.handle(Future.failedFuture(new InitException(initResult.cause())));
+    } else {
+      handler.handle(Future.succeededFuture(initResult.result()));
+    }
+  });
 } catch (Exception e) {
- handler.handle(Future.failedFuture(e));
+  handler.handle(Future.failedFuture(e));
 }
 ----
 In this example first the `link:unavailable[DataStoreSettings]` are loaded from a local
@@ -93,18 +93,18 @@ extensions for MySql and MongoDb, for instance.
 <pre>
 [source, java]
 ----
-public DataStoreSettings loadDataStoreSettings(String path) {
-  FileSystem fs = vertx.fileSystem();
-  if (fs.existsBlocking(path)) {
-    Buffer buffer = fs.readFileBlocking(path);
-    DataStoreSettings settings = Json.decodeValue(buffer.toString(), DataStoreSettings.class);
-    return settings;
-  } else {
-    IDataStoreSettings settings = MongoDataStoreInit.createDefaultSettings();
-    fs.writeFileBlocking(path, Buffer.buffer(Json.encode(settings)));
-    throw new FileSystemException("File did not exist and was created new in path " + path);
-  }
-}
+ public DataStoreSettings loadDataStoreSettings(String path) {
+   FileSystem fs = vertx.fileSystem();
+   if (fs.existsBlocking(path)) {
+     Buffer buffer = fs.readFileBlocking(path);
+     DataStoreSettings settings = Json.decodeValue(buffer.toString(), DataStoreSettings.class);
+     return settings;
+   } else {
+     IDataStoreSettings settings = MongoDataStoreInit.createDefaultSettings();
+     fs.writeFileBlocking(path, Buffer.buffer(Json.encode(settings)));
+     throw new FileSystemException("File did not exist and was created new in path " + path);
+   }
+ }
 
 ----
 </pre>
@@ -801,8 +801,8 @@ are defining the name of the IKeyGenerator, which shall be used
 @Entity
 @KeyGenerator
 public class KeyGeneratorMapper {
- @Id
- public String id;
+  @Id
+  public String id;
 
 }
 ----
