@@ -21,8 +21,9 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IRamblerSource;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
-import de.braintags.io.vertx.util.CounterObject;
+import de.braintags.io.vertx.util.async.DefaultAsyncResult;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
@@ -36,7 +37,7 @@ import io.vertx.core.Handler;
 
 public class LogicContainer<T extends IQueryContainer> extends AbstractQueryContainer<IQueryContainer>
     implements ILogicContainer<T>, IRamblerSource {
-  private List<Object> filters = new ArrayList<Object>();
+  private List<Object> filters = new ArrayList<>();
   private QueryLogic logic;
 
   /**
@@ -57,8 +58,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
    */
   @Override
   public IFieldParameter<LogicContainer<T>> field(String fieldName) {
-    FieldParameter<LogicContainer<T>> param = new FieldParameter<LogicContainer<T>>(this,
-        getQuery().getMapper().getField(fieldName));
+    FieldParameter<LogicContainer<T>> param = new FieldParameter<>(this, getQuery().getMapper().getField(fieldName));
     filters.add(param);
     return param;
   }
@@ -70,7 +70,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
    */
   @Override
   public IFieldParameter<LogicContainer<IQueryContainer>> and(String fieldName) {
-    LogicContainer<IQueryContainer> container = new LogicContainer<IQueryContainer>(this, QueryLogic.AND);
+    LogicContainer<IQueryContainer> container = new LogicContainer<>(this, QueryLogic.AND);
     filters.add(container);
     return container.field(fieldName);
   }
@@ -82,7 +82,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
    */
   @Override
   public IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> andOpen(String fieldName) {
-    LogicContainer<IQueryContainer> container = new LogicContainer<IQueryContainer>(this, QueryLogic.AND_OPEN);
+    LogicContainer<IQueryContainer> container = new LogicContainer<>(this, QueryLogic.AND_OPEN);
     filters.add(container);
     return container.field(fieldName);
   }
@@ -94,7 +94,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
    */
   @Override
   public IFieldParameter<LogicContainer<IQueryContainer>> or(String fieldName) {
-    LogicContainer<IQueryContainer> container = new LogicContainer<IQueryContainer>(this, QueryLogic.OR);
+    LogicContainer<IQueryContainer> container = new LogicContainer<>(this, QueryLogic.OR);
     filters.add(container);
     return container.field(fieldName);
   }
@@ -106,7 +106,7 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
    */
   @Override
   public IFieldParameter<? extends ILogicContainer<? extends IQueryContainer>> orOpen(String fieldName) {
-    LogicContainer<IQueryContainer> container = new LogicContainer<IQueryContainer>(this, QueryLogic.OR_OPEN);
+    LogicContainer<IQueryContainer> container = new LogicContainer<>(this, QueryLogic.OR_OPEN);
     filters.add(container);
     return container.field(fieldName);
   }
@@ -138,40 +138,38 @@ public class LogicContainer<T extends IQueryContainer> extends AbstractQueryCont
   public void applyTo(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     rambler.start(this);
     if (filters.isEmpty()) {
-      finishCounter(rambler, resultHandler);
-      return;
+      rambler.stop(this);
+      resultHandler.handle(Future.succeededFuture());
+    } else {
+      CompositeFuture cf = CompositeFuture.all(createFutureList(rambler));
+      cf.setHandler(res -> {
+        if (res.failed()) {
+          resultHandler.handle(DefaultAsyncResult.fail(res.cause()));
+        } else {
+          rambler.stop(this);
+          resultHandler.handle(DefaultAsyncResult.succeed());
+        }
+      });
     }
-    CounterObject<Void> co = new CounterObject<Void>(filters.size(), resultHandler);
+  }
+
+  @SuppressWarnings("rawtypes")
+  private List<Future> createFutureList(IQueryRambler rambler) {
+    List<Future> fl = new ArrayList<>();
     for (Object filter : filters) {
-      handleFilter(rambler, resultHandler, filter, co);
-      if (co.isError()) {
-        return;
-      }
+      fl.add(handleFilter(rambler, filter));
     }
+    return fl;
   }
 
-  private void handleFilter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler, Object filter,
-      CounterObject<Void> co) {
+  private Future<Void> handleFilter(IQueryRambler rambler, Object filter) {
     if (!(filter instanceof IRamblerSource)) {
-      co.setThrowable(
+      return Future.failedFuture(
           new UnsupportedOperationException("NOT AN INSTANCE OF IRamblerSource: " + filter.getClass().getName()));
-      return;
     }
-
-    ((IRamblerSource) filter).applyTo(rambler, result -> {
-      if (result.failed()) {
-        co.setThrowable(result.cause());
-        return;
-      }
-      if (co.reduce()) { // last element in the list
-        finishCounter(rambler, resultHandler);
-      }
-    });
-  }
-
-  private void finishCounter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
-    rambler.stop(this);
-    resultHandler.handle(Future.succeededFuture());
+    Future<Void> f = Future.future();
+    ((IRamblerSource) filter).applyTo(rambler, f.completer());
+    return f;
   }
 
   /*
