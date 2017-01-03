@@ -21,7 +21,9 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
 import de.braintags.io.vertx.util.CounterObject;
+import de.braintags.io.vertx.util.async.DefaultAsyncResult;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
@@ -33,12 +35,7 @@ import io.vertx.core.Handler;
  */
 
 public abstract class AbstractStoreObjectFactory<F> implements IStoreObjectFactory<F> {
-
-  /**
-   * 
-   */
-  public AbstractStoreObjectFactory() {
-  }
+  private static boolean NEW = true;
 
   /*
    * (non-Javadoc)
@@ -47,28 +44,60 @@ public abstract class AbstractStoreObjectFactory<F> implements IStoreObjectFacto
    * de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory#createStoreObjects(de.braintags.io.vertx.pojomapper.
    * mapping.IMapper, java.util.List, io.vertx.core.Handler)
    */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public <T> void createStoreObjects(IMapper<T> mapper, List<T> entities,
       Handler<AsyncResult<List<IStoreObject<T, ?>>>> handler) {
-    CounterObject<List<IStoreObject<T, ?>>> co = new CounterObject<>(entities.size(), handler);
-    List<IStoreObject<T, ?>> returnList = new ArrayList<>();
-    for (T entity : entities) {
-      createStoreObject(mapper, entity, result -> {
+    if (NEW) {
+      List<Future> fl = createFutureList(mapper, entities);
+      CompositeFuture cf = CompositeFuture.all(fl);
+      cf.setHandler(result -> {
         if (result.failed()) {
-          co.setThrowable(result.cause());
+          handler.handle(DefaultAsyncResult.fail(result.cause()));
         } else {
-          returnList.add(result.result());
-          if (co.reduce()) {
-            handler.handle(Future.succeededFuture(returnList));
-          }
+          List stl = createStoreObjectList(cf);
+          handler.handle(Future.succeededFuture(stl));
         }
-
       });
-      if (co.isError()) {
-        return;
+    } else {
+      CounterObject<List<IStoreObject<T, ?>>> co = new CounterObject<>(entities.size(), handler);
+      List<IStoreObject<T, ?>> returnList = new ArrayList<>();
+      for (T entity : entities) {
+        createStoreObject(mapper, entity, result -> {
+          if (result.failed()) {
+            co.setThrowable(result.cause());
+          } else {
+            returnList.add(result.result());
+            if (co.reduce()) {
+              handler.handle(Future.succeededFuture(returnList));
+            }
+          }
+
+        });
+        if (co.isError()) {
+          return;
+        }
       }
     }
 
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> List<IStoreObject<T, ?>> createStoreObjectList(CompositeFuture cf) {
+    List<IStoreObject<T, ?>> stl = new ArrayList<>();
+    cf.list().forEach(f -> stl.add((IStoreObject<T, ?>) f));
+    return stl;
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private <T> List<Future> createFutureList(IMapper<T> mapper, List<T> entities) {
+    List<Future> fl = new ArrayList<>();
+    for (T entity : entities) {
+      Future f = Future.future();
+      fl.add(f);
+      createStoreObject(mapper, entity, f.completer());
+    }
+    return fl;
   }
 
 }
