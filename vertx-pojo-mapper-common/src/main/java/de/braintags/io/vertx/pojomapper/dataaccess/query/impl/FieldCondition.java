@@ -1,7 +1,11 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * <br>
@@ -14,9 +18,9 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 
 public class FieldCondition implements IQueryCondition {
 
-  private String        field;
+  private String field;
   private QueryOperator operator;
-  private Object        value;
+  private Object value;
 
   public FieldCondition(String field, Object value) {
     this(field, QueryOperator.EQUALS, value);
@@ -50,5 +54,21 @@ public class FieldCondition implements IQueryCondition {
   @Override
   public Object getValue() {
     return value;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IRamblerSource#applyTo(de.braintags.io.vertx.pojomapper.
+   * dataaccess.query.IQueryRambler, io.vertx.core.Handler)
+   */
+  @Override
+  public void applyTo(IQueryRambler ramblerHandler, Handler<AsyncResult<Void>> resultHandler) {
+    ramblerHandler.apply(this, result -> {
+      if (result.failed())
+        resultHandler.handle(Future.failedFuture(result.cause()));
+      else
+        resultHandler.handle(Future.succeededFuture());
+    });
   }
 }

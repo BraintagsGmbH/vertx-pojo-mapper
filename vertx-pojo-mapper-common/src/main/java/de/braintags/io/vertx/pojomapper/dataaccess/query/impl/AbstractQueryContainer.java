@@ -10,6 +10,10 @@ import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * An abstract implementation of {@link IQueryContainer}
@@ -30,11 +34,28 @@ public abstract class AbstractQueryContainer implements IQueryContainer {
 
   /*
    * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#getContent()
    */
   @Override
   public List<IQueryPart> getContent() {
     return queryParts;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IRamblerSource#applyTo(de.braintags.io.vertx.pojomapper.
+   * dataaccess.query.IQueryRambler, io.vertx.core.Handler)
+   */
+  @Override
+  public void applyTo(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
+    rambler.apply(this, result -> {
+      if (result.failed())
+        resultHandler.handle(Future.failedFuture(result.cause()));
+      else
+        resultHandler.handle(Future.succeededFuture());
+    });
   }
 
 }

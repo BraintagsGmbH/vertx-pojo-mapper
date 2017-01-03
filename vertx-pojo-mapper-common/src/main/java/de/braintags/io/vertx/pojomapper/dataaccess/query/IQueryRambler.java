@@ -41,7 +41,9 @@ public interface IQueryRambler {
    * @param queryPart
    * @param resultHandler
    */
-  void apply(IQueryPart queryPart, Handler<AsyncResult<Void>> resultHandler);
+  void apply(IQueryCondition queryPart, Handler<AsyncResult<Void>> resultHandler);
+
+  void apply(IQueryContainer queryPart, Handler<AsyncResult<Void>> resultHandler);
 
   /**
    * Apply the sort definition to the query rambler.

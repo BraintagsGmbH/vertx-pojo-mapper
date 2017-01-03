@@ -13,7 +13,8 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import io.vertx.core.AsyncResult;
@@ -76,10 +77,11 @@ public class LoggerQueryRamber implements IQueryRambler {
    * 
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#apply(de.braintags.io.vertx.pojomapper.dataaccess.
-   * query.IQueryPart, io.vertx.core.Handler)
+   * query.ISortDefinition, io.vertx.core.Handler)
    */
   @Override
-  public void apply(IQueryPart queryPart, Handler<AsyncResult<Void>> resultHandler) {
+  public void apply(ISortDefinition<?> sortDefinition, Handler<AsyncResult<Void>> resultHandler) {
+    log(sortDefinition.toString());
   }
 
   /*
@@ -87,10 +89,22 @@ public class LoggerQueryRamber implements IQueryRambler {
    * 
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#apply(de.braintags.io.vertx.pojomapper.dataaccess.
-   * query.ISortDefinition, io.vertx.core.Handler)
+   * query.IQueryCondition, io.vertx.core.Handler)
    */
   @Override
-  public void apply(ISortDefinition<?> sortDefinition, Handler<AsyncResult<Void>> resultHandler) {
+  public void apply(IQueryCondition queryPart, Handler<AsyncResult<Void>> resultHandler) {
+    log(queryPart.getField() + " " + queryPart.getOperator() + " " + queryPart.getValue());
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#apply(de.braintags.io.vertx.pojomapper.dataaccess.
+   * query.IQueryContainer, io.vertx.core.Handler)
+   */
+  @Override
+  public void apply(IQueryContainer queryPart, Handler<AsyncResult<Void>> resultHandler) {
   }
 
 }

@@ -130,7 +130,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   }
 
   private void handleSortDefs(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
-    rambler.apply(sortDefs, result -> {
+    sortDefs.applyTo(rambler, result -> {
       if (result.failed())
         resultHandler.handle(Future.failedFuture(result.cause()));
       else
@@ -140,7 +140,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   private void handleFilter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
     if (rootQueryPart != null) {
-      rambler.apply(rootQueryPart, apr -> {
+      rootQueryPart.applyTo(rambler, apr -> {
         if (apr.failed())
           resultHandler.handle(Future.failedFuture(apr.cause()));
         else

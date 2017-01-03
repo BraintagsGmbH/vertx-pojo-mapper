@@ -201,29 +201,20 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
     return queryExpression.toString();
   }
 
-  private void apply(IQueryCondition queryCondition, Handler<AsyncResult<Void>> resultHandler) {
+  @Override
+  public void apply(IQueryCondition queryCondition, Handler<AsyncResult<Void>> resultHandler) {
     handleCondition(queryCondition, resultHandler);
   }
 
   @Override
-  public void apply(IQueryPart queryPart, Handler<AsyncResult<Void>> resultHandler) {
-    if (queryPart instanceof IQueryCondition) {
-      apply((IQueryCondition) queryPart, resultHandler);
-    } else if (queryPart instanceof IQueryContainer) {
-      apply((IQueryContainer) queryPart, resultHandler);
-    } else {
-      resultHandler.handle(Future.failedFuture("Unknown query type class:" + queryPart.getClass()));
-    }
-  }
-
-  private void apply(IQueryContainer queryContainer, Handler<AsyncResult<Void>> resultHandler) {
+  public void apply(IQueryContainer queryContainer, Handler<AsyncResult<Void>> resultHandler) {
     queryExpression.startConnectorBlock();
     List<IQueryPart> content = queryContainer.getContent();
     CounterObject<Void> co = new CounterObject<>(content.size(), resultHandler);
     Iterator<IQueryPart> it = content.iterator();
     while (it.hasNext() && !co.isError()) {
       IQueryPart queryPart = it.next();
-      apply(queryPart, result -> {
+      queryPart.applyTo(this, result -> {
         if (result.failed()) {
           co.setThrowable(result.cause());
           return;
