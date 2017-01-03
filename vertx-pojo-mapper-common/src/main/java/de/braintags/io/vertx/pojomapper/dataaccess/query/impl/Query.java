@@ -27,15 +27,14 @@ import io.vertx.core.Handler;
  */
 
 public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQuery<T> {
-  private static final io.vertx.core.logging.Logger LOGGER              = io.vertx.core.logging.LoggerFactory
-      .getLogger(Query.class);
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory.getLogger(Query.class);
 
-  private IQueryPart                                rootQueryPart;
-  private int                                       limit               = 500;
-  private int                                       start               = 0;
-  private boolean                                   returnCompleteCount = false;
-  private SortDefinition<T>                         sortDefs            = new SortDefinition<>(this);
-  private Object                                    nativeCommand;
+  private IQueryPart rootQueryPart;
+  private int limit = 500;
+  private int start = 0;
+  private boolean returnCompleteCount = false;
+  private SortDefinition<T> sortDefs = new SortDefinition<>(this);
+  private Object nativeCommand;
 
   /**
    * @param mapperClass
@@ -47,6 +46,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
    */
   @Override
@@ -74,6 +74,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
    */
   @Override
@@ -129,7 +130,12 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   }
 
   private void handleSortDefs(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
-    sortDefs.applyTo(rambler, resultHandler);
+    rambler.apply(sortDefs, result -> {
+      if (result.failed())
+        resultHandler.handle(Future.failedFuture(result.cause()));
+      else
+        resultHandler.handle(Future.succeededFuture());
+    });
   }
 
   private void handleFilter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
@@ -141,7 +147,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
           resultHandler.handle(Future.succeededFuture());
       });
     } else {
-      //no query
+      // no query
       resultHandler.handle(Future.succeededFuture());
     }
   }
@@ -153,6 +159,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setLimit(int)
    */
   @Override
@@ -163,6 +170,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setStart(int)
    */
   @Override
@@ -204,6 +212,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setOrderBy(java.lang.String)
    */
   @Override
@@ -227,6 +236,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#addNativeCommand(java.lang.Object)
    */
   @Override
@@ -241,6 +251,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#hasQueryArguments()
    */
   @Override
@@ -250,6 +261,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setRootQueryPart(de.braintags.io.vertx.pojomapper.
    * dataaccess.query.IQueryPart)
    */

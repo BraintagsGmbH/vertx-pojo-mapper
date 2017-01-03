@@ -25,7 +25,7 @@ public interface IQueryRambler {
    * @param query
    *          the query to be applied
    */
-  void start(IQuery< ? > query);
+  void start(IQuery<?> query);
 
   /**
    * Stop applying the {@link IQuery} itself
@@ -33,7 +33,7 @@ public interface IQueryRambler {
    * @param query
    *          the query to be applied
    */
-  void stop(IQuery< ? > query);
+  void stop(IQuery<?> query);
 
   /**
    * Apply a query part. Depending on the type, the query part may contain multiple query parts itself
@@ -42,5 +42,13 @@ public interface IQueryRambler {
    * @param resultHandler
    */
   void apply(IQueryPart queryPart, Handler<AsyncResult<Void>> resultHandler);
+
+  /**
+   * Apply the sort definition to the query rambler.
+   * 
+   * @param sortDefinition
+   * @param resultHandler
+   */
+  void apply(ISortDefinition<?> sortDefinition, Handler<AsyncResult<Void>> resultHandler);
 
 }

@@ -12,13 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -69,30 +67,6 @@ public class LoggerQueryRamber implements IQueryRambler {
     log("stop query ");
   }
 
-  @Override
-  public void start(ILogicContainer<?> container) {
-    raiseLevel();
-    log(container.getOperator().toString());
-  }
-
-  @Override
-  public void stop(ILogicContainer<?> container) {
-    reduceLevel();
-  }
-
-  @Override
-  public void start(IFieldParameter<?> fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
-    raiseLevel();
-    log(fieldParameter.getField().getName() + " " + fieldParameter.getOperator().toString() + " "
-        + fieldParameter.getValue());
-    resultHandler.handle(Future.succeededFuture());
-  }
-
-  @Override
-  public void stop(IFieldParameter<?> fieldParameter) {
-    reduceLevel();
-  }
-
   private final void log(String message) {
     logger.info(levelPrefix + message);
   }
@@ -101,25 +75,22 @@ public class LoggerQueryRamber implements IQueryRambler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess.
-   * query.ISortDefinition)
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#apply(de.braintags.io.vertx.pojomapper.dataaccess.
+   * query.IQueryPart, io.vertx.core.Handler)
    */
   @Override
-  public void start(ISortDefinition<?> sortDefinition) {
-    raiseLevel();
-    log(sortDefinition.toString());
+  public void apply(IQueryPart queryPart, Handler<AsyncResult<Void>> resultHandler) {
   }
 
   /*
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess.
-   * query.ISortDefinition)
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#apply(de.braintags.io.vertx.pojomapper.dataaccess.
+   * query.ISortDefinition, io.vertx.core.Handler)
    */
   @Override
-  public void stop(ISortDefinition<?> sortDefinition) {
-    reduceLevel();
+  public void apply(ISortDefinition<?> sortDefinition, Handler<AsyncResult<Void>> resultHandler) {
   }
 
 }

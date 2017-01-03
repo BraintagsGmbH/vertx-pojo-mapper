@@ -13,6 +13,7 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.typehandler.IFieldParameterResult;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
@@ -29,13 +30,9 @@ public interface IQueryExpression {
   /**
    * Start an AND / OR block
    * 
-   * @param connector
-   *          the connector AND / OR
-   * @param openParenthesis
-   *          info, wether a parenthesis shall be opened
    * @return the IQueryExpression itself for fluent usage
    */
-  IQueryExpression startConnectorBlock(String connector, boolean openParenthesis);
+  IQueryExpression startConnectorBlock();
 
   /**
    * Stop the current connector block
@@ -45,18 +42,13 @@ public interface IQueryExpression {
   IQueryExpression stopConnectorBlock();
 
   /**
-   * Append an opening parenthesis and handle the counter for open parenthesis
+   * Adds a connector between two query parts
    * 
+   * @param queryLogic
+   *          the boolean logic of the connector
    * @return the IQueryExpression itself for fluent usage
    */
-  IQueryExpression openParenthesis();
-
-  /**
-   * Append a closing parenthesis and handle the counter for open parenthesis
-   * 
-   * @return the IQueryExpression itself for fluent usage
-   */
-  IQueryExpression closeParenthesis();
+  IQueryExpression connect(QueryLogic queryLogic);
 
   /**
    * Set a native command to be executed as query

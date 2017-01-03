@@ -6,9 +6,8 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
 import java.util.Iterator;
+import java.util.List;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.ILogicContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
@@ -36,7 +35,7 @@ import io.vertx.core.json.JsonArray;
  */
 public abstract class AbstractQueryRambler implements IQueryRambler {
   private IQueryExpression queryExpression;
-  private IMapper          mapper;
+  private IMapper<?> mapper;
 
   /**
    * @param queryExpression
@@ -48,12 +47,13 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
 
   /*
    * (non-Javadoc)
+   * 
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess.
    * query.IQuery)
    */
   @Override
-  public final void start(IQuery< ? > query) {
+  public final void start(IQuery<?> query) {
     if (mapper != null)
       throw new UnsupportedOperationException("sub query not implemented yet");
     mapper = query.getMapper();
@@ -65,78 +65,14 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
 
   /*
    * (non-Javadoc)
+   * 
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess.
    * query.IQuery)
    */
   @Override
-  public void stop(IQuery< ? > query) {
+  public void stop(IQuery<?> query) {
     // nothing to do here
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess.
-   * query.ILogicContainer)
-   */
-  @Override
-  public final void start(IQueryContainer container) {
-    IQueryLogicTranslator logicTranslator = mapper.getMapperFactory().getDataStore().getQueryLogicTranslator();
-    String logic = logicTranslator.translate(container.getOperator());
-    queryExpression.startConnectorBlock(logic, logicTranslator.opensParenthesis(container.getOperator()));
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess.
-   * query.ILogicContainer)
-   */
-  @Override
-  public final void stop(ILogicContainer< ? > container) {
-    queryExpression.stopConnectorBlock();
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess.
-   * query.ISortDefinition)
-   */
-  @Override
-  public void start(ISortDefinition< ? > sortDefinition) {
-    queryExpression.addSort(sortDefinition);
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#stop(de.braintags.io.vertx.pojomapper.dataaccess.
-   * query.ISortDefinition)
-   */
-  @Override
-  public void stop(ISortDefinition< ? > sortDefinition) {
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#start(de.braintags.io.vertx.pojomapper.dataaccess.
-   * query.IFieldParameter, io.vertx.core.Handler)
-   */
-  @Override
-  public final void start(IFieldParameter< ? > fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
-    switch (fieldParameter.getOperator()) {
-    case IN:
-    case NOT_IN:
-      handleMultipleValues(fieldParameter, resultHandler);
-      break;
-
-    default:
-      handleSingleValue(fieldParameter, resultHandler);
-    }
-
   }
 
   private void handleCondition(IQueryCondition condition, Handler<AsyncResult<Void>> resultHandler) {
@@ -174,7 +110,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
           Future.failedFuture(new QueryParameterException("multivalued argument but not an instance of Iterable")));
       return;
     }
-    int count = Size.size((Iterable< ? >) valueIterable);
+    int count = Size.size((Iterable<?>) valueIterable);
     if (count == 0) {
       String message = String.format(
           "multivalued argument but no values defined for search in field %s.%s with operator '%s'",
@@ -182,13 +118,13 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
       resultHandler.handle(Future.failedFuture(new QueryParameterException(message)));
       return;
     }
-    iterateMultipleValues(field, ci, operator, count, (Iterable< ? >) valueIterable, resultHandler);
+    iterateMultipleValues(field, ci, operator, count, (Iterable<?>) valueIterable, resultHandler);
   }
 
   private final void iterateMultipleValues(IField field, IColumnInfo ci, String operator, int count,
-      Iterable< ? > valueIterable, Handler<AsyncResult<Void>> resultHandler) {
+      Iterable<?> valueIterable, Handler<AsyncResult<Void>> resultHandler) {
     CounterObject<Void> co = new CounterObject<>(count, resultHandler);
-    Iterator< ? > values = valueIterable.iterator();
+    Iterator<?> values = valueIterable.iterator();
     JsonArray resultArray = new JsonArray();
 
     while (values.hasNext() && !co.isError()) {
@@ -218,7 +154,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    */
   private final void handleSingleValue(IQueryCondition fieldParameter, Handler<AsyncResult<Void>> resultHandler) {
     IField field = mapper.getField(fieldParameter.getField());
-    field.getTypeHandler().handleFieldParameter(fieldParameter, result -> {
+    field.getTypeHandler().handleFieldParameter(field, fieldParameter, result -> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
@@ -237,7 +173,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    * 
    * @return the mapper
    */
-  public final IMapper getMapper() {
+  public final IMapper<?> getMapper() {
     return mapper;
   }
 
@@ -247,7 +183,7 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
    * @param mapper
    *          the mapper to set
    */
-  public final void setMapper(IMapper mapper) {
+  public final void setMapper(IMapper<?> mapper) {
     this.mapper = mapper;
   }
 
@@ -265,13 +201,60 @@ public abstract class AbstractQueryRambler implements IQueryRambler {
     return queryExpression.toString();
   }
 
+  private void apply(IQueryCondition queryCondition, Handler<AsyncResult<Void>> resultHandler) {
+    handleCondition(queryCondition, resultHandler);
+  }
+
   @Override
   public void apply(IQueryPart queryPart, Handler<AsyncResult<Void>> resultHandler) {
-    if (queryPart instanceof IQueryContainer) {
-
-    } else if (queryPart instanceof IQueryCondition) {
-      handleCondition((IQueryCondition) queryPart, resultHandler);
+    if (queryPart instanceof IQueryCondition) {
+      apply((IQueryCondition) queryPart, resultHandler);
+    } else if (queryPart instanceof IQueryContainer) {
+      apply((IQueryContainer) queryPart, resultHandler);
+    } else {
+      resultHandler.handle(Future.failedFuture("Unknown query type class:" + queryPart.getClass()));
     }
   }
 
+  private void apply(IQueryContainer queryContainer, Handler<AsyncResult<Void>> resultHandler) {
+    queryExpression.startConnectorBlock();
+    List<IQueryPart> content = queryContainer.getContent();
+    CounterObject<Void> co = new CounterObject<>(content.size(), resultHandler);
+    Iterator<IQueryPart> it = content.iterator();
+    while (it.hasNext() && !co.isError()) {
+      IQueryPart queryPart = it.next();
+      apply(queryPart, result -> {
+        if (result.failed()) {
+          co.setThrowable(result.cause());
+          return;
+        } else {
+          if (it.hasNext())
+            queryExpression.connect(queryContainer.getConnector());
+
+          if (co.reduce()) {
+            queryExpression.stopConnectorBlock();
+            resultHandler.handle(Future.succeededFuture());
+          }
+        }
+      });
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler#apply(de.braintags.io.vertx.pojomapper.dataaccess.
+   * query.ISortDefinition, io.vertx.core.Handler)
+   */
+  @Override
+  public void apply(ISortDefinition<?> sortDefinition, Handler<AsyncResult<Void>> resultHandler) {
+    try {
+      queryExpression.addSort(sortDefinition);
+      resultHandler.handle(Future.succeededFuture());
+    } catch (Exception e) {
+      resultHandler.handle(Future.failedFuture(e));
+    }
+
+  }
 }

@@ -19,7 +19,7 @@ import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTranslator;
 import de.braintags.io.vertx.pojomapper.exception.MappingException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -64,8 +64,8 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
    * IFieldParameter, io.vertx.core.Handler)
    */
   @Override
-  public void handleFieldParameter(IFieldParameter<?> param, Handler<AsyncResult<IFieldParameterResult>> handler) {
-    IField field = param.getField();
+  public void handleFieldParameter(IField field, IQueryCondition param,
+      Handler<AsyncResult<IFieldParameterResult>> handler) {
     IColumnInfo ci = field.getColumnInfo();
     IQueryOperatorTranslator queryOperatorTranslator = field.getMapper().getMapperFactory().getDataStore()
         .getQueryOperatorTranslator();
