@@ -12,12 +12,18 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import java.util.Iterator;
+import java.util.List;
+
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
+import de.braintags.io.vertx.util.CounterObject;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -28,17 +34,10 @@ import io.vertx.core.logging.LoggerFactory;
  * @author Michael Remme
  * 
  */
-
 public class LoggerQueryRamber implements IQueryRambler {
   private static Logger logger = LoggerFactory.getLogger(LoggerQueryRamber.class);
   private String levelPrefix = "";
   private int level;
-
-  /**
-   * 
-   */
-  public LoggerQueryRamber() {
-  }
 
   public void raiseLevel() {
     ++level;
@@ -94,6 +93,7 @@ public class LoggerQueryRamber implements IQueryRambler {
   @Override
   public void apply(IQueryCondition queryPart, Handler<AsyncResult<Void>> resultHandler) {
     log(queryPart.getField() + " " + queryPart.getOperator() + " " + queryPart.getValue());
+    resultHandler.handle(Future.succeededFuture());
   }
 
   /*
@@ -104,7 +104,27 @@ public class LoggerQueryRamber implements IQueryRambler {
    * query.IQueryContainer, io.vertx.core.Handler)
    */
   @Override
-  public void apply(IQueryContainer queryPart, Handler<AsyncResult<Void>> resultHandler) {
+  public void apply(IQueryContainer queryContainer, Handler<AsyncResult<Void>> resultHandler) {
+    raiseLevel();
+    List<IQueryPart> content = queryContainer.getContent();
+    CounterObject<Void> co = new CounterObject<>(content.size(), resultHandler);
+    Iterator<IQueryPart> it = content.iterator();
+    while (it.hasNext() && !co.isError()) {
+      IQueryPart queryPart = it.next();
+      queryPart.applyTo(this, result -> {
+        if (result.failed()) {
+          co.setThrowable(result.cause());
+          return;
+        } else {
+          if (it.hasNext())
+            log(queryContainer.getConnector().toString());
+          if (co.reduce()) {
+            reduceLevel();
+            resultHandler.handle(Future.succeededFuture());
+          }
+        }
+      });
+    }
   }
 
 }

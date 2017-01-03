@@ -18,7 +18,7 @@ import io.vertx.core.Handler;
  *          the underlaying mapper class
  */
 
-public interface IQuery<T> extends IDataAccessObject<T>, IQueryContainer {
+public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Execute the query

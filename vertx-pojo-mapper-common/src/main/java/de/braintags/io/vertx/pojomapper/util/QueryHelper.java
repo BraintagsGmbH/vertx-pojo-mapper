@@ -18,6 +18,7 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition;
 import de.braintags.io.vertx.pojomapper.exception.NoSuchRecordException;
 import de.braintags.io.vertx.util.IteratorAsync;
 import io.vertx.core.AsyncResult;
@@ -52,7 +53,7 @@ public class QueryHelper {
   public static final <T> void findRecordById(IDataStore datastore, Class<T> mapperClass, String id,
       Handler<AsyncResult<T>> handler) {
     IQuery<T> query = datastore.createQuery(mapperClass);
-    query.field(query.getMapper().getIdField().getName()).is(id);
+    query.setRootQueryPart(new FieldCondition(query.getMapper().getIdField().getName(), id));
     executeToFirstRecord(query, handler);
   }
 

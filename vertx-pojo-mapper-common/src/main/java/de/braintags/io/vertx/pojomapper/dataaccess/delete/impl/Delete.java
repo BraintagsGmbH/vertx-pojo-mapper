@@ -24,6 +24,8 @@ import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
@@ -42,7 +44,7 @@ import io.vertx.core.Handler;
 public abstract class Delete<T> extends AbstractDataAccessObject<T> implements IDelete<T> {
   private static final String ERROR_MESSAGE = "You can only use ONE source for deletion, either an IQuery or a list of instances";
   private IQuery<T> query;
-  private List<T> recordList = new ArrayList<T>();
+  private List<T> recordList = new ArrayList<>();
 
   /**
    * @param mapperClass
@@ -173,7 +175,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    */
   protected void getRecordIds(IField idField, Handler<AsyncResult<List<Object>>> resultHandler) {
     CounterObject<List<Object>> co = new CounterObject<>(getRecordList().size(), resultHandler);
-    List<Object> values = new ArrayList<Object>();
+    List<Object> values = new ArrayList<>();
     for (T record : getRecordList()) {
       idField.getPropertyMapper().readForStore(record, idField, vr -> {
         if (vr.failed()) {
@@ -204,7 +206,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   protected void deleteRecordsById(IField idField, List<Object> objectIds,
       Handler<AsyncResult<IDeleteResult>> resultHandler) {
     IQuery<T> q = getDataStore().createQuery(getMapperClass());
-    q.field(idField.getName()).in(objectIds);
+    q.setRootQueryPart(new FieldCondition(idField.getName(), QueryOperator.IN, objectIds));
     deleteQuery(q, dr -> {
       if (dr.failed()) {
         resultHandler.handle(dr);
