@@ -91,6 +91,7 @@ public class SqlUtil {
           handler.handle(DefaultAsyncResult.fail(result.cause()));
         } else {
           cf.list().forEach(f -> returnBuffer.appendString((String) f));
+          handler.handle(DefaultAsyncResult.succeed(returnBuffer.toString()));
         }
       });
     }

@@ -37,6 +37,7 @@ public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSync
 
   /*
    * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer#synchronize(de.braintags.io.vertx.pojomapper.
    * mapping .IMapper, io.vertx.core.Handler)
    */
@@ -50,6 +51,7 @@ public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSync
         if (res.failed()) {
           resultHandler.handle(Future.failedFuture(res.cause()));
         } else {
+          LOGGER.debug("successful synchronized for mapper " + mapper.getClass().getSimpleName());
           syncIndexDefinitions(mapper, idxResult -> {
             if (idxResult.failed()) {
               resultHandler.handle(Future.failedFuture(idxResult.cause()));
@@ -74,6 +76,7 @@ public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSync
     if (mapper.getIndexDefinitions() == null) {
       resultHandler.handle(Future.succeededFuture());
     } else {
+      LOGGER.debug("Start synchronization of IndexDefinitions");
       syncIndexes(mapper, mapper.getIndexDefinitions(), resultHandler);
     }
   }

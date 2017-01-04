@@ -268,6 +268,7 @@ public abstract class DatastoreBaseTest {
    * @return teh list of records
    */
   public static List<?> findAll(TestContext context, IQuery<?> query) {
+    LOGGER.info("executing findAll with query " + query.toString());
     Async async = context.async();
     ResultObject<List<?>> res = new ResultObject<>(null);
     QueryHelper.executeToList(query, result -> {
@@ -448,7 +449,7 @@ public abstract class DatastoreBaseTest {
   public static void clearTable(TestContext context, Class mapperClass) {
     if (EXTERNAL_DATASTORE != null) {
       Async async = context.async();
-      ErrorObject<Void> err = new ErrorObject<Void>(null);
+      ErrorObject<Void> err = new ErrorObject<>(null);
       IQuery q = EXTERNAL_DATASTORE.createQuery(mapperClass);
       find(context, q, -1).queryResult.toArray(result -> {
         if (result.failed()) {
@@ -490,7 +491,7 @@ public abstract class DatastoreBaseTest {
   public static void clearTable(TestContext context, String tableName) {
     LOGGER.info("clearing table " + tableName);
     Async async = context.async();
-    ErrorObject<Void> err = new ErrorObject<Void>(null);
+    ErrorObject<Void> err = new ErrorObject<>(null);
     TestHelper.getDatastoreContainer(context).clearTable(tableName, result -> {
       if (result.failed()) {
         err.setThrowable(result.cause());
@@ -506,7 +507,7 @@ public abstract class DatastoreBaseTest {
 
   public static void dropTable(TestContext context, String tableName) {
     Async async = context.async();
-    ErrorObject<Void> err = new ErrorObject<Void>(null);
+    ErrorObject<Void> err = new ErrorObject<>(null);
     TestHelper.getDatastoreContainer(context).dropTable(tableName, result -> {
       if (result.failed()) {
         err.setThrowable(result.cause());
