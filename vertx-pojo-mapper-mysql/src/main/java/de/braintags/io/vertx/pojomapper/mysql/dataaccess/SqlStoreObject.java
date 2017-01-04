@@ -277,7 +277,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
 
     @Override
     public String toString() {
-      return getSqlStatement() + " | " + getParameters();
+      return getSqlStatement() + " | " + getParameters() + " | id: " + id;
     }
   }
 }
