@@ -40,9 +40,6 @@ import io.vertx.core.json.JsonObject;
  */
 
 public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
-  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
-      .getLogger(SqlStoreObject.class);
-
   /**
    * Creates a new instance of SqlStoreObject with a {@link Map} as internal format
    * 
@@ -232,12 +229,9 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
       setStatement = new StringBuilder(" set ");
       whereStatement = new StringBuilder(" WHERE ").append(idColInfo.getName()).append(" = ?");
       this.id = idValue;
-
     }
 
     void addEntry(String colName, Object value) {
-      if (value == null)
-        return;
       if (added)
         setStatement.append(", ");
       if (value instanceof SqlFunction) {
@@ -245,7 +239,11 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
         parameters.add(((SqlFunction) value).getContent());
       } else {
         setStatement.append(colName).append(" = ?");
-        parameters.add(value);
+        if (value == null) {
+          parameters.addNull();
+        } else {
+          parameters.add(value);
+        }
       }
       added = true;
     }

@@ -49,7 +49,6 @@ import io.vertx.ext.sql.UpdateResult;
 
 public class SqlWrite<T> extends AbstractWrite<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SqlWrite.class);
-  private static final String LAST_INSERT_ID_COMMAND = "SELECT LAST_INSERT_ID();";
   private int saveSize;
 
   /**
@@ -74,8 +73,9 @@ public class SqlWrite<T> extends AbstractWrite<T> {
             return;
           } else {
             if (stoResult.result().size() != saveSize) {
+              int stoSize = stoResult.result().size();
               String message = String.format("Wrong number of StoreObjects created. Expected %d - created: %d",
-                  saveSize, stoResult.result().size());
+                  saveSize, stoSize);
               LOGGER.error(message);
             }
             save(stoResult.result(), resultHandler);
@@ -134,6 +134,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param resultHandler
    *          the {@link Handler} to be informed
    */
+  @SuppressWarnings("rawtypes")
   private void handleUpdate(SqlStoreObject<T> storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlUpdateStatement();
