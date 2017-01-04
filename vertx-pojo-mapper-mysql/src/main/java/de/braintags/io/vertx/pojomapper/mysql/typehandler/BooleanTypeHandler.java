@@ -40,12 +40,12 @@ public class BooleanTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? false : ((byte) source == 1) ? true : false, resultHandler);
+    success(source == null ? null : ((byte) source == 1) ? true : false, resultHandler);
   }
 
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    success(source == null ? source : ((Boolean) source).booleanValue() == true ? 1 : 0, resultHandler);
+    success(source == null ? source : ((Boolean) source).booleanValue() == Boolean.TRUE ? 1 : 0, resultHandler);
   }
 
 }

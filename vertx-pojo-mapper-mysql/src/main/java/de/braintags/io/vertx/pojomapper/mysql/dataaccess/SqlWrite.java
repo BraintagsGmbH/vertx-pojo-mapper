@@ -182,6 +182,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     }
   }
 
+  @SuppressWarnings("rawtypes")
   private void handleInsert(SqlStoreObject<T> storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     storeObject.generateSqlInsertStatement(isr -> {
@@ -207,6 +208,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param seq
    * @param resultHandler
    */
+  @SuppressWarnings("rawtypes")
   private void insertWithoutParameters(SqlStoreObject storeObject, IWriteResult writeResult, SqlSequence seq,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlUtil.update((MySqlDataStore) getDataStore(), seq.getSqlStatement(), updateResult -> {
@@ -220,6 +222,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     });
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private void insertWithParameters(SqlStoreObject storeObject, IWriteResult writeResult, SqlSequence seq,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), seq.getSqlStatement(), seq.getParameters(),

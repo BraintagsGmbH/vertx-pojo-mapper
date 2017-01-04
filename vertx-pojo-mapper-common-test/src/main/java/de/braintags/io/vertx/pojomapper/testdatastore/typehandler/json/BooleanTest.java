@@ -39,7 +39,7 @@ public class BooleanTest extends AbstractTypeHandlerTest {
     List list = findAll(context, query);
     context.assertEquals(1, list.size());
     BooleanMapper loaded = (BooleanMapper) list.get(0);
-    context.assertNull(loaded.myBooloean);
+    context.assertNull(loaded.myBooloean, "expected null, not " + loaded.myBooloean);
   }
 
   /*
