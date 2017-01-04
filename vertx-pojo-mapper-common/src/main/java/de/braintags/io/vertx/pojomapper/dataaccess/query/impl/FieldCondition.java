@@ -3,6 +3,8 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.Position;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -30,6 +32,11 @@ public class FieldCondition implements IQueryCondition {
     this.field = field;
     this.operator = logic;
     this.value = value;
+  }
+
+  public static FieldCondition near(String field, double x, double y, int maxDistance) {
+    return new FieldCondition(field, QueryOperator.NEAR,
+        new GeoSearchArgument(new GeoPoint(new Position(x, y, new double[0])), maxDistance));
   }
 
   /**
