@@ -13,6 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper.mysql;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,8 +25,9 @@ import de.braintags.io.vertx.pojomapper.annotation.Indexes;
 import de.braintags.io.vertx.pojomapper.exception.DuplicateKeyException;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mysql.exception.SqlException;
-import de.braintags.io.vertx.util.CounterObject;
+import de.braintags.io.vertx.util.async.DefaultAsyncResult;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -81,54 +83,51 @@ public class SqlUtil {
     if (indexes == null || indexes.value().length == 0) {
       handler.handle(Future.succeededFuture("No indexes defined"));
     } else {
-      CounterObject<String> co = new CounterObject<>(indexes.value().length, handler);
+      List<Future> fl = createFutureList(ds, tableName, indexes);
       Buffer returnBuffer = Buffer.buffer();
-      for (Index index : indexes.value()) {
-        if (co.isError()) {
-          break;
+      CompositeFuture cf = CompositeFuture.all(fl);
+      cf.setHandler(result -> {
+        if (result.failed()) {
+          handler.handle(DefaultAsyncResult.fail(result.cause()));
+        } else {
+          cf.list().forEach(f -> returnBuffer.appendString((String) f));
         }
-        createIndex(ds, tableName, index, result -> {
-          if (result.failed()) {
-            co.setThrowable(result.cause());
-          } else {
-            returnBuffer.appendString(result.result());
-            if (co.reduce()) {
-              co.setResult(returnBuffer.toString());
-            }
-          }
-        });
-      }
+      });
     }
-
   }
 
-  private static final void createIndex(MySqlDataStore ds, String tableName, Index index,
-      Handler<AsyncResult<String>> handler) {
+  @SuppressWarnings("rawtypes")
+  private static List<Future> createFutureList(MySqlDataStore ds, String tableName, Indexes indexes) {
+    List<Future> fl = new ArrayList<>();
+    for (Index index : indexes.value()) {
+      fl.add(createIndex(ds, tableName, index));
+    }
+    return fl;
+  }
 
+  private static final Future<String> createIndex(MySqlDataStore ds, String tableName, Index index) {
+    Future<String> f = Future.future();
     checkIndexExists(ds, tableName, index, result -> {
       if (result.failed()) {
-        handler.handle(Future.failedFuture(result.cause()));
+        f.fail(result.cause());
       } else {
         switch (result.result().state) {
         case INDEX_EXISTS:
-          handler.handle(Future.succeededFuture("Index exists: " + index.name()));
+          f.complete("Index exists: " + index.name());
           break;
-
         case INDEX_NOT_EXISTS:
-          createIndex(ds, tableName, index, result.result(), handler);
+          createIndex(ds, tableName, index, result.result(), f.completer());
           break;
-
         case INDEX_MODIFIED:
-          modifyIndex(ds, tableName, index, result.result(), handler);
+          modifyIndex(ds, tableName, index, result.result(), f.completer());
           break;
-
         default:
-          handler
-              .handle(Future.failedFuture(new UnsupportedOperationException("unsupported result: " + result.result())));
+          f.fail(new UnsupportedOperationException("unsupported result: " + result.result()));
           break;
         }
       }
     });
+    return f;
   }
 
   private static void createIndex(MySqlDataStore ds, String tableName, Index index, IndexResult res,
@@ -295,7 +294,7 @@ public class SqlUtil {
         LOGGER.error("", sqlEx);
         resultHandler.handle(Future.failedFuture(sqlEx));
         return;
-      } 
+      }
       SQLConnection connection = cr.result();
       LOGGER.debug(GAINED_SUCCESSFULLY_A_CONNECTION);
       doQuery(command, resultHandler, connection);

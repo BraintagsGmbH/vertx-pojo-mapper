@@ -61,4 +61,5 @@ public interface IDatastoreContainer {
    * @return the expected typehandler class name
    */
   public String getExpectedTypehandlerName(Class<? extends AbstractTypeHandlerTest> testClass, String defaultName);
+
 }

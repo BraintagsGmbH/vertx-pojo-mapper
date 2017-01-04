@@ -36,8 +36,8 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(AbstractStoreObject.class);
 
-  private IMapper<T>                                mapper;
-  private T                                         entity           = null;
+  private IMapper<T> mapper;
+  private T entity = null;
   private Collection<IObjectReference> objectReferences = new ArrayList<>();
   private boolean newInstance = true;
   protected F container;

@@ -50,6 +50,31 @@ public class TestKeyGenerator extends DatastoreBaseTest {
     context.assertNull(mapper.getKeyGenerator(), "keygenerator must be null");
   }
 
+  /**
+   * Check the creation of an ID by the datastore
+   * 
+   * @param context
+   */
+  @Test
+  public void testNullKeyGeneratorCheckId(TestContext context) {
+    IKeyGenerator keyGen = getDataStore(context).getDefaultKeyGenerator();
+    context.assertNotNull(keyGen, "keygenerator must not be null");
+    context.assertTrue(keyGen instanceof DefaultKeyGenerator,
+        "not an instance of DefaultKeyGenerator: " + String.valueOf(keyGen.getName()));
+
+    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(NoKeyGeneratorMapper.class);
+    context.assertNull(mapper.getKeyGenerator(), "keygenerator must be null");
+
+    clearTable(context, "NoKeyGeneratorMapper");
+    NoKeyGeneratorMapper sm = new NoKeyGeneratorMapper();
+    sm.name = "testName";
+    ResultContainer resultContainer = saveRecord(context, sm);
+    IWriteEntry we1 = resultContainer.writeResult.iterator().next();
+    context.assertEquals(we1.getAction(), WriteAction.INSERT);
+    context.assertNotNull(sm.id);
+    context.assertTrue(sm.id.hashCode() != 0); // "ID wasn't set by insert statement",
+  }
+
   @Test
   public void testKeyGenerator(TestContext context) {
     if (getDataStore(context).getClass().getName().equals("de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore")) {
