@@ -14,9 +14,11 @@ package de.braintags.io.vertx.pojomapper.testdatastore;
 
 import org.junit.Test;
 
+import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
+import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.KeyGeneratorMapper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.NoKeyGeneratorMapper;
 import de.braintags.io.vertx.util.ResultObject;
@@ -36,6 +38,9 @@ public class TestStoreObject extends DatastoreBaseTest {
   public void testWithNullKeyGenerator(TestContext context) {
     NoKeyGeneratorMapper entity = new NoKeyGeneratorMapper();
     IMapper mapper = getDataStore(context).getMapperFactory().getMapper(entity.getClass());
+    IKeyGenerator keyGen = mapper.getKeyGenerator();
+    context.assertNull(keyGen, "keyGenerator must be null but is instance of " + String.valueOf(keyGen));
+
     entity.name = "testName";
     IStoreObject<?, ?> sto = createStoreObject(context, mapper, entity);
     Object idValue = sto.get(mapper.getIdField());
@@ -48,6 +53,10 @@ public class TestStoreObject extends DatastoreBaseTest {
   public void testWithKeyGenerator(TestContext context) {
     KeyGeneratorMapper entity = new KeyGeneratorMapper();
     IMapper mapper = getDataStore(context).getMapperFactory().getMapper(entity.getClass());
+    IKeyGenerator keyGen = mapper.getKeyGenerator();
+    context.assertTrue(keyGen.getClass() == DefaultKeyGenerator.class,
+        "keygenerator should be " + DefaultKeyGenerator.class.getName() + " but is " + keyGen.getClass().getName());
+
     entity.name = "testName";
     IStoreObject<?, ?> sto = createStoreObject(context, mapper, entity);
     Object idValue = sto.get(mapper.getIdField());
