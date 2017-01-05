@@ -46,7 +46,7 @@ public class SqlMapTypeHandlerEmbedded extends MapTypeHandlerEmbedded {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     try {
-      JsonArray sourceArray = new JsonArray((String) source);
+      JsonArray sourceArray = source == null ? null : new JsonArray((String) source);
       super.fromStore(sourceArray, field, cls, handler);
     } catch (Exception e) {
       fail(e, handler);
@@ -68,7 +68,7 @@ public class SqlMapTypeHandlerEmbedded extends MapTypeHandlerEmbedded {
       }
       JsonArray resultArray = (JsonArray) result.result().getResult();
       try {
-        String arrayString = resultArray.encode();
+        String arrayString = resultArray == null ? null : resultArray.encode();
         success(arrayString, handler);
       } catch (Exception e) {
         fail(e, handler);

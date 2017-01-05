@@ -31,7 +31,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.util.QueryHelper;
 import de.braintags.io.vertx.util.ErrorObject;
-import de.braintags.io.vertx.util.ExceptionUtil;
 import de.braintags.io.vertx.util.IteratorAsync;
 import de.braintags.io.vertx.util.ResultObject;
 import io.vertx.core.AsyncResult;
@@ -385,58 +384,38 @@ public abstract class DatastoreBaseTest {
 
   @SuppressWarnings({ "rawtypes" })
   public static void checkQueryResult(TestContext context, IQueryResult qr, int expectedResult) {
-    Async async = context.async();
-
-    try {
-      context.assertNotNull(qr);
-    } catch (Exception e) {
-      LOGGER.error("", e);
-      async.complete();
-      throw ExceptionUtil.createRuntimeException(e);
-    }
-
+    context.assertNotNull(qr);
     if (expectedResult < 0) {
-      async.complete();
       return;
     }
     if (expectedResult == 0) {
-      try {
-        context.assertFalse(qr.iterator().hasNext());
-      } finally {
-        async.complete();
-      }
+      context.assertFalse(qr.iterator().hasNext());
     } else {
-      try {
-        context.assertEquals(expectedResult, qr.size(), "Not the expected number of records");
-      } catch (Exception e) {
-        LOGGER.error("", e);
-        async.complete();
-        throw ExceptionUtil.createRuntimeException(e);
-      }
-
       IteratorAsync<?> itr = qr.iterator();
-      try {
-        context.assertTrue(itr.hasNext(), "No record in selection");
-      } catch (Exception e) {
-        LOGGER.error("", e);
-        async.complete();
-        throw ExceptionUtil.createRuntimeException(e);
-      }
-
+      context.assertTrue(itr.hasNext(), "No record in selection");
+      ErrorObject err = new ErrorObject<>(null);
+      Async async = context.async();
       itr.next(nitr -> {
-        try {
-          if (nitr.failed()) {
-            LOGGER.error("", nitr.cause());
-            throw ExceptionUtil.createRuntimeException(nitr.cause());
-          }
-          context.assertNotNull(nitr.result());
-        } finally {
+        if (nitr.failed()) {
+          LOGGER.error("", nitr.cause());
+          err.setThrowable(nitr.cause());
           async.complete();
+        } else {
+          try {
+            context.assertNotNull(nitr.result());
+            async.complete();
+          } catch (Throwable e) {
+            err.setThrowable(e);
+            async.complete();
+          }
         }
       });
+      async.await();
+      if (err.isError()) {
+        throw err.getRuntimeException();
+      }
     }
 
-    async.await();
   }
 
   /**

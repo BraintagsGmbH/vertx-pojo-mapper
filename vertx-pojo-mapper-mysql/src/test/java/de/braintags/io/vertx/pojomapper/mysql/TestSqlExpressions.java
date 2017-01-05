@@ -256,7 +256,7 @@ public class TestSqlExpressions extends DatastoreBaseTest {
 
     final Async async2 = context.async();
 
-    String queryExpression = "SELECT id, AsText(point)  from GeoPointRecord; ";
+    String queryExpression = "SELECT id, AsText(point) AS point  from GeoPointRecord; ";
 
     SqlUtil.query((MySqlDataStore) getDataStore(context), queryExpression, ur -> {
       if (ur.failed()) {

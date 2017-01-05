@@ -50,7 +50,7 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
   @Override
   public void fromStore(Object dbValue, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     try {
-      JsonObject jsonObject = new JsonObject((String) dbValue);
+      JsonObject jsonObject = dbValue == null ? null : new JsonObject((String) dbValue);
       super.fromStore(jsonObject, field, cls, handler);
     } catch (Exception e) {
       fail(e, handler);
@@ -71,7 +71,8 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
         handler.handle(result);
       }
       try {
-        String newResult = ((JsonObject) result.result().getResult()).encode();
+        JsonObject thr = (JsonObject) result.result().getResult();
+        String newResult = thr == null ? null : thr.encode();
         success(newResult, handler);
       } catch (Exception e) {
         fail(e, handler);
@@ -79,6 +80,7 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
     });
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   protected void writeSingleValueAsMapper(IDataStore store, Object embeddedObject, IMapper embeddedMapper, IField field,
       Handler<AsyncResult<ITypeHandlerResult>> handler) {
@@ -99,6 +101,7 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
 
   }
 
+  @SuppressWarnings("rawtypes")
   private void checkId(IDataStore store, Object embeddedObject, IMapper mapper, Handler<AsyncResult<Void>> handler) {
     IField field = mapper.getIdField();
     Object id = field.getPropertyAccessor().readData(embeddedObject);
