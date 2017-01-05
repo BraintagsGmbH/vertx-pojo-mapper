@@ -20,7 +20,6 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory;
-import de.braintags.io.vertx.util.async.DefaultAsyncResult;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -50,7 +49,7 @@ public abstract class AbstractStoreObjectFactory<F> implements IStoreObjectFacto
     CompositeFuture cf = CompositeFuture.all(fl);
     cf.setHandler(result -> {
       if (result.failed()) {
-        handler.handle(DefaultAsyncResult.fail(result.cause()));
+        handler.handle(Future.failedFuture(result.cause()));
       } else {
         List stl = createStoreObjectList(cf);
         handler.handle(Future.succeededFuture(stl));

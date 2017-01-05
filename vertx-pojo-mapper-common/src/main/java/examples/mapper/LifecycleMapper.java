@@ -1,5 +1,7 @@
 package examples.mapper;
 
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.isEqual;
+
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.io.vertx.pojomapper.annotation.field.Id;
@@ -10,7 +12,6 @@ import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeDelete;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
 import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition;
 import de.braintags.io.vertx.pojomapper.mapping.ITriggerContext;
 import io.vertx.docgen.Source;
 
@@ -34,7 +35,7 @@ public class LifecycleMapper {
     name = "just after load";
     IDataStore ds = triggerContext.getMapper().getMapperFactory().getDataStore();
     IQuery<MiniMapper> q = ds.createQuery(MiniMapper.class);
-    q.setRootQueryPart(new FieldCondition("name", "test"));
+    q.setRootQueryPart(isEqual("name", "test"));
     q.execute(qr -> {
       if (qr.failed()) {
         triggerContext.fail(qr.cause());

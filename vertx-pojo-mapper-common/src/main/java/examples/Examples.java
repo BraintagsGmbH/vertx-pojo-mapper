@@ -12,11 +12,12 @@
  */
 package examples;
 
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.isEqual;
+
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
@@ -99,7 +100,7 @@ public class Examples {
    */
   public void example4(IDataStore dataStore) {
     IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
-    query.setRootQueryPart(new FieldCondition("name", "my mini mapper"));
+    query.setRootQueryPart(isEqual("name", "my mini mapper"));
     query.execute(rResult -> {
       if (rResult.failed()) {
         logger.error(rResult.cause());
@@ -137,7 +138,7 @@ public class Examples {
 
   public void example6(IDataStore dataStore) {
     IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
-    query.setRootQueryPart(new FieldCondition("name", "test"));
+    query.setRootQueryPart(isEqual("name", "test"));
     IDelete<MiniMapper> delete = dataStore.createDelete(MiniMapper.class);
     delete.setQuery(query);
     delete.delete(deleteResult -> {

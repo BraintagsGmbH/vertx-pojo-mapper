@@ -15,10 +15,6 @@ package de.braintags.io.vertx.pojomapper;
 import de.braintags.io.vertx.pojomapper.annotation.KeyGenerator;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryLogicTranslator;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTranslator;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.exception.UnsupportedKeyGenerator;
 import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
@@ -178,20 +174,6 @@ public interface IDataStore {
    * @return the database specific client
    */
   Object getClient();
-
-  /**
-   * Get the instance, which translates {@link QueryLogic} into datastore specific idioms
-   * 
-   * @return
-   */
-  IQueryLogicTranslator getQueryLogicTranslator();
-
-  /**
-   * Get the instance, which translates {@link QueryOperator} into datastore specific idioms
-   * 
-   * @return
-   */
-  IQueryOperatorTranslator getQueryOperatorTranslator();
 
   /**
    * Get an instance of {@link IEncoder} with the given name. Encoders to be used can be defined by the

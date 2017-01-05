@@ -45,8 +45,8 @@ public class SqlQueryResult<T> extends AbstractQueryResult<T> {
    * @param query
    *          the {@link SqlQueryRambler}
    */
-  public SqlQueryResult(ResultSet resultSet, MySqlDataStore store, IMapper mapper, SqlQueryRambler query) {
-    super(store, mapper, resultSet.getNumRows(), query.getQueryExpression());
+  public SqlQueryResult(ResultSet resultSet, MySqlDataStore store, IMapper mapper, SqlExpression statement) {
+    super(store, mapper, resultSet.getNumRows(), statement);
     this.resultSet = resultSet;
   }
 

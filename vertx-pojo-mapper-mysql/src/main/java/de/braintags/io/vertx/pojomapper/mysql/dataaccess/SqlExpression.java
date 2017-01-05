@@ -13,17 +13,31 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.dataaccess;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.QueryExpressionBuildException;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryLogicException;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryOperatorException;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition.SortArgument;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlMapper;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlDistanceSearchFunction;
-import de.braintags.io.vertx.pojomapper.typehandler.IFieldParameterResult;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 
 /**
@@ -34,11 +48,11 @@ import io.vertx.core.json.JsonArray;
  * 
  */
 
-public class SqlExpression implements IQueryExpression {
+public class SqlExpression extends AbstractQueryExpression {
   private static final String SELECT_STATEMENT = "SELECT %s from %s";
   private static final String DELETE_STATEMENT = "DELETE from %s";
   private static final String COUNT_STATEMENT = "SELECT count(*) from %s";
-  private IMapper mapper;
+  private IMapper<?> mapper;
 
   private String nativeCommand = null;
   private StringBuilder select = new StringBuilder();
@@ -50,26 +64,24 @@ public class SqlExpression implements IQueryExpression {
   private StringBuilder whereClause = new StringBuilder();
   private StringBuilder orderByClause = new StringBuilder();
   private JsonArray parameters = new JsonArray();
-  private Deque<Connector> connectorDeque = new ArrayDeque<Connector>();
-  private int openedParenthesis;
-
-  /**
-   * Used to render the propriate statements which will be executed in the database later
-   * 
-   * @param mapper
-   *          the underlaying mapper, to retrive the name of the table in the database
-   */
-  public SqlExpression() {
-    connectorDeque.addLast(new Connector("AND"));
-  }
 
   @Override
-  public void setMapper(IMapper mapper) {
+  public void setMapper(IMapper<?> mapper) {
     this.mapper = mapper;
     select.append(
-        String.format(SELECT_STATEMENT, ((SqlMapper) mapper).getQueryFieldNames(), mapper.getTableInfo().getName()));
+        String.format(SELECT_STATEMENT, ((SqlMapper<?>) mapper).getQueryFieldNames(), mapper.getTableInfo().getName()));
     delete.append(String.format(DELETE_STATEMENT, mapper.getTableInfo().getName()));
     count.append(String.format(COUNT_STATEMENT, mapper.getTableInfo().getName()));
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#getMapper()
+   */
+  @Override
+  public IMapper<?> getMapper() {
+    return mapper;
   }
 
   /*
@@ -87,119 +99,259 @@ public class SqlExpression implements IQueryExpression {
     }
   }
 
-  /**
-   * Add a text part into the where clause
+  /*
+   * (non-Javadoc)
    * 
-   * @param text
-   *          the text to be added
-   * @return the SqlExpression itself for fluent usage
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#buildQueryExpression(de.braintags.io.vertx.
+   * pojomapper.dataaccess.query.IQueryPart)
    */
-  public SqlExpression addWhere(String text) {
-    whereClause.append(text);
-    return this;
+  @Override
+  public void buildQueryExpression(IQueryPart queryPart, Handler<AsyncResult<Void>> handler) {
+    internalBuildSearchCondition(queryPart, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        SqlWhereFragment fragment = result.result();
+        whereClause.append(fragment.whereClause);
+        parameters.addAll(fragment.parameters);
+        handler.handle(Future.succeededFuture());
+      }
+    });
+    // TODO order by
   }
 
   /**
-   * Start an AND / OR block
+   * Recursive method to build the query parts into the native search condition of the query
    * 
-   * @param connector
-   *          the connector AND / OR
-   * @param openParenthesis
-   *          info, wether a parenthesis shall be opened
-   * @return the SqlExpression itself for fluent usage
+   * @param queryPart
+   * @param handler
    */
-  @Override
-  public SqlExpression startConnectorBlock(String connector, boolean openParenthesis) {
-    connectorDeque.addLast(new Connector(connector));
-    if (whereClause.length() > 0)
-      whereClause.append(" ").append(connector);
-    if (openParenthesis) {
-      openParenthesis();
+  private void internalBuildSearchCondition(IQueryPart queryPart, Handler<AsyncResult<SqlWhereFragment>> handler) {
+    if (queryPart instanceof IQueryCondition) {
+      parseQueryCondition((IQueryCondition) queryPart, result -> {
+        if (result.failed()) {
+          handler.handle(Future.failedFuture(result.cause()));
+        } else {
+          handler.handle(Future.succeededFuture(result.result()));
+        }
+      });
+    } else if (queryPart instanceof IQueryContainer) {
+      parseQueryContainer((IQueryContainer) queryPart, result -> {
+        if (result.failed()) {
+          handler.handle(Future.failedFuture(result.cause()));
+        } else {
+          handler.handle(Future.succeededFuture(result.result()));
+        }
+      });
     }
-    return this;
   }
 
   /**
-   * Append an opening parenthesis and handle the counter for open parenthesis
-   */
-  @Override
-  public IQueryExpression openParenthesis() {
-    whereClause.append(" ( ");
-    ++openedParenthesis;
-    return this;
-  }
-
-  /**
-   * Append a closing parenthesis and handle the counter for open parenthesis
-   */
-  @Override
-  public IQueryExpression closeParenthesis() {
-    whereClause.append(" ) ");
-    --openedParenthesis;
-    if (openedParenthesis < 0)
-      throw new IllegalArgumentException("closed more parenthesis than opened before");
-    return this;
-  }
-
-  /**
-   * Stop the current connector block
+   * Parses an {@link IQueryCondition}. The operator and value will be transformed into a format fitting the SQL
+   * database
    * 
-   * @return the SqlExpression itself for fluent usage
+   * @param queryCondition
+   * @param handler
    */
-  @Override
-  public SqlExpression stopConnectorBlock() {
-    connectorDeque.removeLast();
-    return this;
-  }
-
-  /**
-   * add a query expression
-   * 
-   * @param fieldName
-   *          the name to search in
-   * @param logic
-   *          the logic
-   * @param value
-   *          the value
-   * @return the SqlExpression itself for fluent usage
-   */
-  @Override
-  public SqlExpression addQuery(String fieldName, String logic, Object value) {
-    Connector conn = connectorDeque.getLast();
-    if (conn.arguments > 0)
-      whereClause.append(" ").append(conn.conn);
-    if (logic.equalsIgnoreCase("IN") || logic.equalsIgnoreCase("NOT IN")) {
-      addQueryIn(fieldName, logic, (JsonArray) value);
-    } else if (value instanceof SqlDistanceSearchFunction) {
-      whereClause.append(" ").append(((SqlDistanceSearchFunction) value).getFunctionSequence());
-      parameters.add(((SqlDistanceSearchFunction) value).getValue());
+  private void parseQueryCondition(IQueryCondition queryCondition, Handler<AsyncResult<SqlWhereFragment>> handler) {
+    if (queryCondition.getValue() != null) {
+      transformValue(queryCondition.getField(), queryCondition.getOperator(), queryCondition.getValue(), result -> {
+        if (result.failed()) {
+          handler.handle(Future.failedFuture(result.cause()));
+        } else {
+          Object parsedValue = result.result();
+          String parsedOperator;
+          try {
+            parsedOperator = transformOperator(queryCondition.getOperator());
+          } catch (UnknownQueryOperatorException e) {
+            handler.handle(Future.failedFuture(e));
+            return;
+          }
+          SqlWhereFragment fragment = handleParsedCondition(queryCondition.getField(), parsedOperator, parsedValue);
+          handler.handle(Future.succeededFuture(fragment));
+        }
+      });
     } else {
-      whereClause.append(" ").append(fieldName).append(" ").append(logic).append(" ?");
-      parameters.add(value);
+      // special handling for NULL values
+      SqlWhereFragment fragment = new SqlWhereFragment();
+      fragment.whereClause.append(queryCondition.getField()).append(" ");
+      if (queryCondition.getOperator() == QueryOperator.EQUALS) {
+        fragment.whereClause.append("IS NULL");
+      } else if (queryCondition.getOperator() == QueryOperator.NOT_EQUALS) {
+        fragment.whereClause.append("IS NOT NULL");
+      } else {
+        handler.handle(Future.failedFuture("Invalid 'null' value for operator " + queryCondition.getOperator()));
+        return;
+      }
+      handler.handle(Future.succeededFuture(fragment));
     }
-    conn.arguments++;
-    return this;
   }
 
-  private void addQueryIn(String fieldName, String logic, JsonArray values) {
-    whereClause.append(" ").append(fieldName).append(" ").append(logic).append(" ( ");
-    for (int i = 0; i < values.size(); i++) {
-      whereClause.append(i == 0 ? "?" : ", ?");
-      parameters.add(values.getValue(i));
+  /**
+   * Creates the final clause, handling different parsed values like collections for IN queries, or distance search
+   * functions
+   * 
+   * @param field
+   *          the field of this clause
+   * @param operator
+   *          the parsed operator
+   * @param valueResult
+   *          the parsed value
+   * @return
+   */
+  private SqlWhereFragment handleParsedCondition(String field, String operator, Object valueResult) {
+    SqlWhereFragment fragment = new SqlWhereFragment();
+    if (valueResult instanceof SqlDistanceSearchFunction) {
+      fragment.whereClause.append(" ").append(((SqlDistanceSearchFunction) valueResult).getFunctionSequence());
+      fragment.parameters.add(((SqlDistanceSearchFunction) valueResult).getValue());
+    } else {
+      fragment.whereClause.append(field).append(" ");
+      fragment.whereClause.append(operator).append(" ");
+      if (valueResult instanceof Collection<?>) {
+        fragment.whereClause.append("(");
+        Iterator<?> it = ((Collection<?>) valueResult).iterator();
+        while (it.hasNext()) {
+          fragment.whereClause.append("?");
+          fragment.parameters.add(it.next());
+          if (it.hasNext())
+            fragment.whereClause.append(", ");
+        }
+        fragment.whereClause.append(")");
+      } else {
+        fragment.whereClause.append("?");
+        fragment.parameters.add(valueResult);
+      }
     }
-    whereClause.append(" ) ");
+    return fragment;
+  }
+
+  /**
+   * Parses the query operator into native SQL format
+   * 
+   * @param operator
+   * @return
+   * @throws UnknownQueryOperatorException
+   */
+  private String transformOperator(QueryOperator operator) throws UnknownQueryOperatorException {
+    switch (operator) {
+    case EQUALS:
+      return "=";
+    case NOT_EQUALS:
+      return "!=";
+    case LARGER:
+      return ">";
+    case LARGER_EQUAL:
+      return ">=";
+    case SMALLER:
+      return "<";
+    case SMALLER_EQUAL:
+    case NEAR:
+      return "<=";
+    case IN:
+      return "IN";
+    case NOT_IN:
+      return "NOT IN";
+    case STARTS:
+    case ENDS:
+    case CONTAINS:
+      return "LIKE";
+    default:
+      throw new UnknownQueryOperatorException(operator);
+    }
   }
 
   /*
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#addQuery(de.braintags.io.vertx.pojomapper.
-   * typehandler.IFieldParameterResult)
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#transformValue(java.lang.String,
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator, java.lang.Object, io.vertx.core.Handler)
    */
   @Override
-  public IQueryExpression addQuery(IFieldParameterResult fpr) {
-    return addQuery(fpr.getColName(), fpr.getOperator(), fpr.getValue());
+  protected void transformValue(String fieldName, QueryOperator operator, Object value,
+      Handler<AsyncResult<Object>> handler) {
+    super.transformValue(fieldName, operator, value, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        Object transformedValue = result.result();
+        switch (operator) {
+        case CONTAINS:
+          transformedValue = "%" + value + "%";
+          break;
+        case STARTS:
+          transformedValue = value + "%";
+          break;
+        case ENDS:
+          transformedValue = "%" + value;
+          break;
+        default:
+          transformedValue = value;
+          break;
+        }
+        handler.handle(Future.succeededFuture(transformedValue));
+      }
+    });
+  }
+
+  /**
+   * Parses the container part of a search condition. Loops through the content of the container and connects each
+   * resulting condition with the specified connector.
+   * 
+   * @param container
+   * @param handler
+   */
+  private void parseQueryContainer(IQueryContainer container, Handler<AsyncResult<SqlWhereFragment>> handler) {
+    SqlWhereFragment fragment = new SqlWhereFragment();
+    fragment.whereClause.append("(");
+
+    @SuppressWarnings("rawtypes")
+    List<Future> futures = new ArrayList<>();
+    for (IQueryPart queryPart : container.getContent()) {
+      Future<SqlWhereFragment> future = Future.future();
+      internalBuildSearchCondition(queryPart, future.completer());
+    }
+
+    CompositeFuture.all(futures).setHandler(result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        Iterator<Object> resultIterator = result.result().list().iterator();
+        while (resultIterator.hasNext()) {
+          SqlWhereFragment subFragment = (SqlWhereFragment) resultIterator.next();
+          fragment.whereClause.append(subFragment.whereClause);
+          fragment.parameters.addAll(subFragment.parameters);
+          if (resultIterator.hasNext())
+            try {
+              fragment.whereClause.append(" ").append(translateConnector(container.getConnector())).append(" ");
+            } catch (QueryExpressionBuildException e) {
+              handler.handle(Future.failedFuture(e));
+              return;
+            }
+        }
+        whereClause.append(")");
+        handler.handle(Future.succeededFuture(fragment));
+      }
+    });
+  }
+
+  /**
+   * Translate the connector into native SQL format
+   * 
+   * @param connector
+   * @return the native SQL connector value
+   * @throws QueryExpressionBuildException
+   */
+  private String translateConnector(QueryLogic connector) throws QueryExpressionBuildException {
+    switch (connector) {
+    case AND:
+      return "AND";
+    case OR:
+      return "OR";
+    default:
+      throw new UnknownQueryLogicException(connector);
+    }
   }
 
   /**
@@ -278,10 +430,7 @@ public class SqlExpression implements IQueryExpression {
 
   private void appendWhereClause(StringBuilder complete) {
     if (whereClause.length() > 0) {
-      complete.append(" WHERE").append(whereClause);
-      int parCount = openedParenthesis;
-      while (parCount-- > 0)
-        complete.append(" )");
+      complete.append(" WHERE ").append(whereClause);
     }
   }
 
@@ -311,24 +460,28 @@ public class SqlExpression implements IQueryExpression {
    * @param offset
    *          the first record
    */
+  @Override
   public void setLimit(int limit, int offset) {
     this.limit = limit;
     this.offset = offset;
 
   }
 
-  class Connector {
-    String conn;
-    int arguments;
-
-    Connector(String connector) {
-      this.conn = connector;
-    }
-  }
-
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
   @Override
   public String toString() {
     return getSelectExpression() + " | " + getDeleteExpression() + " | " + getParameters();
   }
 
+  /**
+   * POJO to hold the condition and optionally its parameters of a single fragment of the search condition
+   */
+  private static class SqlWhereFragment {
+    private StringBuilder whereClause = new StringBuilder();
+    private JsonArray parameters = new JsonArray();
+  }
 }

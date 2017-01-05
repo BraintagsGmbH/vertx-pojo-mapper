@@ -12,13 +12,14 @@
  */
 package de.braintags.io.vertx.pojomapper.util;
 
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.isEqual;
+
 import java.util.Arrays;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition;
 import de.braintags.io.vertx.pojomapper.exception.NoSuchRecordException;
 import de.braintags.io.vertx.util.IteratorAsync;
 import io.vertx.core.AsyncResult;
@@ -53,7 +54,7 @@ public class QueryHelper {
   public static final <T> void findRecordById(IDataStore datastore, Class<T> mapperClass, String id,
       Handler<AsyncResult<T>> handler) {
     IQuery<T> query = datastore.createQuery(mapperClass);
-    query.setRootQueryPart(new FieldCondition(query.getMapper().getIdField().getName(), id));
+    query.setRootQueryPart(isEqual(query.getMapper().getIdField().getName(), id));
     executeToFirstRecord(query, handler);
   }
 

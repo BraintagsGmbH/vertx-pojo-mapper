@@ -18,6 +18,7 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.QueryCountResult;
 import de.braintags.io.vertx.pojomapper.exception.QueryException;
@@ -52,15 +53,9 @@ public class MongoQuery<T> extends Query<T> {
   }
 
   @Override
-  public void internalExecute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  public void internalExecute(IQueryExpression queryExpression, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     try {
-      createQueryDefinition(result -> {
-        if (result.failed()) {
-          resultHandler.handle(Future.failedFuture(result.cause()));
-        } else {
-          doFind(result.result(), resultHandler);
-        }
-      });
+      doFind((MongoQueryExpression) queryExpression, resultHandler);
     } catch (Exception e) {
       Future<IQueryResult<T>> future = Future.failedFuture(e);
       resultHandler.handle(future);
@@ -78,61 +73,54 @@ public class MongoQuery<T> extends Query<T> {
   }
 
   @Override
-  public void internalExecuteCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+  public void internalExecuteCount(IQueryExpression queryExpression,
+      Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     try {
-      createQueryDefinition(result -> {
-        if (result.failed()) {
-          resultHandler.handle(Future.failedFuture(result.cause()));
-        } else {
-          doFindCount(result.result(), resultHandler);
-        }
-      });
+      doFindCount(queryExpression, resultHandler);
     } catch (Exception e) {
       Future<IQueryCountResult> future = Future.failedFuture(e);
       resultHandler.handle(future);
     }
   }
 
-  private void doFindCount(MongoQueryRambler rambler, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+  private void doFindCount(IQueryExpression queryExpression, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     String column = getMapper().getTableInfo().getName();
-    mongoClient.count(column, ((MongoQueryExpression) rambler.getQueryExpression()).getQueryDefinition(), qResult -> {
+    mongoClient.count(column, ((MongoQueryExpression) queryExpression).getQueryDefinition(), qResult -> {
       if (qResult.failed()) {
         Future<IQueryCountResult> future = Future.failedFuture(qResult.cause());
         resultHandler.handle(future);
       } else {
-        QueryCountResult qcr = new QueryCountResult(getMapper(), getDataStore(), qResult.result(),
-            rambler.getQueryExpression());
+        QueryCountResult qcr = new QueryCountResult(getMapper(), getDataStore(), qResult.result(), queryExpression);
         Future<IQueryCountResult> future = Future.succeededFuture(qcr);
         resultHandler.handle(future);
       }
     });
   }
 
-  private void doFind(MongoQueryRambler rambler, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  private void doFind(MongoQueryExpression queryExpression, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     String column = getMapper().getTableInfo().getName();
     FindOptions fo = new FindOptions();
     fo.setSkip(getStart());
     fo.setLimit(getLimit());
-    MongoQueryExpression mq = (MongoQueryExpression) rambler.getQueryExpression();
-    if (mq.getSortArguments() != null && !mq.getSortArguments().isEmpty()) {
-      fo.setSort(mq.getSortArguments());
+    if (queryExpression.getSortArguments() != null && !queryExpression.getSortArguments().isEmpty()) {
+      fo.setSort(queryExpression.getSortArguments());
     }
-    mongoClient.findWithOptions(column, mq.getQueryDefinition(), fo, qResult -> {
+    mongoClient.findWithOptions(column, queryExpression.getQueryDefinition(), fo, qResult -> {
       if (qResult.failed()) {
-        Future<IQueryResult<T>> future = Future.failedFuture(new QueryException(mq, qResult.cause()));
+        Future<IQueryResult<T>> future = Future.failedFuture(new QueryException(queryExpression, qResult.cause()));
         resultHandler.handle(future);
       } else {
-        createQueryResult(qResult.result(), rambler, resultHandler);
+        createQueryResult(qResult.result(), queryExpression, resultHandler);
       }
     });
   }
 
-  private void createQueryResult(List<JsonObject> findList, MongoQueryRambler rambler,
+  private void createQueryResult(List<JsonObject> findList, MongoQueryExpression queryExpression,
       Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     MongoQueryResult<T> qR = new MongoQueryResult<>(findList, (MongoDataStore) getDataStore(),
-        (MongoMapper) getMapper(), rambler);
+        (MongoMapper) getMapper(), queryExpression);
     if (isReturnCompleteCount()) {
       if (getStart() == 0 && getLimit() > 0 && qR.size() < getLimit()) {
         qR.setCompleteResult(qR.size());
@@ -164,32 +152,14 @@ public class MongoQuery<T> extends Query<T> {
     });
   }
 
-  /**
-   * Create the {@link JsonObject} which then contains the definition for the query, which will be executed by
-   * {@link MongoClient}
-   * 
-   * @param resultHandler
-   *          the resulthandler which will receive notification
-   */
-  void createQueryDefinition(Handler<AsyncResult<MongoQueryRambler>> resultHandler) {
-    MongoQueryRambler rambler = new MongoQueryRambler();
-    executeQueryRambler(rambler, result -> {
-      if (result.failed()) {
-        resultHandler.handle(Future.failedFuture(result.cause()));
-      } else {
-        resultHandler.handle(Future.succeededFuture(rambler));
-      }
-    });
-  }
-
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#parent()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#buildQueryExperssion(io.vertx.core.Handler)
    */
   @Override
-  public Object parent() {
-    return null;
+  protected void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler) {
+    // TODO
   }
 
 }

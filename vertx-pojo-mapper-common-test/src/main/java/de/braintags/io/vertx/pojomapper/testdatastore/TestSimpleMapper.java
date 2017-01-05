@@ -13,10 +13,11 @@
 
 package de.braintags.io.vertx.pojomapper.testdatastore;
 
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.isEqual;
+
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleMapper;
@@ -65,7 +66,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
         context.assertTrue(sm.equals(result.result()));
 
         // search inside name field
-        query.setRootQueryPart(new FieldCondition("name", "testNameModified"));
+        query.setRootQueryPart(isEqual("name", "testNameModified"));
         try {
           ResultContainer resultContainer2 = find(context, query, 1);
           resultContainer2.queryResult.iterator().next(res2 -> {

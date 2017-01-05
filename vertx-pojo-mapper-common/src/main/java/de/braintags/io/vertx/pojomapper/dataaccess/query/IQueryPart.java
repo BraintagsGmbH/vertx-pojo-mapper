@@ -9,6 +9,6 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query;
  * @author sschmitt
  */
 
-public interface IQueryPart extends IRamblerSource {
+public interface IQueryPart {
 
 }

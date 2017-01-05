@@ -16,11 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
 
 /**
  * Implementation of {@link ISortDefinition}
@@ -70,22 +66,6 @@ public class SortDefinition<T> implements ISortDefinition<T> {
   public ISortDefinition<T> addSort(String sortField, boolean ascending) {
     sortArgs.add(new SortArgument(sortField, ascending));
     return this;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IRamblerSource#applyTo(de.braintags.io.vertx.pojomapper.
-   * dataaccess.query.IQueryRambler, io.vertx.core.Handler)
-   */
-  @Override
-  public void applyTo(IQueryRambler ramblerHandler, Handler<AsyncResult<Void>> resultHandler) {
-    ramblerHandler.apply(this, result -> {
-      if (result.failed())
-        resultHandler.handle(Future.failedFuture(result.cause()));
-      else
-        resultHandler.handle(Future.succeededFuture());
-    });
   }
 
   @Override

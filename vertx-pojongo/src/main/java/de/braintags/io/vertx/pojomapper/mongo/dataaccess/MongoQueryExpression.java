@@ -5,15 +5,11 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.typehandler.IFieldParameterResult;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -23,11 +19,9 @@ import io.vertx.core.json.JsonObject;
  */
 
 public class MongoQueryExpression implements IQueryExpression {
-  private JsonObject    qDef          = new JsonObject();
-  private Object        currentObject = qDef;
-  private Deque<Object> deque         = new ArrayDeque<>();
-  private IMapper       mapper;
-  private JsonObject    sortArguments;
+  private JsonObject qDef = new JsonObject();
+  private IMapper<?> mapper;
+  private JsonObject sortArguments;
 
   /**
    * Get the original Query definition for Mongo
@@ -40,103 +34,37 @@ public class MongoQueryExpression implements IQueryExpression {
 
   /*
    * (non-Javadoc)
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#startConnectorBlock(java.lang.String,
-   * boolean)
-   */
-  @Override
-  public IQueryExpression startConnectorBlock(String connector, boolean openParenthesis) {
-    JsonArray array = new JsonArray();
-    add(connector, array);
-    deque.addLast(currentObject);
-    currentObject = array;
-    if (openParenthesis) {
-      openParenthesis();
-    }
-    return this;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#stopConnectorBlock()
-   */
-  @Override
-  public IQueryExpression stopConnectorBlock() {
-    currentObject = deque.pollLast();
-    return this;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#openParenthesis()
-   */
-  @Override
-  public IQueryExpression openParenthesis() {
-    return this;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#closeParenthesis()
-   */
-  @Override
-  public IQueryExpression closeParenthesis() {
-    return this;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#addQuery(java.lang.String,
-   * java.lang.String, java.lang.Object)
-   */
-  @Override
-  public IQueryExpression addQuery(String fieldName, String logic, Object value) {
-    if (logic == null) {
-      add(fieldName, value);
-    } else {
-      JsonObject arg = new JsonObject().put(logic, value);
-      if ("$regex".equals(logic)) { // adding option for case insensitive query
-        arg.put("$options", "i");
-      }
-      add(fieldName, arg);
-    }
-    return this;
-  }
-
-  /*
-   * (non-Javadoc)
+   * 
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#setMapper(de.braintags.io.vertx.pojomapper.
    * mapping.IMapper)
    */
   @Override
-  public void setMapper(IMapper mapper) {
+  public void setMapper(IMapper<?> mapper) {
     this.mapper = mapper;
-  }
-
-  private void add(String key, Object objectToAdd) {
-    if (currentObject instanceof JsonObject) {
-      ((JsonObject) currentObject).put(key, objectToAdd);
-    } else if (currentObject instanceof JsonArray) {
-      JsonObject ob = new JsonObject().put(key, objectToAdd);
-      ((JsonArray) currentObject).add(ob);
-    } else
-      throw new UnsupportedOperationException("no definition to add for " + currentObject.getClass().getName());
-  }
-
-  @Override
-  public String toString() {
-    return String.valueOf(qDef) + " | sort: " + String.valueOf(sortArguments);
   }
 
   /*
    * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#buildQueryExpression(de.braintags.io.vertx.
+   * pojomapper.dataaccess.query.IQueryPart)
+   */
+  @Override
+  public void buildQueryExpression(IQueryPart queryPart) {
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#addSort(de.braintags.io.vertx.pojomapper.
    * dataaccess.query.ISortDefinition)
    */
   @Override
-  public IQueryExpression addSort(ISortDefinition< ? > sortDef) {
-    SortDefinition< ? > sd = (SortDefinition< ? >) sortDef;
+  public IQueryExpression addSort(ISortDefinition<?> sortDef) {
+    SortDefinition<?> sd = (SortDefinition<?>) sortDef;
     if (!sd.getSortArguments().isEmpty()) {
       sortArguments = new JsonObject();
       sd.getSortArguments().forEach(sda -> sortArguments.put(sda.fieldName, sda.ascending ? 1 : -1));
@@ -155,6 +83,7 @@ public class MongoQueryExpression implements IQueryExpression {
 
   /*
    * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#setNativeCommand(java.lang.Object)
    */
   @Override
@@ -168,14 +97,9 @@ public class MongoQueryExpression implements IQueryExpression {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#addQuery(de.braintags.io.vertx.pojomapper.
-   * typehandler.IFieldParameterResult)
-   */
   @Override
-  public IQueryExpression addQuery(IFieldParameterResult fpr) {
-    return addQuery(fpr.getColName(), fpr.getOperator(), fpr.getValue());
+  public String toString() {
+    return String.valueOf(qDef) + " | sort: " + String.valueOf(sortArguments);
   }
+
 }

@@ -10,9 +10,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IRamblerSource;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -55,22 +53,54 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
       } else {
-        try {
-          internalExecute(resultHandler);
-        } catch (Exception e) {
-          LOGGER.debug("error occured", e);
-          resultHandler.handle(Future.failedFuture(e));
-        }
+        buildQueryExpression(result -> {
+          if (result.failed()) {
+            resultHandler.handle(Future.failedFuture(result.cause()));
+          } else {
+            IQueryExpression queryExpression = result.result();
+            try {
+              internalExecute(queryExpression, resultHandler);
+            } catch (Exception e) {
+              resultHandler.handle(Future.failedFuture(e));
+            }
+          }
+        });
       }
     });
   }
 
+  public void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler) {
+    try {
+      IQueryExpression expression = getQueryExpressionClass().newInstance();
+      expression.setMapper(getMapper());
+      expression.setLimit(getLimit(), getStart());
+      expression.setNativeCommand(getNativeCommand());
+      if (getRootQueryPart() != null) {
+        expression.buildQueryExpression(getRootQueryPart(), result -> {
+          if (result.failed())
+            resultHandler.handle(Future.failedFuture(result.cause()));
+          else
+            resultHandler.handle(Future.succeededFuture(expression));
+        });
+      } else {
+        resultHandler.handle(Future.succeededFuture(expression));
+      }
+    } catch (Exception e) {
+      resultHandler.handle(Future.failedFuture(e));
+    }
+  }
+
+  protected abstract Class<? extends IQueryExpression> getQueryExpressionClass();
+
   /**
    * This method is called after the sync call to execute the query
    * 
+   * @param queryExpression
+   * 
    * @param resultHandler
    */
-  protected abstract void internalExecute(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
+  protected abstract void internalExecute(IQueryExpression queryExpression,
+      Handler<AsyncResult<IQueryResult<T>>> resultHandler);
 
   /*
    * (non-Javadoc)
@@ -83,11 +113,19 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
       } else {
-        try {
-          internalExecuteCount(resultHandler);
-        } catch (Exception e) {
-          resultHandler.handle(Future.failedFuture(e));
-        }
+        buildQueryExpression(result -> {
+          if (result.failed()) {
+            resultHandler.handle(Future.failedFuture(result.cause()));
+          } else {
+            IQueryExpression queryExpression = result.result();
+            try {
+              internalExecuteCount(queryExpression, resultHandler);
+            } catch (Exception e) {
+              LOGGER.debug("error occured", e);
+              resultHandler.handle(Future.failedFuture(e));
+            }
+          }
+        });
       }
     });
   }
@@ -95,67 +133,12 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   /**
    * This method is called after the sync call to execute count the query
    * 
-   * @param resultHandler
-   */
-  protected abstract void internalExecuteCount(Handler<AsyncResult<IQueryCountResult>> resultHandler);
-
-  /**
-   * Traverses through all elements of the current definition, which implement {@link IRamblerSource} and executes the
-   * methods of the {@link IQueryRambler}
+   * @param queryExpression
    * 
-   * @param rambler
-   *          the rambler to be filled
    * @param resultHandler
-   *          the handler to be informed about the result
    */
-  public void executeQueryRambler(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
-    rambler.start(this);
-    if (getNativeCommand() == null) {
-      handleFilter(rambler, fr -> {
-        if (fr.failed()) {
-          resultHandler.handle(fr);
-        } else {
-          handleSortDefs(rambler, sd -> {
-            if (sd.failed()) {
-              resultHandler.handle(sd);
-            } else {
-              finishCounter(rambler, resultHandler);
-            }
-          });
-        }
-      });
-    } else {
-      resultHandler.handle(Future.succeededFuture());
-    }
-  }
-
-  private void handleSortDefs(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
-    sortDefs.applyTo(rambler, result -> {
-      if (result.failed())
-        resultHandler.handle(Future.failedFuture(result.cause()));
-      else
-        resultHandler.handle(Future.succeededFuture());
-    });
-  }
-
-  private void handleFilter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
-    if (rootQueryPart != null) {
-      rootQueryPart.applyTo(rambler, apr -> {
-        if (apr.failed())
-          resultHandler.handle(Future.failedFuture(apr.cause()));
-        else
-          resultHandler.handle(Future.succeededFuture());
-      });
-    } else {
-      // no query
-      resultHandler.handle(Future.succeededFuture());
-    }
-  }
-
-  private void finishCounter(IQueryRambler rambler, Handler<AsyncResult<Void>> resultHandler) {
-    rambler.stop(this);
-    resultHandler.handle(Future.succeededFuture());
-  }
+  protected abstract void internalExecuteCount(IQueryExpression queryExpression,
+      Handler<AsyncResult<IQueryCountResult>> resultHandler);
 
   /*
    * (non-Javadoc)
@@ -268,6 +251,16 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   @Override
   public void setRootQueryPart(IQueryPart rootQueryPart) {
     this.rootQueryPart = rootQueryPart;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#getRootQueryPart()
+   */
+  @Override
+  public IQueryPart getRootQueryPart() {
+    return rootQueryPart;
   }
 
 }

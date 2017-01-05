@@ -19,8 +19,6 @@ import java.util.Map;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.KeyGenerator;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryLogicTranslator;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTranslator;
 import de.braintags.io.vertx.pojomapper.exception.UnsupportedKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.IDataStoreSynchronizer;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
@@ -49,8 +47,6 @@ public abstract class AbstractDataStore implements IDataStore {
   private IDataStoreSynchronizer dataStoreSynchronizer;
   private Map<String, IKeyGenerator> keyGeneratorMap = new HashMap<>();
   private ITriggerContextFactory triggerContextFactory = new TriggerContextFactory();
-  private IQueryLogicTranslator logicTranslator;
-  private IQueryOperatorTranslator queryOperatorTranslator;
   private Map<String, IEncoder> encoderMap = new HashMap<>();
 
   /**
@@ -61,12 +57,9 @@ public abstract class AbstractDataStore implements IDataStore {
    * @param properties
    *          the properties by which the new instance is created
    */
-  public AbstractDataStore(Vertx vertx, JsonObject properties, IQueryLogicTranslator logicTranslator,
-      IQueryOperatorTranslator queryOperatorTranslator) {
+  public AbstractDataStore(Vertx vertx, JsonObject properties) {
     this.vertx = vertx;
     this.properties = properties;
-    this.logicTranslator = logicTranslator;
-    this.queryOperatorTranslator = queryOperatorTranslator;
     initSupportedKeyGenerators();
   }
 
@@ -184,26 +177,6 @@ public abstract class AbstractDataStore implements IDataStore {
   @Override
   public final void setTriggerContextFactory(ITriggerContextFactory triggerContextFactory) {
     this.triggerContextFactory = triggerContextFactory;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getQueryLogicTranslator()
-   */
-  @Override
-  public IQueryLogicTranslator getQueryLogicTranslator() {
-    return logicTranslator;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getQueryOperatorTranslator()
-   */
-  @Override
-  public IQueryOperatorTranslator getQueryOperatorTranslator() {
-    return queryOperatorTranslator;
   }
 
   /**

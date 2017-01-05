@@ -12,13 +12,14 @@
  */
 package de.braintags.io.vertx.pojomapper.testdatastore;
 
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.isEqual;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniNumberMapper;
 import io.vertx.ext.unit.TestContext;
@@ -49,7 +50,7 @@ public class TestMassInsert extends DatastoreBaseTest {
       LOGGER.warn("size of writeresult is incorrect - checking records in datastore");
       // check wether records weren't written or "only" IWriteResult is incomplete
       IQuery<MiniNumberMapper> query = getDataStore(context).createQuery(MiniNumberMapper.class);
-      query.setRootQueryPart(new FieldCondition("name", "looper"));
+      query.setRootQueryPart(isEqual("name", "looper"));
       find(context, query, LOOP);
       context.assertEquals(LOOP, resultContainer.writeResult.size());
       context.fail("The write result hasn't got the right content, the records in the datastore are correct");

@@ -13,16 +13,20 @@
 
 package de.braintags.io.vertx.pojomapper.testdatastore;
 
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.contains;
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.in;
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.isEqual;
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.notEqual;
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.notIn;
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.QueryAnd.and;
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.QueryOr.or;
+
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.QueryAnd;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.QueryOr;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.SimpleMapper;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.EnumRecord;
@@ -45,12 +49,11 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     createDemoRecords(context);
 
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(new FieldCondition("name", "Dublette"));
+    query.setRootQueryPart(isEqual("name", "Dublette"));
     ResultContainer resultContainer = find(context, query, 2);
 
     query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(
-        new QueryOr(new FieldCondition("secondProperty", "erste"), new FieldCondition("secondProperty", "zweite")));
+    query.setRootQueryPart(or(isEqual("secondProperty", "erste"), isEqual("secondProperty", "zweite")));
     resultContainer = find(context, query, 2);
   }
 
@@ -59,8 +62,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     createDemoRecords(context);
 
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(
-        new QueryAnd(new FieldCondition("name", "Dublette"), new FieldCondition("secondProperty", "erste")));
+    query.setRootQueryPart(and(isEqual("name", "Dublette"), isEqual("secondProperty", "erste")));
     ResultContainer resultContainer = find(context, query, 1);
     logger.info(resultContainer.queryResult.getOriginalQuery().toString());
   }
@@ -70,8 +72,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     createDemoRecords(context);
 
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(
-        new QueryAnd(new FieldCondition("name", "Dublette"), new FieldCondition("secondProperty", "erste")));
+    query.setRootQueryPart(and(isEqual("name", "Dublette"), isEqual("secondProperty", "erste")));
     ResultContainer resultContainer = findCount(context, query, 1);
   }
 
@@ -79,11 +80,10 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testQueryMultipleFields(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(new FieldCondition("name", "Dublette"));
+    query.setRootQueryPart(isEqual("name", "Dublette"));
     ResultContainer resultContainer = find(context, query, 2);
 
-    query.setRootQueryPart(
-        new QueryAnd(new FieldCondition("name", "Dublette"), new FieldCondition("secondProperty", "erste")));
+    query.setRootQueryPart(and(isEqual("name", "Dublette"), isEqual("secondProperty", "erste")));
     resultContainer = find(context, query, 1);
   }
 
@@ -95,8 +95,8 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testAndOr(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(new QueryAnd(new FieldCondition("name", "AndOr"),
-        new QueryOr(new FieldCondition("secondProperty", "AndOr 1"), new FieldCondition("secondProperty", "AndOr 2"))));
+    query.setRootQueryPart(
+        and(isEqual("name", "AndOr"), or(isEqual("secondProperty", "AndOr 1"), isEqual("secondProperty", "AndOr 2"))));
     ResultContainer resultContainer = find(context, query, -1);
   }
 
@@ -108,7 +108,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     List<String> it = Arrays.asList("Dublette", "AndOr");
-    query.setRootQueryPart(new FieldCondition("name", QueryOperator.IN, it));
+    query.setRootQueryPart(in("name", it));
     ResultContainer resultContainer = find(context, query, 5);
   }
 
@@ -120,7 +120,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     List<String> it = Arrays.asList("erste", "zweite");
-    query.setRootQueryPart(new FieldCondition("secondProperty", QueryOperator.NOT_IN, it));
+    query.setRootQueryPart(notIn("secondProperty", it));
     ResultContainer resultContainer = find(context, query, 6);
   }
 
@@ -131,7 +131,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testIsNot(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(new FieldCondition("name", QueryOperator.NOT_EQUALS, "Dublette"));
+    query.setRootQueryPart(notEqual("name", "Dublette"));
     ResultContainer resultContainer = find(context, query, 6);
   }
 
@@ -142,7 +142,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testContains(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(new FieldCondition("secondProperty", QueryOperator.CONTAINS, "ab"));
+    query.setRootQueryPart(contains("secondProperty", "ab"));
     ResultContainer resultContainer = find(context, query, 3);
   }
 
@@ -153,7 +153,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testContainsCaseInsensitive(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(new FieldCondition("secondProperty", QueryOperator.CONTAINS, "AB"));
+    query.setRootQueryPart(contains("secondProperty", "AB"));
 
     ResultContainer resultContainer = find(context, query, 3);
   }
@@ -165,7 +165,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testStartsWith(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(new FieldCondition("secondProperty", QueryOperator.CONTAINS, "aa"));
+    query.setRootQueryPart(contains("secondProperty", "aa"));
 
     ResultContainer resultContainer = find(context, query, 3);
   }
@@ -174,7 +174,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testEndsWith(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(new FieldCondition("secondProperty", QueryOperator.CONTAINS, "cc"));
+    query.setRootQueryPart(contains("secondProperty", "cc"));
 
     ResultContainer resultContainer = find(context, query, 3);
   }
@@ -183,7 +183,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testFindLimit(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(new FieldCondition("secondProperty", QueryOperator.CONTAINS, "cc"));
+    query.setRootQueryPart(contains("secondProperty", "cc"));
     query.setLimit(2);
 
     ResultContainer resultContainer = find(context, query, 2);
@@ -206,7 +206,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testFindLimitGetCompleteCount(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(new FieldCondition("secondProperty", QueryOperator.CONTAINS, "cc"));
+    query.setRootQueryPart(contains("secondProperty", "cc"));
     query.setLimit(2);
     query.setReturnCompleteCount(true);
 
@@ -218,7 +218,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testFindLimitGetCompleteCountQueryStart(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(new FieldCondition("secondProperty", QueryOperator.CONTAINS, "cc"));
+    query.setRootQueryPart(contains("secondProperty", "cc"));
     query.setLimit(2);
     query.setStart(2);
     query.setReturnCompleteCount(true);
@@ -231,7 +231,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testFindSorted(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setRootQueryPart(new FieldCondition("secondProperty", QueryOperator.CONTAINS, "e"));
+    query.setRootQueryPart(contains("secondProperty", "e"));
     query.addSort("secondProperty", false);
     List<SimpleMapper> list = (List<SimpleMapper>) findAll(context, query);
     context.assertEquals(2, list.size(), "incorrect result");
@@ -243,7 +243,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testFindByEnum(TestContext context) {
     createDemoRecords(context);
     IQuery<EnumRecord> query = getDataStore(context).createQuery(EnumRecord.class);
-    query.setRootQueryPart(new FieldCondition("enumEnum", WriteAction.INSERT));
+    query.setRootQueryPart(isEqual("enumEnum", WriteAction.INSERT));
     List<EnumRecord> list = (List<EnumRecord>) findAll(context, query);
     list.forEach(sm -> logger.info(sm.enumEnum));
     context.assertEquals(1, list.size(), "incorrect result");
@@ -253,7 +253,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testFindByEnumContains(TestContext context) {
     createDemoRecords(context);
     IQuery<EnumRecord> query = getDataStore(context).createQuery(EnumRecord.class);
-    query.setRootQueryPart(new FieldCondition("enumEnum", QueryOperator.CONTAINS, "IN"));
+    query.setRootQueryPart(contains("enumEnum", "IN"));
     List<EnumRecord> list = (List<EnumRecord>) findAll(context, query);
     list.forEach(sm -> logger.info(sm.enumEnum));
     context.assertEquals(1, list.size(), "incorrect result");

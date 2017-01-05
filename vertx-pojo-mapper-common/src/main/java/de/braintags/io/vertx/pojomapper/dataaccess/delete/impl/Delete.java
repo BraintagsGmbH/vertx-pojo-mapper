@@ -13,6 +13,8 @@
 
 package de.braintags.io.vertx.pojomapper.dataaccess.delete.impl;
 
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.in;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,8 +26,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
@@ -206,7 +206,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   protected void deleteRecordsById(IField idField, List<Object> objectIds,
       Handler<AsyncResult<IDeleteResult>> resultHandler) {
     IQuery<T> q = getDataStore().createQuery(getMapperClass());
-    q.setRootQueryPart(new FieldCondition(idField.getName(), QueryOperator.IN, objectIds));
+    q.setRootQueryPart(in(idField.getName(), objectIds));
     deleteQuery(q, dr -> {
       if (dr.failed()) {
         resultHandler.handle(dr);

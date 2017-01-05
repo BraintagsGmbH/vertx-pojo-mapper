@@ -16,7 +16,6 @@ import java.lang.annotation.Annotation;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -77,16 +76,6 @@ public interface ITypeHandler extends Cloneable {
    *          the method will store the result inside the {@link ITypeHandlerResult}
    */
   void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler);
-
-  /**
-   * This method is called to transform the given {@link IFieldParameter} into the specific search idiom for the
-   * underlaying datastore
-   * 
-   * @param param
-   * @param handler
-   */
-  public void handleFieldParameter(IField field, IQueryCondition param,
-      Handler<AsyncResult<IFieldParameterResult>> handler);
 
   /**
    * Checks wether the given {@link IField} is matching the criteria in the current instance. The method returns a

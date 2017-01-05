@@ -18,7 +18,7 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query;
  * @author Michael Remme
  * 
  */
-public interface ISortDefinition<T> extends IRamblerSource {
+public interface ISortDefinition<T> {
 
   IQuery<T> parent();
 

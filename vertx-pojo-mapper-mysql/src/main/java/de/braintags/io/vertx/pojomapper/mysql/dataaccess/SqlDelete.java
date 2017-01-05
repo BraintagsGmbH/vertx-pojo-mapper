@@ -54,27 +54,26 @@ public class SqlDelete<T> extends Delete<T> {
   @Override
   protected void deleteQuery(IQuery<T> q, Handler<AsyncResult<IDeleteResult>> resultHandler) {
     SqlQuery<T> query = (SqlQuery<T>) q;
-    query.createQueryDefinition(qDefResult -> {
-      if (qDefResult.failed()) {
-        resultHandler.handle(Future.failedFuture(qDefResult.cause()));
+    query.buildQueryExpression(qExpResul -> {
+      if (qExpResul.failed()) {
+        resultHandler.handle(Future.failedFuture(qExpResul.cause()));
       } else {
-        SqlQueryRambler rambler = qDefResult.result();
-        handleDelete(rambler, resultHandler);
+        handleDelete((SqlExpression) qExpResul.result(), resultHandler);
       }
     });
   }
 
-  private void handleDelete(SqlQueryRambler rambler, Handler<AsyncResult<IDeleteResult>> resultHandler) {
-    SqlExpression expr = (SqlExpression) rambler.getQueryExpression();
-    SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), expr.getDeleteExpression(), expr.getParameters(), ur -> {
-      if (ur.failed()) {
-        resultHandler.handle(Future.failedFuture(new SqlException(rambler, ur.cause())));
-        return;
-      }
-      UpdateResult updateResult = ur.result();
-      SqlDeleteResult deleteResult = new SqlDeleteResult(getDataStore(), getMapper(), expr, updateResult);
-      resultHandler.handle(Future.succeededFuture(deleteResult));
-    });
+  private void handleDelete(SqlExpression expression, Handler<AsyncResult<IDeleteResult>> resultHandler) {
+    SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), expression.getDeleteExpression(),
+        expression.getParameters(), ur -> {
+          if (ur.failed()) {
+            resultHandler.handle(Future.failedFuture(new SqlException(expression, ur.cause())));
+            return;
+          }
+          UpdateResult updateResult = ur.result();
+          SqlDeleteResult deleteResult = new SqlDeleteResult(getDataStore(), getMapper(), expression, updateResult);
+          resultHandler.handle(Future.succeededFuture(deleteResult));
+        });
 
   }
 

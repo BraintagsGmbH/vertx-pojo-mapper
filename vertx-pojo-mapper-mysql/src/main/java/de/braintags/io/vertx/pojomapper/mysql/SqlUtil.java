@@ -25,7 +25,6 @@ import de.braintags.io.vertx.pojomapper.annotation.Indexes;
 import de.braintags.io.vertx.pojomapper.exception.DuplicateKeyException;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo;
 import de.braintags.io.vertx.pojomapper.mysql.exception.SqlException;
-import de.braintags.io.vertx.util.async.DefaultAsyncResult;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -88,7 +87,7 @@ public class SqlUtil {
       CompositeFuture cf = CompositeFuture.all(fl);
       cf.setHandler(result -> {
         if (result.failed()) {
-          handler.handle(DefaultAsyncResult.fail(result.cause()));
+          handler.handle(Future.failedFuture(result.cause()));
         } else {
           cf.list().forEach(f -> returnBuffer.appendString((String) f));
         }

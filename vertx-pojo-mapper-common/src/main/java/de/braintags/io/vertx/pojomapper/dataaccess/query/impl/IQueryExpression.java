@@ -12,11 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.typehandler.IFieldParameterResult;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * IQueryExpression is the datastore specific result of an executed {@link AbstractQueryRambler}, which later on is used
@@ -27,67 +27,13 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
  */
 public interface IQueryExpression {
 
-  /**
-   * Start an AND / OR block
-   * 
-   * @return the IQueryExpression itself for fluent usage
-   */
-  IQueryExpression startConnectorBlock();
-
-  /**
-   * Stop the current connector block
-   * 
-   * @return the IQueryExpression itself for fluent usage
-   */
-  IQueryExpression stopConnectorBlock();
-
-  /**
-   * Adds a connector between two query parts
-   * 
-   * @param queryLogic
-   *          the boolean logic of the connector
-   * @return the IQueryExpression itself for fluent usage
-   */
-  IQueryExpression connect(QueryLogic queryLogic);
-
-  /**
-   * Set a native command to be executed as query
-   * 
-   * @param nativeCommand
-   *          the command to be set
-   */
   void setNativeCommand(Object nativeCommand);
 
-  /**
-   * add a query expression
-   * 
-   * @param fieldName
-   *          the name to search in
-   * @param logic
-   *          the logic
-   * @param value
-   *          the value
-   * @return the IQueryExpression itself for fluent usage
-   */
-  IQueryExpression addQuery(String fieldName, String logic, Object value);
+  void setMapper(IMapper<?> mapper);
 
-  /**
-   * add a query expression
-   * 
-   * @param fpr
-   *          the instance of {@link IFieldParameterResult} which was processed by
-   *          {@link ITypeHandler#handleFieldParameter(de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter, io.vertx.core.Handler)}
-   * @return the IQueryExpression itself for fluent usage
-   */
-  IQueryExpression addQuery(IFieldParameterResult fpr);
+  IMapper<?> getMapper();
 
-  /**
-   * Set the {@link IMapper} to be used
-   * 
-   * @param mapper
-   *          the mapper
-   */
-  void setMapper(IMapper mapper);
+  void buildQueryExpression(IQueryPart queryPart, Handler<AsyncResult<Void>> handler);
 
   /**
    * Adds the given {@link ISortDefinition} into the current instance like it is needed by the implementation
@@ -97,5 +43,7 @@ public interface IQueryExpression {
    * @return the IQueryExpression itself for fluent usage
    */
   IQueryExpression addSort(ISortDefinition<?> sortDef);
+
+  void setLimit(int limit, int start);
 
 }

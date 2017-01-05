@@ -14,6 +14,8 @@
 
 package de.braintags.io.vertx.pojomapper.testdatastore;
 
+import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.isEqual;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +23,6 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -56,13 +57,13 @@ public class TestRoundtrip extends DatastoreBaseTest {
     if (LOOP != resultContainer.writeResult.size()) {
       // check wether records weren't written or "only" IWriteResult is incomplete
       IQuery<MiniMapper> query = getDataStore(context).createQuery(MiniMapper.class);
-      query.setRootQueryPart(new FieldCondition("name", "looper"));
+      query.setRootQueryPart(isEqual("name", "looper"));
       find(context, query, LOOP);
       context.assertEquals(LOOP, resultContainer.writeResult.size());
     }
 
     IQuery<MiniMapper> query = getDataStore(context).createQuery(MiniMapper.class);
-    query.setRootQueryPart(new FieldCondition("name", "looper"));
+    query.setRootQueryPart(isEqual("name", "looper"));
     ResultContainer reCo = find(context, query, LOOP);
 
     IDelete<MiniMapper> delete = getDataStore(context).createDelete(MiniMapper.class);

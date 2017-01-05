@@ -118,7 +118,12 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * @param queryPart
-   *          the root query part that contains or builds the complete query condition logic
+   *          the root query part that contains or builds the complete query search condition
    */
   void setRootQueryPart(IQueryPart queryPart);
+
+  /**
+   * @return the root query part that contains or builds the complete query search condition
+   */
+  IQueryPart getRootQueryPart();
 }

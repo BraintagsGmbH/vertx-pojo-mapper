@@ -21,10 +21,8 @@ import de.braintags.io.vertx.pojomapper.impl.AbstractDataStore;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
-import de.braintags.io.vertx.pojomapper.mysql.dataaccess.QueryLogicTranslator;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlDelete;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQuery;
-import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQueryOperatorTranslator;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlStoreObjectFactory;
 import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlWrite;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlDataStoreSynchronizer;
@@ -61,7 +59,7 @@ public class MySqlDataStore extends AbstractDataStore {
    *          the name of the database used
    */
   public MySqlDataStore(Vertx vertx, AsyncSQLClient sqlClient, JsonObject properties) {
-    super(vertx, properties, new QueryLogicTranslator(), new SqlQueryOperatorTranslator());
+    super(vertx, properties);
     this.sqlClient = sqlClient;
     metaData = new MySqlMetaData(this);
     setMapperFactory(new SqlMapperFactory(this, new SqlTypeHandlerFactory(), new JsonPropertyMapperFactory(),
@@ -87,7 +85,7 @@ public class MySqlDataStore extends AbstractDataStore {
    */
   @Override
   public <T> IWrite<T> createWrite(Class<T> mapper) {
-    return new SqlWrite<T>(mapper, this);
+    return new SqlWrite<>(mapper, this);
   }
 
   /*
@@ -97,7 +95,7 @@ public class MySqlDataStore extends AbstractDataStore {
    */
   @Override
   public <T> IDelete<T> createDelete(Class<T> mapper) {
-    return new SqlDelete<T>(mapper, this);
+    return new SqlDelete<>(mapper, this);
   }
 
   /**
