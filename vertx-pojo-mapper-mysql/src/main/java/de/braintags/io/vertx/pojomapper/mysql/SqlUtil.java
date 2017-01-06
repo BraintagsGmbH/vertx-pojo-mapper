@@ -90,7 +90,7 @@ public class SqlUtil {
           handler.handle(Future.failedFuture(result.cause()));
         } else {
           cf.list().forEach(f -> returnBuffer.appendString((String) f));
-          handler.handle(DefaultAsyncResult.succeed(returnBuffer.toString()));
+          handler.handle(Future.succeededFuture(returnBuffer.toString()));
         }
       });
     }

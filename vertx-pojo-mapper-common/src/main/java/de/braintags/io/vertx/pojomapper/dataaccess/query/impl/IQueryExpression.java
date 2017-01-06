@@ -44,6 +44,14 @@ public interface IQueryExpression {
    */
   IQueryExpression addSort(ISortDefinition<?> sortDef);
 
+  /**
+   * Set the limit and the offset ( start ) of a selection
+   * 
+   * @param limit
+   *          the limit of the selection
+   * @param offset
+   *          the first record
+   */
   void setLimit(int limit, int start);
 
 }

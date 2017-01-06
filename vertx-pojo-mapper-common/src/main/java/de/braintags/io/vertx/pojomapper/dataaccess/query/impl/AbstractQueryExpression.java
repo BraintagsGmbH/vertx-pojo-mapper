@@ -12,9 +12,17 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
+import de.braintags.io.vertx.pojomapper.exception.QueryParameterException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.util.Size;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
@@ -26,8 +34,25 @@ import io.vertx.core.Handler;
  */
 public abstract class AbstractQueryExpression implements IQueryExpression {
 
+  private int limit;
+  private int offset;
+  private IMapper<?> mapper;
+
   protected void transformValue(String fieldName, QueryOperator operator, Object value,
       Handler<AsyncResult<Object>> handler) {
+    if (operator == QueryOperator.IN || operator == QueryOperator.NOT_IN) {
+      handleMultipleValues(fieldName, operator, value, handler);
+    } else {
+      handleSingleValue(fieldName, value, handler);
+    }
+  }
+
+  /**
+   * @param fieldName
+   * @param value
+   * @param handler
+   */
+  private void handleSingleValue(String fieldName, Object value, Handler<AsyncResult<Object>> handler) {
     IField field = getMapper().getField(fieldName);
     field.getTypeHandler().intoStore(value, field, result -> {
       if (result.failed()) {
@@ -36,5 +61,90 @@ public abstract class AbstractQueryExpression implements IQueryExpression {
         handler.handle(Future.succeededFuture(result.result().getResult()));
       }
     });
+  }
+
+  /**
+   * @param fieldName
+   * @param operator
+   * @param value
+   * @param handler
+   */
+  private void handleMultipleValues(String fieldName, QueryOperator operator, Object value,
+      Handler<AsyncResult<Object>> handler) {
+    if (!(value instanceof Iterable)) {
+      handler.handle(
+          Future.failedFuture(new QueryParameterException("Multivalued argument but not an instance of Iterable")));
+      return;
+    }
+
+    int count = Size.size((Iterable<?>) value);
+    if (count == 0) {
+      String message = String.format(
+          "multivalued argument but no values defined for search in field %s.%s with operator '%s'",
+          getMapper().getMapperClass().getName(), fieldName, operator);
+      handler.handle(Future.failedFuture(new QueryParameterException(message)));
+      return;
+    }
+
+    Iterator<?> it = ((Iterable<?>) value).iterator();
+    @SuppressWarnings("rawtypes")
+    List<Future> futures = new ArrayList<>();
+    while (it.hasNext()) {
+      Future<Object> future = Future.future();
+      futures.add(future);
+      Object singleValue = it.next();
+      handleSingleValue(fieldName, singleValue, future.completer());
+    }
+
+    CompositeFuture.all(futures).setHandler(result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        List<Object> results = result.result().list();
+        handler.handle(Future.succeededFuture(results));
+      }
+    });
+  }
+
+  @Override
+  public void setLimit(int limit, int offset) {
+    this.limit = limit;
+    this.offset = offset;
+  }
+
+  /**
+   * @return the limit
+   */
+  protected int getLimit() {
+    return limit;
+  }
+
+  /**
+   * @return the offset
+   */
+  protected int getOffset() {
+    return offset;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#setMapper(de.braintags.io.vertx.pojomapper.
+   * mapping.IMapper)
+   */
+  @Override
+  public void setMapper(IMapper<?> mapper) {
+    this.mapper = mapper;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#getMapper()
+   */
+  @Override
+  public IMapper<?> getMapper() {
+    return mapper;
   }
 }

@@ -134,7 +134,7 @@ public class DummyDataStore implements IDataStore {
      * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#buildQueryExpression(io.vertx.core.Handler)
      */
     @Override
-    protected void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler) {
+    public void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler) {
       setUnsupported(resultHandler);
     }
 
@@ -163,6 +163,16 @@ public class DummyDataStore implements IDataStore {
         Handler<AsyncResult<IQueryCountResult>> resultHandler) {
       setUnsupported(resultHandler);
 
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#getQueryExpressionClass()
+     */
+    @Override
+    protected Class<? extends IQueryExpression> getQueryExpressionClass() {
+      throw new UnsupportedOperationException();
     }
 
   }

@@ -27,6 +27,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.QueryExpressionBuildException;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryLogicException;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryOperatorException;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryPartException;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
@@ -52,14 +53,11 @@ public class SqlExpression extends AbstractQueryExpression {
   private static final String SELECT_STATEMENT = "SELECT %s from %s";
   private static final String DELETE_STATEMENT = "DELETE from %s";
   private static final String COUNT_STATEMENT = "SELECT count(*) from %s";
-  private IMapper<?> mapper;
 
   private String nativeCommand = null;
   private StringBuilder select = new StringBuilder();
   private StringBuilder delete = new StringBuilder();
   private StringBuilder count = new StringBuilder();
-  private int limit;
-  private int offset;
 
   private StringBuilder whereClause = new StringBuilder();
   private StringBuilder orderByClause = new StringBuilder();
@@ -67,21 +65,11 @@ public class SqlExpression extends AbstractQueryExpression {
 
   @Override
   public void setMapper(IMapper<?> mapper) {
-    this.mapper = mapper;
+    super.setMapper(mapper);
     select.append(
         String.format(SELECT_STATEMENT, ((SqlMapper<?>) mapper).getQueryFieldNames(), mapper.getTableInfo().getName()));
     delete.append(String.format(DELETE_STATEMENT, mapper.getTableInfo().getName()));
     count.append(String.format(COUNT_STATEMENT, mapper.getTableInfo().getName()));
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#getMapper()
-   */
-  @Override
-  public IMapper<?> getMapper() {
-    return mapper;
   }
 
   /*
@@ -118,7 +106,6 @@ public class SqlExpression extends AbstractQueryExpression {
         handler.handle(Future.succeededFuture());
       }
     });
-    // TODO order by
   }
 
   /**
@@ -144,6 +131,8 @@ public class SqlExpression extends AbstractQueryExpression {
           handler.handle(Future.succeededFuture(result.result()));
         }
       });
+    } else {
+      handler.handle(Future.failedFuture(new UnknownQueryPartException(queryPart)));
     }
   }
 
@@ -181,7 +170,8 @@ public class SqlExpression extends AbstractQueryExpression {
       } else if (queryCondition.getOperator() == QueryOperator.NOT_EQUALS) {
         fragment.whereClause.append("IS NOT NULL");
       } else {
-        handler.handle(Future.failedFuture("Invalid 'null' value for operator " + queryCondition.getOperator()));
+        handler.handle(Future.failedFuture(
+            new NullPointerException("Invalid 'null' value for operator " + queryCondition.getOperator())));
         return;
       }
       handler.handle(Future.succeededFuture(fragment));
@@ -414,11 +404,11 @@ public class SqlExpression extends AbstractQueryExpression {
   }
 
   private void appendLimitClause(StringBuilder complete) {
-    if (limit > 0) {
-      complete.append(" LIMIT ").append(limit);
+    if (getLimit() > 0) {
+      complete.append(" LIMIT ").append(getLimit());
     }
-    if (offset > 0) {
-      complete.append(" OFFSET ").append(offset);
+    if (getOffset() > 0) {
+      complete.append(" OFFSET ").append(getOffset());
     }
   }
 
@@ -450,21 +440,6 @@ public class SqlExpression extends AbstractQueryExpression {
           .append(sa.ascending ? " asc" : " desc");
     }
     return this;
-  }
-
-  /**
-   * Set the limit and the offset ( start ) of a selection
-   * 
-   * @param limit
-   *          the limit of the selection
-   * @param offset
-   *          the first record
-   */
-  @Override
-  public void setLimit(int limit, int offset) {
-    this.limit = limit;
-    this.offset = offset;
-
   }
 
   /*

@@ -158,8 +158,18 @@ public class MongoQuery<T> extends Query<T> {
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#buildQueryExperssion(io.vertx.core.Handler)
    */
   @Override
-  protected void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler) {
+  public void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler) {
     // TODO
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#getQueryExpressionClass()
+   */
+  @Override
+  protected Class<? extends IQueryExpression> getQueryExpressionClass() {
+    return MongoQueryExpression.class;
   }
 
 }
