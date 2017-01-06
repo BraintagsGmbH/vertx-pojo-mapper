@@ -50,7 +50,7 @@ public class SqlMapper<T> extends Mapper<T> {
     }
     if (GeoJsonObject.class.isAssignableFrom(mf.getType())) {
       queryWithFieldNames = true;
-      queryFieldList = queryFieldList + "AsText( " + mf.getColumnInfo().getName() + " )";
+      queryFieldList = queryFieldList + "AsText( " + mf.getColumnInfo().getName() + " ) AS " + mf.getColumnInfo().getName();
     } else {
       queryFieldList += mf.getColumnInfo().getName();
     }

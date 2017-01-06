@@ -40,9 +40,6 @@ import io.vertx.core.json.JsonObject;
  */
 
 public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
-  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
-      .getLogger(SqlStoreObject.class);
-
   /**
    * Creates a new instance of SqlStoreObject with a {@link Map} as internal format
    * 
@@ -69,6 +66,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    * 
    * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#get(de.braintags.io.vertx.pojomapper.mapping.IField)
    */
+  @SuppressWarnings("rawtypes")
   @Override
   public Object get(IField field) {
     String colName = field.getColumnInfo().getName();
@@ -86,6 +84,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
     return container instanceof JsonObject ? (JsonObject) container : convert();
   }
 
+  @SuppressWarnings("unchecked")
   private JsonObject convert() {
     JsonObject jo = new JsonObject();
     ((Map<String, Object>) container).entrySet().forEach(entry -> jo.put(entry.getKey(), entry.getValue()));
@@ -98,6 +97,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    * @see
    * de.braintags.io.vertx.pojomapper.mapping.IStoreObject#hasProperty(de.braintags.io.vertx.pojomapper.mapping.IField)
    */
+  @SuppressWarnings("rawtypes")
   @Override
   public boolean hasProperty(IField field) {
     String colName = field.getColumnInfo().getName();
@@ -111,6 +111,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#put(de.braintags.io.vertx.pojomapper.mapping.IField,
    * java.lang.Object)
    */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public IStoreObject<T, Object> put(IField field, Object value) {
     IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
@@ -232,12 +233,9 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
       setStatement = new StringBuilder(" set ");
       whereStatement = new StringBuilder(" WHERE ").append(idColInfo.getName()).append(" = ?");
       this.id = idValue;
-
     }
 
     void addEntry(String colName, Object value) {
-      if (value == null)
-        return;
       if (added)
         setStatement.append(", ");
       if (value instanceof SqlFunction) {
@@ -245,7 +243,11 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
         parameters.add(((SqlFunction) value).getContent());
       } else {
         setStatement.append(colName).append(" = ?");
-        parameters.add(value);
+        if (value == null) {
+          parameters.addNull();
+        } else {
+          parameters.add(value);
+        }
       }
       added = true;
     }
@@ -277,7 +279,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
 
     @Override
     public String toString() {
-      return getSqlStatement() + " | " + getParameters();
+      return getSqlStatement() + " | " + getParameters() + " | id: " + id;
     }
   }
 }

@@ -13,8 +13,12 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
+import java.math.BigDecimal;
+
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.GeoSearchArgument;
 import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.Position;
+import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
@@ -30,6 +34,10 @@ import io.vertx.core.Handler;
  * 
  */
 public class SqlGeoPointTypeHandler extends AbstractTypeHandler {
+  /**
+   * Comment for <code>THIS_IS_NOT_A_VALID_POINT_DEFINITON</code>
+   */
+  private static final String THIS_IS_NOT_A_VALID_POINT_DEFINITON = "This is not a valid POINT definiton: ";
   private static final String CREATE_STRING = " POINT( %s %s) ";
 
   /**
@@ -51,7 +59,35 @@ public class SqlGeoPointTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    throw new UnsupportedOperationException();
+    success(parse((String) source), resultHandler);
+  }
+
+  /**
+   * parses a String like POINT( 15.5 13.3 ) into a GeoPoint
+   * 
+   * @param positionString
+   * @return
+   */
+  private GeoPoint parse(String positionString) {
+    if (positionString == null) {
+      return null;
+    }
+    int open = positionString.indexOf("POINT(");
+    if (open < 0) {
+      throw new TypeHandlerException(THIS_IS_NOT_A_VALID_POINT_DEFINITON + positionString);
+    }
+    String positions = positionString.substring(open + 6);
+    int close = positions.indexOf(')');
+    if (close < 0) {
+      throw new TypeHandlerException(THIS_IS_NOT_A_VALID_POINT_DEFINITON + positionString);
+    }
+    positions = positions.substring(0, close).trim();
+    String[] posDefs = positions.split(" ");
+    if (posDefs.length != 2) {
+      throw new TypeHandlerException(THIS_IS_NOT_A_VALID_POINT_DEFINITON + positionString);
+    }
+    Position pos = new Position(new BigDecimal(posDefs[0]).doubleValue(), new BigDecimal(posDefs[1]).doubleValue());
+    return new GeoPoint(pos);
   }
 
   /*

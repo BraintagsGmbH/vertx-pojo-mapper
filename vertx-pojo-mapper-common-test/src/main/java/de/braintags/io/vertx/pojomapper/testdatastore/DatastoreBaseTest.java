@@ -31,7 +31,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.util.QueryHelper;
 import de.braintags.io.vertx.util.ErrorObject;
-import de.braintags.io.vertx.util.ExceptionUtil;
 import de.braintags.io.vertx.util.IteratorAsync;
 import de.braintags.io.vertx.util.ResultObject;
 import io.vertx.core.AsyncResult;
@@ -268,6 +267,7 @@ public abstract class DatastoreBaseTest {
    * @return teh list of records
    */
   public static List<?> findAll(TestContext context, IQuery<?> query) {
+    LOGGER.info("executing findAll with query " + query.toString());
     Async async = context.async();
     ResultObject<List<?>> res = new ResultObject<>(null);
     QueryHelper.executeToList(query, result -> {
@@ -384,58 +384,38 @@ public abstract class DatastoreBaseTest {
 
   @SuppressWarnings({ "rawtypes" })
   public static void checkQueryResult(TestContext context, IQueryResult qr, int expectedResult) {
-    Async async = context.async();
-
-    try {
-      context.assertNotNull(qr);
-    } catch (Exception e) {
-      LOGGER.error("", e);
-      async.complete();
-      throw ExceptionUtil.createRuntimeException(e);
-    }
-
+    context.assertNotNull(qr);
     if (expectedResult < 0) {
-      async.complete();
       return;
     }
     if (expectedResult == 0) {
-      try {
-        context.assertFalse(qr.iterator().hasNext());
-      } finally {
-        async.complete();
-      }
+      context.assertFalse(qr.iterator().hasNext());
     } else {
-      try {
-        context.assertEquals(expectedResult, qr.size(), "Not the expected number of records");
-      } catch (Exception e) {
-        LOGGER.error("", e);
-        async.complete();
-        throw ExceptionUtil.createRuntimeException(e);
-      }
-
       IteratorAsync<?> itr = qr.iterator();
-      try {
-        context.assertTrue(itr.hasNext(), "No record in selection");
-      } catch (Exception e) {
-        LOGGER.error("", e);
-        async.complete();
-        throw ExceptionUtil.createRuntimeException(e);
-      }
-
+      context.assertTrue(itr.hasNext(), "No record in selection");
+      ErrorObject err = new ErrorObject<>(null);
+      Async async = context.async();
       itr.next(nitr -> {
-        try {
-          if (nitr.failed()) {
-            LOGGER.error("", nitr.cause());
-            throw ExceptionUtil.createRuntimeException(nitr.cause());
-          }
-          context.assertNotNull(nitr.result());
-        } finally {
+        if (nitr.failed()) {
+          LOGGER.error("", nitr.cause());
+          err.setThrowable(nitr.cause());
           async.complete();
+        } else {
+          try {
+            context.assertNotNull(nitr.result());
+            async.complete();
+          } catch (Throwable e) {
+            err.setThrowable(e);
+            async.complete();
+          }
         }
       });
+      async.await();
+      if (err.isError()) {
+        throw err.getRuntimeException();
+      }
     }
 
-    async.await();
   }
 
   /**
@@ -448,7 +428,7 @@ public abstract class DatastoreBaseTest {
   public static void clearTable(TestContext context, Class mapperClass) {
     if (EXTERNAL_DATASTORE != null) {
       Async async = context.async();
-      ErrorObject<Void> err = new ErrorObject<Void>(null);
+      ErrorObject<Void> err = new ErrorObject<>(null);
       IQuery q = EXTERNAL_DATASTORE.createQuery(mapperClass);
       find(context, q, -1).queryResult.toArray(result -> {
         if (result.failed()) {
@@ -490,7 +470,7 @@ public abstract class DatastoreBaseTest {
   public static void clearTable(TestContext context, String tableName) {
     LOGGER.info("clearing table " + tableName);
     Async async = context.async();
-    ErrorObject<Void> err = new ErrorObject<Void>(null);
+    ErrorObject<Void> err = new ErrorObject<>(null);
     TestHelper.getDatastoreContainer(context).clearTable(tableName, result -> {
       if (result.failed()) {
         err.setThrowable(result.cause());
@@ -506,7 +486,7 @@ public abstract class DatastoreBaseTest {
 
   public static void dropTable(TestContext context, String tableName) {
     Async async = context.async();
-    ErrorObject<Void> err = new ErrorObject<Void>(null);
+    ErrorObject<Void> err = new ErrorObject<>(null);
     TestHelper.getDatastoreContainer(context).dropTable(tableName, result -> {
       if (result.failed()) {
         err.setThrowable(result.cause());

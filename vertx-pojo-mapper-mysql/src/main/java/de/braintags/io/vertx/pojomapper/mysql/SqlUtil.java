@@ -90,6 +90,7 @@ public class SqlUtil {
           handler.handle(Future.failedFuture(result.cause()));
         } else {
           cf.list().forEach(f -> returnBuffer.appendString((String) f));
+          handler.handle(DefaultAsyncResult.succeed(returnBuffer.toString()));
         }
       });
     }
@@ -115,7 +116,7 @@ public class SqlUtil {
           f.complete("Index exists: " + index.name());
           break;
         case INDEX_NOT_EXISTS:
-          createIndex(ds, tableName, index, result.result(), f.completer());
+          createIndex(ds, tableName, index, f.completer());
           break;
         case INDEX_MODIFIED:
           modifyIndex(ds, tableName, index, result.result(), f.completer());
@@ -129,7 +130,7 @@ public class SqlUtil {
     return f;
   }
 
-  private static void createIndex(MySqlDataStore ds, String tableName, Index index, IndexResult res,
+  private static void createIndex(MySqlDataStore ds, String tableName, Index index,
       Handler<AsyncResult<String>> handler) {
     IndexField[] fields = index.fields();
     if (fields.length > 1) {

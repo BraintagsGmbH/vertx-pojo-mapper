@@ -63,6 +63,10 @@ public class BaseRecord {
   private boolean equalValues(Object value, Object compareValue, String fieldName) {
     if (value == null && compareValue == null)
       return true;
+    if (value == null || compareValue == null) {
+      throw new MappingException("Contents are not equal: " + fieldName + ": " + value + " / " + compareValue);
+    }
+
     if (value instanceof CharSequence) {
       value = value.toString();
       compareValue = compareValue.toString();

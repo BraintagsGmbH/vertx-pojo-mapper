@@ -23,7 +23,6 @@ import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
 import de.braintags.io.vertx.pojomapper.exception.DuplicateKeyException;
-import de.braintags.io.vertx.pojomapper.exception.InsertException;
 import de.braintags.io.vertx.pojomapper.exception.WriteException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
@@ -50,7 +49,6 @@ import io.vertx.ext.sql.UpdateResult;
 
 public class SqlWrite<T> extends AbstractWrite<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SqlWrite.class);
-  private static final String LAST_INSERT_ID_COMMAND = "SELECT LAST_INSERT_ID();";
   private int saveSize;
 
   /**
@@ -75,8 +73,9 @@ public class SqlWrite<T> extends AbstractWrite<T> {
             return;
           } else {
             if (stoResult.result().size() != saveSize) {
+              int stoSize = stoResult.result().size();
               String message = String.format("Wrong number of StoreObjects created. Expected %d - created: %d",
-                  saveSize, stoResult.result().size());
+                  saveSize, stoSize);
               LOGGER.error(message);
             }
             save(stoResult.result(), resultHandler);
@@ -85,10 +84,10 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   }
 
-  private void save(List<IStoreObject<T, ? >> storeObjects, Handler<AsyncResult<IWriteResult>> resultHandler) {
+  private void save(List<IStoreObject<T, ?>> storeObjects, Handler<AsyncResult<IWriteResult>> resultHandler) {
     CounterObject<IWriteResult> co = new CounterObject<>(storeObjects.size(), resultHandler);
     WriteResult rr = new SqlWriteResult();
-    for (IStoreObject<T, ? > sto : storeObjects) {
+    for (IStoreObject<T, ?> sto : storeObjects) {
       saveStoreObject((SqlStoreObject<T>) sto, rr, saveResult -> {
         if (saveResult.failed()) {
           LOGGER.error("", saveResult.cause());
@@ -135,12 +134,13 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param resultHandler
    *          the {@link Handler} to be informed
    */
+  @SuppressWarnings("rawtypes")
   private void handleUpdate(SqlStoreObject<T> storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlUpdateStatement();
     if (seq.getParameters().isEmpty()) {
       SqlUtil.update((MySqlDataStore) getDataStore(), seq.getSqlStatement(), updateResult -> {
-        checkUpdateResult(seq, updateResult, checkResult -> {
+        checkUpdateResult(updateResult, checkResult -> {
           if (checkResult.failed()) {
             resultHandler.handle(checkResult);
           } else {
@@ -151,7 +151,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     } else {
       SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), seq.getSqlStatement(), seq.getParameters(),
           updateResult -> {
-            checkUpdateResult(seq, updateResult, checkResult -> {
+            checkUpdateResult(updateResult, checkResult -> {
               if (checkResult.failed()) {
                 resultHandler.handle(checkResult);
               } else {
@@ -182,6 +182,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     }
   }
 
+  @SuppressWarnings("rawtypes")
   private void handleInsert(SqlStoreObject<T> storeObject, IWriteResult writeResult,
       Handler<AsyncResult<Void>> resultHandler) {
     storeObject.generateSqlInsertStatement(isr -> {
@@ -207,10 +208,11 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param seq
    * @param resultHandler
    */
+  @SuppressWarnings("rawtypes")
   private void insertWithoutParameters(SqlStoreObject storeObject, IWriteResult writeResult, SqlSequence seq,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlUtil.update((MySqlDataStore) getDataStore(), seq.getSqlStatement(), updateResult -> {
-      checkUpdateResult(seq, updateResult, checkResult -> {
+      checkUpdateResult(updateResult, checkResult -> {
         if (checkResult.failed()) {
           resultHandler.handle(checkResult);
         } else {
@@ -220,11 +222,12 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     });
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private void insertWithParameters(SqlStoreObject storeObject, IWriteResult writeResult, SqlSequence seq,
       Handler<AsyncResult<Void>> resultHandler) {
     SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), seq.getSqlStatement(), seq.getParameters(),
         updateResult -> {
-          checkUpdateResult(seq, updateResult, checkResult -> {
+          checkUpdateResult(updateResult, checkResult -> {
             if (checkResult.failed()) {
               handleInsertError(checkResult.cause(), storeObject, writeResult, resultHandler);
             } else {
@@ -264,22 +267,13 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param resultHandler
    *          the {@link Handler} to be informed
    */
-  private void checkUpdateResult(SqlSequence seq, AsyncResult<UpdateResult> updateResult,
-      Handler<AsyncResult<Void>> resultHandler) {
+  private void checkUpdateResult(AsyncResult<UpdateResult> updateResult, Handler<AsyncResult<Void>> resultHandler) {
     if (updateResult.failed()) {
       Exception we = updateResult.cause() instanceof DuplicateKeyException
           ? (DuplicateKeyException) updateResult.cause() : new WriteException(updateResult.cause());
       resultHandler.handle(Future.failedFuture(we));
     } else {
-      UpdateResult res = updateResult.result();
-      if (res.getUpdated() != 1) {
-        String message = String.format(
-            "Error inserting a record, expected %d records saved, but was %d With sequence %s", 1, res.getUpdated(),
-            seq);
-        resultHandler.handle(Future.failedFuture(new InsertException(message)));
-      } else {
-        resultHandler.handle(Future.succeededFuture());
-      }
+      resultHandler.handle(Future.succeededFuture());
     }
   }
 
@@ -315,7 +309,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * {@link IStoreObject}
    */
   @Override
-  protected void setIdValue(Object id, IStoreObject<T, ? > storeObject, Handler<AsyncResult<Void>> resultHandler) {
+  protected void setIdValue(Object id, IStoreObject<T, ?> storeObject, Handler<AsyncResult<Void>> resultHandler) {
     IField idField = getMapper().getIdField();
     idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
   }

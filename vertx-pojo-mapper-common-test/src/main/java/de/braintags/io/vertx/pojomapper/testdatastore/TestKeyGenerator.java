@@ -68,11 +68,16 @@ public class TestKeyGenerator extends DatastoreBaseTest {
     clearTable(context, "NoKeyGeneratorMapper");
     NoKeyGeneratorMapper sm = new NoKeyGeneratorMapper();
     sm.name = "testName";
-    ResultContainer resultContainer = saveRecord(context, sm);
-    IWriteEntry we1 = resultContainer.writeResult.iterator().next();
-    context.assertEquals(we1.getAction(), WriteAction.INSERT);
-    context.assertNotNull(sm.id);
-    context.assertTrue(sm.id.hashCode() != 0); // "ID wasn't set by insert statement",
+
+    if (getDataStore(context).getClass().getName().contains("Mongo")) {
+      ResultContainer resultContainer = saveRecord(context, sm);
+      IWriteEntry we1 = resultContainer.writeResult.iterator().next();
+      context.assertEquals(we1.getAction(), WriteAction.INSERT);
+      context.assertNotNull(sm.id);
+      context.assertTrue(sm.id.hashCode() != 0); // "ID wasn't set by insert statement",
+    } else {
+      // MySql requires a key generator, since it does not return a generated ID
+    }
   }
 
   @Test
