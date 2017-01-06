@@ -100,7 +100,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
    * @param cf
    * @return
    */
-  public Object transferValues(IField field, JsonArray jsonArray, CompositeFuture cf) {
+  private Object transferValues(IField field, JsonArray jsonArray, CompositeFuture cf) {
     List<ITypeHandlerResult> thl = cf.list();
     final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
     for (int i = 0; i < thl.size(); i++) {
