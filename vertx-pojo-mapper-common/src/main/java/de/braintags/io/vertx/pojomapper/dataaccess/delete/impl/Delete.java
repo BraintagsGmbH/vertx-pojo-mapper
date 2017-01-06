@@ -25,9 +25,9 @@ import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDeleteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
@@ -42,7 +42,7 @@ import io.vertx.core.Handler;
 public abstract class Delete<T> extends AbstractDataAccessObject<T> implements IDelete<T> {
   private static final String ERROR_MESSAGE = "You can only use ONE source for deletion, either an IQuery or a list of instances";
   private IQuery<T> query;
-  private List<T> recordList = new ArrayList<T>();
+  private List<T> recordList = new ArrayList<>();
 
   /**
    * @param mapperClass
@@ -88,28 +88,38 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
       resultHandler.handle(Future.succeededFuture());
       return;
     }
-    CounterObject<IDeleteResult> co = new CounterObject<>(recordList.size(), resultHandler);
-    for (T record : getRecordList()) {
-      getMapper().executeLifecycle(BeforeDelete.class, record, lcr -> {
-        if (lcr.failed()) {
-          co.setThrowable(lcr.cause());
-        } else {
-          if (co.reduce()) {
-            IField idField = getMapper().getIdField();
-            getRecordIds(idField, res -> {
-              if (res.failed()) {
-                resultHandler.handle(Future.failedFuture(res.cause()));
-              } else {
-                deleteRecordsById(idField, res.result(), resultHandler);
-              }
-            });
-          }
-        }
-      });
-      if (co.isError()) {
-        break;
+
+    CompositeFuture cf = CompositeFuture.all(executeLifeCycle(BeforeDelete.class));
+    cf.setHandler(res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        doDeleteRecords(resultHandler);
       }
+    });
+  }
+
+  private void doDeleteRecords(Handler<AsyncResult<IDeleteResult>> resultHandler) {
+    IField idField = getMapper().getIdField();
+    CompositeFuture cf = CompositeFuture.all(getRecordIds(idField));
+    cf.setHandler(res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        deleteRecordsById(idField, cf.list(), resultHandler);
+      }
+    });
+  }
+
+  @SuppressWarnings("rawtypes")
+  private List<Future> executeLifeCycle(Class lifecycleClass) {
+    List<Future> fl = new ArrayList<>();
+    for (T record : getRecordList()) {
+      Future<Void> f = Future.future();
+      getMapper().executeLifecycle(lifecycleClass, record, f.completer());
+      fl.add(f);
     }
+    return fl;
   }
 
   /*
@@ -171,24 +181,15 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * @param idField
    * @param resultHandler
    */
-  protected void getRecordIds(IField idField, Handler<AsyncResult<List<Object>>> resultHandler) {
-    CounterObject<List<Object>> co = new CounterObject<>(getRecordList().size(), resultHandler);
-    List<Object> values = new ArrayList<Object>();
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private List<Future> getRecordIds(IField idField) {
+    List<Future> fList = new ArrayList<>();
     for (T record : getRecordList()) {
-      idField.getPropertyMapper().readForStore(record, idField, vr -> {
-        if (vr.failed()) {
-          co.setThrowable(vr.cause());
-          return;
-        }
-        values.add(vr.result());
-        if (co.reduce()) {
-          resultHandler.handle(Future.succeededFuture(values));
-          return;
-        }
-      });
-      if (co.isError())
-        return;
+      Future f = Future.future();
+      idField.getPropertyMapper().readForStore(record, idField, f.completer());
+      fList.add(f);
     }
+    return fList;
   }
 
   /**
@@ -209,21 +210,14 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
       if (dr.failed()) {
         resultHandler.handle(dr);
       } else {
-        CounterObject<IDeleteResult> co = new CounterObject<>(recordList.size(), resultHandler);
-        for (T record : getRecordList()) {
-          getMapper().executeLifecycle(AfterDelete.class, record, lcr -> {
-            if (lcr.failed()) {
-              co.setThrowable(lcr.cause());
-            } else {
-              if (co.reduce()) {
-                resultHandler.handle(dr);
-              }
-            }
-          });
-          if (co.isError()) {
-            break;
+        CompositeFuture cf = CompositeFuture.all(executeLifeCycle(AfterDelete.class));
+        cf.setHandler(res -> {
+          if (res.failed()) {
+            resultHandler.handle(Future.failedFuture(res.cause()));
+          } else {
+            resultHandler.handle(dr);
           }
-        }
+        });
       }
     });
   }
