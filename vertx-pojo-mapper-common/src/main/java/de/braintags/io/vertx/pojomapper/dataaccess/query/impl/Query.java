@@ -74,7 +74,11 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
       IQueryExpression expression = getQueryExpressionClass().newInstance();
       expression.setMapper(getMapper());
       expression.setLimit(getLimit(), getStart());
-      expression.setNativeCommand(getNativeCommand());
+      if (getNativeCommand() != null)
+        expression.setNativeCommand(getNativeCommand());
+      if (!getSortDefinitions().isEmpty()) {
+        expression.addSort(getSortDefinitions());
+      }
       if (getRootQueryPart() != null) {
         expression.buildQueryExpression(getRootQueryPart(), result -> {
           if (result.failed())

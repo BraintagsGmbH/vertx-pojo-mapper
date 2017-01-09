@@ -42,4 +42,6 @@ public interface ISortDefinition<T> {
    */
   ISortDefinition<T> addSort(String sortField, boolean ascending);
 
+  boolean isEmpty();
+
 }

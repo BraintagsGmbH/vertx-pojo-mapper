@@ -84,6 +84,16 @@ public class SortDefinition<T> implements ISortDefinition<T> {
     return sortArgs;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition#isEmpty()
+   */
+  @Override
+  public boolean isEmpty() {
+    return getSortArguments().isEmpty();
+  }
+
   public class SortArgument {
     public String fieldName;
     public boolean ascending;
