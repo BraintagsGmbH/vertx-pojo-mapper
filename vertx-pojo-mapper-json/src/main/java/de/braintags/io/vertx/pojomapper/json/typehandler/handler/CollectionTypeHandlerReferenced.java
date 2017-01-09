@@ -13,7 +13,6 @@
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
 import java.lang.annotation.Annotation;
-import java.util.Collection;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
@@ -93,30 +92,27 @@ public class CollectionTypeHandlerReferenced extends CollectionTypeHandler imple
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler#handleObjectFromStore(java.lang.
-   * Object, de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler, java.util.Collection,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
+   * de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler#handleObjectFromStore(de.braintags.
+   * io.vertx.pojomapper.mapping.IField, de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler, java.lang.Object)
    */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
-  protected void handleObjectFromStore(Object o, ITypeHandler subHandler, Collection coll, IField field,
-      Handler<AsyncResult<Void>> resultHandler) {
+  protected Future handleObjectFromStore(IField field, ITypeHandler subHandler, Object o) {
     if (subHandler instanceof ObjectTypeHandlerReferenced) {
+      Future f = Future.future();
       IDataStore store = field.getMapper().getMapperFactory().getDataStore();
       IMapperFactory mf = store.getMapperFactory();
       IMapper subMapper = mf.getMapper(field.getSubClass());
-      ((ObjectTypeHandlerReferenced) subHandler).getReferencedObjectById(store, subMapper, o, tmpResult -> {
-        if (tmpResult.failed()) {
-          resultHandler.handle(Future.failedFuture(tmpResult.cause()));
-          return;
+      ((ObjectTypeHandlerReferenced) subHandler).getReferencedObjectById(store, subMapper, o, thr -> {
+        if (thr.failed()) {
+          f.fail(thr.cause());
+        } else {
+          f.complete(thr.result().getResult());
         }
-        Object dest = tmpResult.result().getResult();
-        coll.add(dest);
-        resultHandler.handle(Future.succeededFuture());
       });
+      return f;
     } else {
-      resultHandler
-          .handle(Future.failedFuture(new UnsupportedOperationException("Need a ObjectTypeHandlerReferenced here! ")));
-
+      return Future.failedFuture(new UnsupportedOperationException("Need a ObjectTypeHandlerReferenced here! "));
     }
   }
 

@@ -487,6 +487,7 @@ public class Mapper<T> implements IMapper<T> {
         // ONLY INFORM HANDLER, if no TriggerContext is given
         handler.handle(Future.succeededFuture());
       }
+      LOGGER.debug("trigger method invokement finished");
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }

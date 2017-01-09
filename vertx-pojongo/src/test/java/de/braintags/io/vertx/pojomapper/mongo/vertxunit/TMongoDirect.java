@@ -183,6 +183,8 @@ public class TMongoDirect extends DatastoreBaseTest {
     LOGGER.info("-->>test");
     MongoDataStore ds = (MongoDataStore) getDataStore(context);
     MongoClient client = (MongoClient) ds.getClient();
+    dropTable(context, "nativeCommandCollection");
+
     JsonObject jsonCommand = new JsonObject("{\"name\":\"testName\",\"_id\":null}");
     client.insert("nativeCommandCollection", jsonCommand, result -> {
       if (result.failed()) {

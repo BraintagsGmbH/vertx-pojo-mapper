@@ -108,29 +108,6 @@ public class ArrayTypeHandlerReferenced extends ArrayTypeHandler implements ITyp
           success(resultArray, handler);
         }
       });
-
-      // CounterObject<ITypeHandlerResult> co = new CounterObject<>(jsonArray.size(), handler);
-      // final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
-      // int counter = 0;
-      // for (Object jo : jsonArray) {
-      // CurrentCounter cc = new CurrentCounter(counter++, jo);
-      // ObjectTypeHandlerReferenced subTypehandler = (ObjectTypeHandlerReferenced) field.getSubTypeHandler();
-      // subTypehandler.getReferencedObjectById(store, subMapper, jo, result -> {
-      // if (result.failed()) {
-      // co.setThrowable(result.cause());
-      // return;
-      // }
-      // Object javaValue = result.result().getResult();
-      // if (javaValue != null) {
-      // Array.set(resultArray, cc.i, javaValue);
-      // }
-      // if (co.reduce()) {
-      // success(resultArray, handler);
-      // }
-      // });
-      //
-      // }
-
     }
   }
 
