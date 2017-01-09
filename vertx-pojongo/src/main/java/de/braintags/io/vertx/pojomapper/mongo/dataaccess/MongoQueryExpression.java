@@ -59,6 +59,8 @@ public class MongoQueryExpression extends AbstractQueryExpression {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
+        JsonObject expression = result.result();
+        this.searchCondition = expression;
         handler.handle(Future.succeededFuture());
       }
     });
@@ -121,7 +123,6 @@ public class MongoQueryExpression extends AbstractQueryExpression {
   }
 
   private void parseQueryCondition(IQueryCondition condition, Handler<AsyncResult<JsonObject>> handler) {
-    JsonObject expression = new JsonObject();
 
     String parsedLogic;
     try {
@@ -139,11 +140,15 @@ public class MongoQueryExpression extends AbstractQueryExpression {
           Object parsedValue = result.result();
           JsonObject logicCondition = new JsonObject();
           logicCondition.put(parsedLogic, parsedValue);
+
+          JsonObject expression = new JsonObject();
           expression.put(condition.getField(), logicCondition);
+          handler.handle(Future.succeededFuture(expression));
         }
       });
     } else {
       if (condition.getOperator() == QueryOperator.EQUALS || condition.getOperator() == QueryOperator.NOT_EQUALS) {
+        JsonObject expression = new JsonObject();
         JsonObject logicCondition = new JsonObject();
         logicCondition.putNull(parsedLogic);
         expression.put(condition.getField(), logicCondition);
@@ -154,6 +159,40 @@ public class MongoQueryExpression extends AbstractQueryExpression {
         return;
       }
     }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#transformValue(java.lang.String,
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator, java.lang.Object, io.vertx.core.Handler)
+   */
+  @Override
+  protected void transformValue(String fieldName, QueryOperator operator, Object value,
+      Handler<AsyncResult<Object>> handler) {
+    super.transformValue(fieldName, operator, value, result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        Object transformedValue = result.result();
+        switch (operator) {
+        case CONTAINS:
+          transformedValue = "." + transformedValue + ".";
+          break;
+        case STARTS:
+          transformedValue = transformedValue + ".";
+          break;
+        case ENDS:
+          transformedValue = "." + transformedValue;
+          break;
+        default:
+          // noop
+          break;
+        }
+        handler.handle(Future.succeededFuture(transformedValue));
+      }
+    });
   }
 
   /**

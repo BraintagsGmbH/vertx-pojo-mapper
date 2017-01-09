@@ -268,16 +268,16 @@ public class SqlExpression extends AbstractQueryExpression {
         Object transformedValue = result.result();
         switch (operator) {
         case CONTAINS:
-          transformedValue = "%" + value + "%";
+          transformedValue = "%" + transformedValue + "%";
           break;
         case STARTS:
-          transformedValue = value + "%";
+          transformedValue = transformedValue + "%";
           break;
         case ENDS:
-          transformedValue = "%" + value;
+          transformedValue = "%" + transformedValue;
           break;
         default:
-          transformedValue = value;
+          // noop
           break;
         }
         handler.handle(Future.succeededFuture(transformedValue));
@@ -300,6 +300,7 @@ public class SqlExpression extends AbstractQueryExpression {
     List<Future> futures = new ArrayList<>();
     for (IQueryPart queryPart : container.getContent()) {
       Future<SqlWhereFragment> future = Future.future();
+      futures.add(future);
       internalBuildSearchCondition(queryPart, future.completer());
     }
 
@@ -320,7 +321,7 @@ public class SqlExpression extends AbstractQueryExpression {
               return;
             }
         }
-        whereClause.append(")");
+        fragment.whereClause.append(")");
         handler.handle(Future.succeededFuture(fragment));
       }
     });
