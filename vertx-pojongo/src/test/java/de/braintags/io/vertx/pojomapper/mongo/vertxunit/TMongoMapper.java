@@ -85,6 +85,7 @@ public class TMongoMapper extends DatastoreBaseTest {
     String javaName = field.getName();
     IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     context.assertNotNull(ci);
+    context.assertEquals("_id", ci.getName());
     String dbName = ci.getName();
 
     context.assertNotEquals(javaName, dbName);
