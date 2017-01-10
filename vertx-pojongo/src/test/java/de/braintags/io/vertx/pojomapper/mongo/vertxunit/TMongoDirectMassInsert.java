@@ -15,14 +15,11 @@ package de.braintags.io.vertx.pojomapper.mongo.vertxunit;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
@@ -53,8 +50,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 public class TMongoDirectMassInsert {
   private static Logger LOGGER = LoggerFactory.getLogger(TMongoDirectMassInsert.class);
   private static final int LOOP = 200;
-  private static final List<Integer> LOOPLIST = IntStream.iterate(0, i -> i + 1).limit(LOOP).boxed()
-      .collect(Collectors.toList());
 
   private static final String TABLENAME = "massInsert";
   private static final boolean startMongoLocal = false;
@@ -72,9 +67,9 @@ public class TMongoDirectMassInsert {
   public void massInsertWithComposite(TestContext context) {
     ErrorObject err = new ErrorObject<>(null);
     Async async = context.async();
-    dropTable(context, TABLENAME);
+    dropTable(context);
     final long startTime = System.currentTimeMillis();
-    List<Future> futureList = createFutureList();
+    List<Future> futureList = createFutureList(TABLENAME);
     CompositeFuture cf = CompositeFuture.all(futureList);
     cf.setHandler(result -> {
       if (result.failed()) {
@@ -111,76 +106,64 @@ public class TMongoDirectMassInsert {
   }
 
   @SuppressWarnings("rawtypes")
-  private List<Future> createFutureList() {
+  private List<Future> createFutureList(String tableName) {
     List<Future> futureList = new ArrayList<>();
     for (int i = 0; i < LOOP; i++) {
-      futureList.add(handleEntry(i));
+      futureList.add(handleEntry(tableName, i));
     }
     return futureList;
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private Future handleEntry(int number) {
+  private Future handleEntry(String tableName, int number) {
     Future f = Future.future();
     JsonObject jsonCommand = new JsonObject().put("name", "testName " + number);
-    client.insert(TABLENAME, jsonCommand, f.completer());
+    client.insert(tableName, jsonCommand, f.completer());
     return f;
   }
 
   @Test
   public void massInsertWithCounter(TestContext context) {
     Async async = context.async();
-    dropTable(context, TABLENAME);
+    dropTable(context);
 
     final long startTime = System.currentTimeMillis();
-    CounterObject<Void> co = new CounterObject<>(LOOP, null);
+    @SuppressWarnings("rawtypes")
+    List<Future> futures = new ArrayList<>();
     for (int i = 0; i < LOOP; i++) {
+      Future<String> future = Future.future();
+      futures.add(future);
       JsonObject jsonCommand = new JsonObject().put("name", "testName " + i);
-      client.insert(TABLENAME, jsonCommand, result -> {
-        if (result.failed()) {
-          LOGGER.error("", result.cause());
-          co.setThrowable(result.cause());
-          async.complete();
-        } else {
-          LOGGER.info("executed: " + result.result());
-          if (co.reduce()) {
-            LOGGER.info("finished");
-            client.count(TABLENAME, new JsonObject(), cr -> {
-              if (cr.failed()) {
-                LOGGER.error("", cr.cause());
-                co.setThrowable(cr.cause());
-                async.complete();
-              } else {
-                try {
-                  context.assertEquals(LOOP, cr.result().intValue(), "result not correct");
-                  async.complete();
-                } catch (Throwable e) {
-                  LOGGER.error("", e);
-                  co.setThrowable(e);
-                  async.complete();
-                }
-              }
-            });
-          }
-        }
-      });
-      if (co.isError()) {
-        break;
-      }
+      client.insert(TABLENAME, jsonCommand, future.completer());
     }
 
-    async.await();
-    if (co.isError()) {
-      context.fail(co.getThrowable());
-    }
-    long execution = System.currentTimeMillis() - startTime;
-    results.add("massInsertWithCounter: " + execution + " | ");
-    LOGGER.info(results.toString());
+    CompositeFuture.all(futures).setHandler(result -> {
+      if (result.failed()) {
+        LOGGER.error("", result.cause());
+        context.fail(result.cause());
+      } else {
+        client.count(TABLENAME, new JsonObject(), cr -> {
+          if (cr.failed()) {
+            LOGGER.error("", cr.cause());
+            context.fail(cr.cause());
+          } else {
+            int count = cr.result().intValue();
+            LOGGER.debug("got " + count + " results");
+            context.assertEquals(LOOP, count, "result not correct");
+            long execution = System.currentTimeMillis() - startTime;
+            results.add("massInsertWithCounter: " + execution + " | ");
+            LOGGER.info(results.toString());
+            async.complete();
+          }
+        });
+      }
+    });
   }
 
   @BeforeClass
-  public static void beforeTest() {
+  public static void beforeTest(TestContext testContext) {
     vertx = Vertx.vertx();
+    vertx.exceptionHandler(testContext.exceptionHandler());
     startMongoExe(startMongoLocal);
     client = MongoClient.createShared(vertx, createConfig());
   }
@@ -192,10 +175,10 @@ public class TMongoDirectMassInsert {
     return config;
   }
 
-  public static void dropTable(TestContext context, String collection) {
+  private static void dropTable(TestContext context) {
     Async async = context.async();
     ErrorObject<Void> err = new ErrorObject<>(null);
-    client.dropCollection(collection, dropResult -> {
+    client.dropCollection(TABLENAME, dropResult -> {
       if (dropResult.failed()) {
         err.setThrowable(dropResult.cause());
         async.complete();
@@ -203,6 +186,7 @@ public class TMongoDirectMassInsert {
         async.complete();
       }
     });
+    async.await();
   }
 
   /**
