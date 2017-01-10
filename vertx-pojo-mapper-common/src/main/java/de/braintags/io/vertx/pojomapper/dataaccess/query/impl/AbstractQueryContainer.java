@@ -5,8 +5,11 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
@@ -21,11 +24,11 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
 
 public abstract class AbstractQueryContainer implements IQueryContainer {
 
-  private List<IQueryPart> queryParts;
+  private List<IQueryPart> queryParts = new ArrayList<>();
 
   public AbstractQueryContainer(IQueryPart... queryParts) {
     if (queryParts != null)
-      this.queryParts = Arrays.asList(queryParts);
+      this.queryParts.addAll(Arrays.asList(queryParts));
   }
 
   /*
@@ -38,4 +41,17 @@ public abstract class AbstractQueryContainer implements IQueryContainer {
     return queryParts;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    result.append(getConnector().name()).append(" [");
+    result.append(StringUtils.join(getContent(), " && "));
+    result.append("]");
+    return result.toString();
+  }
 }

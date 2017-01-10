@@ -5,8 +5,11 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
+import java.util.Collection;
+
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.IDataAccessObject;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -126,4 +129,192 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    * @return the root query part that contains or builds the complete query search condition
    */
   IQueryPart getRootQueryPart();
+
+  /**
+   * Create a query condition for the {@link QueryOperator#NEAR} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param x
+   *          the x geo coordinate
+   * @param y
+   *          the y geo coordinate
+   * @param maxDistance
+   *          the maximum distance to the given point
+   * @return
+   */
+  IQueryCondition near(String field, double x, double y, int maxDistance);
+
+  /**
+   * Create a query condition for the {@link QueryOperator#CONTAINS} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param value
+   *          the value that must be contained
+   * @return
+   */
+  IQueryCondition contains(String field, Object value);
+
+  /**
+   * Create a query condition for the {@link QueryOperator#ENDS} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param value
+   *          the value that the record must end with
+   * @return
+   */
+  IQueryCondition endsWith(String field, Object value);
+
+  /**
+   * Create a query condition for the {@link QueryOperator#STARTS} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param value
+   *          the value that the record must start with
+   * @return
+   */
+  IQueryCondition startsWith(String field, Object value);
+
+  /**
+   * Create a query condition for the {@link QueryOperator#NOT_IN} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param values
+   *          the values for the comparison
+   * @return
+   */
+  IQueryCondition notIn(String field, Collection<?> values);
+
+  /**
+   * Create a query condition for the {@link QueryOperator#NOT_IN} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param values
+   *          the values for the comparison
+   * @return
+   */
+  IQueryCondition notIn(String field, Object... values);
+
+  /**
+   * 
+   * Create a query condition for the {@link QueryOperator#IN} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param values
+   *          the values for the comparison
+   * @return
+   */
+  IQueryCondition in(String field, Collection<?> values);
+
+  /**
+   * Create a query condition for the {@link QueryOperator#IN} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param values
+   *          the values for the comparison
+   * @return
+   */
+  IQueryCondition in(String field, Object... values);
+
+  /**
+   * Create a query condition for the {@link QueryOperator#SMALLER_EQUAL} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param value
+   *          the value that the record must be smaller or equal to
+   * @return
+   */
+  IQueryCondition smallerOrEqual(String field, Object value);
+
+  /**
+   * Create a query condition for the {@link QueryOperator#SMALLER} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param value
+   *          the value that the record must be smaller than
+   * @return
+   */
+  IQueryCondition smaller(String field, Object value);
+
+  /**
+   * Create a query condition for the {@link QueryOperator#LARGER_EQUAL} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param value
+   *          the value that the record must be larger or equal to
+   * @return
+   */
+  IQueryCondition largerOrEqual(String field, Object value);
+
+  /**
+   * Create a query condition for the {@link QueryOperator#LARGER} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param value
+   *          the value that the record must be larger than
+   * @return
+   */
+  IQueryCondition larger(String field, Object value);
+
+  /**
+   * 
+   * Create a query condition for the {@link QueryOperator#NOT_EQUALS} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param value
+   *          the value that the record must not be equal to
+   * @return
+   */
+  IQueryCondition notEqual(String field, Object value);
+
+  /**
+   * 
+   * Create a query condition for the {@link QueryOperator#EQUALS} operator
+   * 
+   * @param field
+   *          the field for the comparison
+   * @param value
+   *          the value that the record must be equal to
+   * @return
+   */
+  IQueryCondition isEqual(String field, Object value);
+
+  /**
+   * Connects the given query parts with the {@link QueryLogic#OR} connector
+   * 
+   * @param queryParts
+   *          the query parts to connect
+   * @return
+   */
+  IQueryContainer or(IQueryPart... queryParts);
+
+  /**
+   * Connects the given query parts with the {@link QueryLogic#AND} connector
+   * 
+   * @param queryParts
+   *          the query parts to connect
+   * @return
+   */
+  IQueryContainer and(IQueryPart... queryParts);
+
+  /**
+   * Build the complete query expression that contains all info needed to execute this query against the current
+   * datastore
+   * 
+   * @param resultHandler
+   *          handler for the completed {@link IQueryExpression}
+   */
+  public void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler);
 }

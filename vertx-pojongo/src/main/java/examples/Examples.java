@@ -12,8 +12,6 @@
  */
 package examples;
 
-import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.isEqual;
-
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
@@ -63,7 +61,7 @@ public class Examples {
     config.put("connection_string", "mongodb://localhost:27017");
     config.put("db_name", "PojongoTestDatabase");
     MongoClient mongoClient = MongoClient.createNonShared(vertx, config);
-    MongoDataStore mongoDataStore = new MongoDataStore(vertx, mongoClient, config);
+    new MongoDataStore(vertx, mongoClient, config);
   }
 
   /**
@@ -110,7 +108,7 @@ public class Examples {
    */
   public void example4(MongoDataStore mongoDataStore) {
     IQuery<DemoMapper> query = mongoDataStore.createQuery(DemoMapper.class);
-    query.setRootQueryPart(isEqual("name", "demoMapper"));
+    query.setRootQueryPart(query.isEqual("name", "demoMapper"));
     query.execute(rResult -> {
       if (rResult.failed()) {
         logger.error(rResult.cause());

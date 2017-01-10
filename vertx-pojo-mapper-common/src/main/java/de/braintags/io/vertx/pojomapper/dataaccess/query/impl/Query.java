@@ -5,13 +5,21 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.Position;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -231,6 +239,11 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     this.nativeCommand = command;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#getNativeCommand()
+   */
   @Override
   public Object getNativeCommand() {
     return nativeCommand;
@@ -267,4 +280,162 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     return rootQueryPart;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#isEqual(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public IQueryCondition isEqual(String field, Object value) {
+    return new FieldCondition(field, QueryOperator.EQUALS, value);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#notEqual(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public IQueryCondition notEqual(String field, Object value) {
+    return new FieldCondition(field, QueryOperator.NOT_EQUALS, value);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#larger(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public IQueryCondition larger(String field, Object value) {
+    return new FieldCondition(field, QueryOperator.LARGER, value);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#largerOrEqual(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public IQueryCondition largerOrEqual(String field, Object value) {
+    return new FieldCondition(field, QueryOperator.LARGER_EQUAL, value);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#smaller(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public IQueryCondition smaller(String field, Object value) {
+    return new FieldCondition(field, QueryOperator.SMALLER, value);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#smallerOrEqual(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public IQueryCondition smallerOrEqual(String field, Object value) {
+    return new FieldCondition(field, QueryOperator.SMALLER_EQUAL, value);
+  }
+
+  @Override
+  public IQueryCondition in(String field, Object... values) {
+    return in(field, Arrays.asList(values));
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#in(java.lang.String, java.util.Collection)
+   */
+  @Override
+  public IQueryCondition in(String field, Collection<?> values) {
+    return new FieldCondition(field, QueryOperator.IN, values);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#notIn(java.lang.String, java.lang.Object[])
+   */
+  @Override
+  public IQueryCondition notIn(String field, Object... values) {
+    return notIn(field, Arrays.asList(values));
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#notIn(java.lang.String, java.util.Collection)
+   */
+  @Override
+  public IQueryCondition notIn(String field, Collection<?> values) {
+    return new FieldCondition(field, QueryOperator.NOT_IN, values);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#startsWith(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public IQueryCondition startsWith(String field, Object value) {
+    return new FieldCondition(field, QueryOperator.STARTS, value);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#endsWith(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public IQueryCondition endsWith(String field, Object value) {
+    return new FieldCondition(field, QueryOperator.ENDS, value);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#contains(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public IQueryCondition contains(String field, Object value) {
+    return new FieldCondition(field, QueryOperator.CONTAINS, value);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#near(java.lang.String, double, double, int)
+   */
+  @Override
+  public IQueryCondition near(String field, double x, double y, int maxDistance) {
+    return new FieldCondition(field, QueryOperator.NEAR,
+        new GeoSearchArgument(new GeoPoint(new Position(x, y, new double[0])), maxDistance));
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#and(de.braintags.io.vertx.pojomapper.dataaccess.query.
+   * IQueryPart[])
+   */
+  @Override
+  public IQueryContainer and(IQueryPart... queryParts) {
+    return new QueryAnd(queryParts);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#or(de.braintags.io.vertx.pojomapper.dataaccess.query.
+   * IQueryPart[])
+   */
+  @Override
+  public IQueryContainer or(IQueryPart... queryParts) {
+    return new QueryOr(queryParts);
+  }
 }

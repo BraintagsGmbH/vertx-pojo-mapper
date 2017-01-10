@@ -12,16 +12,13 @@
  */
 package de.braintags.io.vertx.pojomapper;
 
-import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.in;
-import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.isEqual;
-import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.QueryAnd.and;
-
 import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.impl.DummyDataStore;
 import de.braintags.io.vertx.pojomapper.mapper.Person;
 import io.vertx.core.logging.Logger;
@@ -38,13 +35,20 @@ public class TQuery {
 
   @Test
   public void test() {
-    Query<Person> query = (Query<Person>) dataStore.createQuery(Person.class);
-    query.setRootQueryPart(
-        and(isEqual("name", "peter"), in("secName", Arrays.asList("eins", "zwei")), isEqual("weight", 15)));
+    IQuery<Person> query = dataStore.createQuery(Person.class);
+    query.setRootQueryPart(query.and(query.isEqual("name", "peter"), query.in("secName", Arrays.asList("eins", "zwei")),
+        query.isEqual("weight", 15)));
     logger.info("--- start Rambler");
 
-    final Query<Person> exQuery = query;
-    // TODO
+    final IQuery<Person> exQuery = query;
+    exQuery.buildQueryExpression(result -> {
+      if (result.failed()) {
+        logger.error("Error building expression", result.cause());
+      } else {
+        IQueryExpression expression = result.result();
+        logger.info(expression.toString());
+      }
+    });
 
   }
 }

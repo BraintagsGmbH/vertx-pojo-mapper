@@ -12,8 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.util;
 
-import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.isEqual;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,7 +52,7 @@ public class QueryHelper {
   public static final <T> void findRecordById(IDataStore datastore, Class<T> mapperClass, String id,
       Handler<AsyncResult<T>> handler) {
     IQuery<T> query = datastore.createQuery(mapperClass);
-    query.setRootQueryPart(isEqual(query.getMapper().getIdField().getName(), id));
+    query.setRootQueryPart(query.isEqual(query.getMapper().getIdField().getName(), id));
     executeToFirstRecord(query, handler);
   }
 
@@ -118,7 +116,7 @@ public class QueryHelper {
    * @param handler
    *          the handler, which will receive the list of objects
    */
-  public static void executeToList(IQuery<?> query, Handler<AsyncResult<List<?>>> handler) {
+  public static <T> void executeToList(IQuery<T> query, Handler<AsyncResult<List<T>>> handler) {
     query.execute(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -137,12 +135,14 @@ public class QueryHelper {
    * @param handler
    *          the handler to be informed
    */
-  public static final void queryResultToList(IQueryResult<?> queryResult, Handler<AsyncResult<List<?>>> handler) {
+  @SuppressWarnings("unchecked")
+  public static final <T> void queryResultToList(IQueryResult<T> queryResult, Handler<AsyncResult<List<T>>> handler) {
     queryResult.toArray(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
-        handler.handle(Future.succeededFuture(Arrays.asList(result.result())));
+        Object[] resultArray = result.result();
+        handler.handle(Future.succeededFuture((List<T>) Arrays.asList(resultArray)));
       }
     });
   }

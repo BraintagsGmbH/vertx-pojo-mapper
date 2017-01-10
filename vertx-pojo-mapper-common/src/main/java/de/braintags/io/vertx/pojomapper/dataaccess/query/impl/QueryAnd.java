@@ -14,7 +14,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 
 public class QueryAnd extends AbstractQueryContainer {
 
-  private QueryAnd(IQueryPart... queryParts) {
+  public QueryAnd(IQueryPart... queryParts) {
     super(queryParts);
   }
 
@@ -26,10 +26,6 @@ public class QueryAnd extends AbstractQueryContainer {
   @Override
   public QueryLogic getConnector() {
     return QueryLogic.AND;
-  }
-
-  public static QueryAnd and(IQueryPart... queryParts) {
-    return new QueryAnd(queryParts);
   }
 
 }

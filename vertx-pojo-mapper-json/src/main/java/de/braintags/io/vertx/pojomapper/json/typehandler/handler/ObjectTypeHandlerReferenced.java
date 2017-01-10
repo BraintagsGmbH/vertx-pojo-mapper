@@ -12,8 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
-import static de.braintags.io.vertx.pojomapper.dataaccess.query.impl.FieldCondition.isEqual;
-
 import java.lang.annotation.Annotation;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
@@ -108,11 +106,11 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    * @param id
    * @param resultHandler
    */
-  public void getReferencedObjectById(IDataStore store, IMapper subMapper, Object id,
+  public void getReferencedObjectById(IDataStore store, IMapper<?> subMapper, Object id,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     LOGGER.debug("start getReferencedObjectById");
     IQuery<?> query = store.createQuery(subMapper.getMapperClass());
-    query.setRootQueryPart(isEqual(subMapper.getIdField().getName(), id));
+    query.setRootQueryPart(query.isEqual(subMapper.getIdField().getName(), id));
     query.execute(result -> {
       if (result.failed()) {
         fail(result.cause(), resultHandler);
