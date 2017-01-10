@@ -20,6 +20,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryP
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -124,34 +125,41 @@ public class MongoQueryExpression extends AbstractQueryExpression {
 
   private void parseQueryCondition(IQueryCondition condition, Handler<AsyncResult<JsonObject>> handler) {
 
-    String parsedLogic;
-    try {
-      parsedLogic = translateOperator(condition.getOperator());
-    } catch (UnknownQueryOperatorException e) {
-      handler.handle(Future.failedFuture(e));
-      return;
-    }
+    IField field = getMapper().getField(condition.getField());
+    String columnName = field.getColumnInfo().getName();
 
     if (condition.getValue() != null) {
-      transformValue(condition.getField(), condition.getOperator(), condition.getValue(), result -> {
+      transformValue(field, condition.getOperator(), condition.getValue(), result -> {
         if (result.failed()) {
           handler.handle(Future.failedFuture(result.cause()));
         } else {
-          Object parsedValue = result.result();
-          JsonObject logicCondition = new JsonObject();
-          logicCondition.put(parsedLogic, parsedValue);
+          JsonObject logicCondition;
+          try {
+            logicCondition = buildLogicCondition(condition.getOperator(), result.result());
+          } catch (UnknownQueryOperatorException e) {
+            handler.handle(Future.failedFuture(e));
+            return;
+          }
 
           JsonObject expression = new JsonObject();
-          expression.put(condition.getField(), logicCondition);
+          expression.put(columnName, logicCondition);
           handler.handle(Future.succeededFuture(expression));
         }
       });
     } else {
+      // special case for query with null value
       if (condition.getOperator() == QueryOperator.EQUALS || condition.getOperator() == QueryOperator.NOT_EQUALS) {
+        String parsedLogic;
+        try {
+          parsedLogic = translateOperator(condition.getOperator());
+        } catch (UnknownQueryOperatorException e) {
+          handler.handle(Future.failedFuture(e));
+          return;
+        }
         JsonObject expression = new JsonObject();
         JsonObject logicCondition = new JsonObject();
         logicCondition.putNull(parsedLogic);
-        expression.put(condition.getField(), logicCondition);
+        expression.put(columnName, logicCondition);
         handler.handle(Future.succeededFuture(expression));
       } else {
         handler.handle(Future
@@ -159,6 +167,23 @@ public class MongoQueryExpression extends AbstractQueryExpression {
         return;
       }
     }
+  }
+
+  /**
+   * @param condition
+   * @param result
+   * @param handler
+   * @return
+   * @throws UnknownQueryOperatorException
+   */
+  private JsonObject buildLogicCondition(QueryOperator operator, Object parsedValue)
+      throws UnknownQueryOperatorException {
+    String parsedLogic = translateOperator(operator);
+    JsonObject logicCondition = new JsonObject();
+    logicCondition.put(parsedLogic, parsedValue);
+    if (operator == QueryOperator.CONTAINS || operator == QueryOperator.STARTS || operator == QueryOperator.ENDS)
+      logicCondition.put("$options", "i");
+    return logicCondition;
   }
 
   /*
@@ -169,22 +194,22 @@ public class MongoQueryExpression extends AbstractQueryExpression {
    * de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator, java.lang.Object, io.vertx.core.Handler)
    */
   @Override
-  protected void transformValue(String fieldName, QueryOperator operator, Object value,
+  protected void transformValue(IField field, QueryOperator operator, Object value,
       Handler<AsyncResult<Object>> handler) {
-    super.transformValue(fieldName, operator, value, result -> {
+    super.transformValue(field, operator, value, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
         Object transformedValue = result.result();
         switch (operator) {
         case CONTAINS:
-          transformedValue = "." + transformedValue + ".";
+          transformedValue = ".*" + transformedValue + ".*";
           break;
         case STARTS:
-          transformedValue = transformedValue + ".";
+          transformedValue = transformedValue + ".*";
           break;
         case ENDS:
-          transformedValue = "." + transformedValue;
+          transformedValue = ".*" + transformedValue;
           break;
         default:
           // noop

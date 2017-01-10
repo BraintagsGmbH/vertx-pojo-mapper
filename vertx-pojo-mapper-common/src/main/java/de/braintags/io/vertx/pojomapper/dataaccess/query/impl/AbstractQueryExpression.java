@@ -38,12 +38,12 @@ public abstract class AbstractQueryExpression implements IQueryExpression {
   private int offset;
   private IMapper<?> mapper;
 
-  protected void transformValue(String fieldName, QueryOperator operator, Object value,
+  protected void transformValue(IField field, QueryOperator operator, Object value,
       Handler<AsyncResult<Object>> handler) {
     if (operator == QueryOperator.IN || operator == QueryOperator.NOT_IN) {
-      handleMultipleValues(fieldName, operator, value, handler);
+      handleMultipleValues(field, operator, value, handler);
     } else {
-      handleSingleValue(fieldName, value, handler);
+      handleSingleValue(field, value, handler);
     }
   }
 
@@ -52,8 +52,7 @@ public abstract class AbstractQueryExpression implements IQueryExpression {
    * @param value
    * @param handler
    */
-  private void handleSingleValue(String fieldName, Object value, Handler<AsyncResult<Object>> handler) {
-    IField field = getMapper().getField(fieldName);
+  private void handleSingleValue(IField field, Object value, Handler<AsyncResult<Object>> handler) {
     field.getTypeHandler().intoStore(value, field, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -69,7 +68,7 @@ public abstract class AbstractQueryExpression implements IQueryExpression {
    * @param value
    * @param handler
    */
-  private void handleMultipleValues(String fieldName, QueryOperator operator, Object value,
+  private void handleMultipleValues(IField field, QueryOperator operator, Object value,
       Handler<AsyncResult<Object>> handler) {
     if (!(value instanceof Iterable)) {
       handler.handle(
@@ -81,7 +80,7 @@ public abstract class AbstractQueryExpression implements IQueryExpression {
     if (count == 0) {
       String message = String.format(
           "multivalued argument but no values defined for search in field %s.%s with operator '%s'",
-          getMapper().getMapperClass().getName(), fieldName, operator);
+          getMapper().getMapperClass().getName(), field, operator);
       handler.handle(Future.failedFuture(new QueryParameterException(message)));
       return;
     }
@@ -93,7 +92,7 @@ public abstract class AbstractQueryExpression implements IQueryExpression {
       Future<Object> future = Future.future();
       futures.add(future);
       Object singleValue = it.next();
-      handleSingleValue(fieldName, singleValue, future.completer());
+      handleSingleValue(field, singleValue, future.completer());
     }
 
     CompositeFuture.all(futures).setHandler(result -> {

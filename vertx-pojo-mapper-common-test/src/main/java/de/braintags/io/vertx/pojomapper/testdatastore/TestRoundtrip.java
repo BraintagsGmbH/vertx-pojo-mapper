@@ -89,7 +89,7 @@ public class TestRoundtrip extends DatastoreBaseTest {
           logger.info(reCod.deleteResult.getOriginalCommand());
           async.complete();
         } catch (Throwable e) {
-          logger.error("", e);
+          logger.error(delete, e);
           context.fail(e.toString());
           async.complete();
         }

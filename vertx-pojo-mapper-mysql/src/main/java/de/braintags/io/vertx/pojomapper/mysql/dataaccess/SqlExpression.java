@@ -32,6 +32,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpre
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition.SortArgument;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mysql.mapping.SqlMapper;
 import de.braintags.io.vertx.pojomapper.mysql.typehandler.SqlDistanceSearchFunction;
@@ -144,8 +145,10 @@ public class SqlExpression extends AbstractQueryExpression {
    * @param handler
    */
   private void parseQueryCondition(IQueryCondition queryCondition, Handler<AsyncResult<SqlWhereFragment>> handler) {
+    final IField field = getMapper().getField(queryCondition.getField());
+    final String columnName = field.getColumnInfo().getName();
     if (queryCondition.getValue() != null) {
-      transformValue(queryCondition.getField(), queryCondition.getOperator(), queryCondition.getValue(), result -> {
+      transformValue(field, queryCondition.getOperator(), queryCondition.getValue(), result -> {
         if (result.failed()) {
           handler.handle(Future.failedFuture(result.cause()));
         } else {
@@ -157,14 +160,14 @@ public class SqlExpression extends AbstractQueryExpression {
             handler.handle(Future.failedFuture(e));
             return;
           }
-          SqlWhereFragment fragment = handleParsedCondition(queryCondition.getField(), parsedOperator, parsedValue);
+          SqlWhereFragment fragment = handleParsedCondition(columnName, parsedOperator, parsedValue);
           handler.handle(Future.succeededFuture(fragment));
         }
       });
     } else {
       // special handling for NULL values
       SqlWhereFragment fragment = new SqlWhereFragment();
-      fragment.whereClause.append(queryCondition.getField()).append(" ");
+      fragment.whereClause.append(columnName).append(" ");
       if (queryCondition.getOperator() == QueryOperator.EQUALS) {
         fragment.whereClause.append("IS NULL");
       } else if (queryCondition.getOperator() == QueryOperator.NOT_EQUALS) {
@@ -259,9 +262,9 @@ public class SqlExpression extends AbstractQueryExpression {
    * de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator, java.lang.Object, io.vertx.core.Handler)
    */
   @Override
-  protected void transformValue(String fieldName, QueryOperator operator, Object value,
+  protected void transformValue(IField field, QueryOperator operator, Object value,
       Handler<AsyncResult<Object>> handler) {
-    super.transformValue(fieldName, operator, value, result -> {
+    super.transformValue(field, operator, value, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
