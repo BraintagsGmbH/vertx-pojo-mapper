@@ -297,16 +297,6 @@ public class MapTypeHandler extends AbstractTypeHandler {
     return getSubTypeHandler(keyClass, null);
   }
 
-  class CurrentCounter {
-    int i;
-    Object value;
-
-    CurrentCounter(int i, Object value) {
-      this.i = i;
-      this.value = value;
-    }
-  }
-
   class MapEntry {
     Object key;
     Object value;
