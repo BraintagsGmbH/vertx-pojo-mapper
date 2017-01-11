@@ -22,7 +22,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
@@ -125,57 +124,6 @@ public class TMongoDirectMassInsert {
     JsonObject jsonCommand = new JsonObject().put("name", "testName " + number);
     client.insert(TABLENAME, jsonCommand, f.completer());
     return f;
-  }
-
-  @Test
-  public void massInsertWithCounter(TestContext context) {
-    Async async = context.async();
-    dropTable(context, TABLENAME);
-
-    final long startTime = System.currentTimeMillis();
-    CounterObject<Void> co = new CounterObject<>(LOOP, null);
-    for (int i = 0; i < LOOP; i++) {
-      JsonObject jsonCommand = new JsonObject().put("name", "testName " + i);
-      client.insert(TABLENAME, jsonCommand, result -> {
-        if (result.failed()) {
-          LOGGER.error("", result.cause());
-          co.setThrowable(result.cause());
-          async.complete();
-        } else {
-          LOGGER.info("executed: " + result.result());
-          if (co.reduce()) {
-            LOGGER.info("finished");
-            client.count(TABLENAME, new JsonObject(), cr -> {
-              if (cr.failed()) {
-                LOGGER.error("", cr.cause());
-                co.setThrowable(cr.cause());
-                async.complete();
-              } else {
-                try {
-                  context.assertEquals(LOOP, cr.result().intValue(), "result not correct");
-                  async.complete();
-                } catch (Throwable e) {
-                  LOGGER.error("", e);
-                  co.setThrowable(e);
-                  async.complete();
-                }
-              }
-            });
-          }
-        }
-      });
-      if (co.isError()) {
-        break;
-      }
-    }
-
-    async.await();
-    if (co.isError()) {
-      context.fail(co.getThrowable());
-    }
-    long execution = System.currentTimeMillis() - startTime;
-    results.add("massInsertWithCounter: " + execution + " | ");
-    LOGGER.info(results.toString());
   }
 
   @BeforeClass
