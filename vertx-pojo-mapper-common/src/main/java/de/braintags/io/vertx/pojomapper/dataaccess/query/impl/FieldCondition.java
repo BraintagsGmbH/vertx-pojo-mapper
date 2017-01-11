@@ -2,11 +2,12 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
+import io.vertx.codegen.annotations.Nullable;
 
 /**
- * <br>
+ * Simple implementation of {@link IFieldCondition}<br>
  * <br>
  * Copyright: Copyright (c) 20.12.2016 <br>
  * Company: Braintags GmbH <br>
@@ -14,20 +15,30 @@ import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
  * @author sschmitt
  */
 
-public class FieldCondition implements IQueryCondition {
+public class FieldCondition implements IFieldCondition {
 
   private String field;
   private QueryOperator operator;
   private Object value;
 
-  public FieldCondition(String field, QueryOperator logic, Object value) {
+  /**
+   * Creates a complete field condition
+   * 
+   * @param field
+   *          the field of this condition
+   * @param logic
+   *          the compare logic of this condition
+   * @param value
+   *          the value of this condition, can be null
+   */
+  public FieldCondition(String field, QueryOperator logic, @Nullable Object value) {
     this.field = field;
     this.operator = logic;
     this.value = value;
   }
 
   /**
-   * @return the field
+   * @return the POJO field of this condition
    */
   @Override
   public String getField() {
@@ -35,7 +46,7 @@ public class FieldCondition implements IQueryCondition {
   }
 
   /**
-   * @return the logic
+   * @return the compare logic of this condition
    */
   @Override
   public QueryOperator getOperator() {
@@ -43,7 +54,7 @@ public class FieldCondition implements IQueryCondition {
   }
 
   /**
-   * @return the value
+   * @return the value of this condition, can be null
    */
   @Override
   public Object getValue() {

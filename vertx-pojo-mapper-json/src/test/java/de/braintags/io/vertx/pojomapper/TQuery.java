@@ -36,7 +36,7 @@ public class TQuery {
   @Test
   public void test() {
     IQuery<Person> query = dataStore.createQuery(Person.class);
-    query.setRootQueryPart(query.and(query.isEqual("name", "peter"), query.in("secName", Arrays.asList("eins", "zwei")),
+    query.setSearchCondition(query.and(query.isEqual("name", "peter"), query.in("secName", "eins", "zwei"),
         query.isEqual("weight", 15)));
     logger.info("--- start Rambler");
 

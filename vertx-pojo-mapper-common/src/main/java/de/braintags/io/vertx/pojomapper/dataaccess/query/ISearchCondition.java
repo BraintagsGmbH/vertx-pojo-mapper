@@ -1,7 +1,7 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
 /**
- * The parts that make up the conditions of the query<br>
+ * The parts that make up the search condition of the query<br>
  * <br>
  * Copyright: Copyright (c) 20.12.2016 <br>
  * Company: Braintags GmbH <br>
@@ -9,6 +9,6 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query;
  * @author sschmitt
  */
 
-public interface IQueryPart {
+public interface ISearchCondition {
 
 }

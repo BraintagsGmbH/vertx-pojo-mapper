@@ -52,6 +52,9 @@ public class MongoQuery<T> extends Query<T> {
     super(mapperClass, datastore);
   }
 
+  /* (non-Javadoc)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#internalExecute(de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
+   */
   @Override
   public void internalExecute(IQueryExpression queryExpression, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     try {
@@ -72,6 +75,9 @@ public class MongoQuery<T> extends Query<T> {
     resultHandler.handle(Future.failedFuture(new UnsupportedOperationException("Not implemented yet")));
   }
 
+  /* (non-Javadoc)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#internalExecuteCount(de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
+   */
   @Override
   public void internalExecuteCount(IQueryExpression queryExpression,
       Handler<AsyncResult<IQueryCountResult>> resultHandler) {

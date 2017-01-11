@@ -122,17 +122,17 @@ public interface IQuery<T> extends IDataAccessObject<T> {
   /**
    * Set the complete search condition of the query
    * 
-   * @param queryPart
-   *          the root query part that contains or builds the complete query search condition
+   * @param searchCondition
+   *          the root condition that contains or builds the complete query search condition
    */
-  void setRootQueryPart(IQueryPart queryPart);
+  void setSearchCondition(ISearchCondition searchCondition);
 
   /**
    * Get the complete search condition of the query
    * 
-   * @return the root query part that contains or builds the complete query search condition
+   * @return the root condition that contains or builds the complete query search condition
    */
-  IQueryPart getRootQueryPart();
+  ISearchCondition getSearchCondition();
 
   /**
    * Create a query condition for the {@link QueryOperator#NEAR} operator
@@ -147,7 +147,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the maximum distance to the given point
    * @return
    */
-  IQueryCondition near(String field, double x, double y, int maxDistance);
+  IFieldCondition near(String field, double x, double y, int maxDistance);
 
   /**
    * Create a query condition for the {@link QueryOperator#CONTAINS} operator
@@ -158,7 +158,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the value that must be contained
    * @return
    */
-  IQueryCondition contains(String field, Object value);
+  IFieldCondition contains(String field, Object value);
 
   /**
    * Create a query condition for the {@link QueryOperator#ENDS} operator
@@ -169,7 +169,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the value that the record must end with
    * @return
    */
-  IQueryCondition endsWith(String field, Object value);
+  IFieldCondition endsWith(String field, Object value);
 
   /**
    * Create a query condition for the {@link QueryOperator#STARTS} operator
@@ -180,7 +180,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the value that the record must start with
    * @return
    */
-  IQueryCondition startsWith(String field, Object value);
+  IFieldCondition startsWith(String field, Object value);
 
   /**
    * Create a query condition for the {@link QueryOperator#NOT_IN} operator
@@ -191,7 +191,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the values for the comparison
    * @return
    */
-  IQueryCondition notIn(String field, Collection<?> values);
+  IFieldCondition notIn(String field, Collection<?> values);
 
   /**
    * Create a query condition for the {@link QueryOperator#NOT_IN} operator
@@ -202,7 +202,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the values for the comparison
    * @return
    */
-  IQueryCondition notIn(String field, Object... values);
+  IFieldCondition notIn(String field, Object... values);
 
   /**
    * 
@@ -214,7 +214,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the values for the comparison
    * @return
    */
-  IQueryCondition in(String field, Collection<?> values);
+  IFieldCondition in(String field, Collection<?> values);
 
   /**
    * Create a query condition for the {@link QueryOperator#IN} operator
@@ -225,7 +225,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the values for the comparison
    * @return
    */
-  IQueryCondition in(String field, Object... values);
+  IFieldCondition in(String field, Object... values);
 
   /**
    * Create a query condition for the {@link QueryOperator#SMALLER_EQUAL} operator
@@ -236,7 +236,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the value that the record must be smaller or equal to
    * @return
    */
-  IQueryCondition smallerOrEqual(String field, Object value);
+  IFieldCondition smallerOrEqual(String field, Object value);
 
   /**
    * Create a query condition for the {@link QueryOperator#SMALLER} operator
@@ -247,7 +247,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the value that the record must be smaller than
    * @return
    */
-  IQueryCondition smaller(String field, Object value);
+  IFieldCondition smaller(String field, Object value);
 
   /**
    * Create a query condition for the {@link QueryOperator#LARGER_EQUAL} operator
@@ -258,7 +258,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the value that the record must be larger or equal to
    * @return
    */
-  IQueryCondition largerOrEqual(String field, Object value);
+  IFieldCondition largerOrEqual(String field, Object value);
 
   /**
    * Create a query condition for the {@link QueryOperator#LARGER} operator
@@ -269,7 +269,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the value that the record must be larger than
    * @return
    */
-  IQueryCondition larger(String field, Object value);
+  IFieldCondition larger(String field, Object value);
 
   /**
    * 
@@ -281,7 +281,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the value that the record must not be equal to
    * @return
    */
-  IQueryCondition notEqual(String field, Object value);
+  IFieldCondition notEqual(String field, Object value);
 
   /**
    * 
@@ -293,7 +293,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the value that the record must be equal to
    * @return
    */
-  IQueryCondition isEqual(String field, Object value);
+  IFieldCondition isEqual(String field, Object value);
 
   /**
    * Connects the given query parts with the {@link QueryLogic#OR} connector
@@ -302,7 +302,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the query parts to connect
    * @return
    */
-  IQueryContainer or(IQueryPart... queryParts);
+  ISearchConditionContainer or(ISearchCondition... queryParts);
 
   /**
    * Connects the given query parts with the {@link QueryLogic#AND} connector
@@ -311,7 +311,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    *          the query parts to connect
    * @return
    */
-  IQueryContainer and(IQueryPart... queryParts);
+  ISearchConditionContainer and(ISearchCondition... queryParts);
 
   /**
    * Build the complete query expression that contains all info needed to execute this query against the current

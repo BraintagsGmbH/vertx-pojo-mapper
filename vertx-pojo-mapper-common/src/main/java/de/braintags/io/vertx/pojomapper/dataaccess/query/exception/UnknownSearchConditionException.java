@@ -12,23 +12,23 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.exception;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchCondition;
 
 /**
- * 
+ * Thrown if a query expression encouters an unknown implementation of {@link ISearchCondition} that it can not handle
  * 
  * @author sschmitt
  * 
  */
-public class UnknownQueryPartException extends QueryExpressionBuildException {
+public class UnknownSearchConditionException extends QueryExpressionBuildException {
 
   private static final long serialVersionUID = 1L;
 
   /**
    * @param message
    */
-  public UnknownQueryPartException(IQueryPart queryPart) {
-    super("Unknown query part class: " + queryPart.getClass());
+  public UnknownSearchConditionException(ISearchCondition queryPart) {
+    super("Unknown ISearchCondition implementation: " + queryPart.getClass());
   }
 
 }

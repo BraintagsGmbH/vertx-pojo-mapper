@@ -1,7 +1,7 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
 /**
- * A single condition statement of a query<br>
+ * A single condition statement of a query, to filter the result based on the value of a field<br>
  * <br>
  * Copyright: Copyright (c) 20.12.2016 <br>
  * Company: Braintags GmbH <br>
@@ -9,7 +9,7 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query;
  * @author sschmitt
  */
 
-public interface IQueryCondition extends IQueryPart {
+public interface IFieldCondition extends ISearchCondition {
 
   /**
    * @return the field of the condition

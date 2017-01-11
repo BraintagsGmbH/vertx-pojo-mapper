@@ -8,15 +8,15 @@ package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchCondition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchConditionContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryLogicException;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryOperatorException;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryPartException;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownSearchConditionException;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
@@ -39,7 +39,7 @@ public class MongoQueryExpression extends AbstractQueryExpression {
   private JsonObject sortArguments;
 
   /**
-   * Get the original Query definition for Mongo
+   * Get the native query definition for Mongo
    * 
    * @return
    */
@@ -55,7 +55,7 @@ public class MongoQueryExpression extends AbstractQueryExpression {
    * pojomapper.dataaccess.query.IQueryPart)
    */
   @Override
-  public void buildQueryExpression(IQueryPart queryPart, Handler<AsyncResult<Void>> handler) {
+  public void buildQueryExpression(ISearchCondition queryPart, Handler<AsyncResult<Void>> handler) {
     internalBuildQuery(queryPart, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -67,28 +67,45 @@ public class MongoQueryExpression extends AbstractQueryExpression {
     });
   }
 
-  private void internalBuildQuery(IQueryPart queryPart, Handler<AsyncResult<JsonObject>> handler) {
-    if (queryPart instanceof IQueryCondition) {
-      parseQueryCondition((IQueryCondition) queryPart, handler);
-    } else if (queryPart instanceof IQueryContainer) {
-      parseQueryContainer((IQueryContainer) queryPart, handler);
+  /**
+   * Build the abstract search condition into the native search condition of the query. Can be used recursively for
+   * conditions that contain more than one sub condition (AND, OR, ..)
+   * 
+   * @param searchCondition
+   *          the query search condition
+   * @param handler
+   *          returns the JSON object that represents the given search condition
+   */
+  private void internalBuildQuery(ISearchCondition searchCondition, Handler<AsyncResult<JsonObject>> handler) {
+    if (searchCondition instanceof IFieldCondition) {
+      parseFieldCondition((IFieldCondition) searchCondition, handler);
+    } else if (searchCondition instanceof ISearchConditionContainer) {
+      parseSearchConditionContainer((ISearchConditionContainer) searchCondition, handler);
     } else {
-      handler.handle(Future.failedFuture(new UnknownQueryPartException(queryPart)));
+      handler.handle(Future.failedFuture(new UnknownSearchConditionException(searchCondition)));
     }
   }
 
-  private void parseQueryContainer(IQueryContainer container, Handler<AsyncResult<JsonObject>> handler) {
+  /**
+   * Parses the container part of a search condition. Loops through the content of the container and connects all of
+   * them with the specified connector.
+   * 
+   * @param container
+   * @param handler
+   */
+  private void parseSearchConditionContainer(ISearchConditionContainer container,
+      Handler<AsyncResult<JsonObject>> handler) {
     String connector;
     try {
-      connector = translateConnector(container.getConnector());
+      connector = translateConnector(container.getQueryLogic());
     } catch (UnknownQueryLogicException e) {
       handler.handle(Future.failedFuture(e));
       return;
     }
-    List<IQueryPart> content = container.getContent();
+    List<ISearchCondition> content = container.getConditions();
     @SuppressWarnings("rawtypes")
     List<Future> futures = new ArrayList<>();
-    for (IQueryPart queryPart : content) {
+    for (ISearchCondition queryPart : content) {
       Future<JsonObject> future = Future.future();
       futures.add(future);
       internalBuildQuery(queryPart, future.completer());
@@ -123,7 +140,7 @@ public class MongoQueryExpression extends AbstractQueryExpression {
     }
   }
 
-  private void parseQueryCondition(IQueryCondition condition, Handler<AsyncResult<JsonObject>> handler) {
+  private void parseFieldCondition(IFieldCondition condition, Handler<AsyncResult<JsonObject>> handler) {
 
     IField field = getMapper().getField(condition.getField());
     String columnName = field.getColumnInfo().getName();

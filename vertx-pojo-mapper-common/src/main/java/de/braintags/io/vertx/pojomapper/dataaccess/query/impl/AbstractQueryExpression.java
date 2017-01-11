@@ -27,7 +27,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 /**
- * 
+ * Abstract implementation of {@link IQueryExpression}
  * 
  * @author sschmitt
  * 
@@ -38,19 +38,43 @@ public abstract class AbstractQueryExpression implements IQueryExpression {
   private int offset;
   private IMapper<?> mapper;
 
+  /**
+   * Transforms the java value of the given field into a value that is suited for the database, via the configured type
+   * handler(s).<br>
+   * If the operator is a multi-value operator (e.g IN or NOT_IN), the value must be an instance of {@link Iterable}.
+   * 
+   * @param field
+   *          the java field of the condition
+   * @param operator
+   *          the operator of the condition
+   * @param value
+   *          the value that will be transformed, must not be null
+   * @param handler
+   *          returns the transformed value
+   */
   protected void transformValue(IField field, QueryOperator operator, Object value,
       Handler<AsyncResult<Object>> handler) {
-    if (operator == QueryOperator.IN || operator == QueryOperator.NOT_IN) {
-      handleMultipleValues(field, operator, value, handler);
+    if (operator.isMultiValueOperator()) {
+      if (!(value instanceof Iterable)) {
+        handler.handle(
+            Future.failedFuture(new QueryParameterException("Multivalued argument but not an instance of Iterable")));
+        return;
+      }
+      handleMultipleValues(field, (Iterable<?>) value, handler);
     } else {
       handleSingleValue(field, value, handler);
     }
   }
 
   /**
-   * @param fieldName
+   * Handle the transformation of a single value
+   * 
+   * @param field
+   *          the java field of the condition
    * @param value
+   *          the value that will be transformed
    * @param handler
+   *          returns the transformed value
    */
   private void handleSingleValue(IField field, Object value, Handler<AsyncResult<Object>> handler) {
     field.getTypeHandler().intoStore(value, field, result -> {
@@ -63,29 +87,25 @@ public abstract class AbstractQueryExpression implements IQueryExpression {
   }
 
   /**
+   * Handle the transformation of multiple values
+   * 
    * @param fieldName
-   * @param operator
+   *          the java field of the condition
    * @param value
+   *          the values of the condition, must not be empty
    * @param handler
+   *          returns a {@link List} with the transformed values
    */
-  private void handleMultipleValues(IField field, QueryOperator operator, Object value,
-      Handler<AsyncResult<Object>> handler) {
-    if (!(value instanceof Iterable)) {
-      handler.handle(
-          Future.failedFuture(new QueryParameterException("Multivalued argument but not an instance of Iterable")));
-      return;
-    }
-
-    int count = Size.size((Iterable<?>) value);
+  private void handleMultipleValues(IField field, Iterable<?> value, Handler<AsyncResult<Object>> handler) {
+    int count = Size.size(value);
     if (count == 0) {
-      String message = String.format(
-          "multivalued argument but no values defined for search in field %s.%s with operator '%s'",
-          getMapper().getMapperClass().getName(), field, operator);
+      String message = String.format("Multivalued argument, but no values defined for search in field %s.%s",
+          getMapper().getMapperClass().getName(), field);
       handler.handle(Future.failedFuture(new QueryParameterException(message)));
       return;
     }
 
-    Iterator<?> it = ((Iterable<?>) value).iterator();
+    Iterator<?> it = value.iterator();
     @SuppressWarnings("rawtypes")
     List<Future> futures = new ArrayList<>();
     while (it.hasNext()) {
@@ -105,6 +125,11 @@ public abstract class AbstractQueryExpression implements IQueryExpression {
     });
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#setLimit(int, int)
+   */
   @Override
   public void setLimit(int limit, int offset) {
     this.limit = limit;
@@ -112,14 +137,14 @@ public abstract class AbstractQueryExpression implements IQueryExpression {
   }
 
   /**
-   * @return the limit
+   * @return the limit for this query
    */
   protected int getLimit() {
     return limit;
   }
 
   /**
-   * @return the offset
+   * @return the offset (starting position) for this query
    */
   protected int getOffset() {
     return offset;

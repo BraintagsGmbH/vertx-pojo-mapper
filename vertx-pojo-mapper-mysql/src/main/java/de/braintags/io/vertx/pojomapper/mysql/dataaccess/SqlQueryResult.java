@@ -45,11 +45,14 @@ public class SqlQueryResult<T> extends AbstractQueryResult<T> {
    * @param query
    *          the {@link SqlQueryRambler}
    */
-  public SqlQueryResult(ResultSet resultSet, MySqlDataStore store, IMapper mapper, SqlExpression statement) {
-    super(store, mapper, resultSet.getNumRows(), statement);
+  public SqlQueryResult(ResultSet resultSet, MySqlDataStore store, IMapper mapper, SqlExpression expression) {
+    super(store, mapper, resultSet.getNumRows(), expression);
     this.resultSet = resultSet;
   }
 
+  /* (non-Javadoc)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryResult#generatePojo(int, io.vertx.core.Handler)
+   */
   @Override
   protected void generatePojo(int i, Handler<AsyncResult<T>> handler) {
     JsonObject sourceObject = resultSet.getRows().get(i);
@@ -65,6 +68,9 @@ public class SqlQueryResult<T> extends AbstractQueryResult<T> {
     });
   }
 
+  /**
+   * @return the result set of this query result
+   */
   public ResultSet getResultSet() {
     return resultSet;
   }

@@ -20,18 +20,35 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query;
  */
 
 public enum QueryOperator {
-  EQUALS,
-  NOT_EQUALS,
-  LARGER,
-  SMALLER,
-  LARGER_EQUAL,
-  SMALLER_EQUAL,
-  IN,
-  NOT_IN,
-  STARTS,
-  ENDS,
-  CONTAINS,
-  NEAR;
+  EQUALS(false),
+  NOT_EQUALS(false),
+
+  LARGER(false),
+  SMALLER(false),
+  LARGER_EQUAL(false),
+  SMALLER_EQUAL(false),
+
+  STARTS(false),
+  ENDS(false),
+  CONTAINS(false),
+
+  NEAR(false),
+
+  IN(true),
+  NOT_IN(true);
+
+  private final boolean multiValueOperator;
+
+  private QueryOperator(boolean multiValueOperator) {
+    this.multiValueOperator = multiValueOperator;
+  }
+
+  /**
+   * @return if the value of conditions with this operator must consist of multiple values
+   */
+  public boolean isMultiValueOperator() {
+    return multiValueOperator;
+  }
 
 }
 

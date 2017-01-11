@@ -10,12 +10,12 @@ import java.util.Collection;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchCondition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchConditionContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
@@ -35,7 +35,7 @@ import io.vertx.core.Handler;
 public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQuery<T> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory.getLogger(Query.class);
 
-  private IQueryPart rootQueryPart;
+  private ISearchCondition searchCondition;
   private int limit = 500;
   private int start = 0;
   private boolean returnCompleteCount = false;
@@ -77,6 +77,12 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     });
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#buildQueryExpression(io.vertx.core.Handler)
+   */
+  @Override
   public void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler) {
     try {
       IQueryExpression expression = getQueryExpressionClass().newInstance();
@@ -84,11 +90,11 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
       expression.setLimit(getLimit(), getStart());
       if (getNativeCommand() != null)
         expression.setNativeCommand(getNativeCommand());
-      if (!getSortDefinitions().isEmpty()) {
+      if (getSortDefinitions() != null && !getSortDefinitions().isEmpty()) {
         expression.addSort(getSortDefinitions());
       }
-      if (getRootQueryPart() != null) {
-        expression.buildQueryExpression(getRootQueryPart(), result -> {
+      if (getSearchCondition() != null) {
+        expression.buildQueryExpression(getSearchCondition(), result -> {
           if (result.failed())
             resultHandler.handle(Future.failedFuture(result.cause()));
           else
@@ -102,6 +108,9 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     }
   }
 
+  /**
+   * @return the implementation of the {@link IQueryExpression} for the current datastore
+   */
   protected abstract Class<? extends IQueryExpression> getQueryExpressionClass();
 
   /**
@@ -175,6 +184,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   }
 
   /**
+   * Get the limit for the query
+   * 
    * @return the limit
    */
   public final int getLimit() {
@@ -182,6 +193,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   }
 
   /**
+   * Get the start position of the query
    * @return the start
    */
   public final int getStart() {
@@ -189,7 +201,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   }
 
   /**
-   * @return the returnCompleteCount
+   * 
+   * @return if the complete number of results should be computed
    */
   public final boolean isReturnCompleteCount() {
     return returnCompleteCount;
@@ -197,7 +210,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /**
    * @param returnCompleteCount
-   *          the returnCompleteCount to set
+   *          if the complete number of results should be computed
    */
   @Override
   public final IQuery<T> setReturnCompleteCount(boolean returnCompleteCount) {
@@ -215,6 +228,9 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     return addSort(fieldName, true);
   }
 
+  /* (non-Javadoc)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#addSort(java.lang.String, boolean)
+   */
   @Override
   public ISortDefinition<T> addSort(String fieldName, boolean ascending) {
     return sortDefs.addSort(fieldName, ascending);
@@ -256,28 +272,28 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public boolean hasQueryArguments() {
-    return rootQueryPart != null;
+    return searchCondition != null;
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setRootQueryPart(de.braintags.io.vertx.pojomapper.
-   * dataaccess.query.IQueryPart)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setSearchCondition(de.braintags.io.vertx.pojomapper.
+   * dataaccess.query.ISearchCondition)
    */
   @Override
-  public void setRootQueryPart(IQueryPart rootQueryPart) {
-    this.rootQueryPart = rootQueryPart;
+  public void setSearchCondition(ISearchCondition searchCondition) {
+    this.searchCondition = searchCondition;
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#getRootQueryPart()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#getSearchCondition()
    */
   @Override
-  public IQueryPart getRootQueryPart() {
-    return rootQueryPart;
+  public ISearchCondition getSearchCondition() {
+    return searchCondition;
   }
 
   /*
@@ -286,7 +302,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#isEqual(java.lang.String, java.lang.Object)
    */
   @Override
-  public IQueryCondition isEqual(String field, Object value) {
+  public IFieldCondition isEqual(String field, Object value) {
     return new FieldCondition(field, QueryOperator.EQUALS, value);
   }
 
@@ -296,7 +312,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#notEqual(java.lang.String, java.lang.Object)
    */
   @Override
-  public IQueryCondition notEqual(String field, Object value) {
+  public IFieldCondition notEqual(String field, Object value) {
     return new FieldCondition(field, QueryOperator.NOT_EQUALS, value);
   }
 
@@ -306,7 +322,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#larger(java.lang.String, java.lang.Object)
    */
   @Override
-  public IQueryCondition larger(String field, Object value) {
+  public IFieldCondition larger(String field, Object value) {
     return new FieldCondition(field, QueryOperator.LARGER, value);
   }
 
@@ -316,7 +332,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#largerOrEqual(java.lang.String, java.lang.Object)
    */
   @Override
-  public IQueryCondition largerOrEqual(String field, Object value) {
+  public IFieldCondition largerOrEqual(String field, Object value) {
     return new FieldCondition(field, QueryOperator.LARGER_EQUAL, value);
   }
 
@@ -326,7 +342,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#smaller(java.lang.String, java.lang.Object)
    */
   @Override
-  public IQueryCondition smaller(String field, Object value) {
+  public IFieldCondition smaller(String field, Object value) {
     return new FieldCondition(field, QueryOperator.SMALLER, value);
   }
 
@@ -336,12 +352,15 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#smallerOrEqual(java.lang.String, java.lang.Object)
    */
   @Override
-  public IQueryCondition smallerOrEqual(String field, Object value) {
+  public IFieldCondition smallerOrEqual(String field, Object value) {
     return new FieldCondition(field, QueryOperator.SMALLER_EQUAL, value);
   }
 
+  /* (non-Javadoc)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#in(java.lang.String, java.lang.Object[])
+   */
   @Override
-  public IQueryCondition in(String field, Object... values) {
+  public IFieldCondition in(String field, Object... values) {
     return in(field, Arrays.asList(values));
   }
 
@@ -351,7 +370,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#in(java.lang.String, java.util.Collection)
    */
   @Override
-  public IQueryCondition in(String field, Collection<?> values) {
+  public IFieldCondition in(String field, Collection<?> values) {
     return new FieldCondition(field, QueryOperator.IN, values);
   }
 
@@ -361,7 +380,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#notIn(java.lang.String, java.lang.Object[])
    */
   @Override
-  public IQueryCondition notIn(String field, Object... values) {
+  public IFieldCondition notIn(String field, Object... values) {
     return notIn(field, Arrays.asList(values));
   }
 
@@ -371,7 +390,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#notIn(java.lang.String, java.util.Collection)
    */
   @Override
-  public IQueryCondition notIn(String field, Collection<?> values) {
+  public IFieldCondition notIn(String field, Collection<?> values) {
     return new FieldCondition(field, QueryOperator.NOT_IN, values);
   }
 
@@ -381,7 +400,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#startsWith(java.lang.String, java.lang.Object)
    */
   @Override
-  public IQueryCondition startsWith(String field, Object value) {
+  public IFieldCondition startsWith(String field, Object value) {
     return new FieldCondition(field, QueryOperator.STARTS, value);
   }
 
@@ -391,7 +410,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#endsWith(java.lang.String, java.lang.Object)
    */
   @Override
-  public IQueryCondition endsWith(String field, Object value) {
+  public IFieldCondition endsWith(String field, Object value) {
     return new FieldCondition(field, QueryOperator.ENDS, value);
   }
 
@@ -401,7 +420,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#contains(java.lang.String, java.lang.Object)
    */
   @Override
-  public IQueryCondition contains(String field, Object value) {
+  public IFieldCondition contains(String field, Object value) {
     return new FieldCondition(field, QueryOperator.CONTAINS, value);
   }
 
@@ -411,7 +430,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#near(java.lang.String, double, double, int)
    */
   @Override
-  public IQueryCondition near(String field, double x, double y, int maxDistance) {
+  public IFieldCondition near(String field, double x, double y, int maxDistance) {
     return new FieldCondition(field, QueryOperator.NEAR,
         new GeoSearchArgument(new GeoPoint(new Position(x, y, new double[0])), maxDistance));
   }
@@ -424,7 +443,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * IQueryPart[])
    */
   @Override
-  public IQueryContainer and(IQueryPart... queryParts) {
+  public ISearchConditionContainer and(ISearchCondition... queryParts) {
     return new QueryAnd(queryParts);
   }
 
@@ -435,7 +454,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * IQueryPart[])
    */
   @Override
-  public IQueryContainer or(IQueryPart... queryParts) {
+  public ISearchConditionContainer or(ISearchCondition... queryParts) {
     return new QueryOr(queryParts);
   }
 }

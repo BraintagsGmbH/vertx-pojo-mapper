@@ -39,17 +39,17 @@ public class TestGeoSearch extends DatastoreBaseTest {
     clearTable(context, GeoMapper.class.getSimpleName());
     createDemoRecords(context);
     IQuery<GeoMapper> query = getDataStore(context).createQuery(GeoMapper.class);
-    query.setRootQueryPart(query.near("position", sLong, sLat, 10));
+    query.setSearchCondition(query.near("position", sLong, sLat, 10));
     List<GeoMapper> found = findAll(context, query);
     context.assertEquals(found.size(), 1, "wrong number of records");
 
     query = getDataStore(context).createQuery(GeoMapper.class);
-    query.setRootQueryPart(query.near("position", sLong, sLat, 70000));
+    query.setSearchCondition(query.near("position", sLong, sLat, 70000));
     found = findAll(context, query);
     context.assertEquals(found.size(), 2, "wrong number of records");
 
     query = getDataStore(context).createQuery(GeoMapper.class);
-    query.setRootQueryPart(query.near("position", sLong, sLat, 700000));
+    query.setSearchCondition(query.near("position", sLong, sLat, 700000));
     found = findAll(context, query);
     context.assertEquals(found.size(), 3, "wrong number of records");
 

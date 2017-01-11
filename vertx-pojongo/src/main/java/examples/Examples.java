@@ -108,7 +108,7 @@ public class Examples {
    */
   public void example4(MongoDataStore mongoDataStore) {
     IQuery<DemoMapper> query = mongoDataStore.createQuery(DemoMapper.class);
-    query.setRootQueryPart(query.isEqual("name", "demoMapper"));
+    query.setSearchCondition(query.isEqual("name", "demoMapper"));
     query.execute(rResult -> {
       if (rResult.failed()) {
         logger.error(rResult.cause());

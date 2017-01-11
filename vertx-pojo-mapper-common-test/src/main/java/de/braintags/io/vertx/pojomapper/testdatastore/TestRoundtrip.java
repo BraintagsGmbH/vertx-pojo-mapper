@@ -55,13 +55,13 @@ public class TestRoundtrip extends DatastoreBaseTest {
     if (LOOP != resultContainer.writeResult.size()) {
       // check wether records weren't written or "only" IWriteResult is incomplete
       IQuery<MiniMapper> query = getDataStore(context).createQuery(MiniMapper.class);
-      query.setRootQueryPart(query.isEqual("name", "looper"));
+      query.setSearchCondition(query.isEqual("name", "looper"));
       find(context, query, LOOP);
       context.assertEquals(LOOP, resultContainer.writeResult.size());
     }
 
     IQuery<MiniMapper> query = getDataStore(context).createQuery(MiniMapper.class);
-    query.setRootQueryPart(query.isEqual("name", "looper"));
+    query.setSearchCondition(query.isEqual("name", "looper"));
     ResultContainer reCo = find(context, query, LOOP);
 
     IDelete<MiniMapper> delete = getDataStore(context).createDelete(MiniMapper.class);

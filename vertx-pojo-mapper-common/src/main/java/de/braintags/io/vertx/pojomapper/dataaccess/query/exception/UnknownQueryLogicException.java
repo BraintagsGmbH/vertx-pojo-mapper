@@ -15,7 +15,7 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query.exception;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 
 /**
- * 
+ * Thrown if the query expression encounters an unknown {@link QueryLogic}
  * 
  * @author sschmitt
  * 

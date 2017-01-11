@@ -12,8 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.exception;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
+
 /**
- * 
+ * Thrown if there is an exception during the conversion process of the general {@link IQuery} to a more native {@link IQueryExpression}
  * 
  * @author sschmitt
  * 
@@ -23,7 +26,7 @@ public abstract class QueryExpressionBuildException extends Exception {
   private static final long serialVersionUID = -4972417569758843244L;
 
   /**
-   * @param string
+   * @param message
    */
   public QueryExpressionBuildException(String message) {
     super(message);

@@ -18,16 +18,16 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCondition;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchCondition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchConditionContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.QueryExpressionBuildException;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryLogicException;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryOperatorException;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryPartException;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownSearchConditionException;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
@@ -64,6 +64,13 @@ public class SqlExpression extends AbstractQueryExpression {
   private StringBuilder orderByClause = new StringBuilder();
   private JsonArray parameters = new JsonArray();
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#setMapper(de.braintags.io.vertx.
+   * pojomapper.mapping.IMapper)
+   */
   @Override
   public void setMapper(IMapper<?> mapper) {
     super.setMapper(mapper);
@@ -93,11 +100,11 @@ public class SqlExpression extends AbstractQueryExpression {
    * 
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#buildQueryExpression(de.braintags.io.vertx.
-   * pojomapper.dataaccess.query.IQueryPart)
+   * pojomapper.dataaccess.query.ISearchCondition, io.vertx.core.Handler)
    */
   @Override
-  public void buildQueryExpression(IQueryPart queryPart, Handler<AsyncResult<Void>> handler) {
-    internalBuildSearchCondition(queryPart, result -> {
+  public void buildQueryExpression(ISearchCondition searchCondition, Handler<AsyncResult<Void>> handler) {
+    internalBuildSearchCondition(searchCondition, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
@@ -110,96 +117,102 @@ public class SqlExpression extends AbstractQueryExpression {
   }
 
   /**
-   * Recursive method to build the query parts into the native search condition of the query
+   * Build the abstract search condition into the native search condition of the query. Can be used recursively for
+   * conditions that contain more than one sub condition (AND, OR, ..)
    * 
-   * @param queryPart
+   * @param searchCondition
+   *          the query search condition
    * @param handler
+   *          returns a fragment that contains the SQL query clause of this condition, and possibly parameters that are
+   *          used in this clause
    */
-  private void internalBuildSearchCondition(IQueryPart queryPart, Handler<AsyncResult<SqlWhereFragment>> handler) {
-    if (queryPart instanceof IQueryCondition) {
-      parseQueryCondition((IQueryCondition) queryPart, result -> {
-        if (result.failed()) {
-          handler.handle(Future.failedFuture(result.cause()));
-        } else {
-          handler.handle(Future.succeededFuture(result.result()));
-        }
-      });
-    } else if (queryPart instanceof IQueryContainer) {
-      parseQueryContainer((IQueryContainer) queryPart, result -> {
-        if (result.failed()) {
-          handler.handle(Future.failedFuture(result.cause()));
-        } else {
-          handler.handle(Future.succeededFuture(result.result()));
-        }
-      });
+  private void internalBuildSearchCondition(ISearchCondition searchCondition,
+      Handler<AsyncResult<SqlWhereFragment>> handler) {
+    if (searchCondition instanceof IFieldCondition) {
+      parseFieldCondition((IFieldCondition) searchCondition, handler);
+    } else if (searchCondition instanceof ISearchConditionContainer) {
+      parseSearchConditionContainer((ISearchConditionContainer) searchCondition, handler);
     } else {
-      handler.handle(Future.failedFuture(new UnknownQueryPartException(queryPart)));
+      handler.handle(Future.failedFuture(new UnknownSearchConditionException(searchCondition)));
     }
   }
 
   /**
-   * Parses an {@link IQueryCondition}. The operator and value will be transformed into a format fitting the SQL
+   * Parses a {@link IFieldCondition}. The operator and value will be transformed into a format fitting the SQL
    * database
    * 
-   * @param queryCondition
+   * @param fieldCondition
    * @param handler
    */
-  private void parseQueryCondition(IQueryCondition queryCondition, Handler<AsyncResult<SqlWhereFragment>> handler) {
-    final IField field = getMapper().getField(queryCondition.getField());
+  private void parseFieldCondition(IFieldCondition fieldCondition, Handler<AsyncResult<SqlWhereFragment>> handler) {
+    final IField field = getMapper().getField(fieldCondition.getField());
     final String columnName = field.getColumnInfo().getName();
-    if (queryCondition.getValue() != null) {
-      transformValue(field, queryCondition.getOperator(), queryCondition.getValue(), result -> {
+    if (fieldCondition.getValue() != null) {
+      transformValue(field, fieldCondition.getOperator(), fieldCondition.getValue(), result -> {
         if (result.failed()) {
           handler.handle(Future.failedFuture(result.cause()));
         } else {
           Object parsedValue = result.result();
           String parsedOperator;
           try {
-            parsedOperator = transformOperator(queryCondition.getOperator());
+            parsedOperator = transformOperator(fieldCondition.getOperator());
           } catch (UnknownQueryOperatorException e) {
             handler.handle(Future.failedFuture(e));
             return;
           }
-          SqlWhereFragment fragment = handleParsedCondition(columnName, parsedOperator, parsedValue);
+          SqlWhereFragment fragment = buildConditionFragment(columnName, parsedOperator, parsedValue);
           handler.handle(Future.succeededFuture(fragment));
         }
       });
     } else {
-      // special handling for NULL values
-      SqlWhereFragment fragment = new SqlWhereFragment();
-      fragment.whereClause.append(columnName).append(" ");
-      if (queryCondition.getOperator() == QueryOperator.EQUALS) {
-        fragment.whereClause.append("IS NULL");
-      } else if (queryCondition.getOperator() == QueryOperator.NOT_EQUALS) {
-        fragment.whereClause.append("IS NOT NULL");
-      } else {
-        handler.handle(Future.failedFuture(
-            new NullPointerException("Invalid 'null' value for operator " + queryCondition.getOperator())));
-        return;
-      }
-      handler.handle(Future.succeededFuture(fragment));
+      handleNullConditionValue(fieldCondition, columnName, handler);
     }
   }
 
   /**
-   * Creates the final clause, handling different parsed values like collections for IN queries, or distance search
+   * Special case for null values, to avoid costly, unneeded transformation
+   * 
+   * @param fieldCondition
+   * @param columnName
+   * @param handler
+   */
+  private void handleNullConditionValue(IFieldCondition fieldCondition, final String columnName,
+      Handler<AsyncResult<SqlWhereFragment>> handler) {
+    // special handling for NULL values
+    SqlWhereFragment fragment = new SqlWhereFragment();
+    fragment.whereClause.append(columnName).append(" ");
+    if (fieldCondition.getOperator() == QueryOperator.EQUALS) {
+      fragment.whereClause.append("IS NULL");
+    } else if (fieldCondition.getOperator() == QueryOperator.NOT_EQUALS) {
+      fragment.whereClause.append("IS NOT NULL");
+    } else {
+      handler.handle(Future
+          .failedFuture(new NullPointerException("Invalid 'null' value for operator " + fieldCondition.getOperator())));
+      return;
+    }
+    handler.handle(Future.succeededFuture(fragment));
+  }
+
+  /**
+   * Creates the final fragment for a field condition, handling different parsed values like collections for IN queries,
+   * or distance search
    * functions
    * 
-   * @param field
-   *          the field of this clause
+   * @param fieldName
+   *          the column field name of this clause
    * @param operator
    *          the parsed operator
    * @param valueResult
    *          the parsed value
-   * @return
+   * @return the finished fragment of the condition
    */
-  private SqlWhereFragment handleParsedCondition(String field, String operator, Object valueResult) {
+  private SqlWhereFragment buildConditionFragment(String fieldName, String operator, Object valueResult) {
     SqlWhereFragment fragment = new SqlWhereFragment();
     if (valueResult instanceof SqlDistanceSearchFunction) {
       fragment.whereClause.append(" ").append(((SqlDistanceSearchFunction) valueResult).getFunctionSequence());
       fragment.parameters.add(((SqlDistanceSearchFunction) valueResult).getValue());
     } else {
-      fragment.whereClause.append(field).append(" ");
+      fragment.whereClause.append(fieldName).append(" ");
       fragment.whereClause.append(operator).append(" ");
       if (valueResult instanceof Collection<?>) {
         fragment.whereClause.append("(");
@@ -225,6 +238,7 @@ public class SqlExpression extends AbstractQueryExpression {
    * @param operator
    * @return
    * @throws UnknownQueryOperatorException
+   *           if the operator is unknown
    */
   private String transformOperator(QueryOperator operator) throws UnknownQueryOperatorException {
     switch (operator) {
@@ -295,13 +309,22 @@ public class SqlExpression extends AbstractQueryExpression {
    * @param container
    * @param handler
    */
-  private void parseQueryContainer(IQueryContainer container, Handler<AsyncResult<SqlWhereFragment>> handler) {
+  private void parseSearchConditionContainer(ISearchConditionContainer container,
+      Handler<AsyncResult<SqlWhereFragment>> handler) {
+    final String translatedConnector;
+    try {
+      translatedConnector = translateQueryLogic(container.getQueryLogic());
+    } catch (QueryExpressionBuildException e) {
+      handler.handle(Future.failedFuture(e));
+      return;
+    }
+
     SqlWhereFragment fragment = new SqlWhereFragment();
     fragment.whereClause.append("(");
 
     @SuppressWarnings("rawtypes")
     List<Future> futures = new ArrayList<>();
-    for (IQueryPart queryPart : container.getContent()) {
+    for (ISearchCondition queryPart : container.getConditions()) {
       Future<SqlWhereFragment> future = Future.future();
       futures.add(future);
       internalBuildSearchCondition(queryPart, future.completer());
@@ -317,12 +340,7 @@ public class SqlExpression extends AbstractQueryExpression {
           fragment.whereClause.append(subFragment.whereClause);
           fragment.parameters.addAll(subFragment.parameters);
           if (resultIterator.hasNext())
-            try {
-              fragment.whereClause.append(" ").append(translateConnector(container.getConnector())).append(" ");
-            } catch (QueryExpressionBuildException e) {
-              handler.handle(Future.failedFuture(e));
-              return;
-            }
+            fragment.whereClause.append(" ").append(translatedConnector).append(" ");
         }
         fragment.whereClause.append(")");
         handler.handle(Future.succeededFuture(fragment));
@@ -331,27 +349,28 @@ public class SqlExpression extends AbstractQueryExpression {
   }
 
   /**
-   * Translate the connector into native SQL format
+   * Translate the logic connector into native SQL format
    * 
-   * @param connector
+   * @param logic
    * @return the native SQL connector value
    * @throws QueryExpressionBuildException
+   *           if the logic value is unknown
    */
-  private String translateConnector(QueryLogic connector) throws QueryExpressionBuildException {
-    switch (connector) {
+  private String translateQueryLogic(QueryLogic logic) throws QueryExpressionBuildException {
+    switch (logic) {
     case AND:
       return "AND";
     case OR:
       return "OR";
     default:
-      throw new UnknownQueryLogicException(connector);
+      throw new UnknownQueryLogicException(logic);
     }
   }
 
   /**
-   * Get the information, whether the query has parameters
+   * Checks if the query has parameters
    * 
-   * @return true, if query has parameters
+   * @return true, iff the query has parameters
    */
   public boolean hasQueryParameters() {
     return parameters != null && !parameters.isEmpty();
@@ -375,9 +394,9 @@ public class SqlExpression extends AbstractQueryExpression {
     if (nativeCommand != null) {
       return nativeCommand;
     }
-    StringBuilder complete = new StringBuilder(count);
-    appendWhereClause(complete);
-    return complete.toString();
+    StringBuilder countExpression = new StringBuilder(count);
+    appendWhereClause(countExpression);
+    return countExpression.toString();
   }
 
   /**
@@ -389,11 +408,11 @@ public class SqlExpression extends AbstractQueryExpression {
     if (nativeCommand != null) {
       return nativeCommand;
     }
-    StringBuilder complete = new StringBuilder(select);
-    appendWhereClause(complete);
-    appendOrderByClause(complete);
-    appendLimitClause(complete);
-    return complete.toString();
+    StringBuilder selectExpression = new StringBuilder(select);
+    appendWhereClause(selectExpression);
+    appendOrderByClause(selectExpression);
+    appendLimitClause(selectExpression);
+    return selectExpression.toString();
   }
 
   /**
@@ -402,29 +421,44 @@ public class SqlExpression extends AbstractQueryExpression {
    * @return the complete expression
    */
   public String getDeleteExpression() {
-    StringBuilder complete = new StringBuilder(delete);
-    appendWhereClause(complete);
-    return complete.toString();
+    StringBuilder deleteExpression = new StringBuilder(delete);
+    appendWhereClause(deleteExpression);
+    return deleteExpression.toString();
   }
 
-  private void appendLimitClause(StringBuilder complete) {
+  /**
+   * Add the limit and offset to the given expression, if they are defined
+   * 
+   * @param expression
+   */
+  private void appendLimitClause(StringBuilder expression) {
     if (getLimit() > 0) {
-      complete.append(" LIMIT ").append(getLimit());
+      expression.append(" LIMIT ").append(getLimit());
     }
     if (getOffset() > 0) {
-      complete.append(" OFFSET ").append(getOffset());
+      expression.append(" OFFSET ").append(getOffset());
     }
   }
 
-  private void appendOrderByClause(StringBuilder complete) {
+  /**
+   * Append the order by to the expression
+   * 
+   * @param expression
+   */
+  private void appendOrderByClause(StringBuilder expression) {
     if (orderByClause.length() > 0) {
-      complete.append(" ORDER BY ").append(orderByClause);
+      expression.append(" ORDER BY ").append(orderByClause);
     }
   }
 
-  private void appendWhereClause(StringBuilder complete) {
+  /**
+   * Append the where condition to the expression
+   * 
+   * @param expression
+   */
+  private void appendWhereClause(StringBuilder expression) {
     if (whereClause.length() > 0) {
-      complete.append(" WHERE ").append(whereClause);
+      expression.append(" WHERE ").append(whereClause);
     }
   }
 

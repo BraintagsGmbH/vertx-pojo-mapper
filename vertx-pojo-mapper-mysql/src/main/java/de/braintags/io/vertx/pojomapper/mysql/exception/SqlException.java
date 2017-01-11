@@ -24,6 +24,8 @@ import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlExpression;
 
 public class SqlException extends RuntimeException {
 
+  private static final long serialVersionUID = 1L;
+
   /**
    * 
    */

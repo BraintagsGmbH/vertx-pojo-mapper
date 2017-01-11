@@ -33,7 +33,7 @@ public class LifecycleMapper {
     name = "just after load";
     IDataStore ds = triggerContext.getMapper().getMapperFactory().getDataStore();
     IQuery<MiniMapper> q = ds.createQuery(MiniMapper.class);
-    q.setRootQueryPart(q.isEqual("name", "test"));
+    q.setSearchCondition(q.isEqual("name", "test"));
     q.execute(qr -> {
       if (qr.failed()) {
         triggerContext.fail(qr.cause());

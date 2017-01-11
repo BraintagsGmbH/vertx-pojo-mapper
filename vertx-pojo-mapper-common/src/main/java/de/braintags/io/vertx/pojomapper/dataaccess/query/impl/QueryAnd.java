@@ -1,30 +1,34 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryPart;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchCondition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 
 /**
- * <br>
+ * Represents a container that joins search conditions with an {@link QueryLogic#AND}<br>
  * <br>
  * Copyright: Copyright (c) 20.12.2016 <br>
  * Company: Braintags GmbH <br>
  * 
  * @author sschmitt
  */
+public class QueryAnd extends AbstractSearchConditionContainer {
 
-public class QueryAnd extends AbstractQueryContainer {
-
-  public QueryAnd(IQueryPart... queryParts) {
+  /**
+   * Initializes the container with zero or more sub conditions that will be connected with {@link QueryLogic#AND}
+   * 
+   * @param conditions
+   */
+  public QueryAnd(ISearchCondition... queryParts) {
     super(queryParts);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#getConnector()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchConditionContainer#getQueryLogic()
    */
   @Override
-  public QueryLogic getConnector() {
+  public QueryLogic getQueryLogic() {
     return QueryLogic.AND;
   }
 

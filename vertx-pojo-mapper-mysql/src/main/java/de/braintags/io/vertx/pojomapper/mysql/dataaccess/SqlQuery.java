@@ -156,6 +156,9 @@ public class SqlQuery<T> extends Query<T> {
     });
   }
 
+  /* (non-Javadoc)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#getQueryExpressionClass()
+   */
   @Override
   protected Class<? extends IQueryExpression> getQueryExpressionClass() {
     return SqlExpression.class;
