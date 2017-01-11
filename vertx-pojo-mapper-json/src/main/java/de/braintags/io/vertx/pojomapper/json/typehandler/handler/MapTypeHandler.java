@@ -13,7 +13,10 @@
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -24,8 +27,8 @@ import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
-import de.braintags.io.vertx.util.CounterObject;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -71,70 +74,105 @@ public class MapTypeHandler extends AbstractTypeHandler {
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    JsonArray jsonArray = (JsonArray) source;
-    if (jsonArray == null) {
+    if (source == null) {
       success(null, resultHandler);
-    } else if (jsonArray.isEmpty()) {
+    } else if (((JsonArray) source).isEmpty()) {
       success(field.getMapper().getObjectFactory().createMap(field), resultHandler);
     } else {
-      CounterObject<ITypeHandlerResult> co = new CounterObject<>(jsonArray.size(), resultHandler);
-      final MapEntry[] resultArray = new MapEntry[jsonArray.size()];
-      int counter = 0;
-      for (Object jo : jsonArray) {
-        CurrentCounter cc = new CurrentCounter(counter++, jo);
-        handleOneEntryFromStore(field, cc, resultArray, result -> {
-          if (result.failed()) {
-            co.setThrowable(result.cause());
-            return;
-          } else {
-            checkSuccessFromStore(field, co, resultArray, resultHandler);
+      CompositeFuture cf = handleObjectsFromStore(field, (JsonArray) source);
+      cf.setHandler(result -> {
+        if (result.failed()) {
+          resultHandler.handle(Future.failedFuture(result.cause()));
+        } else {
+          Map map = field.getMapper().getObjectFactory().createMap(field);
+          for (Object entry : cf.list()) {
+            map.put(((MapEntry) entry).key, ((MapEntry) entry).value);
           }
-        });
-        if (co.isError())
-          return;
-      }
+          success(map, resultHandler);
+        }
+      });
     }
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  private void checkSuccessFromStore(IField field, CounterObject co, MapEntry[] resultArray,
-      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    if (co.reduce()) {
-      Map map = field.getMapper().getObjectFactory().createMap(field);
-      for (int i = 0; i < resultArray.length; i++) {
-        map.put(resultArray[i].key, resultArray[i].value);
-      }
-      success(map, resultHandler);
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
+   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
+   */
+  @SuppressWarnings("rawtypes")
+  @Override
+  public final void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+    if (source == null) {
+      success(null, resultHandler);
+    } else if (((Map) source).isEmpty()) {
+      success(encodeResultArray(new JsonArray()), resultHandler);
+    } else {
+      Map map = (Map) source;
+      CompositeFuture cf = encodeSubValues(map, field);
+      cf.setHandler(cfh -> {
+        if (cfh.failed()) {
+          fail(cfh.cause(), resultHandler);
+        } else {
+          try {
+            success(encodeResultArray(transferEncodedResults(cf)), resultHandler);
+          } catch (Exception e) {
+            resultHandler.handle(Future.failedFuture(e));
+          }
+        }
+      });
     }
   }
 
-  private void handleOneEntryFromStore(IField field, CurrentCounter cc, MapEntry[] resultArray,
-      Handler<AsyncResult<Void>> resultHandler) {
-    Object keyIn = ((JsonArray) cc.value).getValue(0);
+  @SuppressWarnings("rawtypes")
+  private CompositeFuture handleObjectsFromStore(IField field, JsonArray source) {
+    List<Future> fl = new ArrayList<>();
+    for (int i = 0; i < source.size(); i++) {
+      fl.add(i, handleObjectFromStore(field, source.getJsonArray(i)));
+    }
+    return CompositeFuture.all(fl);
+  }
 
+  /**
+   * Create one instance of the {@link Collection} and return the Future
+   * 
+   * @param o
+   *          the object from the store
+   * @param subHandler
+   *          the subhandler to be used
+   * @param coll
+   *          the collection to be filled
+   * @param field
+   *          the field, where the Collection stays in
+   * @param resultHandler
+   *          the handler to be informed
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected Future handleObjectFromStore(IField field, JsonArray array) {
+    Future f = Future.future();
+    Object keyIn = array.getValue(0);
     ITypeHandler keyTypehandler = field.getMapper().getMapperFactory().getTypeHandlerFactory()
         .getTypeHandler(field.getMapKeyClass(), null);
     keyTypehandler.fromStore(keyIn, field, field.getMapKeyClass(), keyResult -> {
       if (keyResult.failed()) {
-        resultHandler.handle(Future.failedFuture(keyResult.cause()));
-        return;
+        f.fail(keyResult.cause());
       } else {
-        Object valueIn = ((JsonArray) cc.value).getValue(1);
+        Object valueIn = array.getValue(1);
         convertValueFromStore(valueIn, field, valueResult -> {
           if (valueResult.failed()) {
-            resultHandler.handle(Future.failedFuture(valueResult.cause()));
-            return;
+            f.fail(valueResult.cause());
           } else {
             Object javaValue = valueResult.result();
             if (javaValue != null) {
-              resultArray[cc.i] = new MapEntry(keyResult.result().getResult(), valueResult.result());
+              f.complete(new MapEntry(keyResult.result().getResult(), valueResult.result()));
+            } else {
+              f.complete();
             }
-            resultHandler.handle(Future.succeededFuture());
           }
         });
       }
     });
-
+    return f;
   }
 
   /**
@@ -163,89 +201,66 @@ public class MapTypeHandler extends AbstractTypeHandler {
     });
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
-   */
-  @SuppressWarnings("rawtypes")
-  @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    Map<?, ?> map = (Map<?, ?>) source;
-    int size = map == null ? 0 : map.size();
-    if (map == null) {
-      success(null, resultHandler);
-    } else if (map.size() == 0) {
-      success(new JsonArray(), resultHandler);
-    } else {
-      CounterObject<ITypeHandlerResult> co = new CounterObject<>(size, resultHandler);
-      JsonArray[] resultArray = new JsonArray[size];
-      Iterator<?> it = map.entrySet().iterator();
-      int counter = 0;
-      while (it.hasNext() && !co.isError()) {
-        // trying to write the array in the order like it is
-        Entry entry = (Entry) it.next();
-        CurrentCounter cc = new CurrentCounter(counter++, entry);
-
-        valueIntoStore(field, cc, resultArray, result -> {
-          if (result.failed()) {
-            co.setThrowable(result.cause());
-            return;
-          } else {
-            checkSuccessIntoStore(co, resultArray, resultHandler);
-          }
-        });
-      }
-    }
-  }
-
-  private void checkSuccessIntoStore(CounterObject co, JsonArray[] resultArray,
-      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
-    if (co.reduce()) {
-      JsonArray arr = new JsonArray();
-      for (int k = 0; k < resultArray.length; k++) {
-        arr.add(resultArray[k]);
-      }
-      success(arr, resultHandler);
-    }
-  }
-
   /**
-   * Transforms the key - value pair into the given Json Array
+   * Transfers the results inside the {@link CompositeFuture} into a JsonArray.
    * 
-   * @param field
-   *          the field, which describes the {@link Map}
-   * @param cc
-   *          the instance of {@link CurrentCounter}
-   * @param resultArray
-   *          the {@link JsonArray} to be filled
-   * @param resultHandler
-   *          the {@link Handler} to be informed
+   * @param cf
+   *          a CompositeFuture, where the results are of type JsonArray with key / value pair
+   * @return an instance which contains the encoded results of the CompositeFuture.
    */
-  @SuppressWarnings("rawtypes")
-  protected void valueIntoStore(IField field, CurrentCounter cc, JsonArray[] resultArray,
-      Handler<AsyncResult<Void>> resultHandler) {
-    ITypeHandler keyTh = getKeyTypeHandler(((Entry) cc.value).getKey(), field);
-
-    keyTh.intoStore(((Entry) cc.value).getKey(), field, keyResult -> {
-      if (keyResult.failed()) {
-        resultHandler.handle(Future.failedFuture(keyResult.cause()));
-        return;
+  protected final JsonArray transferEncodedResults(CompositeFuture cf) {
+    JsonArray jsonArray = new JsonArray();
+    for (Object thr : cf.list()) {
+      JsonArray value = (JsonArray) thr;
+      if (value == null) {
+        jsonArray.addNull();
       } else {
-        ITypeHandler valueTh = getValueTypeHandler(((Entry) cc.value).getValue(), field);
-        valueTh.intoStore(((Entry) cc.value).getValue(), field, valueResult -> {
+        jsonArray.add(value);
+      }
+    }
+    return jsonArray;
+  }
+
+  @SuppressWarnings("rawtypes")
+  protected CompositeFuture encodeSubValues(Map map, IField field) {
+    List<Future> fl = new ArrayList<>();
+    Iterator<?> it = map.entrySet().iterator();
+    while (it.hasNext()) {
+      fl.add(encodeSubValue(field, (Entry) it.next()));
+    }
+    return CompositeFuture.all(fl);
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  protected Future encodeSubValue(IField field, Entry entry) {
+    Future f = Future.future();
+    ITypeHandler keyTh = getKeyTypeHandler(entry.getKey(), field);
+
+    keyTh.intoStore(entry.getKey(), field, keyResult -> {
+      if (keyResult.failed()) {
+        f.fail(keyResult.cause());
+      } else {
+        ITypeHandler valueTh = getValueTypeHandler(entry.getValue(), field);
+        valueTh.intoStore(entry.getValue(), field, valueResult -> {
           if (valueResult.failed()) {
-            resultHandler.handle(Future.failedFuture(valueResult.cause()));
-            return;
+            f.fail(valueResult.cause());
           } else {
-            resultArray[cc.i] = new JsonArray().add(keyResult.result().getResult())
-                .add(valueResult.result().getResult());
-            resultHandler.handle(Future.succeededFuture());
+            f.complete(new JsonArray().add(keyResult.result().getResult()).add(valueResult.result().getResult()));
           }
         });
       }
     });
+    return f;
+  }
+
+  /**
+   * Converts the JsonArray into an adequate format which can be stored by the datastore
+   * 
+   * @param result
+   * @return
+   */
+  protected Object encodeResultArray(JsonArray result) {
+    return result;
   }
 
   /**

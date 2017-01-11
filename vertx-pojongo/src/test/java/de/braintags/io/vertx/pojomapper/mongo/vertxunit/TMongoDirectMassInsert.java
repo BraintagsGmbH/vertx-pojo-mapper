@@ -203,6 +203,7 @@ public class TMongoDirectMassInsert {
         async.complete();
       }
     });
+    async.await();
   }
 
   /**
