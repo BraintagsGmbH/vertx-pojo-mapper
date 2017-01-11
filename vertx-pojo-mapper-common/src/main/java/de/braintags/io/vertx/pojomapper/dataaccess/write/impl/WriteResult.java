@@ -33,11 +33,15 @@ import io.vertx.core.logging.LoggerFactory;
 
 public class WriteResult implements IWriteResult {
   private static final Logger logger = LoggerFactory.getLogger(WriteResult.class);
-  private List<IWriteEntry> resultList = new ArrayList<IWriteEntry>();
+  private List<IWriteEntry> resultList = new ArrayList<>();
   @SuppressWarnings("rawtypes")
   private List insertedIds = new ArrayList();
 
   public WriteResult() {
+  }
+
+  public WriteResult(List<IWriteEntry> resultList) {
+    this.resultList = resultList;
   }
 
   /*
@@ -70,7 +74,7 @@ public class WriteResult implements IWriteResult {
   }
 
   @Override
-  public void addEntry(IStoreObject< ? , ? > sto, Object id, WriteAction action) {
+  public void addEntry(IStoreObject<?, ?> sto, Object id, WriteAction action) {
     addEntry(new WriteEntry(sto, id, action));
   }
 

@@ -12,9 +12,10 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
+import java.util.List;
+
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult;
-import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 
 /**
  * 
@@ -24,15 +25,18 @@ import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
  */
 public class MongoWriteResult extends WriteResult {
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteResult#addEntry(de.braintags.io.vertx.pojomapper.
-   * mapping.IStoreObject, java.lang.Object, de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction)
    */
-  @Override
-  public synchronized void addEntry(IStoreObject< ? , ? > sto, Object id, WriteAction action) {
-    super.addEntry(sto, id, action);
+  public MongoWriteResult() {
+    super();
+  }
+
+  /**
+   * @param resultList
+   */
+  public MongoWriteResult(List<IWriteEntry> resultList) {
+    super(resultList);
   }
 
 }
