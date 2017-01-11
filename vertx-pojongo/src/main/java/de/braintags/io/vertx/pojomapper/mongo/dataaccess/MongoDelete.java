@@ -46,6 +46,12 @@ public class MongoDelete<T> extends Delete<T> {
     super(mapperClass, datastore);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete#deleteQuery(de.braintags.io.vertx.pojomapper.
+   * dataaccess.query.IQuery, io.vertx.core.Handler)
+   */
   @Override
   protected void deleteQuery(IQuery<T> q, Handler<AsyncResult<IDeleteResult>> resultHandler) {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();

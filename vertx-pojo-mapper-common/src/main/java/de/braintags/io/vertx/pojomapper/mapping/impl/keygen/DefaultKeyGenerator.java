@@ -48,7 +48,7 @@ public class DefaultKeyGenerator extends AbstractKeyGenerator {
    * IMapper, io.vertx.core.Handler)
    */
   @Override
-  public void generateKey(IMapper mapper, Handler<AsyncResult<Key>> handler) {
+  public void generateKey(IMapper<?> mapper, Handler<AsyncResult<Key>> handler) {
     vertx.eventBus().send(KeyGeneratorVerticle.SERVICE_NAME, mapper.getMapperClass().getSimpleName(), result -> {
       if (result.failed()) {
         LOGGER.error(result.cause());

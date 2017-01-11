@@ -204,7 +204,7 @@ To search inside the connected datastore, we are creating first an instance of
 [source,java]
 ----
 IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
-query.setRootQueryPart(isEqual("name", "my mini mapper"));
+query.setRootQueryPart(query.isEqual("name", "my mini mapper"));
 query.execute(rResult -> {
   if (rResult.failed()) {
     logger.error(rResult.cause());
@@ -267,7 +267,7 @@ arguments which were used to perform the delete action
 [source,java]
 ----
 IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
-query.setRootQueryPart(isEqual("name", "test"));
+query.setRootQueryPart(query.isEqual("name", "test"));
 IDelete<MiniMapper> delete = dataStore.createDelete(MiniMapper.class);
 delete.setQuery(query);
 delete.delete(deleteResult -> {
@@ -484,7 +484,7 @@ public class LifecycleMapper {
     name = "just after load";
     IDataStore ds = triggerContext.getMapper().getMapperFactory().getDataStore();
     IQuery<MiniMapper> q = ds.createQuery(MiniMapper.class);
-    q.setRootQueryPart(isEqual("name", "test"));
+    q.setRootQueryPart(q.isEqual("name", "test"));
     q.execute(qr -> {
       if (qr.failed()) {
         triggerContext.fail(qr.cause());
@@ -542,7 +542,7 @@ The trigger methods can be empty, or get the parameter
 name = "just after load";
 IDataStore ds = triggerContext.getMapper().getMapperFactory().getDataStore();
 IQuery<MiniMapper> q = ds.createQuery(MiniMapper.class);
-q.setRootQueryPart(isEqual("name", "test"));
+q.setRootQueryPart(q.isEqual("name", "test"));
 q.execute(qr -> {
   if (qr.failed()) {
     triggerContext.fail(qr.cause());

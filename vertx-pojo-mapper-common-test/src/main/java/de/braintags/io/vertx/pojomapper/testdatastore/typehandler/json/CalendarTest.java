@@ -37,10 +37,10 @@ public class CalendarTest extends AbstractTypeHandlerTest {
     record.myCal = null;
     saveRecord(context, record);
     IQuery<CalendarMapper> query = getDataStore(context).createQuery(CalendarMapper.class);
-    List list = findAll(context, query);
+    List<CalendarMapper> list = findAll(context, query);
     context.assertEquals(1, list.size());
-    CalendarMapper loaded = (CalendarMapper) list.get(0);
-    context.assertNull(loaded.myCal);
+    CalendarMapper loaded = list.get(0);
+    context.assertNull(loaded.myCal, "Found " + loaded.myCal);
   }
 
   /*

@@ -13,8 +13,10 @@
 package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
 import de.braintags.io.vertx.pojomapper.annotation.field.Referenced;
@@ -25,9 +27,12 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
 import de.braintags.io.vertx.util.CounterObject;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * Deals all fields, which contain {@link Collection} content, which are NOT annotated as {@link Referenced} or
@@ -38,6 +43,7 @@ import io.vertx.core.json.JsonArray;
  */
 
 public class CollectionTypeHandler extends AbstractTypeHandler {
+  private static final Logger logger = LoggerFactory.getLogger(CollectionTypeHandler.class);
 
   /**
    * Constructor with parent {@link ITypeHandlerFactory}
@@ -142,7 +148,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
     } else if (((Collection<?>) source).isEmpty()) {
       success(new JsonArray(), resultHandler);
     } else {
-      JsonArray jsonArray = new JsonArray();
+      List<Future> futures = new ArrayList<>();
       CounterObject<ITypeHandlerResult> co = new CounterObject<>(((Collection<?>) source).size(), resultHandler);
       Iterator<?> sourceIt = ((Collection<?>) source).iterator();
       ITypeHandler subHandler = field.getSubTypeHandler();
@@ -150,6 +156,9 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
       boolean determineSubhandler = subHandler == null;
       Class<?> valueClass = null;
       while (sourceIt.hasNext() && !co.isError()) {
+        Future<ITypeHandlerResult> future = Future.future();
+        futures.add(future);
+
         Object value = sourceIt.next();
         if (determineSubhandler) {
           boolean valueClassChanged = valueClass != null && value.getClass() != valueClass;
@@ -160,19 +169,24 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
             // datastore?
           }
         }
-        subHandler.intoStore(value, field, tmpResult -> {
-          if (tmpResult.failed()) {
-            co.setThrowable(tmpResult.cause());
-            return;
-          } else {
-            ITypeHandlerResult thResult = tmpResult.result();
-            jsonArray.add(thResult.getResult());
-            if (co.reduce()) {
-              success(jsonArray, resultHandler);
-            }
-          }
-        });
+
+        subHandler.intoStore(value, field, future.completer());
       }
+
+      CompositeFuture.all(futures).setHandler(tmpResult -> {
+        if (tmpResult.failed()) {
+          resultHandler.handle(Future.failedFuture(tmpResult.cause()));
+          return;
+        } else {
+          List<ITypeHandlerResult> thResults = tmpResult.result().list();
+          JsonArray jsonArray = new JsonArray();
+          for (ITypeHandlerResult thResult : thResults) {
+            jsonArray.add(thResult.getResult());
+          }
+          logger.debug("Finished converting collection: " + jsonArray);
+          success(jsonArray, resultHandler);
+        }
+      });
     }
   }
 
