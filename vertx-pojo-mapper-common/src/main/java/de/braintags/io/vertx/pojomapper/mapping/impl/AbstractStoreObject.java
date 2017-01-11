@@ -22,7 +22,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
-import de.braintags.io.vertx.util.CounterObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -135,24 +134,26 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
     getMapper().executeLifecycle(AfterLoad.class, entity, handler);
   }
 
+  @SuppressWarnings("rawtypes")
   protected final void iterateFields(T tmpObject, Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start iterateFields");
     Set<String> fieldNames = getMapper().getFieldNames();
-    CounterObject<Void> co = new CounterObject<>(fieldNames.size(), handler);
+    List<Future> fl = new ArrayList<>(fieldNames.size());
     for (String fieldName : fieldNames) {
+      Future<Void> f = Future.future();
+      fl.add(f);
       IField field = getMapper().getField(fieldName);
       LOGGER.debug("handling field " + field.getFullName());
-      field.getPropertyMapper().fromStoreObject(tmpObject, this, field, result -> {
-        if (result.failed()) {
-          co.setThrowable(result.cause());
-          return;
-        }
-        if (co.reduce()) {
-          LOGGER.debug("field counter finished");
-          handler.handle(Future.succeededFuture());
-        }
-      });
+      field.getPropertyMapper().fromStoreObject(tmpObject, this, field, f.completer());
     }
+    CompositeFuture cf = CompositeFuture.all(fl);
+    cf.setHandler(cfr -> {
+      if (cfr.failed()) {
+        handler.handle(Future.failedFuture(cfr.cause()));
+      } else {
+        handler.handle(Future.succeededFuture());
+      }
+    });
   }
 
   protected void iterateObjectReferences(Object tmpObject, Handler<AsyncResult<Void>> handler) {
@@ -163,20 +164,21 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
       return;
     }
     Collection<IObjectReference> refs = getObjectReferences();
-    CounterObject<Void> co = new CounterObject<>(refs.size(), handler);
+    List<Future> fl = new ArrayList<>(refs.size());
     for (IObjectReference ref : refs) {
       LOGGER.debug("handling object reference " + ref.getField().getFullName());
-      ref.getField().getPropertyMapper().fromObjectReference(tmpObject, ref, result -> {
-        if (result.failed()) {
-          co.setThrowable(result.cause());
-          return;
-        }
-        if (co.reduce()) {
-          LOGGER.debug("object references finished");
-          handler.handle(Future.succeededFuture());
-        }
-      });
+      Future<Void> f = Future.future();
+      fl.add(f);
+      ref.getField().getPropertyMapper().fromObjectReference(tmpObject, ref, f.completer());
     }
+    CompositeFuture cf = CompositeFuture.all(fl);
+    cf.setHandler(cfr -> {
+      if (cfr.failed()) {
+        handler.handle(Future.failedFuture(cfr.cause()));
+      } else {
+        handler.handle(Future.succeededFuture());
+      }
+    });
   }
 
   /**
