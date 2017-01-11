@@ -17,15 +17,14 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.braintags.io.vertx.pojomapper.exception.InsertException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
-import de.braintags.io.vertx.util.CounterObject;
-import de.braintags.io.vertx.util.ErrorObject;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 
@@ -83,27 +82,51 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
     } else if (jsonArray.isEmpty()) {
       success(Array.newInstance(field.getSubClass(), 0), handler);
     } else {
-      CounterObject<ITypeHandlerResult> co = new CounterObject<>(jsonArray.size(), handler);
-      final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
-      int counter = 0;
-      for (Object jo : jsonArray) {
-        CurrentCounter cc = new CurrentCounter(counter++, jo);
-        ITypeHandler subTypehandler = field.getSubTypeHandler();
-        subTypehandler.fromStore(cc.value, field, field.getSubClass(), result -> {
-          if (result.failed()) {
-            co.setThrowable(result.cause());
-            return;
-          }
-          Object javaValue = result.result().getResult();
-          if (javaValue != null)
-            Array.set(resultArray, cc.i, javaValue);
-          if (co.reduce()) {
-            success(resultArray, handler);
-          }
+      CompositeFuture cf = CompositeFuture.all(extractSubValues(field, jsonArray));
+      cf.setHandler(result -> {
+        if (result.failed()) {
+          handler.handle(Future.failedFuture(result.cause()));
+        } else {
+          final Object resultArray = transferValues(field, jsonArray, cf);
+          success(resultArray, handler);
+        }
+      });
+    }
+  }
 
-        });
+  /**
+   * @param field
+   * @param jsonArray
+   * @param cf
+   * @return
+   */
+  private Object transferValues(IField field, JsonArray jsonArray, CompositeFuture cf) {
+    List<ITypeHandlerResult> thl = cf.list();
+    final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
+    for (int i = 0; i < thl.size(); i++) {
+      Object javaValue = thl.get(i).getResult();
+      if (javaValue != null) {
+        Array.set(resultArray, i, javaValue);
       }
     }
+    return resultArray;
+  }
+
+  @SuppressWarnings("rawtypes")
+  private List<Future> extractSubValues(IField field, JsonArray jsonArray) {
+    List<Future> fl = new ArrayList<>(jsonArray.size());
+    ITypeHandler subTypehandler = field.getSubTypeHandler();
+    for (int i = 0; i < jsonArray.size(); i++) {
+      Object jo = jsonArray.getValue(i);
+      fl.add(i, extractSubValue(field, subTypehandler, jo));
+    }
+    return fl;
+  }
+
+  private Future<ITypeHandlerResult> extractSubValue(IField field, ITypeHandler subTypeHandler, Object jo) {
+    Future<ITypeHandlerResult> f = Future.future();
+    subTypeHandler.fromStore(jo, field, field.getSubClass(), f.completer());
+    return f;
   }
 
   /*
@@ -121,84 +144,45 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
       success(new JsonArray(), handler);
     } else {
       ITypeHandler subTypehandler = field.getSubTypeHandler();
-      CounterObject<ITypeHandlerResult> co = new CounterObject<>(length, handler);
-      ResultArray resultArray = new ResultArray(length);
-      for (int i = 0; i < length; i++) {
-        // trying to write the array in the order like it is
-        final CurrentCounter cc = new CurrentCounter(i, Array.get(javaValues, i));
-        writeEntry(cc, co, resultArray, subTypehandler, field, handler);
-        if (co.isError()) {
-          return;
-        }
-      }
-    }
-  }
-
-  private void writeEntry(final CurrentCounter cc, CounterObject<ITypeHandlerResult> co, ResultArray resultArray,
-      ITypeHandler subTypehandler, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    subTypehandler.intoStore(cc.value, field, subResult -> {
-      if (subResult.failed()) {
-        co.setThrowable(subResult.cause());
-      } else {
-        resultArray.add(cc.i, subResult.result().getResult(), co);
-        if (co.reduce()) {
-          JsonArray arr = resultArray.toJsonArray();
-          if (!co.isError()) {
-            success(arr, handler);
-          }
-        }
-      }
-    });
-  }
-
-  class ResultArray {
-    final List contentList;
-    final Object[] content;
-
-    ResultArray(int length) {
-      content = new Object[length];
-      contentList = new ArrayList<>();
-    }
-
-    void add(int position, Object instance, ErrorObject<ITypeHandlerResult> errorObject) {
-      if (content[position] != null) {
-        errorObject.setThrowable(new InsertException(String.format(
-            "Trying to write an entry, which was filled already. Old: %s | new: %s", content[position], instance)));
-      } else {
-        content[position] = instance;
-        contentList.add(instance);
-      }
-
-    }
-
-    /**
-     * transforms the content into a JsonArray, null values are omitted so that they are staying null inside the
-     * JsonArray as well
-     * 
-     * @param errorObject
-     * @return
-     */
-    JsonArray toJsonArray() {
-      JsonArray arr = new JsonArray();
-      for (int k = 0; k < content.length; k++) {
-        if (content[k] != null) {
-          arr.add(content[k]);
+      CompositeFuture cf = writeEntries(subTypehandler, field, javaValues, length);
+      cf.setHandler(cfResult -> {
+        if (cfResult.failed()) {
+          handler.handle(Future.failedFuture(cfResult.cause()));
         } else {
-          arr.addNull();
+          success(createJsonResult(cf), handler);
         }
-      }
-      return arr;
+      });
     }
   }
 
-  class CurrentCounter {
-    final int i;
-    final Object value;
-
-    CurrentCounter(int i, Object value) {
-      this.i = i;
-      this.value = value;
+  private JsonArray createJsonResult(CompositeFuture cf) {
+    JsonArray arr = new JsonArray();
+    List<ITypeHandlerResult> thl = cf.list();
+    for (int k = 0; k < thl.size(); k++) {
+      Object value = thl.get(k).getResult();
+      if (value != null) {
+        arr.add(value);
+      } else {
+        arr.addNull();
+      }
     }
+    return arr;
+  }
+
+  @SuppressWarnings("rawtypes")
+  private CompositeFuture writeEntries(ITypeHandler subTypehandler, IField field, Object javaValues, int length) {
+    List<Future> fl = new ArrayList<>(length);
+    for (int i = 0; i < length; i++) {
+      Object value = Array.get(javaValues, i);
+      fl.add(i, writeEntry(subTypehandler, field, value));
+    }
+    return CompositeFuture.all(fl);
+  }
+
+  private Future<ITypeHandlerResult> writeEntry(ITypeHandler subTypehandler, IField field, Object javaValue) {
+    Future<ITypeHandlerResult> f = Future.future();
+    subTypehandler.intoStore(javaValue, field, f.completer());
+    return f;
   }
 
 }

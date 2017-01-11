@@ -15,7 +15,6 @@ package de.braintags.io.vertx.pojomapper.json.typehandler.handler;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.annotation.field.Embedded;
@@ -25,14 +24,11 @@ import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
-import de.braintags.io.vertx.util.CounterObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 /**
  * Deals all fields, which contain {@link Collection} content, which are NOT annotated as {@link Referenced} or
@@ -43,7 +39,8 @@ import io.vertx.core.logging.LoggerFactory;
  */
 
 public class CollectionTypeHandler extends AbstractTypeHandler {
-  private static final Logger logger = LoggerFactory.getLogger(CollectionTypeHandler.class);
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(CollectionTypeHandler.class);
 
   /**
    * Constructor with parent {@link ITypeHandlerFactory}
@@ -72,6 +69,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#fromStore(java.lang.Object,
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public void fromStore(Object source, IField field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
@@ -80,29 +78,31 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
     } else if (((JsonArray) source).isEmpty()) {
       success(field.getMapper().getObjectFactory().createCollection(field), resultHandler);
     } else {
-      CounterObject<ITypeHandlerResult> co = new CounterObject<>(((JsonArray) source).size(), resultHandler);
-      Collection coll = field.getMapper().getObjectFactory().createCollection(field);
-      Iterator<?> ji = ((JsonArray) source).iterator();
-      ITypeHandler subHandler = field.getSubTypeHandler();
-      while (ji.hasNext() && !co.isError()) {
-        Object o = ji.next();
-        handleObjectFromStore(o, subHandler, coll, field, result -> {
-          if (result.failed()) {
-            co.setThrowable(result.cause());
-            return;
-          } else {
-            if (co.reduce()) {
-              success(coll, resultHandler);
-              return;
-            }
-          }
-        });
-      }
+      CompositeFuture cf = handleObjectsFromStore(field, (JsonArray) source);
+      cf.setHandler(result -> {
+        if (result.failed()) {
+          resultHandler.handle(Future.failedFuture(result.cause()));
+        } else {
+          Collection coll = field.getMapper().getObjectFactory().createCollection(field);
+          coll.addAll(cf.list());
+          success(coll, resultHandler);
+        }
+      });
     }
   }
 
+  @SuppressWarnings("rawtypes")
+  private CompositeFuture handleObjectsFromStore(IField field, JsonArray source) {
+    List<Future> fl = new ArrayList<>();
+    ITypeHandler subHandler = field.getSubTypeHandler();
+    for (int i = 0; i < source.size(); i++) {
+      fl.add(i, handleObjectFromStore(field, subHandler, source.getValue(i)));
+    }
+    return CompositeFuture.all(fl);
+  }
+
   /**
-   * Create one instance of the {@link Collection} and add it into the Collection
+   * Create one instance of the {@link Collection} and return the Future
    * 
    * @param o
    *          the object from the store
@@ -116,23 +116,21 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
    *          the handler to be informed
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected void handleObjectFromStore(Object o, ITypeHandler subHandler, Collection coll, IField field,
-      Handler<AsyncResult<Void>> resultHandler) {
+  protected Future handleObjectFromStore(IField field, ITypeHandler subHandler, Object o) {
+    Future f = Future.future();
     if (subHandler != null) {
+      LOGGER.debug("subtypehandler: " + subHandler.getClass().getName());
       subHandler.fromStore(o, field, field.getSubClass(), tmpResult -> {
         if (tmpResult.failed()) {
-          resultHandler.handle(Future.failedFuture(tmpResult.cause()));
-          return;
+          f.fail(tmpResult.cause());
         } else {
-          Object dest = tmpResult.result().getResult();
-          coll.add(dest);
-          resultHandler.handle(Future.succeededFuture());
+          f.complete(tmpResult.result().getResult());
         }
       });
     } else {
-      coll.add(o);
-      resultHandler.handle(Future.succeededFuture());
+      f.complete(o);
     }
+    return f;
   }
 
   /*
@@ -141,53 +139,85 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
    * de.braintags.io.vertx.pojomapper.mapping.IField)
    */
+  @SuppressWarnings("rawtypes")
   @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public final void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (source == null) {
       success(null, resultHandler);
     } else if (((Collection<?>) source).isEmpty()) {
-      success(new JsonArray(), resultHandler);
+      success(encodeResultArray(new JsonArray()), resultHandler);
     } else {
-      List<Future> futures = new ArrayList<>();
-      CounterObject<ITypeHandlerResult> co = new CounterObject<>(((Collection<?>) source).size(), resultHandler);
-      Iterator<?> sourceIt = ((Collection<?>) source).iterator();
-      ITypeHandler subHandler = field.getSubTypeHandler();
-      // no generics were defined, so that subhandler could not be defined from mapping
-      boolean determineSubhandler = subHandler == null;
-      Class<?> valueClass = null;
-      while (sourceIt.hasNext() && !co.isError()) {
-        Future<ITypeHandlerResult> future = Future.future();
-        futures.add(future);
-
-        Object value = sourceIt.next();
-        if (determineSubhandler) {
-          boolean valueClassChanged = valueClass != null && value.getClass() != valueClass;
-          valueClass = value.getClass();
-          if (subHandler == null || valueClassChanged) {
-            subHandler = getSubTypeHandler(value.getClass(), field.getEmbedRef());
-            // TODO could it be useful to write the class of the value into the field, to restore it proper from
-            // datastore?
-          }
-        }
-
-        subHandler.intoStore(value, field, future.completer());
-      }
-
-      CompositeFuture.all(futures).setHandler(tmpResult -> {
-        if (tmpResult.failed()) {
-          resultHandler.handle(Future.failedFuture(tmpResult.cause()));
-          return;
+      Collection coll = (Collection) source;
+      CompositeFuture cf = encodeSubValues(coll, field);
+      cf.setHandler(cfh -> {
+        if (cfh.failed()) {
+          fail(cfh.cause(), resultHandler);
         } else {
-          List<ITypeHandlerResult> thResults = tmpResult.result().list();
-          JsonArray jsonArray = new JsonArray();
-          for (ITypeHandlerResult thResult : thResults) {
-            jsonArray.add(thResult.getResult());
+          try {
+            success(encodeResultArray(transferEncodedResults(cf)), resultHandler);
+          } catch (Exception e) {
+            resultHandler.handle(Future.failedFuture(e));
           }
-          logger.debug("Finished converting collection: " + jsonArray);
-          success(jsonArray, resultHandler);
         }
       });
     }
+  }
+
+  /**
+   * Transfers the results inside the {@link CompositeFuture} into a JsonArray.
+   * 
+   * @param cf
+   *          a CompositeFuture, where the results are of type {@link ITypeHandlerResult}
+   * @return an instance which contains the encoded results of the CompositeFuture.
+   */
+  protected final JsonArray transferEncodedResults(CompositeFuture cf) {
+    JsonArray jsonArray = new JsonArray();
+    for (Object thr : cf.list()) {
+      Object value = ((ITypeHandlerResult) thr).getResult();
+      if (value == null) {
+        jsonArray.addNull();
+      } else {
+        jsonArray.add(value);
+      }
+    }
+    return jsonArray;
+  }
+
+  /**
+   * Converts the JsonArray into an adequate format which can be stored by the datastore
+   * 
+   * @param result
+   * @return
+   */
+  protected Object encodeResultArray(JsonArray result) {
+    return result;
+  }
+
+  protected CompositeFuture encodeSubValues(Collection coll, IField field) {
+    List<Future> fl = new ArrayList<>();
+    ITypeHandler subHandler = field.getSubTypeHandler();
+    // no generics were defined, so that subhandler could not be defined from mapping
+    boolean determineSubhandler = subHandler == null;
+    Class<?> valueClass = null;
+    for (Object value : coll) {
+      if (determineSubhandler) {
+        boolean valueClassChanged = valueClass != null && value.getClass() != valueClass;
+        valueClass = value.getClass();
+        if (subHandler == null || valueClassChanged) {
+          subHandler = getSubTypeHandler(value.getClass(), field.getEmbedRef());
+          // TODO could it be useful to write the class of the value into the field, to restore it proper from
+          // datastore?
+        }
+      }
+      fl.add(encodeSubValue(field, subHandler, value));
+    }
+    return CompositeFuture.all(fl);
+  }
+
+  private Future encodeSubValue(IField field, ITypeHandler subHandler, Object value) {
+    Future f = Future.future();
+    subHandler.intoStore(value, field, f.completer());
+    return f;
   }
 
 }

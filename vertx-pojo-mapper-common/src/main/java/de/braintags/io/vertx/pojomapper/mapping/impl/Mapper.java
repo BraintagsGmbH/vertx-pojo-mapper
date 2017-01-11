@@ -50,9 +50,9 @@ import de.braintags.io.vertx.pojomapper.mapping.datastore.IColumnHandler;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableGenerator;
 import de.braintags.io.vertx.pojomapper.mapping.datastore.ITableInfo;
 import de.braintags.io.vertx.util.ClassUtil;
-import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.exception.ClassAccessException;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
@@ -69,16 +69,16 @@ public class Mapper<T> implements IMapper<T> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(Mapper.class);
 
-  private IObjectFactory                                              objectFactory;
-  private Map<String, MappedField>                                    mappedFields             = new HashMap<>();
-  private IField                                                      idField;
-  private MapperFactory                                               mapperFactory;
-  private Class<T>                                                    mapperClass;
-  private Entity                                                      entity;
-  private Map<Class< ? extends Annotation>, IField[]>                 fieldCache               = new HashMap<>();
-  private ITableInfo                                                  tableInfo;
-  private boolean                                                     syncNeeded               = true;
-  private IKeyGenerator                                               keyGenerator;
+  private IObjectFactory objectFactory;
+  private Map<String, MappedField> mappedFields = new HashMap<>();
+  private IField idField;
+  private MapperFactory mapperFactory;
+  private Class<T> mapperClass;
+  private Entity entity;
+  private Map<Class<? extends Annotation>, IField[]> fieldCache = new HashMap<>();
+  private ITableInfo tableInfo;
+  private boolean syncNeeded = true;
+  private IKeyGenerator keyGenerator;
 
   /**
    * all annotations which shall be examined for the mapper class itself
@@ -426,7 +426,7 @@ public class Mapper<T> implements IMapper<T> {
    * @see de.braintags.io.vertx.pojomapper.mapping.IMapper#executeLifecycle(java.lang.Class, java.lang.Object)
    */
   @Override
-  public void executeLifecycle(Class< ? extends Annotation> annotationClass, T entity,
+  public void executeLifecycle(Class<? extends Annotation> annotationClass, T entity,
       Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start executing Lifecycle " + annotationClass.getSimpleName());
     List<IMethodProxy> methods = getLifecycleMethods(annotationClass);
@@ -444,23 +444,26 @@ public class Mapper<T> implements IMapper<T> {
    * @param methods
    */
   private void executeLifecycleMethods(Object entity, Handler<AsyncResult<Void>> handler, List<IMethodProxy> methods) {
-    CounterObject<Void> co = new CounterObject<>(methods.size(), handler);
-    for (IMethodProxy mp : methods) {
-      LOGGER.debug("execute lifecycle method: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
-      executeMethod(mp, entity, result -> {
-        if (result.failed()) {
-          co.setThrowable(result.cause());
-        } else {
-          if (co.reduce()) {
-            LOGGER.debug("finished Lifecycle: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
-            handler.handle(result);
-          }
-        }
-      });
-      if (co.isError()) {
-        break;
+    CompositeFuture cf = CompositeFuture.all(createFutureList(entity, methods));
+    cf.setHandler(res -> {
+      if (res.failed()) {
+        handler.handle(Future.failedFuture(res.cause()));
+      } else {
+        handler.handle(Future.succeededFuture());
       }
+    });
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  private List<Future> createFutureList(Object entity, List<IMethodProxy> methods) {
+    List<Future> fl = new ArrayList<>();
+    for (IMethodProxy mp : methods) {
+      Future f = Future.future();
+      LOGGER.debug("execute lifecycle method: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
+      executeMethod(mp, entity, f.completer());
+      fl.add(f);
     }
+    return fl;
   }
 
   /**
@@ -484,6 +487,7 @@ public class Mapper<T> implements IMapper<T> {
         // ONLY INFORM HANDLER, if no TriggerContext is given
         handler.handle(Future.succeededFuture());
       }
+      LOGGER.debug("trigger method invokement finished");
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }

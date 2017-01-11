@@ -36,6 +36,7 @@ public class TestEmbeddedEntity extends DatastoreBaseTest {
   }
 
   protected Country initCountry(TestContext context) {
+    clearTable(context, Country.class);
     Country country = new Country();
     country.name = "Germany";
     City city = new City();

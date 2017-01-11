@@ -51,27 +51,9 @@ public class SqlCollectionTypeHandlerReferenced extends CollectionTypeHandlerRef
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
-   */
   @Override
-  public void intoStore(Object javaValues, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    super.intoStore(javaValues, field, result -> {
-      if (result.failed()) {
-        handler.handle(result);
-        return;
-      }
-      JsonArray resultArray = (JsonArray) result.result().getResult();
-      try {
-        String arrayString = resultArray == null ? null : resultArray.encode();
-        success(arrayString, handler);
-      } catch (Exception e) {
-        fail(e, handler);
-      }
-    });
+  protected Object encodeResultArray(JsonArray result) {
+    return result.encode();
   }
 
 }

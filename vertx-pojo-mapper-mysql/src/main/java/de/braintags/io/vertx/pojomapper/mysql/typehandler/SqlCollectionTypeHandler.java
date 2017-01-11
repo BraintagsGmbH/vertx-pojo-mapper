@@ -12,7 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper.mysql.typehandler;
 
-import de.braintags.io.vertx.pojomapper.exception.TypeHandlerException;
 import de.braintags.io.vertx.pojomapper.json.typehandler.handler.CollectionTypeHandler;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
@@ -52,31 +51,9 @@ public class SqlCollectionTypeHandler extends CollectionTypeHandler {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.json.typehandler.handler.ArrayTypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
-   */
   @Override
-  public void intoStore(Object javaValues, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    if (javaValues == null) {
-      success(null, handler);
-      return;
-    }
-    super.intoStore(javaValues, field, result -> {
-      if (result.failed()) {
-        handler.handle(result);
-        return;
-      }
-      JsonArray resultArray = (JsonArray) result.result().getResult();
-      try {
-        String arrayString = resultArray.encode();
-        success(arrayString, handler);
-      } catch (Exception e) {
-        fail(new TypeHandlerException("error with field " + field.getFullName(), e), handler);
-      }
-    });
+  protected Object encodeResultArray(JsonArray result) {
+    return result.encode();
   }
 
 }
