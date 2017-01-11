@@ -59,7 +59,6 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   public void internalSave(Handler<AsyncResult<IWriteResult>> resultHandler) {
     if (getObjectsToSave().isEmpty()) {
       resultHandler.handle(Future.succeededFuture(new MongoWriteResult()));
-      return;
     } else {
       CompositeFuture cf = saveRecords();
       cf.setHandler(cfr -> {
