@@ -120,12 +120,16 @@ public interface IQuery<T> extends IDataAccessObject<T> {
   boolean hasQueryArguments();
 
   /**
+   * Set the complete search condition of the query
+   * 
    * @param queryPart
    *          the root query part that contains or builds the complete query search condition
    */
   void setRootQueryPart(IQueryPart queryPart);
 
   /**
+   * Get the complete search condition of the query
+   * 
    * @return the root query part that contains or builds the complete query search condition
    */
   IQueryPart getRootQueryPart();
