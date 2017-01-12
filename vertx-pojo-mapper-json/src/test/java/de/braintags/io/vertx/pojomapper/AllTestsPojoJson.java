@@ -17,7 +17,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ TAsyncHandler.class, TMapperFactory.class, TQuery.class, TReflection.class })
+@SuiteClasses({ TMapperFactory.class, TQuery.class, TReflection.class })
 public class AllTestsPojoJson {
 
 }

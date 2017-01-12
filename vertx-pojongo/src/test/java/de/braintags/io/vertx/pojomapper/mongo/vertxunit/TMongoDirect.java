@@ -23,8 +23,10 @@ import de.braintags.io.vertx.pojomapper.mongo.MongoUtil;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
-import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
+import de.braintags.io.vertx.util.ResultObject;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -115,30 +117,32 @@ public class TMongoDirect extends DatastoreBaseTest {
   @Test
   public void massInsert(TestContext context) {
     LOGGER.info("-->>test");
-    Async async = context.async();
     MongoDataStore ds = (MongoDataStore) getDataStore(context);
     MongoClient client = (MongoClient) ds.getClient();
-    CounterObject co = new CounterObject<>(LOOP, null);
+    List<Future> fl = new ArrayList<>();
     for (int i = 0; i < LOOP; i++) {
+      Future<String> f = Future.future();
+      fl.add(f);
       JsonObject jsonCommand = new JsonObject().put("name", "testName " + i);
-      client.insert("massInsert", jsonCommand, result -> {
-        if (result.failed()) {
-          co.setThrowable(result.cause());
-          context.fail(result.cause());
-          LOGGER.error("", result.cause());
-          async.complete();
-        } else {
-          LOGGER.info("executed: " + result.result());
-          if (co.reduce()) {
-            async.complete();
-          }
-        }
-      });
-      if (co.isError()) {
-        break;
-      }
+      client.insert("massInsert", jsonCommand, f.completer());
     }
+
+    ResultObject<List> ro = new ResultObject<>(null);
+    Async async = context.async();
+    CompositeFuture cf = CompositeFuture.all(fl);
+    cf.setHandler(cfr -> {
+      if (cfr.failed()) {
+        ro.setThrowable(cfr.cause());
+        async.complete();
+      } else {
+        LOGGER.info("number of saved records: " + cf.list().size());
+        ro.setResult(cf.list());
+        async.complete();
+      }
+    });
+
     async.await();
+    context.assertEquals(LOOP, ro.getResult().size());
   }
 
   @Test

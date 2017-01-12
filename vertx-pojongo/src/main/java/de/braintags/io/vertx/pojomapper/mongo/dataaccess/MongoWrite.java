@@ -12,15 +12,20 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.WriteAction;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.impl.WriteEntry;
 import de.braintags.io.vertx.pojomapper.exception.WriteException;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
-import de.braintags.io.vertx.util.CounterObject;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
@@ -52,44 +57,49 @@ public class MongoWrite<T> extends AbstractWrite<T> {
 
   @Override
   public void internalSave(Handler<AsyncResult<IWriteResult>> resultHandler) {
-    MongoWriteResult rr = new MongoWriteResult();
     if (getObjectsToSave().isEmpty()) {
-      resultHandler.handle(Future.succeededFuture(rr));
-      return;
-    }
-
-    CounterObject<IWriteResult> counter = new CounterObject<>(getObjectsToSave().size(), resultHandler);
-    for (T entity : getObjectsToSave()) {
-      save(entity, rr, result -> {
-        if (result.failed()) {
-          counter.setThrowable(result.cause());
+      resultHandler.handle(Future.succeededFuture(new MongoWriteResult()));
+    } else {
+      CompositeFuture cf = saveRecords();
+      cf.setHandler(cfr -> {
+        if (cfr.failed()) {
+          resultHandler.handle(Future.failedFuture(cfr.cause()));
         } else {
-          if (counter.reduce())
-            resultHandler.handle(Future.succeededFuture(rr));
+          resultHandler.handle(Future.succeededFuture(new MongoWriteResult(cf.list())));
         }
       });
-      if (counter.isError())
-        return;
     }
   }
 
-  private void save(T entity, IWriteResult writeResult, Handler<AsyncResult<Void>> resultHandler) {
+  @SuppressWarnings("rawtypes")
+  private CompositeFuture saveRecords() {
+    List<Future> fl = new ArrayList<>(getObjectsToSave().size());
+    for (T entity : getObjectsToSave()) {
+      fl.add(save(entity));
+    }
+    return CompositeFuture.all(fl);
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private Future<IWriteEntry> save(T entity) {
+    Future<IWriteEntry> f = Future.future();
     getDataStore().getMapperFactory().getStoreObjectFactory().createStoreObject(getMapper(), entity, result -> {
       if (result.failed()) {
         WriteException we = new WriteException(result.cause());
         LOG.info("failed", we);
-        resultHandler.handle(Future.failedFuture(we));
+        f.fail(we);
       } else {
-        doSave(entity, (MongoStoreObject) result.result(), writeResult, sResult -> {
+        doSave(entity, (MongoStoreObject) result.result(), sResult -> {
           if (sResult.failed()) {
             LOG.info("failed", sResult.cause());
-            resultHandler.handle(Future.failedFuture(sResult.cause()));
+            f.fail(sResult.cause());
           } else {
-            resultHandler.handle(Future.succeededFuture());
+            f.complete(sResult.result());
           }
         });
       }
     });
+    return f;
   }
 
   /**
@@ -98,34 +108,40 @@ public class MongoWrite<T> extends AbstractWrite<T> {
    * @param storeObject
    * @param resultHandler
    */
-  private void doSave(T entity, MongoStoreObject storeObject, IWriteResult writeResult,
-      Handler<AsyncResult<Void>> resultHandler) {
+  private void doSave(T entity, MongoStoreObject<T> storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {
     LOG.debug("now saving: " + storeObject.toString());
     if (storeObject.isNewInstance()) {
-      doInsert(entity, storeObject, writeResult, resultHandler);
+      doInsert(entity, storeObject, resultHandler);
     } else {
-      doUpdate(entity, storeObject, writeResult, resultHandler);
+      doUpdate(entity, storeObject, resultHandler);
     }
 
   }
 
-  private void doInsert(T entity, MongoStoreObject<T> storeObject, IWriteResult writeResult,
-      Handler<AsyncResult<Void>> resultHandler) {
+  private void doInsert(T entity, MongoStoreObject<T> storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     IMapper<T> mapper = getMapper();
     String collection = mapper.getTableInfo().getName();
     mongoClient.insert(collection, storeObject.getContainer(), result -> {
       if (result.failed()) {
-        handleInsertError(result.cause(), entity, storeObject, writeResult, resultHandler);
+        handleInsertError(result.cause(), entity, storeObject, resultHandler);
       } else {
         Object id = result.result() == null ? storeObject.generatedId : result.result();
-        finishInsert(id, entity, storeObject, writeResult, resultHandler);
+        finishInsert(id, entity, storeObject, resultHandler);
       }
     });
   }
 
-  private void handleInsertError(Throwable t, T entity, MongoStoreObject<T> storeObject, IWriteResult writeResult,
-      Handler<AsyncResult<Void>> resultHandler) {
+  /**
+   * In case of duplicate key exception, try to generate another one
+   * 
+   * @param t
+   * @param entity
+   * @param storeObject
+   * @param resultHandler
+   */
+  private void handleInsertError(Throwable t, T entity, MongoStoreObject<T> storeObject,
+      Handler<AsyncResult<IWriteEntry>> resultHandler) {
     if (t.getMessage().indexOf("duplicate key error") >= 0) {
       if (getMapper().getKeyGenerator() != null) {
         LOG.info("duplicate key, regenerating a new key");
@@ -134,7 +150,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
             resultHandler.handle(Future.failedFuture(
                 new WriteException("Could not generate new ID after duplicate key error", niResult.cause())));
           } else {
-            doInsert(entity, storeObject, writeResult, resultHandler);
+            doInsert(entity, storeObject, resultHandler);
           }
         });
       } else {
@@ -146,8 +162,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
     }
   }
 
-  private void doUpdate(T entity, MongoStoreObject<T> storeObject, IWriteResult writeResult,
-      Handler<AsyncResult<Void>> resultHandler) {
+  private void doUpdate(T entity, MongoStoreObject<T> storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     IMapper<T> mapper = getMapper();
     String collection = mapper.getTableInfo().getName();
@@ -161,25 +176,25 @@ public class MongoWrite<T> extends AbstractWrite<T> {
         resultHandler.handle(Future.failedFuture(new WriteException(result.cause())));
       } else {
         LOG.debug("updated");
-        finishUpdate(currentId, entity, storeObject, writeResult, resultHandler);
+        finishUpdate(currentId, entity, storeObject, resultHandler);
       }
     });
   }
 
-  private void finishInsert(Object id, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
-      Handler<AsyncResult<Void>> resultHandler) {
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  private void finishInsert(Object id, T entity, MongoStoreObject storeObject,
+      Handler<AsyncResult<IWriteEntry>> resultHandler) {
     setIdValue(id, storeObject, result -> {
       if (result.failed()) {
-        resultHandler.handle(result);
+        resultHandler.handle(Future.failedFuture(result.cause()));
         return;
       }
       try {
         executePostSave(entity, lcr -> {
           if (lcr.failed()) {
-            resultHandler.handle(lcr);
+            resultHandler.handle(Future.failedFuture(lcr.cause()));
           } else {
-            writeResult.addEntry(storeObject, id, WriteAction.INSERT);
-            resultHandler.handle(Future.succeededFuture());
+            resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.INSERT)));
           }
         });
       } catch (Exception e) {
@@ -188,15 +203,15 @@ public class MongoWrite<T> extends AbstractWrite<T> {
     });
   }
 
-  private void finishUpdate(Object id, T entity, MongoStoreObject storeObject, IWriteResult writeResult,
-      Handler<AsyncResult<Void>> resultHandler) {
+  @SuppressWarnings("rawtypes")
+  private void finishUpdate(Object id, T entity, MongoStoreObject storeObject,
+      Handler<AsyncResult<IWriteEntry>> resultHandler) {
     try {
       executePostSave(entity, lcr -> {
         if (lcr.failed()) {
-          resultHandler.handle(lcr);
+          resultHandler.handle(Future.failedFuture(lcr.cause()));
         } else {
-          writeResult.addEntry(storeObject, id, WriteAction.UPDATE);
-          resultHandler.handle(Future.succeededFuture());
+          resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.UPDATE)));
         }
       });
     } catch (Exception e) {
