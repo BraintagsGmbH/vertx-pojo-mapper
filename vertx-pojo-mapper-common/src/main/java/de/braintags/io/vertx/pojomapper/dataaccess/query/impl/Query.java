@@ -94,7 +94,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
         expression.addSort(getSortDefinitions());
       }
       if (getSearchCondition() != null) {
-        expression.buildQueryExpression(getSearchCondition(), result -> {
+        expression.buildSearchCondition(getSearchCondition(), result -> {
           if (result.failed())
             resultHandler.handle(Future.failedFuture(result.cause()));
           else

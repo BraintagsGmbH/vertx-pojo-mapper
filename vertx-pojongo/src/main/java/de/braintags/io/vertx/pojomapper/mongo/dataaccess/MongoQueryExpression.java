@@ -5,24 +5,19 @@
  */
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchCondition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchConditionContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryLogicException;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryOperatorException;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownSearchConditionException;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -34,7 +29,7 @@ import io.vertx.core.json.JsonObject;
  * @author Michael Remme
  */
 
-public class MongoQueryExpression extends AbstractQueryExpression {
+public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
   private JsonObject searchCondition = new JsonObject();
   private JsonObject sortArguments;
 
@@ -50,78 +45,29 @@ public class MongoQueryExpression extends AbstractQueryExpression {
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#buildQueryExpression(de.braintags.io.vertx.
-   * pojomapper.dataaccess.query.ISearchCondition, io.vertx.core.Handler)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#handleFinishedBuild(java.lang.
+   * Object)
    */
   @Override
-  public void buildQueryExpression(ISearchCondition searchCondition, Handler<AsyncResult<Void>> handler) {
-    internalBuildQuery(searchCondition, result -> {
-      if (result.failed()) {
-        handler.handle(Future.failedFuture(result.cause()));
-      } else {
-        JsonObject expression = result.result();
-        this.searchCondition = expression;
-        handler.handle(Future.succeededFuture());
-      }
-    });
+  protected void handleFinishedSearchCondition(JsonObject result) {
+    this.searchCondition = result;
   }
 
-  /**
-   * Build the abstract search condition into the native search condition of the query. Can be used recursively for
-   * conditions that contain more than one sub condition (AND, OR, ..)
+  /*
+   * (non-Javadoc)
    * 
-   * @param searchCondition
-   *          the query search condition
-   * @param handler
-   *          returns the JSON object that represents the given search condition
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#parseContainerContents(java.util.
+   * List, de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchConditionContainer)
    */
-  private void internalBuildQuery(ISearchCondition searchCondition, Handler<AsyncResult<JsonObject>> handler) {
-    if (searchCondition instanceof IFieldCondition) {
-      parseFieldCondition((IFieldCondition) searchCondition, handler);
-    } else if (searchCondition instanceof ISearchConditionContainer) {
-      parseSearchConditionContainer((ISearchConditionContainer) searchCondition, handler);
-    } else {
-      handler.handle(Future.failedFuture(new UnknownSearchConditionException(searchCondition)));
-    }
-  }
-
-  /**
-   * Parses the container part of a search condition. Loops through the content of the container and connects all of
-   * them with the specified connector.
-   * 
-   * @param container
-   * @param handler
-   */
-  private void parseSearchConditionContainer(ISearchConditionContainer container,
-      Handler<AsyncResult<JsonObject>> handler) {
-    String queryLogic;
-    try {
-      queryLogic = translateQueryLogic(container.getQueryLogic());
-    } catch (UnknownQueryLogicException e) {
-      handler.handle(Future.failedFuture(e));
-      return;
-    }
-    List<ISearchCondition> conditions = container.getConditions();
-    @SuppressWarnings("rawtypes")
-    List<Future> futures = new ArrayList<>();
-    for (ISearchCondition searchCondition : conditions) {
-      Future<JsonObject> future = Future.future();
-      futures.add(future);
-      internalBuildQuery(searchCondition, future.completer());
-    }
-
-    CompositeFuture.all(futures).setHandler(result -> {
-      if (result.failed()) {
-        handler.handle(Future.failedFuture(result.cause()));
-      } else {
-        List<Object> results = result.result().list();
-        JsonArray subExpressions = new JsonArray(results);
-        JsonObject expression = new JsonObject();
-        expression.put(queryLogic, subExpressions);
-        handler.handle(Future.succeededFuture(expression));
-      }
-    });
+  @Override
+  protected JsonObject parseContainerContents(List<JsonObject> parsedConditionList, ISearchConditionContainer container)
+      throws UnknownQueryLogicException {
+    String queryLogic = translateQueryLogic(container.getQueryLogic());
+    JsonArray subExpressions = new JsonArray(parsedConditionList);
+    JsonObject expression = new JsonObject();
+    expression.put(queryLogic, subExpressions);
+    return expression;
   }
 
   /**
@@ -143,48 +89,52 @@ public class MongoQueryExpression extends AbstractQueryExpression {
     }
   }
 
-  /**
-   * Parses a {@link IFieldCondition}. The operator and value will be transformed into a format fitting the MongoDB
-   * database
+  /*
+   * (non-Javadoc)
    * 
-   * @param fieldCondition
-   * @param handler
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#buildFieldConditionResult(de.
+   * braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
    */
-  private void parseFieldCondition(IFieldCondition fieldCondition, Handler<AsyncResult<JsonObject>> handler) {
-    IField field = getMapper().getField(fieldCondition.getField());
-    String columnName = field.getColumnInfo().getName();
+  @Override
+  protected JsonObject buildFieldConditionResult(IFieldCondition fieldCondition, String columnName, Object parsedValue)
+      throws UnknownQueryOperatorException {
+    QueryOperator operator = fieldCondition.getOperator();
 
-    if (fieldCondition.getValue() != null) {
-      transformValue(field, fieldCondition.getOperator(), fieldCondition.getValue(), result -> {
-        if (result.failed()) {
-          handler.handle(Future.failedFuture(result.cause()));
-        } else {
-          JsonObject logicCondition;
-          try {
-            logicCondition = buildLogicCondition(fieldCondition.getOperator(), result.result());
-          } catch (UnknownQueryOperatorException e) {
-            handler.handle(Future.failedFuture(e));
-            return;
-          }
-
-          JsonObject expression = new JsonObject();
-          expression.put(columnName, logicCondition);
-          handler.handle(Future.succeededFuture(expression));
-        }
-      });
-    } else {
-      handleNullConditionValue(fieldCondition, columnName, handler);
+    switch (operator) {
+    case CONTAINS:
+      parsedValue = ".*" + parsedValue + ".*";
+      break;
+    case STARTS:
+      parsedValue = parsedValue + ".*";
+      break;
+    case ENDS:
+      parsedValue = ".*" + parsedValue;
+      break;
+    default:
+      // noop
+      break;
     }
+
+    String parsedOperator = translateOperator(operator);
+    JsonObject logicCondition = new JsonObject();
+    logicCondition.put(parsedOperator, parsedValue);
+    // make RegEx comparisons case insensitive
+    if (operator == QueryOperator.CONTAINS || operator == QueryOperator.STARTS || operator == QueryOperator.ENDS)
+      logicCondition.put("$options", "i");
+
+    JsonObject expression = new JsonObject();
+    expression.put(columnName, logicCondition);
+    return expression;
   }
 
-  /**
-   * Special case for null values, to avoid costly, unneeded transformation
+  /*
+   * (non-Javadoc)
    * 
-   * @param condition
-   * @param columnName
-   * @param handler
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#handleNullConditionValue(de.
+   * braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
    */
-  private void handleNullConditionValue(IFieldCondition condition, String columnName,
+  @Override
+  protected void handleNullConditionValue(IFieldCondition condition, String columnName,
       Handler<AsyncResult<JsonObject>> handler) {
     // special case for query with null value
     if (condition.getOperator() == QueryOperator.EQUALS || condition.getOperator() == QueryOperator.NOT_EQUALS) {
@@ -205,59 +155,6 @@ public class MongoQueryExpression extends AbstractQueryExpression {
           .failedFuture(new NullPointerException("Invalid 'null' value for operator " + condition.getOperator())));
       return;
     }
-  }
-
-  /**
-   * Build the logic condition, consisting of the parsed operator and the parsed value(s)
-   * 
-   * @param operator
-   * @param parsedValue
-   * @return
-   * @throws UnknownQueryOperatorException
-   */
-  private JsonObject buildLogicCondition(QueryOperator operator, Object parsedValue)
-      throws UnknownQueryOperatorException {
-    String parsedOperator = translateOperator(operator);
-    JsonObject logicCondition = new JsonObject();
-    logicCondition.put(parsedOperator, parsedValue);
-    // make RegEx comparisons case insensitive
-    if (operator == QueryOperator.CONTAINS || operator == QueryOperator.STARTS || operator == QueryOperator.ENDS)
-      logicCondition.put("$options", "i");
-    return logicCondition;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#transformValue(java.lang.String,
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator, java.lang.Object, io.vertx.core.Handler)
-   */
-  @Override
-  protected void transformValue(IField field, QueryOperator operator, Object value,
-      Handler<AsyncResult<Object>> handler) {
-    super.transformValue(field, operator, value, result -> {
-      if (result.failed()) {
-        handler.handle(Future.failedFuture(result.cause()));
-      } else {
-        Object transformedValue = result.result();
-        switch (operator) {
-        case CONTAINS:
-          transformedValue = ".*" + transformedValue + ".*";
-          break;
-        case STARTS:
-          transformedValue = transformedValue + ".*";
-          break;
-        case ENDS:
-          transformedValue = ".*" + transformedValue;
-          break;
-        default:
-          // noop
-          break;
-        }
-        handler.handle(Future.succeededFuture(transformedValue));
-      }
-    });
   }
 
   /**

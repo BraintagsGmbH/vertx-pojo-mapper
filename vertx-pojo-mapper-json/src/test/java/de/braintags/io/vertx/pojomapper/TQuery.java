@@ -12,8 +12,6 @@
  */
 package de.braintags.io.vertx.pojomapper;
 
-import java.util.Arrays;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,8 +34,8 @@ public class TQuery {
   @Test
   public void test() {
     IQuery<Person> query = dataStore.createQuery(Person.class);
-    query.setSearchCondition(query.and(query.isEqual("name", "peter"), query.in("secName", "eins", "zwei"),
-        query.isEqual("weight", 15)));
+    query.setSearchCondition(
+        query.and(query.isEqual("name", "peter"), query.in("secName", "eins", "zwei"), query.isEqual("weight", 15)));
     logger.info("--- start Rambler");
 
     final IQuery<Person> exQuery = query;

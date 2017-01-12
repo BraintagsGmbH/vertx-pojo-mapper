@@ -54,7 +54,7 @@ public interface IQueryExpression {
    * @param searchCondition the implementation independent search condition
    * @param handler
    */
-  void buildQueryExpression(ISearchCondition searchCondition, Handler<AsyncResult<Void>> handler);
+  void buildSearchCondition(ISearchCondition searchCondition, Handler<AsyncResult<Void>> handler);
 
   /**
    * Adds the given {@link ISortDefinition} into the current instance like it is needed by the implementation

@@ -40,6 +40,7 @@ public class CalendarTest extends AbstractTypeHandlerTest {
     List<CalendarMapper> list = findAll(context, query);
     context.assertEquals(1, list.size());
     CalendarMapper loaded = list.get(0);
+    // currenty broken, since by default, Timestamp fields can not be null in MySQL
     context.assertNull(loaded.myCal, "Found " + loaded.myCal);
   }
 
