@@ -18,8 +18,8 @@ public class QueryAnd extends AbstractSearchConditionContainer {
    * 
    * @param conditions
    */
-  public QueryAnd(ISearchCondition... queryParts) {
-    super(queryParts);
+  public QueryAnd(ISearchCondition... searchConditions) {
+    super(searchConditions);
   }
 
   /*

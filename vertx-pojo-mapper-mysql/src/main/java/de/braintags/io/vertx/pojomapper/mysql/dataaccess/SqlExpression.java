@@ -155,7 +155,7 @@ public class SqlExpression extends AbstractQueryExpression {
           Object parsedValue = result.result();
           String parsedOperator;
           try {
-            parsedOperator = transformOperator(fieldCondition.getOperator());
+            parsedOperator = translateOperator(fieldCondition.getOperator());
           } catch (UnknownQueryOperatorException e) {
             handler.handle(Future.failedFuture(e));
             return;
@@ -178,7 +178,6 @@ public class SqlExpression extends AbstractQueryExpression {
    */
   private void handleNullConditionValue(IFieldCondition fieldCondition, final String columnName,
       Handler<AsyncResult<SqlWhereFragment>> handler) {
-    // special handling for NULL values
     SqlWhereFragment fragment = new SqlWhereFragment();
     fragment.whereClause.append(columnName).append(" ");
     if (fieldCondition.getOperator() == QueryOperator.EQUALS) {
@@ -240,7 +239,7 @@ public class SqlExpression extends AbstractQueryExpression {
    * @throws UnknownQueryOperatorException
    *           if the operator is unknown
    */
-  private String transformOperator(QueryOperator operator) throws UnknownQueryOperatorException {
+  private String translateOperator(QueryOperator operator) throws UnknownQueryOperatorException {
     switch (operator) {
     case EQUALS:
       return "=";
@@ -324,10 +323,10 @@ public class SqlExpression extends AbstractQueryExpression {
 
     @SuppressWarnings("rawtypes")
     List<Future> futures = new ArrayList<>();
-    for (ISearchCondition queryPart : container.getConditions()) {
+    for (ISearchCondition searchCondition : container.getConditions()) {
       Future<SqlWhereFragment> future = Future.future();
       futures.add(future);
-      internalBuildSearchCondition(queryPart, future.completer());
+      internalBuildSearchCondition(searchCondition, future.completer());
     }
 
     CompositeFuture.all(futures).setHandler(result -> {
@@ -353,10 +352,10 @@ public class SqlExpression extends AbstractQueryExpression {
    * 
    * @param logic
    * @return the native SQL connector value
-   * @throws QueryExpressionBuildException
+   * @throws UnknownQueryLogicException
    *           if the logic value is unknown
    */
-  private String translateQueryLogic(QueryLogic logic) throws QueryExpressionBuildException {
+  private String translateQueryLogic(QueryLogic logic) throws UnknownQueryLogicException {
     switch (logic) {
     case AND:
       return "AND";

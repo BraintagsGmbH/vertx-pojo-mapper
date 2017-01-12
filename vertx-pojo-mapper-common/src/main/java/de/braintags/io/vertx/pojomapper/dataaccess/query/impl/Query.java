@@ -194,6 +194,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /**
    * Get the start position of the query
+   * 
    * @return the start
    */
   public final int getStart() {
@@ -228,7 +229,9 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     return addSort(fieldName, true);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#addSort(java.lang.String, boolean)
    */
   @Override
@@ -356,7 +359,9 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     return new FieldCondition(field, QueryOperator.SMALLER_EQUAL, value);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#in(java.lang.String, java.lang.Object[])
    */
   @Override
@@ -440,21 +445,21 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * 
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#and(de.braintags.io.vertx.pojomapper.dataaccess.query.
-   * IQueryPart[])
+   * ISearchCondition[])
    */
   @Override
-  public ISearchConditionContainer and(ISearchCondition... queryParts) {
-    return new QueryAnd(queryParts);
+  public ISearchConditionContainer and(ISearchCondition... searchConditions) {
+    return new QueryAnd(searchConditions);
   }
 
   /*
    * (non-Javadoc)
    * 
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#or(de.braintags.io.vertx.pojomapper.dataaccess.query.
-   * IQueryPart[])
+   * ISearchCondition[])
    */
   @Override
-  public ISearchConditionContainer or(ISearchCondition... queryParts) {
-    return new QueryOr(queryParts);
+  public ISearchConditionContainer or(ISearchCondition... searchConditions) {
+    return new QueryOr(searchConditions);
   }
 }

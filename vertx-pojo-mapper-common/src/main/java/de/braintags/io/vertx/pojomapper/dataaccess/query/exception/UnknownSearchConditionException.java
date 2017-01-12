@@ -27,8 +27,8 @@ public class UnknownSearchConditionException extends QueryExpressionBuildExcepti
   /**
    * @param message
    */
-  public UnknownSearchConditionException(ISearchCondition queryPart) {
-    super("Unknown ISearchCondition implementation: " + queryPart.getClass());
+  public UnknownSearchConditionException(ISearchCondition searchCondition) {
+    super("Unknown ISearchCondition implementation: " + searchCondition.getClass());
   }
 
 }

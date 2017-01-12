@@ -15,16 +15,16 @@ public class QueryOr extends AbstractSearchConditionContainer {
   /**
    * Initializes the container with zero or more sub conditions that will be connected with {@link QueryLogic#OR}
    * 
-   * @param conditions
+   * @param searchConditions
    */
-  public QueryOr(ISearchCondition... queryParts) {
-    super(queryParts);
+  public QueryOr(ISearchCondition... searchConditions) {
+    super(searchConditions);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#getConnector()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchConditionContainer#getQueryLogic()
    */
   @Override
   public QueryLogic getQueryLogic() {

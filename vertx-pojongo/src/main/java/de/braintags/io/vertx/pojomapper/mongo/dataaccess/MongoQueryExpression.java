@@ -52,11 +52,11 @@ public class MongoQueryExpression extends AbstractQueryExpression {
    * 
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#buildQueryExpression(de.braintags.io.vertx.
-   * pojomapper.dataaccess.query.IQueryPart)
+   * pojomapper.dataaccess.query.ISearchCondition, io.vertx.core.Handler)
    */
   @Override
-  public void buildQueryExpression(ISearchCondition queryPart, Handler<AsyncResult<Void>> handler) {
-    internalBuildQuery(queryPart, result -> {
+  public void buildQueryExpression(ISearchCondition searchCondition, Handler<AsyncResult<Void>> handler) {
+    internalBuildQuery(searchCondition, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
@@ -95,20 +95,20 @@ public class MongoQueryExpression extends AbstractQueryExpression {
    */
   private void parseSearchConditionContainer(ISearchConditionContainer container,
       Handler<AsyncResult<JsonObject>> handler) {
-    String connector;
+    String queryLogic;
     try {
-      connector = translateConnector(container.getQueryLogic());
+      queryLogic = translateQueryLogic(container.getQueryLogic());
     } catch (UnknownQueryLogicException e) {
       handler.handle(Future.failedFuture(e));
       return;
     }
-    List<ISearchCondition> content = container.getConditions();
+    List<ISearchCondition> conditions = container.getConditions();
     @SuppressWarnings("rawtypes")
     List<Future> futures = new ArrayList<>();
-    for (ISearchCondition queryPart : content) {
+    for (ISearchCondition searchCondition : conditions) {
       Future<JsonObject> future = Future.future();
       futures.add(future);
-      internalBuildQuery(queryPart, future.completer());
+      internalBuildQuery(searchCondition, future.completer());
     }
 
     CompositeFuture.all(futures).setHandler(result -> {
@@ -118,41 +118,50 @@ public class MongoQueryExpression extends AbstractQueryExpression {
         List<Object> results = result.result().list();
         JsonArray subExpressions = new JsonArray(results);
         JsonObject expression = new JsonObject();
-        expression.put(connector, subExpressions);
+        expression.put(queryLogic, subExpressions);
         handler.handle(Future.succeededFuture(expression));
       }
     });
   }
 
   /**
-   * @param connector
-   * @return
+   * Translate the logic connector into native MongoDB format
+   * 
+   * @param logic
+   * @return the native MongoDB connector key
    * @throws UnknownQueryLogicException
+   *           if the logic value is unknown
    */
-  private String translateConnector(QueryLogic connector) throws UnknownQueryLogicException {
-    switch (connector) {
+  private String translateQueryLogic(QueryLogic logic) throws UnknownQueryLogicException {
+    switch (logic) {
     case AND:
       return "$and";
     case OR:
       return "$or";
     default:
-      throw new UnknownQueryLogicException(connector);
+      throw new UnknownQueryLogicException(logic);
     }
   }
 
-  private void parseFieldCondition(IFieldCondition condition, Handler<AsyncResult<JsonObject>> handler) {
-
-    IField field = getMapper().getField(condition.getField());
+  /**
+   * Parses a {@link IFieldCondition}. The operator and value will be transformed into a format fitting the MongoDB
+   * database
+   * 
+   * @param fieldCondition
+   * @param handler
+   */
+  private void parseFieldCondition(IFieldCondition fieldCondition, Handler<AsyncResult<JsonObject>> handler) {
+    IField field = getMapper().getField(fieldCondition.getField());
     String columnName = field.getColumnInfo().getName();
 
-    if (condition.getValue() != null) {
-      transformValue(field, condition.getOperator(), condition.getValue(), result -> {
+    if (fieldCondition.getValue() != null) {
+      transformValue(field, fieldCondition.getOperator(), fieldCondition.getValue(), result -> {
         if (result.failed()) {
           handler.handle(Future.failedFuture(result.cause()));
         } else {
           JsonObject logicCondition;
           try {
-            logicCondition = buildLogicCondition(condition.getOperator(), result.result());
+            logicCondition = buildLogicCondition(fieldCondition.getOperator(), result.result());
           } catch (UnknownQueryOperatorException e) {
             handler.handle(Future.failedFuture(e));
             return;
@@ -164,40 +173,54 @@ public class MongoQueryExpression extends AbstractQueryExpression {
         }
       });
     } else {
-      // special case for query with null value
-      if (condition.getOperator() == QueryOperator.EQUALS || condition.getOperator() == QueryOperator.NOT_EQUALS) {
-        String parsedLogic;
-        try {
-          parsedLogic = translateOperator(condition.getOperator());
-        } catch (UnknownQueryOperatorException e) {
-          handler.handle(Future.failedFuture(e));
-          return;
-        }
-        JsonObject expression = new JsonObject();
-        JsonObject logicCondition = new JsonObject();
-        logicCondition.putNull(parsedLogic);
-        expression.put(columnName, logicCondition);
-        handler.handle(Future.succeededFuture(expression));
-      } else {
-        handler.handle(Future
-            .failedFuture(new NullPointerException("Invalid 'null' value for operator " + condition.getOperator())));
-        return;
-      }
+      handleNullConditionValue(fieldCondition, columnName, handler);
     }
   }
 
   /**
+   * Special case for null values, to avoid costly, unneeded transformation
+   * 
    * @param condition
-   * @param result
+   * @param columnName
    * @param handler
+   */
+  private void handleNullConditionValue(IFieldCondition condition, String columnName,
+      Handler<AsyncResult<JsonObject>> handler) {
+    // special case for query with null value
+    if (condition.getOperator() == QueryOperator.EQUALS || condition.getOperator() == QueryOperator.NOT_EQUALS) {
+      String parsedLogic;
+      try {
+        parsedLogic = translateOperator(condition.getOperator());
+      } catch (UnknownQueryOperatorException e) {
+        handler.handle(Future.failedFuture(e));
+        return;
+      }
+      JsonObject expression = new JsonObject();
+      JsonObject logicCondition = new JsonObject();
+      logicCondition.putNull(parsedLogic);
+      expression.put(columnName, logicCondition);
+      handler.handle(Future.succeededFuture(expression));
+    } else {
+      handler.handle(Future
+          .failedFuture(new NullPointerException("Invalid 'null' value for operator " + condition.getOperator())));
+      return;
+    }
+  }
+
+  /**
+   * Build the logic condition, consisting of the parsed operator and the parsed value(s)
+   * 
+   * @param operator
+   * @param parsedValue
    * @return
    * @throws UnknownQueryOperatorException
    */
   private JsonObject buildLogicCondition(QueryOperator operator, Object parsedValue)
       throws UnknownQueryOperatorException {
-    String parsedLogic = translateOperator(operator);
+    String parsedOperator = translateOperator(operator);
     JsonObject logicCondition = new JsonObject();
-    logicCondition.put(parsedLogic, parsedValue);
+    logicCondition.put(parsedOperator, parsedValue);
+    // make RegEx comparisons case insensitive
     if (operator == QueryOperator.CONTAINS || operator == QueryOperator.STARTS || operator == QueryOperator.ENDS)
       logicCondition.put("$options", "i");
     return logicCondition;
@@ -238,9 +261,12 @@ public class MongoQueryExpression extends AbstractQueryExpression {
   }
 
   /**
+   * Translate the query operator to the native MongoDB value
+   * 
    * @param operator
    * @return
    * @throws UnknownQueryOperatorException
+   *           if the operator is unknown
    */
   private String translateOperator(QueryOperator operator) throws UnknownQueryOperatorException {
     switch (operator) {
@@ -314,9 +340,14 @@ public class MongoQueryExpression extends AbstractQueryExpression {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
   @Override
   public String toString() {
-    return String.valueOf(searchCondition) + " | sort: " + String.valueOf(sortArguments);
+    return String.valueOf(searchCondition) + " | sort: " + sortArguments;
   }
 
 }

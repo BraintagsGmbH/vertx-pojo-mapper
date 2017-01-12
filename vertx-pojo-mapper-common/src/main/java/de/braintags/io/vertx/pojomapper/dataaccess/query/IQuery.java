@@ -298,20 +298,20 @@ public interface IQuery<T> extends IDataAccessObject<T> {
   /**
    * Connects the given query parts with the {@link QueryLogic#OR} connector
    * 
-   * @param queryParts
-   *          the query parts to connect
+   * @param searchConditions
+   *          the search conditions to connect
    * @return
    */
-  ISearchConditionContainer or(ISearchCondition... queryParts);
+  ISearchConditionContainer or(ISearchCondition... searchConditions);
 
   /**
    * Connects the given query parts with the {@link QueryLogic#AND} connector
    * 
-   * @param queryParts
-   *          the query parts to connect
+   * @param searchConditions
+   *          the search conditions to connect
    * @return
    */
-  ISearchConditionContainer and(ISearchCondition... queryParts);
+  ISearchConditionContainer and(ISearchCondition... searchConditions);
 
   /**
    * Build the complete query expression that contains all info needed to execute this query against the current

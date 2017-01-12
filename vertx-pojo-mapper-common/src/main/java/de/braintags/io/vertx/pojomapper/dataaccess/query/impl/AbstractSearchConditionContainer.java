@@ -38,7 +38,7 @@ public abstract class AbstractSearchConditionContainer implements ISearchConditi
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#getContent()
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchConditionContainer#getConditions()
    */
   @Override
   public List<ISearchCondition> getConditions() {
