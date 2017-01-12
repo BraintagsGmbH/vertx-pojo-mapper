@@ -24,12 +24,10 @@
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-sql-common</artifactId>
-	      <version>3.3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mysql-postgresql-client</artifactId>
-	      <version>3.3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>de.braintags</groupId>
