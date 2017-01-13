@@ -15,7 +15,7 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query.exception;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
 
 /**
- * Thrown if a query expression encounters an unknown {@link QueryOperator} 
+ * Thrown if a query expression encounters an unknown {@link QueryOperator}
  * 
  * @author sschmitt
  * 
@@ -25,7 +25,10 @@ public class UnknownQueryOperatorException extends QueryExpressionBuildException
   private static final long serialVersionUID = 1L;
 
   /**
-   * @param message
+   * Create a new exception with a message containing the given query operator
+   * 
+   * @param operator
+   * 
    */
   public UnknownQueryOperatorException(QueryOperator operator) {
     super("Unknown query operator: " + operator);

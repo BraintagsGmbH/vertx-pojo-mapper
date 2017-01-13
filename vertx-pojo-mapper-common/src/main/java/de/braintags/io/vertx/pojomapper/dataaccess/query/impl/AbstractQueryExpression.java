@@ -34,12 +34,12 @@ import io.vertx.core.Handler;
 
 /**
  * Abstract implementation of {@link IQueryExpression}
- * 
+ *
  * @param T
  *          the internal result type of the search condition building process
- * 
+ *
  * @author sschmitt
- * 
+ *
  */
 public abstract class AbstractQueryExpression<T> implements IQueryExpression {
 
@@ -52,7 +52,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    * handler(s).<br>
    * If the operator is a multi-value operator (e.g IN or NOT_IN), the value must be an instance of {@link Iterable}.
    * The result will then also be a List of the transformed values.
-   * 
+   *
    * @param field
    *          the java field of the condition
    * @param operator
@@ -65,12 +65,12 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
   private void transformValue(IField field, QueryOperator operator, Object value,
       Handler<AsyncResult<Object>> handler) {
     if (operator.isMultiValueOperator()) {
-      if (!(value instanceof Iterable)) {
-        handler.handle(
-            Future.failedFuture(new QueryParameterException("Multivalued argument but not an instance of Iterable")));
-        return;
+      if (value instanceof Iterable) {
+        handleMultipleValues(field, (Iterable<?>) value, handler);
+      } else {
+        handler.handle(Future.failedFuture(
+            new QueryParameterException("Multivalued argument but not an instance of Iterable:" + value)));
       }
-      handleMultipleValues(field, (Iterable<?>) value, handler);
     } else {
       handleSingleValue(field, value, handler);
     }
@@ -78,7 +78,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
 
   /**
    * Handle the transformation of a single value
-   * 
+   *
    * @param field
    *          the java field of the condition
    * @param value
@@ -98,7 +98,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
 
   /**
    * Handle the transformation of multiple values
-   * 
+   *
    * @param fieldName
    *          the java field of the condition
    * @param value
@@ -137,7 +137,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#buildQueryExpression(de.braintags.io.vertx.
    * pojomapper.dataaccess.query.ISearchCondition, io.vertx.core.Handler)
@@ -157,7 +157,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
   /**
    * Method to process the final result of the search condition building process, mostly to save it to a field and/or do
    * some final manipulation
-   * 
+   *
    * @param result
    *          the final result of the search condition build process
    */
@@ -166,7 +166,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
   /**
    * Build the abstract search condition into the native search condition of the query. Can be used recursively for
    * conditions that contain more than one sub condition (AND, OR, ..)
-   * 
+   *
    * @param searchCondition
    *          the query search condition
    * @param handler
@@ -185,7 +185,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
   /**
    * Parses a {@link IFieldCondition}. The operator and value will be transformed into a format fitting the concrete
    * database. The java field name will be converted to the matching column name of the database.
-   * 
+   *
    * @param fieldCondition
    *          the field condition to parse
    * @param handler
@@ -200,14 +200,12 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
         if (result.failed()) {
           handler.handle(Future.failedFuture(result.cause()));
         } else {
-          T fieldConditionResult;
           try {
-            fieldConditionResult = buildFieldConditionResult(fieldCondition, columnName, result.result());
+            T fieldConditionResult = buildFieldConditionResult(fieldCondition, columnName, result.result());
+            handler.handle(Future.succeededFuture(fieldConditionResult));
           } catch (UnknownQueryOperatorException e) {
             handler.handle(Future.failedFuture(e));
-            return;
           }
-          handler.handle(Future.succeededFuture(fieldConditionResult));
         }
       });
     } else {
@@ -217,7 +215,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
 
   /**
    * Build the result of a field condition with the parsed value
-   * 
+   *
    * @param fieldCondition
    *          the field condition to parse
    * @param columnName
@@ -231,7 +229,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
 
   /**
    * Special case for null values, to avoid costly, unneeded transformation
-   * 
+   *
    * @param fieldCondition
    *          the field condition to parse
    * @param columnName
@@ -246,7 +244,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
   /**
    * Parses the container part of a search condition. Loops through the content of the container and connects each
    * resulting condition with the specified connector.
-   * 
+   *
    * @param container
    *          the container to parse
    * @param handler
@@ -269,18 +267,17 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
         T parsedContainer;
         try {
           parsedContainer = parseContainerContents(parsedConditionList, container);
+          handler.handle(Future.succeededFuture(parsedContainer));
         } catch (UnknownQueryLogicException e) {
           handler.handle(Future.failedFuture(e));
-          return;
         }
-        handler.handle(Future.succeededFuture(parsedContainer));
       }
     });
   }
 
   /**
    * Builds the parse result containing all parsed conditions of a container
-   * 
+   *
    * @param parsedConditionList
    *          the parsed search conditions of the container
    * @param container
@@ -292,7 +289,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#setLimit(int, int)
    */
   @Override
@@ -317,7 +314,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#setMapper(de.braintags.io.vertx.pojomapper.
    * mapping.IMapper)
@@ -329,7 +326,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#getMapper()
    */
   @Override
