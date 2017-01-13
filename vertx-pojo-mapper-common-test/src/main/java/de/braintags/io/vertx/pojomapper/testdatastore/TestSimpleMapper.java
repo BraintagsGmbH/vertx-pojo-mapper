@@ -64,7 +64,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
         context.assertTrue(sm.equals(result.result()));
 
         // search inside name field
-        query.field("name").is("testNameModified");
+        query.setSearchCondition(query.isEqual("name", "testNameModified"));
         try {
           ResultContainer resultContainer2 = find(context, query, 1);
           resultContainer2.queryResult.iterator().next(res2 -> {

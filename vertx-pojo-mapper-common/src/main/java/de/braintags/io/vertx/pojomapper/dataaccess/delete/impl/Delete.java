@@ -205,7 +205,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   protected void deleteRecordsById(IField idField, List<Object> objectIds,
       Handler<AsyncResult<IDeleteResult>> resultHandler) {
     IQuery<T> q = getDataStore().createQuery(getMapperClass());
-    q.field(idField.getName()).in(objectIds);
+    q.setSearchCondition(q.in(idField.getName(), objectIds));
     deleteQuery(q, dr -> {
       if (dr.failed()) {
         resultHandler.handle(dr);

@@ -12,6 +12,8 @@
  */
 package de.braintags.io.vertx.pojomapper.mapping.impl.keygen;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import io.vertx.core.AsyncResult;
@@ -27,7 +29,7 @@ import io.vertx.core.Handler;
  */
 public class DebugGenerator extends AbstractKeyGenerator {
   public static final String NAME = "DEBUG";
-  private long counter = 0;
+  private final AtomicLong counter = new AtomicLong(0);
 
   /**
    * @param name
@@ -43,12 +45,12 @@ public class DebugGenerator extends AbstractKeyGenerator {
    * @see de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator#generateKey()
    */
   @Override
-  public void generateKey(IMapper mapper, Handler<AsyncResult<Key>> handler) {
-    handler.handle(Future.succeededFuture(new Key(++counter)));
+  public void generateKey(IMapper<?> mapper, Handler<AsyncResult<Key>> handler) {
+    handler.handle(Future.succeededFuture(new Key(counter.incrementAndGet())));
   }
 
   public void resetCounter() {
-    counter = 0;
+    counter.set(0);
   }
 
 }

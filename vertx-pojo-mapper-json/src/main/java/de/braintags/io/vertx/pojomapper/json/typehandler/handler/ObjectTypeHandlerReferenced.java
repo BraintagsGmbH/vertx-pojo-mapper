@@ -106,11 +106,11 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    * @param id
    * @param resultHandler
    */
-  public void getReferencedObjectById(IDataStore store, IMapper subMapper, Object id,
+  public void getReferencedObjectById(IDataStore store, IMapper<?> subMapper, Object id,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     LOGGER.debug("start getReferencedObjectById");
-    IQuery<?> query = (IQuery<?>) store.createQuery(subMapper.getMapperClass()).field(subMapper.getIdField().getName())
-        .is(id);
+    IQuery<?> query = store.createQuery(subMapper.getMapperClass());
+    query.setSearchCondition(query.isEqual(subMapper.getIdField().getName(), id));
     query.execute(result -> {
       if (result.failed()) {
         fail(result.cause(), resultHandler);

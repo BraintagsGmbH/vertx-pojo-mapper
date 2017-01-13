@@ -16,11 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryRambler;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
 
 /**
  * Implementation of {@link ISortDefinition}
@@ -39,23 +35,6 @@ public class SortDefinition<T> implements ISortDefinition<T> {
    */
   public SortDefinition(IQuery<T> parent) {
     this.parent = parent;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IRamblerSource#applyTo(de.braintags.io.vertx.pojomapper.
-   * dataaccess.query.IQueryRambler, io.vertx.core.Handler)
-   */
-  @Override
-  public void applyTo(IQueryRambler ramblerHandler, Handler<AsyncResult<Void>> resultHandler) {
-    try {
-      ramblerHandler.start(this);
-      ramblerHandler.stop(this);
-      resultHandler.handle(Future.succeededFuture());
-    } catch (Exception e) {
-      resultHandler.handle(Future.failedFuture(e));
-    }
   }
 
   /*
@@ -103,6 +82,16 @@ public class SortDefinition<T> implements ISortDefinition<T> {
    */
   public final List<SortArgument> getSortArguments() {
     return sortArgs;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition#isEmpty()
+   */
+  @Override
+  public boolean isEmpty() {
+    return getSortArguments().isEmpty();
   }
 
   public class SortArgument {

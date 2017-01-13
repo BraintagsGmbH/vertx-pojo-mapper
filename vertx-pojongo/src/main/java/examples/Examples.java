@@ -61,7 +61,7 @@ public class Examples {
     config.put("connection_string", "mongodb://localhost:27017");
     config.put("db_name", "PojongoTestDatabase");
     MongoClient mongoClient = MongoClient.createNonShared(vertx, config);
-    MongoDataStore mongoDataStore = new MongoDataStore(vertx, mongoClient, config);
+    new MongoDataStore(vertx, mongoClient, config);
   }
 
   /**
@@ -108,7 +108,7 @@ public class Examples {
    */
   public void example4(MongoDataStore mongoDataStore) {
     IQuery<DemoMapper> query = mongoDataStore.createQuery(DemoMapper.class);
-    query.field("name").is("demoMapper");
+    query.setSearchCondition(query.isEqual("name", "demoMapper"));
     query.execute(rResult -> {
       if (rResult.failed()) {
         logger.error(rResult.cause());

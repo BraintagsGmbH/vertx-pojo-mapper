@@ -1,25 +1,25 @@
 /*
- * #%L
- * vertx-pojongo
- * %%
- * Copyright (C) 2015 Braintags GmbH
- * %%
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * #L%
+ * #%L vertx-pojongo %% Copyright (C) 2015 Braintags GmbH %% All rights reserved. This program and the accompanying
+ * materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html #L%
  */
 package de.braintags.io.vertx.pojomapper.mongo.dataaccess;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchConditionContainer;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryLogic;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryLogicException;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.exception.UnknownQueryOperatorException;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.SortDefinition;
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.typehandler.IFieldParameterResult;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -27,119 +27,171 @@ import io.vertx.core.json.JsonObject;
  * Mongo stores the query expression as JsonObject
  * 
  * @author Michael Remme
- * 
  */
 
-public class MongoQueryExpression implements IQueryExpression {
-  private JsonObject qDef = new JsonObject();
-  private Object currentObject = qDef;
-  private Deque<Object> deque = new ArrayDeque<>();
-  private IMapper mapper;
+public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
+  private JsonObject searchCondition = new JsonObject();
   private JsonObject sortArguments;
 
   /**
-   * Get the original Query definition for Mongo
+   * Get the native query definition for Mongo
    * 
    * @return
    */
   public JsonObject getQueryDefinition() {
-    return qDef;
+    return searchCondition;
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#startConnectorBlock(java.lang.String,
-   * boolean)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#handleFinishedBuild(java.lang.
+   * Object)
    */
   @Override
-  public IQueryExpression startConnectorBlock(String connector, boolean openParenthesis) {
-    JsonArray array = new JsonArray();
-    add(connector, array);
-    deque.addLast(currentObject);
-    currentObject = array;
-    if (openParenthesis) {
-      openParenthesis();
-    }
-    return this;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#stopConnectorBlock()
-   */
-  @Override
-  public IQueryExpression stopConnectorBlock() {
-    currentObject = deque.pollLast();
-    return this;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#openParenthesis()
-   */
-  @Override
-  public IQueryExpression openParenthesis() {
-    return this;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#closeParenthesis()
-   */
-  @Override
-  public IQueryExpression closeParenthesis() {
-    return this;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#addQuery(java.lang.String,
-   * java.lang.String, java.lang.Object)
-   */
-  @Override
-  public IQueryExpression addQuery(String fieldName, String logic, Object value) {
-    if (logic == null) {
-      add(fieldName, value);
-    } else {
-      JsonObject arg = new JsonObject().put(logic, value);
-      if ("$regex".equals(logic)) { // adding option for case insensitive query
-        arg.put("$options", "i");
-      }
-      add(fieldName, arg);
-    }
-    return this;
+  protected void handleFinishedSearchCondition(JsonObject result) {
+    this.searchCondition = result;
   }
 
   /*
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#setMapper(de.braintags.io.vertx.pojomapper.
-   * mapping.IMapper)
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#parseContainerContents(java.util.
+   * List, de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchConditionContainer)
    */
   @Override
-  public void setMapper(IMapper mapper) {
-    this.mapper = mapper;
+  protected JsonObject parseContainerContents(List<JsonObject> parsedConditionList, ISearchConditionContainer container)
+      throws UnknownQueryLogicException {
+    String queryLogic = translateQueryLogic(container.getQueryLogic());
+    JsonArray subExpressions = new JsonArray(parsedConditionList);
+    JsonObject expression = new JsonObject();
+    expression.put(queryLogic, subExpressions);
+    return expression;
   }
 
-  private void add(String key, Object objectToAdd) {
-    if (currentObject instanceof JsonObject) {
-      ((JsonObject) currentObject).put(key, objectToAdd);
-    } else if (currentObject instanceof JsonArray) {
-      JsonObject ob = new JsonObject().put(key, objectToAdd);
-      ((JsonArray) currentObject).add(ob);
-    } else
-      throw new UnsupportedOperationException("no definition to add for " + currentObject.getClass().getName());
+  /**
+   * Translate the logic connector into native MongoDB format
+   * 
+   * @param logic
+   * @return the native MongoDB connector key
+   * @throws UnknownQueryLogicException
+   *           if the logic value is unknown
+   */
+  private String translateQueryLogic(QueryLogic logic) throws UnknownQueryLogicException {
+    switch (logic) {
+    case AND:
+      return "$and";
+    case OR:
+      return "$or";
+    default:
+      throw new UnknownQueryLogicException(logic);
+    }
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#buildFieldConditionResult(de.
+   * braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
+   */
   @Override
-  public String toString() {
-    return String.valueOf(qDef) + " | sort: " + String.valueOf(sortArguments);
+  protected JsonObject buildFieldConditionResult(IFieldCondition fieldCondition, String columnName, Object parsedValue)
+      throws UnknownQueryOperatorException {
+    QueryOperator operator = fieldCondition.getOperator();
+
+    switch (operator) {
+    case CONTAINS:
+      parsedValue = ".*" + parsedValue + ".*";
+      break;
+    case STARTS:
+      parsedValue = parsedValue + ".*";
+      break;
+    case ENDS:
+      parsedValue = ".*" + parsedValue;
+      break;
+    default:
+      // noop
+      break;
+    }
+
+    String parsedOperator = translateOperator(operator);
+    JsonObject logicCondition = new JsonObject();
+    logicCondition.put(parsedOperator, parsedValue);
+    // make RegEx comparisons case insensitive
+    if (operator == QueryOperator.CONTAINS || operator == QueryOperator.STARTS || operator == QueryOperator.ENDS)
+      logicCondition.put("$options", "i");
+
+    JsonObject expression = new JsonObject();
+    expression.put(columnName, logicCondition);
+    return expression;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#handleNullConditionValue(de.
+   * braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
+   */
+  @Override
+  protected void handleNullConditionValue(IFieldCondition condition, String columnName,
+      Handler<AsyncResult<JsonObject>> handler) {
+    // special case for query with null value
+    if (condition.getOperator() == QueryOperator.EQUALS || condition.getOperator() == QueryOperator.NOT_EQUALS) {
+      String parsedLogic;
+      try {
+        parsedLogic = translateOperator(condition.getOperator());
+      } catch (UnknownQueryOperatorException e) {
+        handler.handle(Future.failedFuture(e));
+        return;
+      }
+      JsonObject expression = new JsonObject();
+      JsonObject logicCondition = new JsonObject();
+      logicCondition.putNull(parsedLogic);
+      expression.put(columnName, logicCondition);
+      handler.handle(Future.succeededFuture(expression));
+    } else {
+      handler.handle(Future
+          .failedFuture(new NullPointerException("Invalid 'null' value for operator " + condition.getOperator())));
+      return;
+    }
+  }
+
+  /**
+   * Translate the query operator to the native MongoDB value
+   * 
+   * @param operator
+   * @return
+   * @throws UnknownQueryOperatorException
+   *           if the operator is unknown
+   */
+  private String translateOperator(QueryOperator operator) throws UnknownQueryOperatorException {
+    switch (operator) {
+    case EQUALS:
+      return "$eq";
+    case CONTAINS:
+    case STARTS:
+    case ENDS:
+      return "$regex";
+    case NOT_EQUALS:
+      return "$ne";
+    case LARGER:
+      return "$gt";
+    case LARGER_EQUAL:
+      return "$gte";
+    case SMALLER:
+      return "$lt";
+    case SMALLER_EQUAL:
+      return "$lte";
+    case IN:
+      return "$in";
+    case NOT_IN:
+      return "$nin";
+    case NEAR:
+      return "$geoNear";
+    default:
+      throw new UnknownQueryOperatorException(operator);
+    }
   }
 
   /*
@@ -176,21 +228,23 @@ public class MongoQueryExpression implements IQueryExpression {
   @Override
   public void setNativeCommand(Object nativeCommand) {
     if (nativeCommand instanceof JsonObject) {
-      qDef = (JsonObject) nativeCommand;
+      searchCondition = (JsonObject) nativeCommand;
+    } else if (nativeCommand instanceof CharSequence) {
+      searchCondition = new JsonObject(nativeCommand.toString());
     } else {
-      throw new UnsupportedOperationException("the mongo datastore needs a Jsonobject as native format");
+      throw new UnsupportedOperationException("Can not create a native command from an object of class: "
+          + (nativeCommand != null ? nativeCommand.getClass() : "null"));
     }
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#addQuery(de.braintags.io.vertx.pojomapper.
-   * typehandler.IFieldParameterResult)
+   * @see java.lang.Object#toString()
    */
   @Override
-  public IQueryExpression addQuery(IFieldParameterResult fpr) {
-    return addQuery(fpr.getColName(), fpr.getOperator(), fpr.getValue());
+  public String toString() {
+    return String.valueOf(searchCondition) + " | sort: " + sortArguments;
   }
+
 }

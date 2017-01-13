@@ -18,7 +18,7 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query;
  * @author Michael Remme
  * 
  */
-public interface ISortDefinition<T> extends IRamblerSource {
+public interface ISortDefinition<T> {
 
   IQuery<T> parent();
 
@@ -41,5 +41,10 @@ public interface ISortDefinition<T> extends IRamblerSource {
    * @return an instance of {@link ISortDefinition} for fluent access
    */
   ISortDefinition<T> addSort(String sortField, boolean ascending);
+
+  /**
+   * @return true if there is no sort definition, otherwise false
+   */
+  boolean isEmpty();
 
 }

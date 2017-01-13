@@ -13,7 +13,7 @@
 
 package de.braintags.io.vertx.pojomapper.mysql.exception;
 
-import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQueryRambler;
+import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlExpression;
 
 /**
  * Exception is thrown when an error occured during sql execution
@@ -23,6 +23,8 @@ import de.braintags.io.vertx.pojomapper.mysql.dataaccess.SqlQueryRambler;
  */
 
 public class SqlException extends RuntimeException {
+
+  private static final long serialVersionUID = 1L;
 
   /**
    * 
@@ -46,13 +48,13 @@ public class SqlException extends RuntimeException {
 
   /**
    * 
-   * @param rambler
-   *          an instance of {@link SqlQueryRambler}
+   * @param expression
+   *          an instance of {@link SqlExpression}
    * @param cause
    *          the original exception
    */
-  public SqlException(SqlQueryRambler rambler, Throwable cause) {
-    super("Error in handling query or delete: " + rambler.toString(), cause);
+  public SqlException(SqlExpression expression, Throwable cause) {
+    super("Error in handling query or delete: " + expression.toString(), cause);
   }
 
   /**

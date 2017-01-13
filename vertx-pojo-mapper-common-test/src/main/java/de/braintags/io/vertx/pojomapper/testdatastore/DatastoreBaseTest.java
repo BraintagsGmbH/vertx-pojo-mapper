@@ -266,10 +266,10 @@ public abstract class DatastoreBaseTest {
    *          the query to be executed
    * @return teh list of records
    */
-  public static List<?> findAll(TestContext context, IQuery<?> query) {
+  public static <T> List<T> findAll(TestContext context, IQuery<T> query) {
     LOGGER.info("executing findAll with query " + query.toString());
     Async async = context.async();
-    ResultObject<List<?>> res = new ResultObject<>(null);
+    ResultObject<List<T>> res = new ResultObject<>(null);
     QueryHelper.executeToList(query, result -> {
       if (result.failed()) {
         res.setThrowable(result.cause());

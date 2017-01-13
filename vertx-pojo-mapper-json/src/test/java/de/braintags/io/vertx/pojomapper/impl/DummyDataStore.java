@@ -18,8 +18,7 @@ import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryLogicTranslator;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryOperatorTranslator;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
@@ -61,7 +60,7 @@ public class DummyDataStore implements IDataStore {
    */
   @Override
   public <T> IQuery<T> createQuery(Class<T> mapper) {
-    return new DummyQuery<T>(mapper, this);
+    return new DummyQuery<>(mapper, this);
   }
 
   /*
@@ -112,36 +111,6 @@ public class DummyDataStore implements IDataStore {
     /*
      * (non-Javadoc)
      * 
-     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
-     */
-    @Override
-    public void internalExecute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-      setUnsupported(resultHandler);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
-     */
-    @Override
-    public void internalExecuteCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
-      setUnsupported(resultHandler);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#parent()
-     */
-    @Override
-    public Object parent() {
-      return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeExplain(io.vertx.core.Handler)
      */
     @Override
@@ -156,6 +125,53 @@ public class DummyDataStore implements IDataStore {
      */
     @Override
     public void setNativeCommand(Object command) {
+      throw new UnsupportedOperationException();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#buildQueryExpression(io.vertx.core.Handler)
+     */
+    @Override
+    public void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler) {
+      setUnsupported(resultHandler);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#internalExecute(de.braintags.io.vertx.pojomapper.
+     * dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
+     */
+    @Override
+    protected void internalExecute(IQueryExpression queryExpression,
+        Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+      setUnsupported(resultHandler);
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#internalExecuteCount(de.braintags.io.vertx.
+     * pojomapper.dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
+     */
+    @Override
+    protected void internalExecuteCount(IQueryExpression queryExpression,
+        Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+      setUnsupported(resultHandler);
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#getQueryExpressionClass()
+     */
+    @Override
+    protected Class<? extends IQueryExpression> getQueryExpressionClass() {
       throw new UnsupportedOperationException();
     }
 
@@ -261,26 +277,6 @@ public class DummyDataStore implements IDataStore {
    */
   @Override
   public Object getClient() {
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getQueryLogicTranslator()
-   */
-  @Override
-  public IQueryLogicTranslator getQueryLogicTranslator() {
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getQueryOperatorTranslator()
-   */
-  @Override
-  public IQueryOperatorTranslator getQueryOperatorTranslator() {
     return null;
   }
 

@@ -37,7 +37,7 @@ public class TestMassInsert extends DatastoreBaseTest {
   public void simpleTest(TestContext context) {
     clearTable(context, "MiniNumberMapper");
 
-    List<MiniNumberMapper> mapperList = new ArrayList<MiniNumberMapper>();
+    List<MiniNumberMapper> mapperList = new ArrayList<>();
     for (int i = 0; i < LOOP; i++) {
       mapperList.add(new MiniNumberMapper("looper " + i, i));
     }
@@ -48,7 +48,7 @@ public class TestMassInsert extends DatastoreBaseTest {
       LOGGER.warn("size of writeresult is incorrect - checking records in datastore");
       // check wether records weren't written or "only" IWriteResult is incomplete
       IQuery<MiniNumberMapper> query = getDataStore(context).createQuery(MiniNumberMapper.class);
-      query.field("name").is("looper");
+      query.setSearchCondition(query.isEqual("name", "looper"));
       find(context, query, LOOP);
       context.assertEquals(LOOP, resultContainer.writeResult.size());
       context.fail("The write result hasn't got the right content, the records in the datastore are correct");

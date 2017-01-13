@@ -12,15 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper;
 
-import java.util.Arrays;
-
 import org.junit.Before;
 import org.junit.Test;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.LoggerQueryRamber;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.LogicContainer;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.impl.DummyDataStore;
 import de.braintags.io.vertx.pojomapper.mapper.Person;
 import io.vertx.core.logging.Logger;
@@ -37,28 +33,18 @@ public class TQuery {
 
   @Test
   public void test() {
-    Query<Person> query = (Query<Person>) dataStore.createQuery(Person.class);
-    IFieldParameter<Query<Person>> fp = query.field("name");
-    query = fp.is("peter").field("secName").in(Arrays.asList("eins", "zwei"));
-    IFieldParameter<LogicContainer<Query<Person>>> fplc = query.and("weight");
-    LogicContainer<Query<Person>> lc = fplc.is(15);
-    query = lc.parent();
+    IQuery<Person> query = dataStore.createQuery(Person.class);
+    query.setSearchCondition(
+        query.and(query.isEqual("name", "peter"), query.in("secName", "eins", "zwei"), query.isEqual("weight", 15)));
     logger.info("--- start Rambler");
-    LoggerQueryRamber rambler = new LoggerQueryRamber();
 
-    final Query<Person> exQuery = query;
-    exQuery.executeQueryRambler(rambler, result -> {
+    final IQuery<Person> exQuery = query;
+    exQuery.buildQueryExpression(result -> {
       if (result.failed()) {
-
+        logger.error("Error building expression", result.cause());
       } else {
-        logger.info("--- stop Rambler");
-
-        for (Object arg : exQuery.getChildren()) {
-          if (arg instanceof IFieldParameter) {
-            IFieldParameter<?> fm = (IFieldParameter<?>) arg;
-            logger.info(fm.getValue());
-          }
-        }
+        IQueryExpression expression = result.result();
+        logger.info(expression.toString());
       }
     });
 

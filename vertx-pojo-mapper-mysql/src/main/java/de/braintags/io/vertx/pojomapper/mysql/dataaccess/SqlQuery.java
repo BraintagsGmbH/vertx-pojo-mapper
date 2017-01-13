@@ -17,6 +17,7 @@ import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query;
 import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
 import de.braintags.io.vertx.pojomapper.mysql.SqlUtil;
@@ -54,14 +55,8 @@ public class SqlQuery<T> extends Query<T> {
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
    */
   @Override
-  public void internalExecute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    createQueryDefinition(result -> {
-      if (result.failed()) {
-        resultHandler.handle(Future.failedFuture(result.cause()));
-      } else {
-        doFind(result.result(), resultHandler);
-      }
-    });
+  public void internalExecute(IQueryExpression queryExpression, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    doFind((SqlExpression) queryExpression, resultHandler);
   }
 
   /*
@@ -70,14 +65,9 @@ public class SqlQuery<T> extends Query<T> {
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
    */
   @Override
-  public void internalExecuteCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
-    createQueryDefinition(result -> {
-      if (result.failed()) {
-        resultHandler.handle(Future.failedFuture(result.cause()));
-      } else {
-        executeCount(result.result(), resultHandler);
-      }
-    });
+  public void internalExecuteCount(IQueryExpression queryExpression,
+      Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+    executeCount((SqlExpression) queryExpression, resultHandler);
   }
 
   /*
@@ -90,84 +80,51 @@ public class SqlQuery<T> extends Query<T> {
     resultHandler.handle(Future.failedFuture(new UnsupportedOperationException("Not implemented yet")));
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryContainer#parent()
-   */
-  @Override
-  public Object parent() {
-    return null;
-  }
-
-  /**
-   * Create the statement which will be executed
-   * 
-   * @param resultHandler
-   *          the resulthandler which will receive notification
-   */
-  void createQueryDefinition(Handler<AsyncResult<SqlQueryRambler>> resultHandler) {
-    LOGGER.debug("create query definition");
-    SqlQueryRambler rambler = new SqlQueryRambler();
-    executeQueryRambler(rambler, result -> {
-      if (result.failed()) {
-        LOGGER.debug("rambler failed", result.cause());
-        resultHandler.handle(Future.failedFuture(result.cause()));
-      } else {
-        LOGGER.debug("rambler finished");
-        resultHandler.handle(Future.succeededFuture(rambler));
-      }
-    });
-  }
-
-  private void executeCount(SqlQueryRambler query, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
-    SqlExpression statement = (SqlExpression) query.getQueryExpression();
+  private void executeCount(SqlExpression statement, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     if (statement.hasQueryParameters()) {
       SqlUtil.queryWithParams((MySqlDataStore) getDataStore(), statement.getCountExpression(),
-          statement.getParameters(), qRes -> handleCountResult(qRes, query, resultHandler));
+          statement.getParameters(), qRes -> handleCountResult(qRes, statement, resultHandler));
     } else {
       SqlUtil.query((MySqlDataStore) getDataStore(), statement.getCountExpression(),
-          qRes -> handleCountResult(qRes, query, resultHandler));
+          qRes -> handleCountResult(qRes, statement, resultHandler));
     }
   }
 
-  private void handleCountResult(AsyncResult<ResultSet> qRes, SqlQueryRambler query,
+  private void handleCountResult(AsyncResult<ResultSet> qRes, SqlExpression statement,
       Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     if (qRes.failed()) {
-      String message = "Executed count: " + query.getQueryExpression().toString();
+      String message = "Executed count: " + statement.toString();
       resultHandler.handle(Future.failedFuture(new SqlException(message, qRes.cause())));
       return;
     }
-    SqlQueryCountResult cr = new SqlQueryCountResult(getMapper(), getDataStore(), qRes.result(),
-        query.getQueryExpression());
+    SqlQueryCountResult cr = new SqlQueryCountResult(getMapper(), getDataStore(), qRes.result(), statement);
     resultHandler.handle(Future.succeededFuture(cr));
   }
 
-  private void doFind(SqlQueryRambler query, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  private void doFind(SqlExpression statement, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     LOGGER.debug("start doFind");
-    SqlExpression statement = (SqlExpression) query.getQueryExpression();
     if (statement.hasQueryParameters()) {
       SqlUtil.queryWithParams((MySqlDataStore) getDataStore(), statement.getSelectExpression(),
-          statement.getParameters(), qRes -> handleQueryResult(qRes, query, resultHandler));
+          statement.getParameters(), qRes -> handleQueryResult(qRes, statement, resultHandler));
     } else {
       SqlUtil.query((MySqlDataStore) getDataStore(), statement.getSelectExpression(),
-          qRes -> handleQueryResult(qRes, query, resultHandler));
+          qRes -> handleQueryResult(qRes, statement, resultHandler));
     }
   }
 
-  private void handleQueryResult(AsyncResult<ResultSet> qRes, SqlQueryRambler query,
+  private void handleQueryResult(AsyncResult<ResultSet> qRes, SqlExpression statement,
       Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     if (qRes.failed()) {
-      String message = "Executed query: " + query.getQueryExpression().toString();
+      String message = "Executed query: " + statement.toString();
       resultHandler.handle(Future.failedFuture(new SqlException(message, qRes.cause())));
       return;
     }
-    createQueryResult(qRes.result(), query, resultHandler);
+    createQueryResult(qRes.result(), statement, resultHandler);
   }
 
-  private void createQueryResult(ResultSet resultSet, SqlQueryRambler query,
+  private void createQueryResult(ResultSet resultSet, SqlExpression statement,
       Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    SqlQueryResult<T> qR = new SqlQueryResult<T>(resultSet, (MySqlDataStore) getDataStore(), getMapper(), query);
+    SqlQueryResult<T> qR = new SqlQueryResult<>(resultSet, (MySqlDataStore) getDataStore(), getMapper(), statement);
     if (isReturnCompleteCount()) {
       if (getStart() == 0 && getLimit() > 0 && qR.size() < getLimit()) {
         qR.setCompleteResult(qR.size());
@@ -197,6 +154,14 @@ public class SqlQuery<T> extends Query<T> {
         resultHandler.handle(Future.succeededFuture(qR));
       }
     });
+  }
+
+  /* (non-Javadoc)
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#getQueryExpressionClass()
+   */
+  @Override
+  protected Class<? extends IQueryExpression> getQueryExpressionClass() {
+    return SqlExpression.class;
   }
 
 }

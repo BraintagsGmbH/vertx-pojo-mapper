@@ -98,7 +98,7 @@ public class Examples {
    */
   public void example4(IDataStore dataStore) {
     IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
-    query.field("name").is("my mini mapper");
+    query.setSearchCondition(query.isEqual("name", "my mini mapper"));
     query.execute(rResult -> {
       if (rResult.failed()) {
         logger.error(rResult.cause());
@@ -136,7 +136,7 @@ public class Examples {
 
   public void example6(IDataStore dataStore) {
     IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
-    query.field("name").is("test");
+    query.setSearchCondition(query.isEqual("name", "test"));
     IDelete<MiniMapper> delete = dataStore.createDelete(MiniMapper.class);
     delete.setQuery(query);
     delete.delete(deleteResult -> {

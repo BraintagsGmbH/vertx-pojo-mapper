@@ -12,10 +12,11 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchCondition;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.typehandler.IFieldParameterResult;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /**
  * IQueryExpression is the datastore specific result of an executed {@link AbstractQueryRambler}, which later on is used
@@ -27,75 +28,33 @@ import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
 public interface IQueryExpression {
 
   /**
-   * Start an AND / OR block
-   * 
-   * @param connector
-   *          the connector AND / OR
-   * @param openParenthesis
-   *          info, wether a parenthesis shall be opened
-   * @return the IQueryExpression itself for fluent usage
-   */
-  IQueryExpression startConnectorBlock(String connector, boolean openParenthesis);
-
-  /**
-   * Stop the current connector block
-   * 
-   * @return the IQueryExpression itself for fluent usage
-   */
-  IQueryExpression stopConnectorBlock();
-
-  /**
-   * Append an opening parenthesis and handle the counter for open parenthesis
-   * 
-   * @return the IQueryExpression itself for fluent usage
-   */
-  IQueryExpression openParenthesis();
-
-  /**
-   * Append a closing parenthesis and handle the counter for open parenthesis
-   * 
-   * @return the IQueryExpression itself for fluent usage
-   */
-  IQueryExpression closeParenthesis();
-
-  /**
-   * Set a native command to be executed as query
+   * Set a direct native commend. The value must be of a type that the datastore can handle natively.
    * 
    * @param nativeCommand
-   *          the command to be set
    */
   void setNativeCommand(Object nativeCommand);
 
   /**
-   * add a query expression
-   * 
-   * @param fieldName
-   *          the name to search in
-   * @param logic
-   *          the logic
-   * @param value
-   *          the value
-   * @return the IQueryExpression itself for fluent usage
-   */
-  IQueryExpression addQuery(String fieldName, String logic, Object value);
-
-  /**
-   * add a query expression
-   * 
-   * @param fpr
-   *          the instance of {@link IFieldParameterResult} which was processed by
-   *          {@link ITypeHandler#handleFieldParameter(de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldParameter, io.vertx.core.Handler)}
-   * @return the IQueryExpression itself for fluent usage
-   */
-  IQueryExpression addQuery(IFieldParameterResult fpr);
-
-  /**
-   * Set the {@link IMapper} to be used
+   * Set the mapper for this query expression
    * 
    * @param mapper
-   *          the mapper
    */
-  void setMapper(IMapper mapper);
+  void setMapper(IMapper<?> mapper);
+
+  /**
+   * Get the mapper for this query expression
+   * 
+   * @return
+   */
+  IMapper<?> getMapper();
+
+  /**
+   * Build the concrete query expression from a search condition of a query
+   * 
+   * @param searchCondition the implementation independent search condition
+   * @param handler
+   */
+  void buildSearchCondition(ISearchCondition searchCondition, Handler<AsyncResult<Void>> handler);
 
   /**
    * Adds the given {@link ISortDefinition} into the current instance like it is needed by the implementation
@@ -105,5 +64,15 @@ public interface IQueryExpression {
    * @return the IQueryExpression itself for fluent usage
    */
   IQueryExpression addSort(ISortDefinition<?> sortDef);
+
+  /**
+   * Set the limit and the offset ( start ) of a selection
+   * 
+   * @param limit
+   *          the limit of the selection
+   * @param offset
+   *          the first record
+   */
+  void setLimit(int limit, int start);
 
 }
