@@ -1,8 +1,8 @@
 /*
  * #%L
- * vertx-pojo-mapper-common
+ * vertx-pojo-mapper-mysql
  * %%
- * Copyright (C) 2015 Braintags GmbH
+ * Copyright (C) 2017 Braintags GmbH
  * %%
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
