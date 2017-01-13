@@ -204,7 +204,7 @@ To search inside the connected datastore, we are creating first an instance of
 [source,java]
 ----
 IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
-query.field("name").is("my mini mapper");
+query.setSearchCondition(query.isEqual("name", "my mini mapper"));
 query.execute(rResult -> {
   if (rResult.failed()) {
     logger.error(rResult.cause());
@@ -267,7 +267,7 @@ arguments which were used to perform the delete action
 [source,java]
 ----
 IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
-query.field("name").is("test");
+query.setSearchCondition(query.isEqual("name", "test"));
 IDelete<MiniMapper> delete = dataStore.createDelete(MiniMapper.class);
 delete.setQuery(query);
 delete.delete(deleteResult -> {
@@ -484,7 +484,7 @@ public class LifecycleMapper {
     name = "just after load";
     IDataStore ds = triggerContext.getMapper().getMapperFactory().getDataStore();
     IQuery<MiniMapper> q = ds.createQuery(MiniMapper.class);
-    q.field("name").is("test");
+    q.setSearchCondition(q.isEqual("name", "test"));
     q.execute(qr -> {
       if (qr.failed()) {
         triggerContext.fail(qr.cause());
@@ -542,7 +542,7 @@ The trigger methods can be empty, or get the parameter
 name = "just after load";
 IDataStore ds = triggerContext.getMapper().getMapperFactory().getDataStore();
 IQuery<MiniMapper> q = ds.createQuery(MiniMapper.class);
-q.field("name").is("test");
+q.setSearchCondition(q.isEqual("name", "test"));
 q.execute(qr -> {
   if (qr.failed()) {
     triggerContext.fail(qr.cause());
@@ -626,7 +626,9 @@ If you are inserting new records into a database, those records normally need to
 primary key. All databases can generate such a key in an automatic manner, but not every database is returning the
 generated key. For those databases, which don't return the generated key, like MySql, the concept of
 `IKeyGenerator` was implemented to allow a key generation with local
-access before a new instance is saved into the datastore.
+access before a new instance is saved into the datastore. Another use case is, when the datastore itself creates a
+cryptic ID and a numeric one is needed +
+The config below defines a default datastore, which is used for all mappers, where no KeyGenerator is defined.
 
 [source,java]
 ----
@@ -640,7 +642,7 @@ To add an IKeyGenerator to a mapper, you will add the annotation
 `@KeyGenerator` to the classes head and optionally define the type
 of keygenerator, which shall be used.
 
-Currently there are existing two implementations of `IKeyGenerator`:
+Currently there are existing three implementations of `IKeyGenerator`:
 
 * `DefaultKeyGenerator` +
 an implementation which uses the eventbus to request a key from
@@ -651,6 +653,11 @@ generator*]
 
 * `DebugGenerator` +
 a local implementation which starts at zero by each launch and maybe useful for unint tests etc.
+
+* NULL as a special solution +
+use `link:todo[KeyGenerator.NULL_KEY_GENERATOR]` as value to define, that no
+keygenerator shall be used. This value is useful, when a default keygenerator is set and a certain class shal not use
+one.
 
 An `IDataStore` implementation might contain a set of
 `IKeyGenerator`, which are supported by this implementation.
