@@ -27,7 +27,7 @@ import de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo;
  */
 
 public class DateColumnHandler extends AbstractSqlColumnHandler {
-  public static final String DATE_TYPE = "TIMESTAMP";
+  public static final String DATE_TYPE = "DATETIME";
 
   /**
    * Constructor
@@ -56,7 +56,7 @@ public class DateColumnHandler extends AbstractSqlColumnHandler {
    */
   @Override
   protected StringBuilder generateColumn(IField field, IColumnInfo ci) {
-    return new StringBuilder(String.format("%s %s(3) ", ci.getName(), ci.getType()));
+    return new StringBuilder(String.format("%s %s (3) ", ci.getName(), ci.getType()));
   }
 
 }

@@ -14,6 +14,7 @@ package de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -92,6 +93,10 @@ public class BaseRecord {
       compareDate(value, compareValue, fieldName);
     }
 
+    if (value instanceof Calendar) {
+      compareCalendar(value, compareValue, fieldName);
+    }
+
     if (value instanceof Collection) {
       return compareCollections((Collection) value, (Collection) compareValue, fieldName);
     }
@@ -114,6 +119,19 @@ public class BaseRecord {
       }
     }
     return true;
+  }
+
+  /**
+   * @param value
+   * @param compareValue
+   * @param fieldName
+   */
+  private void compareCalendar(Object value, Object compareValue, String fieldName) {
+    long t = ((Calendar) value).getTimeInMillis();
+    long p = ((Calendar) compareValue).getTimeInMillis();
+    if (t != p)
+      throw new MappingException(
+          "Contents are not equal: " + fieldName + ": " + value + " - " + t + " / " + compareValue + " - " + p);
   }
 
   /**
