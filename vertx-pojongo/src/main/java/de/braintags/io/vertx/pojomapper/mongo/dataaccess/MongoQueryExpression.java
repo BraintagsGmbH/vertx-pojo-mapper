@@ -29,10 +29,11 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.FindOptions;
 
 /**
  * Mongo stores the query expression as JsonObject
- * 
+ *
  * @author Michael Remme
  */
 
@@ -42,16 +43,31 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /**
    * Get the native query definition for Mongo
-   * 
+   *
    * @return
    */
   public JsonObject getQueryDefinition() {
     return searchCondition;
   }
 
+  /**
+   * Creates the FindOptions to set the skip, limit, and sort parameters for a find operation
+   *
+   * @return the find options for this expression
+   */
+  public FindOptions getFindOptions() {
+    FindOptions findOptions = new FindOptions();
+    findOptions.setSkip(getOffset());
+    findOptions.setLimit(getLimit());
+    if (getSortArguments() != null && !getSortArguments().isEmpty()) {
+      findOptions.setSort(getSortArguments());
+    }
+    return findOptions;
+  }
+
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#handleFinishedBuild(java.lang.
    * Object)
    */
@@ -62,7 +78,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#parseContainerContents(java.util.
    * List, de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchConditionContainer)
@@ -79,7 +95,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /**
    * Translate the logic connector into native MongoDB format
-   * 
+   *
    * @param logic
    * @return the native MongoDB connector key
    * @throws UnknownQueryLogicException
@@ -98,7 +114,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#buildFieldConditionResult(de.
    * braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
    */
@@ -136,7 +152,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractQueryExpression#handleNullConditionValue(de.
    * braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
    */
@@ -166,7 +182,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /**
    * Translate the query operator to the native MongoDB value
-   * 
+   *
    * @param operator
    * @return
    * @throws UnknownQueryOperatorException
@@ -203,7 +219,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#addSort(de.braintags.io.vertx.pojomapper.
    * dataaccess.query.ISortDefinition)
@@ -220,7 +236,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /**
    * Get the sort arguments, which were created by method {@link #addSort(ISortDefinition)}
-   * 
+   *
    * @return the sortArguments or null, if none
    */
   public final JsonObject getSortArguments() {
@@ -229,7 +245,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression#setNativeCommand(java.lang.Object)
    */
   @Override
@@ -246,7 +262,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

@@ -22,7 +22,7 @@ import io.vertx.core.Handler;
 
 /**
  * Define and execute queries inside the connected {@link IDataStore}
- * 
+ *
  * @author Michael Remme
  * @param <T>
  *          the underlaying mapper class
@@ -32,7 +32,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Execute the query
-   * 
+   *
    * @param resultHandler
    *          contains the {@link IQueryResult}
    */
@@ -40,7 +40,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Execute the query by counting the fitting objects
-   * 
+   *
    * @param resultHandler
    *          contains the {@link IQueryCountResult}
    */
@@ -48,7 +48,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Execute the query with the option explain and sends back the suitable information
-   * 
+   *
    * @param resultHandler
    *          contains the {@link IQueryResult}
    */
@@ -56,7 +56,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Set the maximum number of records to be returned
-   * 
+   *
    * @param limit
    *          the maximum number of records to be returned
    * @return the query itself for fluent access
@@ -65,7 +65,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Set the first record to be returned
-   * 
+   *
    * @param start
    *          the number of the first record to be returned
    * @return the query itself for fluent access
@@ -75,7 +75,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
   /**
    * If {@link #setLimit(int)} is defined with a value > 0 and this value is set to true, then the
    * {@link IQueryResult#getCompleteResult()} will return the fitting value
-   * 
+   *
    * @param returnCompleteCount
    *          true, if complete count of selection shall be returned ( which might result into a double query count )
    * @return the query itself for fluent access
@@ -84,7 +84,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Add a field to sort the resulting selection by. This method is the same than addSort( fieldName, true )
-   * 
+   *
    * @param sortField
    *          the field, by which to sort the selection
    * @return an instance of {@link ISortDefinition} for fluent access
@@ -93,7 +93,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Add a field to sort the resulting selection by. This method is the same than addSort( fieldName, true )
-   * 
+   *
    * @param sortField
    *          the field, by which to sort the selection
    * @param ascending
@@ -106,7 +106,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    * Add a command, which is a database specific object like an sql string or a JsonObject for mongo. If a native
    * command is added, other parameters are ignored on execution. When the IQuery is executed later, then the native
    * command is executed and the result is transformed into the POJOs of the defined mapper class
-   * 
+   *
    * @param command
    *          the command to be executed
    */
@@ -114,21 +114,21 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Get a formerly defined native command
-   * 
+   *
    * @return the command or null, if none defined
    */
   Object getNativeCommand();
 
   /**
    * Returns true, if the current query definition contains arguments
-   * 
+   *
    * @return
    */
   boolean hasQueryArguments();
 
   /**
    * Set the complete search condition of the query
-   * 
+   *
    * @param searchCondition
    *          the root condition that contains or builds the complete query search condition
    */
@@ -136,14 +136,14 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Get the complete search condition of the query
-   * 
+   *
    * @return the root condition that contains or builds the complete query search condition
    */
   ISearchCondition getSearchCondition();
 
   /**
    * Create a query condition for the {@link QueryOperator#NEAR} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param x
@@ -158,7 +158,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Create a query condition for the {@link QueryOperator#CONTAINS} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -169,7 +169,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Create a query condition for the {@link QueryOperator#ENDS} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -180,7 +180,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Create a query condition for the {@link QueryOperator#STARTS} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -191,7 +191,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Create a query condition for the {@link QueryOperator#NOT_IN} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param values
@@ -202,7 +202,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Create a query condition for the {@link QueryOperator#NOT_IN} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param values
@@ -212,9 +212,9 @@ public interface IQuery<T> extends IDataAccessObject<T> {
   IFieldCondition notIn(String field, Object... values);
 
   /**
-   * 
+   *
    * Create a query condition for the {@link QueryOperator#IN} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param values
@@ -225,7 +225,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Create a query condition for the {@link QueryOperator#IN} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param values
@@ -236,7 +236,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Create a query condition for the {@link QueryOperator#SMALLER_EQUAL} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -247,7 +247,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Create a query condition for the {@link QueryOperator#SMALLER} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -258,7 +258,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Create a query condition for the {@link QueryOperator#LARGER_EQUAL} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -269,7 +269,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Create a query condition for the {@link QueryOperator#LARGER} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -279,9 +279,9 @@ public interface IQuery<T> extends IDataAccessObject<T> {
   IFieldCondition larger(String field, Object value);
 
   /**
-   * 
+   *
    * Create a query condition for the {@link QueryOperator#NOT_EQUALS} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -291,9 +291,9 @@ public interface IQuery<T> extends IDataAccessObject<T> {
   IFieldCondition notEqual(String field, Object value);
 
   /**
-   * 
+   *
    * Create a query condition for the {@link QueryOperator#EQUALS} operator
-   * 
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -303,8 +303,22 @@ public interface IQuery<T> extends IDataAccessObject<T> {
   IFieldCondition isEqual(String field, Object value);
 
   /**
+   *
+   * Create a query condition for any given operator
+   *
+   * @param field
+   *          the field for the comparison
+   * @param operator
+   *          any query operator
+   * @param value
+   *          the value that the record must be equal to
+   * @return
+   */
+  IFieldCondition condition(String field, QueryOperator operator, Object value);
+
+  /**
    * Connects the given query parts with the {@link QueryLogic#OR} connector
-   * 
+   *
    * @param searchConditions
    *          the search conditions to connect
    * @return
@@ -313,7 +327,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
    * Connects the given query parts with the {@link QueryLogic#AND} connector
-   * 
+   *
    * @param searchConditions
    *          the search conditions to connect
    * @return
@@ -323,7 +337,7 @@ public interface IQuery<T> extends IDataAccessObject<T> {
   /**
    * Build the complete query expression that contains all info needed to execute this query against the current
    * datastore
-   * 
+   *
    * @param resultHandler
    *          handler for the completed {@link IQueryExpression}
    */

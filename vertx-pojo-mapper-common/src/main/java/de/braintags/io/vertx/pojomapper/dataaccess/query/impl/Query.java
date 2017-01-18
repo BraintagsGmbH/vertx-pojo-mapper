@@ -33,7 +33,7 @@ import io.vertx.core.Handler;
 
 /**
  * An abstract implementation of {@link IQuery}
- * 
+ *
  * @author Michael Remme
  * @param <T>
  *          the underlaying mapper to be used
@@ -59,7 +59,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
    */
   @Override
@@ -86,7 +86,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#buildQueryExpression(io.vertx.core.Handler)
    */
   @Override
@@ -122,9 +122,9 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /**
    * This method is called after the sync call to execute the query
-   * 
+   *
    * @param queryExpression
-   * 
+   *
    * @param resultHandler
    */
   protected abstract void internalExecute(IQueryExpression queryExpression,
@@ -132,7 +132,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
    */
   @Override
@@ -160,9 +160,9 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /**
    * This method is called after the sync call to execute count the query
-   * 
+   *
    * @param queryExpression
-   * 
+   *
    * @param resultHandler
    */
   protected abstract void internalExecuteCount(IQueryExpression queryExpression,
@@ -170,7 +170,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setLimit(int)
    */
   @Override
@@ -181,7 +181,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setStart(int)
    */
   @Override
@@ -192,7 +192,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /**
    * Get the limit for the query
-   * 
+   *
    * @return the limit
    */
   public final int getLimit() {
@@ -201,7 +201,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /**
    * Get the start position of the query
-   * 
+   *
    * @return the start
    */
   public final int getStart() {
@@ -209,7 +209,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   }
 
   /**
-   * 
+   *
    * @return if the complete number of results should be computed
    */
   public final boolean isReturnCompleteCount() {
@@ -228,7 +228,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setOrderBy(java.lang.String)
    */
   @Override
@@ -238,7 +238,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#addSort(java.lang.String, boolean)
    */
   @Override
@@ -248,7 +248,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /**
    * Get the sort definitions for the current instance
-   * 
+   *
    * @return a list of {@link SortDefinition}
    */
   public ISortDefinition<T> getSortDefinitions() {
@@ -257,7 +257,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#addNativeCommand(java.lang.Object)
    */
   @Override
@@ -267,7 +267,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#getNativeCommand()
    */
   @Override
@@ -277,7 +277,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#hasQueryArguments()
    */
   @Override
@@ -287,7 +287,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setSearchCondition(de.braintags.io.vertx.pojomapper.
    * dataaccess.query.ISearchCondition)
    */
@@ -298,7 +298,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#getSearchCondition()
    */
   @Override
@@ -309,6 +309,17 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   /*
    * (non-Javadoc)
    * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#condition(java.lang.String,
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator, java.lang.Object)
+   */
+  @Override
+  public IFieldCondition condition(String field, QueryOperator operator, Object value) {
+    return new FieldCondition(field, operator, value);
+  }
+
+  /*
+   * (non-Javadoc)
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#isEqual(java.lang.String, java.lang.Object)
    */
   @Override
@@ -318,7 +329,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#notEqual(java.lang.String, java.lang.Object)
    */
   @Override
@@ -328,7 +339,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#larger(java.lang.String, java.lang.Object)
    */
   @Override
@@ -338,7 +349,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#largerOrEqual(java.lang.String, java.lang.Object)
    */
   @Override
@@ -348,7 +359,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#smaller(java.lang.String, java.lang.Object)
    */
   @Override
@@ -358,7 +369,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#smallerOrEqual(java.lang.String, java.lang.Object)
    */
   @Override
@@ -368,7 +379,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#in(java.lang.String, java.lang.Object[])
    */
   @Override
@@ -378,7 +389,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#in(java.lang.String, java.util.Collection)
    */
   @Override
@@ -388,7 +399,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#notIn(java.lang.String, java.lang.Object[])
    */
   @Override
@@ -398,7 +409,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#notIn(java.lang.String, java.util.Collection)
    */
   @Override
@@ -408,7 +419,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#startsWith(java.lang.String, java.lang.Object)
    */
   @Override
@@ -418,7 +429,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#endsWith(java.lang.String, java.lang.Object)
    */
   @Override
@@ -428,7 +439,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#contains(java.lang.String, java.lang.Object)
    */
   @Override
@@ -438,7 +449,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#near(java.lang.String, double, double, int)
    */
   @Override
@@ -449,7 +460,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#and(de.braintags.io.vertx.pojomapper.dataaccess.query.
    * ISearchCondition[])
@@ -461,7 +472,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#or(de.braintags.io.vertx.pojomapper.dataaccess.query.
    * ISearchCondition[])
    */

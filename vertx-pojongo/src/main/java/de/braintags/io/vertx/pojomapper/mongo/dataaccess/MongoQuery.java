@@ -28,12 +28,11 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
 
 /**
  * An implementation of {@link IQuery} for Mongo
- * 
+ *
  * @author Michael Remme
  * @param <T>
  *          the type of the underlaying mapper
@@ -42,7 +41,7 @@ public class MongoQuery<T> extends Query<T> {
 
   /**
    * Constructor
-   * 
+   *
    * @param mapperClass
    *          the mapper class
    * @param datastore
@@ -52,8 +51,11 @@ public class MongoQuery<T> extends Query<T> {
     super(mapperClass, datastore);
   }
 
-  /* (non-Javadoc)
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#internalExecute(de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#internalExecute(de.braintags.io.vertx.pojomapper.
+   * dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
    */
   @Override
   public void internalExecute(IQueryExpression queryExpression, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
@@ -67,7 +69,7 @@ public class MongoQuery<T> extends Query<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeExplain(io.vertx.core.Handler)
    */
   @Override
@@ -75,8 +77,12 @@ public class MongoQuery<T> extends Query<T> {
     resultHandler.handle(Future.failedFuture(new UnsupportedOperationException("Not implemented yet")));
   }
 
-  /* (non-Javadoc)
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#internalExecuteCount(de.braintags.io.vertx.pojomapper.dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#internalExecuteCount(de.braintags.io.vertx.pojomapper.
+   * dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
    */
   @Override
   public void internalExecuteCount(IQueryExpression queryExpression,
@@ -107,20 +113,15 @@ public class MongoQuery<T> extends Query<T> {
   private void doFind(MongoQueryExpression queryExpression, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     String column = getMapper().getTableInfo().getName();
-    FindOptions fo = new FindOptions();
-    fo.setSkip(getStart());
-    fo.setLimit(getLimit());
-    if (queryExpression.getSortArguments() != null && !queryExpression.getSortArguments().isEmpty()) {
-      fo.setSort(queryExpression.getSortArguments());
-    }
-    mongoClient.findWithOptions(column, queryExpression.getQueryDefinition(), fo, qResult -> {
-      if (qResult.failed()) {
-        Future<IQueryResult<T>> future = Future.failedFuture(new QueryException(queryExpression, qResult.cause()));
-        resultHandler.handle(future);
-      } else {
-        createQueryResult(qResult.result(), queryExpression, resultHandler);
-      }
-    });
+    mongoClient.findWithOptions(column, queryExpression.getQueryDefinition(), queryExpression.getFindOptions(),
+        qResult -> {
+          if (qResult.failed()) {
+            Future<IQueryResult<T>> future = Future.failedFuture(new QueryException(queryExpression, qResult.cause()));
+            resultHandler.handle(future);
+          } else {
+            createQueryResult(qResult.result(), queryExpression, resultHandler);
+          }
+        });
   }
 
   private void createQueryResult(List<JsonObject> findList, MongoQueryExpression queryExpression,
@@ -160,7 +161,7 @@ public class MongoQuery<T> extends Query<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#getQueryExpressionClass()
    */
   @Override
