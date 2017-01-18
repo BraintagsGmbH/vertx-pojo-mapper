@@ -1,0 +1,8 @@
+de.braintags.io.vertx.pojomapper.testdatastore
+de.braintags.io.vertx.pojomapper.testdatastore.mapper
+de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler
+de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.geo
+de.braintags.io.vertx.pojomapper.testdatastore.typehandler
+de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json
+de.braintags.io.vertx.pojomapper.testdatastore.typehandler.json.geo
+de.braintags.io.vertx.pojomapper.testdatastore.typehandler.stringbased

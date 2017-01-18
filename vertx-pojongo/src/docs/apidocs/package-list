@@ -1,0 +1,6 @@
+de.braintags.io.vertx.pojomapper.mongo
+de.braintags.io.vertx.pojomapper.mongo.dataaccess
+de.braintags.io.vertx.pojomapper.mongo.init
+de.braintags.io.vertx.pojomapper.mongo.mapper
+de.braintags.io.vertx.pojomapper.mongo.mapper.datastore
+de.braintags.io.vertx.pojomapper.mongo.typehandler

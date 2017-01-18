@@ -1,0 +1,9 @@
+de.braintags.io.vertx.pojomapper.mysql
+de.braintags.io.vertx.pojomapper.mysql.dataaccess
+de.braintags.io.vertx.pojomapper.mysql.exception
+de.braintags.io.vertx.pojomapper.mysql.init
+de.braintags.io.vertx.pojomapper.mysql.mapping
+de.braintags.io.vertx.pojomapper.mysql.mapping.datastore
+de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler
+de.braintags.io.vertx.pojomapper.mysql.mapping.datastore.colhandler.geo
+de.braintags.io.vertx.pojomapper.mysql.typehandler
