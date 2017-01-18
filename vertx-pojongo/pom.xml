@@ -12,12 +12,14 @@
 	<artifactId>vertx-pojongo</artifactId>
 
 	<properties>
-		<maven.test.skip>false</maven.test.skip>
-		<doc.skip>false</doc.skip>
-		<source.skip>false</source.skip>
+		<jacoco.haltOnFailure>false</jacoco.haltOnFailure>
+		<ignoreFailedTests>true</ignoreFailedTests>
 		<testjar.skip>false</testjar.skip>
+		<doc.skip>false</doc.skip>
 		<maven.test.skip>false</maven.test.skip>
-        <ignoreFailedTests>true</ignoreFailedTests>
+		<source.skip>false</source.skip>
+		<maven.compiler.plugin>false</maven.compiler.plugin>
+		<sonar.skip>false</sonar.skip>
 	</properties>
 
 	<dependencies>
@@ -25,11 +27,11 @@
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-json</artifactId>
 		</dependency>
-	  	<dependency>
-	  		<groupId>de.braintags</groupId>
-	  		<artifactId>vertx-pojo-mapper-common</artifactId>
-	  	</dependency>
-		
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-pojo-mapper-common</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-common-test</artifactId>
@@ -45,7 +47,7 @@
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-mongo-embedded-db</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
@@ -59,10 +61,12 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.18</version>
+					<version>${maven.surefire.plugin.version}</version>
 					<configuration>
-						<!-- Testing shall be executed by one Suites, which are calling each other test class -->
+						<!-- Testing shall be executed by one Suites, which are calling each 
+							other test class -->
 						<includes>
 							<include>**/TestAll*.java</include>
 						</includes>
@@ -73,9 +77,10 @@
 							<startMongoLocal>true</startMongoLocal>
 							<db_name>PojongoTestDatabase</db_name>
 						</systemPropertyVariables>
-                        <testFailureIgnore>${ignoreFailedTests}</testFailureIgnore>                    						<argLine>-server -Xmx1200M</argLine>
+						<testFailureIgnore>${ignoreFailedTests}</testFailureIgnore>
+						<argLine>@{argLine} -server -Xmx1200M</argLine>
 						<forkCount>1</forkCount>
-						<reuseForks>true</reuseForks>
+						<reuseForks>false</reuseForks>
 					</configuration>
 				</plugin>
 			</plugins>

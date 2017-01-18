@@ -36,4 +36,7 @@
  * 
  */
 
+@Document(fileName = "index.adoc")
 package de.braintags.io.vertx.pojomapper.mysql;
+
+import io.vertx.docgen.Document;
