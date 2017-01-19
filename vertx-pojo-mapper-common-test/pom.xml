@@ -15,11 +15,11 @@
 		<sonar.exclusions>src/main/java/**</sonar.exclusions>
 		<maven.test.skip>true</maven.test.skip>
 		<jsdoc.skip>true</jsdoc.skip>
-		<doc.skip>false</doc.skip>
+		<doc.skip>true</doc.skip>
 		<source.skip>false</source.skip>
-		<maven.javadoc.skip>false</maven.javadoc.skip>
+		<maven.javadoc.skip>true</maven.javadoc.skip>
 		<testjar.skip>true</testjar.skip>
-		<skipAssembly>false</skipAssembly>
+		<skipAssembly>true</skipAssembly>
 	</properties>
 
 	<dependencies>

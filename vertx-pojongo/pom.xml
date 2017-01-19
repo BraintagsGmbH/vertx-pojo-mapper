@@ -20,6 +20,7 @@
 		<source.skip>false</source.skip>
 		<maven.compiler.plugin>false</maven.compiler.plugin>
 		<sonar.skip>false</sonar.skip>
+		<surefireArgLine> -Ddb_name=NetRelayTestDatabase -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mongo.vertxunit.MongoDataStoreContainer -DstartMongoLocal=true</surefireArgLine>
 	</properties>
 
 	<dependencies>
@@ -57,7 +58,7 @@
 
 	</dependencies>
 
-	<build>
+<!-- 	<build>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -65,8 +66,8 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>${maven.surefire.plugin.version}</version>
 					<configuration>
-						<!-- Testing shall be executed by one Suites, which are calling each 
-							other test class -->
+						Testing shall be executed by one Suites, which are calling each 
+							other test class
 						<includes>
 							<include>**/TestAll*.java</include>
 						</includes>
@@ -86,7 +87,7 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
+ -->
 	<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper</url>
 	<description>implementation of a pojo mapper for MongoDb
 	</description>

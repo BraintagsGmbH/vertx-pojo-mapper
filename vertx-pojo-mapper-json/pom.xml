@@ -20,9 +20,10 @@
 
 	<properties>
 		<source.skip>false</source.skip>
-		<doc.skip>false</doc.skip>
-		<maven.test.skip>false</maven.test.skip>
-		<testjar.skip>false</testjar.skip>
+		<doc.skip>true</doc.skip>
+		<maven.test.skip>true</maven.test.skip>
+		<testjar.skip>true</testjar.skip>
+		<skipAssembly>true</skipAssembly>
 	</properties>
 
 	<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper</url>
