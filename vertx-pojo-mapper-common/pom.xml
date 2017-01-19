@@ -2,15 +2,15 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<parent>
-		<artifactId>vertx-pojo-mapper</artifactId>
-		<groupId>de.braintags</groupId>
-		<version>1.4.0-SNAPSHOT</version>
-	</parent>
 	<modelVersion>4.0.0</modelVersion>
-
 	<artifactId>vertx-pojo-mapper-common</artifactId>
 
+	<parent>
+		<groupId>de.braintags</groupId>
+		<artifactId>btVertxBasePOM</artifactId>
+		<version>20-SNAPSHOT</version>
+	</parent>
+	
 	<properties>
 		<maven.test.skip>true</maven.test.skip>
 		<doc.skip>false</doc.skip>
@@ -20,6 +20,30 @@
 		<skipAssembly>false</skipAssembly>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-util</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-key-generator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-key-generator</artifactId>
+			<classifier>tests</classifier>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-unit</artifactId>
+		</dependency>
+	</dependencies>
+	
 	<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper</url>
 	<description>common interfaces and implementations for pojo mapper
 	</description>

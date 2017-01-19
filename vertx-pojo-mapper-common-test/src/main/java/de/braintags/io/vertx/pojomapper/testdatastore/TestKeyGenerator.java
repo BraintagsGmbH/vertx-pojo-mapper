@@ -43,8 +43,8 @@ public class TestKeyGenerator extends DatastoreBaseTest {
   public void testNullKeyGenerator(TestContext context) {
     IKeyGenerator keyGen = getDataStore(context).getDefaultKeyGenerator();
     context.assertNotNull(keyGen, "keygenerator must not be null");
-    context.assertTrue(keyGen instanceof DefaultKeyGenerator,
-        "not an instance of DefaultKeyGenerator: " + String.valueOf(keyGen.getName()));
+    context.assertTrue(keyGen instanceof DefaultKeyGenerator || keyGen instanceof DebugGenerator,
+        "not an instance of DefaultKeyGenerator or DebugGenerator: " + String.valueOf(keyGen.getName()));
 
     IMapper mapper = getDataStore(context).getMapperFactory().getMapper(NoKeyGeneratorMapper.class);
     context.assertNull(mapper.getKeyGenerator(), "keygenerator must be null");
@@ -59,8 +59,8 @@ public class TestKeyGenerator extends DatastoreBaseTest {
   public void testNullKeyGeneratorCheckId(TestContext context) {
     IKeyGenerator keyGen = getDataStore(context).getDefaultKeyGenerator();
     context.assertNotNull(keyGen, "keygenerator must not be null");
-    context.assertTrue(keyGen instanceof DefaultKeyGenerator,
-        "not an instance of DefaultKeyGenerator: " + String.valueOf(keyGen.getName()));
+    context.assertTrue(keyGen instanceof DefaultKeyGenerator || keyGen instanceof DebugGenerator,
+        "not an instance of DefaultKeyGenerator or DebugGenerator: " + String.valueOf(keyGen.getName()));
 
     IMapper mapper = getDataStore(context).getMapperFactory().getMapper(NoKeyGeneratorMapper.class);
     context.assertNull(mapper.getKeyGenerator(), "keygenerator must be null");
