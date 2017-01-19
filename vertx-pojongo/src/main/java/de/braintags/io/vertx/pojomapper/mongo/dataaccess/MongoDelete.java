@@ -27,7 +27,7 @@ import io.vertx.ext.mongo.MongoClient;
 
 /**
  * An implementation of {@link IDelete} for Mongo
- * 
+ *
  * @author Michael Remme
  * @param <T>
  *          the type of the underlaying mapper
@@ -36,7 +36,7 @@ public class MongoDelete<T> extends Delete<T> {
 
   /**
    * Constructor
-   * 
+   *
    * @param mapperClass
    *          the mapper class
    * @param datastore
@@ -48,7 +48,7 @@ public class MongoDelete<T> extends Delete<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete#deleteQuery(de.braintags.io.vertx.pojomapper.
    * dataaccess.query.IQuery, io.vertx.core.Handler)
    */
@@ -57,7 +57,7 @@ public class MongoDelete<T> extends Delete<T> {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     String collection = getMapper().getTableInfo().getName();
     MongoQuery<T> query = (MongoQuery<T>) q;
-    query.buildQueryExpression(qDefResult -> {
+    query.buildQueryExpression(null, qDefResult -> {
       if (qDefResult.failed()) {
         resultHandler.handle(Future.failedFuture(qDefResult.cause()));
       } else {

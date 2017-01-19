@@ -28,11 +28,11 @@ import io.vertx.ext.sql.UpdateResult;
 
 /**
  * An implementation of {@link IDelete} for sql databases
- * 
+ *
  * @param <T>
  *          the type of the mapper, which is handled here
  * @author Michael Remme
- * 
+ *
  */
 
 public class SqlDelete<T> extends Delete<T> {
@@ -47,14 +47,14 @@ public class SqlDelete<T> extends Delete<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.delete.impl.Delete#deleteQuery(de.braintags.io.vertx.pojomapper.
    * dataaccess.query.IQuery, io.vertx.core.Handler)
    */
   @Override
   protected void deleteQuery(IQuery<T> q, Handler<AsyncResult<IDeleteResult>> resultHandler) {
     SqlQuery<T> query = (SqlQuery<T>) q;
-    query.buildQueryExpression(qExpResul -> {
+    query.buildQueryExpression(null, qExpResul -> {
       if (qExpResul.failed()) {
         resultHandler.handle(Future.failedFuture(qExpResul.cause()));
       } else {

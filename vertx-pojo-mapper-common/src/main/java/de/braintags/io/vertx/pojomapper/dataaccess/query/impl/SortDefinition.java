@@ -15,41 +15,22 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition;
 
 /**
  * Implementation of {@link ISortDefinition}
- * 
+ *
  * @author Michael Remme
  * @param <T>
  *          the parent container
- * 
+ *
  */
 public class SortDefinition<T> implements ISortDefinition<T> {
   private List<SortArgument> sortArgs = new ArrayList<>();
-  private IQuery<T> parent;
-
-  /**
-   * 
-   */
-  public SortDefinition(IQuery<T> parent) {
-    this.parent = parent;
-  }
 
   /*
    * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition#parent()
-   */
-  @Override
-  public IQuery<T> parent() {
-    return parent;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition#addSort(java.lang.String)
    */
   @Override
@@ -59,7 +40,7 @@ public class SortDefinition<T> implements ISortDefinition<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition#addSort(java.lang.String, boolean)
    */
   @Override
@@ -77,7 +58,7 @@ public class SortDefinition<T> implements ISortDefinition<T> {
 
   /**
    * Get the list of defined sort arguments
-   * 
+   *
    * @return the sortArgs
    */
   public final List<SortArgument> getSortArguments() {
@@ -86,7 +67,7 @@ public class SortDefinition<T> implements ISortDefinition<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISortDefinition#isEmpty()
    */
   @Override

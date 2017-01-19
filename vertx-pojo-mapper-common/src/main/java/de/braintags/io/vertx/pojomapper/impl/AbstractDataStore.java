@@ -33,9 +33,9 @@ import io.vertx.core.json.JsonObject;
 
 /**
  * An abstract implementation of {@link IDataStore}
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 
 public abstract class AbstractDataStore implements IDataStore {
@@ -47,10 +47,11 @@ public abstract class AbstractDataStore implements IDataStore {
   private Map<String, IKeyGenerator> keyGeneratorMap = new HashMap<>();
   private ITriggerContextFactory triggerContextFactory = new TriggerContextFactory();
   private Map<String, IEncoder> encoderMap = new HashMap<>();
+  private int defaultQueryLimit;
 
   /**
    * Create a new instance. The possible properties are defined by its concete implementation
-   * 
+   *
    * @param vertx
    *          the instance if {@link Vertx} used
    * @param properties
@@ -60,11 +61,12 @@ public abstract class AbstractDataStore implements IDataStore {
     this.vertx = vertx;
     this.properties = properties;
     initSupportedKeyGenerators();
+    defaultQueryLimit = properties.getInteger("defaultQueryLimit", 500);
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getMapperFactory()
    */
   @Override
@@ -114,7 +116,7 @@ public abstract class AbstractDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getProperties()
    */
   @Override
@@ -124,7 +126,7 @@ public abstract class AbstractDataStore implements IDataStore {
 
   /**
    * Add an {@link IKeyGenerator} supported by the current instance
-   * 
+   *
    * @param generator
    */
   protected void addSupportedKeyGenerator(IKeyGenerator generator) {
@@ -142,7 +144,7 @@ public abstract class AbstractDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getKeyGenerator(java.lang.String)
    */
   @Override
@@ -180,7 +182,7 @@ public abstract class AbstractDataStore implements IDataStore {
 
   /**
    * The map contains the {@link IEncoder} which are defined for the current instance
-   * 
+   *
    * @return the encoderMap
    */
   public Map<String, IEncoder> getEncoderMap() {
@@ -189,12 +191,22 @@ public abstract class AbstractDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getEncoder(java.lang.String)
    */
   @Override
   public IEncoder getEncoder(String name) {
     return getEncoderMap().get(name);
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultQueryLimit()
+   */
+  @Override
+  public int getDefaultQueryLimit() {
+    return defaultQueryLimit;
   }
 
 }

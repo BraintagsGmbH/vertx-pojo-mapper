@@ -27,10 +27,10 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * 
- * 
+ *
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class TestSimpleMapperQuery extends DatastoreBaseTest {
   private static Logger logger = LoggerFactory.getLogger(TestSimpleMapperQuery.class);
@@ -82,7 +82,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
 
   /**
    * Search: Name = "AndOr" AND secondProperty="AndOr 1" OR secondProperty="AndOr 2"
-   * 
+   *
    */
   @Test
   public void testAndOr(TestContext context) {
@@ -177,9 +177,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.setSearchCondition(query.contains("secondProperty", "cc"));
-    query.setLimit(2);
-
-    ResultContainer resultContainer = find(context, query, 2);
+    ResultContainer resultContainer = find(context, query, 2, 2);
     context.assertEquals(2, resultContainer.queryResult.size());
     context.assertEquals((long) -1, resultContainer.queryResult.getCompleteResult());
   }
@@ -188,9 +186,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testFindLimitWithoutQueryArgs(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setLimit(2);
-
-    ResultContainer resultContainer = find(context, query, 2);
+    ResultContainer resultContainer = find(context, query, 2, 2);
     context.assertEquals(2, resultContainer.queryResult.size());
     context.assertEquals((long) -1, resultContainer.queryResult.getCompleteResult());
   }
@@ -200,10 +196,9 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.setSearchCondition(query.contains("secondProperty", "cc"));
-    query.setLimit(2);
     query.setReturnCompleteCount(true);
 
-    ResultContainer resultContainer = find(context, query, 2);
+    ResultContainer resultContainer = find(context, query, 2, 2);
     context.assertEquals((long) 3, resultContainer.queryResult.getCompleteResult());
   }
 
@@ -212,11 +207,9 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     query.setSearchCondition(query.contains("secondProperty", "cc"));
-    query.setLimit(2);
-    query.setStart(2);
     query.setReturnCompleteCount(true);
 
-    ResultContainer resultContainer = find(context, query, 1);
+    ResultContainer resultContainer = find(context, query, 1, 2, 2);
     context.assertEquals((long) 3, resultContainer.queryResult.getCompleteResult(), "incorrect complete result");
   }
 

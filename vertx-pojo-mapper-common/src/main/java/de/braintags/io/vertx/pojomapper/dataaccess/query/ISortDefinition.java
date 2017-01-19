@@ -14,17 +14,15 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
 /**
  * Definition of sort criteria inside an {@link IQuery}
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 public interface ISortDefinition<T> {
 
-  IQuery<T> parent();
-
   /**
    * Add a field to sort the resulting selection by. This method is the same than addSort( fieldName, true )
-   * 
+   *
    * @param sortField
    *          the field, by which to sort the selection
    * @return an instance of {@link ISortDefinition} for fluent access
@@ -33,7 +31,7 @@ public interface ISortDefinition<T> {
 
   /**
    * Add a field to sort the resulting selection by. This method is the same than addSort( fieldName, true )
-   * 
+   *
    * @param sortField
    *          the field, by which to sort the selection
    * @param ascending

@@ -57,8 +57,10 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    */
   public FindOptions getFindOptions() {
     FindOptions findOptions = new FindOptions();
-    findOptions.setSkip(getOffset());
-    findOptions.setLimit(getLimit());
+    if (getLimit() > 0)
+      findOptions.setLimit(getLimit());
+    if (getOffset() > 0)
+      findOptions.setSkip(getOffset());
     if (getSortArguments() != null && !getSortArguments().isEmpty()) {
       findOptions.setSort(getSortArguments());
     }
@@ -267,7 +269,8 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    */
   @Override
   public String toString() {
-    return String.valueOf(searchCondition) + " | sort: " + sortArguments;
+    return String.valueOf(searchCondition) + " | sort: " + sortArguments + " | limit: " + getOffset() + "/"
+        + getLimit();
   }
 
 }

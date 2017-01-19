@@ -1,4 +1,4 @@
-/*-
+/*
  * #%L
  * vertx-pojo-mapper-common
  * %%
@@ -13,13 +13,12 @@
 package de.braintags.io.vertx.pojomapper.dataaccess.query;
 
 /**
- * The parts that make up the search condition of the query<br>
- * <br>
- * Copyright: Copyright (c) 20.12.2016 <br>
- * Company: Braintags GmbH <br>
+ * Marker interface to mark a field condition that has a variable as value and must be passed through an
+ * {@link IFieldValueResolver}
  *
  * @author sschmitt
+ *
  */
-public interface ISearchCondition {
+public interface IVariableFieldCondition extends IFieldCondition {
 
 }

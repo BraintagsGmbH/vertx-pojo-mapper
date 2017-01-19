@@ -15,9 +15,12 @@ package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldValueResolver;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryCountResult;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
@@ -43,10 +46,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory.getLogger(Query.class);
 
   private ISearchCondition searchCondition;
-  private int limit = 500;
-  private int start = 0;
   private boolean returnCompleteCount = false;
-  private SortDefinition<T> sortDefs = new SortDefinition<>(this);
+  private SortDefinition<T> sortDefs = new SortDefinition<>();
   private Object nativeCommand;
 
   /**
@@ -57,22 +58,36 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     super(mapperClass, datastore);
   }
 
+  /**
+   * Execute the query. Any variables in the search condition will result in an error. The used value for limit is the
+   * default query limit of the current datastore. The used value for the offset is 0.
+   *
+   * @param resultHandler
+   * @see #execute(IFieldValueResolver, int, int, Handler)
+   */
+  @Override
+  public final void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    execute(null, getDataStore().getDefaultQueryLimit(), 0, resultHandler);
+  }
+
   /*
    * (non-Javadoc)
    *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
    */
   @Override
-  public final void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  public final void execute(IFieldValueResolver resolver, int limit, int offset,
+      Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     sync(syncResult -> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
       } else {
-        buildQueryExpression(result -> {
+        buildQueryExpression(resolver, result -> {
           if (result.failed()) {
             resultHandler.handle(Future.failedFuture(result.cause()));
           } else {
             IQueryExpression queryExpression = result.result();
+            queryExpression.setLimit(limit, offset);
             try {
               internalExecute(queryExpression, resultHandler);
             } catch (Exception e) {
@@ -84,51 +99,16 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     });
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#buildQueryExpression(io.vertx.core.Handler)
-   */
-  @Override
-  public void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler) {
-    try {
-      IQueryExpression expression = getQueryExpressionClass().newInstance();
-      expression.setMapper(getMapper());
-      expression.setLimit(getLimit(), getStart());
-      if (getNativeCommand() != null)
-        expression.setNativeCommand(getNativeCommand());
-      if (getSortDefinitions() != null && !getSortDefinitions().isEmpty()) {
-        expression.addSort(getSortDefinitions());
-      }
-      if (getSearchCondition() != null) {
-        expression.buildSearchCondition(getSearchCondition(), result -> {
-          if (result.failed())
-            resultHandler.handle(Future.failedFuture(result.cause()));
-          else
-            resultHandler.handle(Future.succeededFuture(expression));
-        });
-      } else {
-        resultHandler.handle(Future.succeededFuture(expression));
-      }
-    } catch (Exception e) {
-      resultHandler.handle(Future.failedFuture(e));
-    }
-  }
-
   /**
-   * @return the implementation of the {@link IQueryExpression} for the current datastore
-   */
-  protected abstract Class<? extends IQueryExpression> getQueryExpressionClass();
-
-  /**
-   * This method is called after the sync call to execute the query
-   *
-   * @param queryExpression
+   * Execute the query by counting the fitting objects. Any variables in the search condition will result in an error
    *
    * @param resultHandler
+   * @see #executeCount(IFieldValueResolver, Handler)
    */
-  protected abstract void internalExecute(IQueryExpression queryExpression,
-      Handler<AsyncResult<IQueryResult<T>>> resultHandler);
+  @Override
+  public final void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+    executeCount(null, resultHandler);
+  }
 
   /*
    * (non-Javadoc)
@@ -136,12 +116,12 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeCount(io.vertx.core.Handler)
    */
   @Override
-  public void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+  public void executeCount(IFieldValueResolver resolver, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     sync(syncResult -> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
       } else {
-        buildQueryExpression(result -> {
+        buildQueryExpression(resolver, result -> {
           if (result.failed()) {
             resultHandler.handle(Future.failedFuture(result.cause()));
           } else {
@@ -158,6 +138,42 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     });
   }
 
+  @Override
+  public void buildQueryExpression(IFieldValueResolver resolver, Handler<AsyncResult<IQueryExpression>> resultHandler) {
+    try {
+      IQueryExpression expression = getQueryExpressionClass().newInstance();
+      expression.setMapper(getMapper());
+
+      if (getNativeCommand() != null)
+        expression.setNativeCommand(getNativeCommand());
+      if (getSortDefinitions() != null && !getSortDefinitions().isEmpty()) {
+        expression.addSort(getSortDefinitions());
+      }
+      if (getSearchCondition() != null) {
+        expression.buildSearchCondition(getSearchCondition(), resolver, result -> {
+          if (result.failed())
+            resultHandler.handle(Future.failedFuture(result.cause()));
+          else
+            resultHandler.handle(Future.succeededFuture(expression));
+        });
+      } else {
+        resultHandler.handle(Future.succeededFuture(expression));
+      }
+    } catch (Exception e) {
+      resultHandler.handle(Future.failedFuture(e));
+    }
+  }
+
+  /**
+   * This method is called after the sync call to execute the query
+   *
+   * @param queryExpression
+   *
+   * @param resultHandler
+   */
+  protected abstract void internalExecute(IQueryExpression queryExpression,
+      Handler<AsyncResult<IQueryResult<T>>> resultHandler);
+
   /**
    * This method is called after the sync call to execute count the query
    *
@@ -168,45 +184,10 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   protected abstract void internalExecuteCount(IQueryExpression queryExpression,
       Handler<AsyncResult<IQueryCountResult>> resultHandler);
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setLimit(int)
-   */
-  @Override
-  public IQuery<T> setLimit(int limit) {
-    this.limit = limit;
-    return this;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#setStart(int)
-   */
-  @Override
-  public IQuery<T> setStart(int start) {
-    this.start = start;
-    return this;
-  }
-
   /**
-   * Get the limit for the query
-   *
-   * @return the limit
+   * @return the implementation of the {@link IQueryExpression} for the current datastore
    */
-  public final int getLimit() {
-    return limit;
-  }
-
-  /**
-   * Get the start position of the query
-   *
-   * @return the start
-   */
-  public final int getStart() {
-    return start;
-  }
+  protected abstract Class<? extends IQueryExpression> getQueryExpressionClass();
 
   /**
    *
@@ -308,13 +289,13 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#condition(java.lang.String,
    * de.braintags.io.vertx.pojomapper.dataaccess.query.QueryOperator, java.lang.Object)
    */
   @Override
   public IFieldCondition condition(String field, QueryOperator operator, Object value) {
-    return new FieldCondition(field, operator, value);
+    return createFieldCondition(field, operator, value);
   }
 
   /*
@@ -324,7 +305,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IFieldCondition isEqual(String field, Object value) {
-    return new FieldCondition(field, QueryOperator.EQUALS, value);
+    return createFieldCondition(field, QueryOperator.EQUALS, value);
   }
 
   /*
@@ -334,7 +315,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IFieldCondition notEqual(String field, Object value) {
-    return new FieldCondition(field, QueryOperator.NOT_EQUALS, value);
+    return createFieldCondition(field, QueryOperator.NOT_EQUALS, value);
   }
 
   /*
@@ -344,7 +325,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IFieldCondition larger(String field, Object value) {
-    return new FieldCondition(field, QueryOperator.LARGER, value);
+    return createFieldCondition(field, QueryOperator.LARGER, value);
   }
 
   /*
@@ -354,7 +335,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IFieldCondition largerOrEqual(String field, Object value) {
-    return new FieldCondition(field, QueryOperator.LARGER_EQUAL, value);
+    return createFieldCondition(field, QueryOperator.LARGER_EQUAL, value);
   }
 
   /*
@@ -364,7 +345,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IFieldCondition smaller(String field, Object value) {
-    return new FieldCondition(field, QueryOperator.SMALLER, value);
+    return createFieldCondition(field, QueryOperator.SMALLER, value);
   }
 
   /*
@@ -374,7 +355,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IFieldCondition smallerOrEqual(String field, Object value) {
-    return new FieldCondition(field, QueryOperator.SMALLER_EQUAL, value);
+    return createFieldCondition(field, QueryOperator.SMALLER_EQUAL, value);
   }
 
   /*
@@ -394,7 +375,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IFieldCondition in(String field, Collection<?> values) {
-    return new FieldCondition(field, QueryOperator.IN, values);
+    return createFieldCondition(field, QueryOperator.IN, values);
   }
 
   /*
@@ -414,7 +395,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IFieldCondition notIn(String field, Collection<?> values) {
-    return new FieldCondition(field, QueryOperator.NOT_IN, values);
+    return createFieldCondition(field, QueryOperator.NOT_IN, values);
   }
 
   /*
@@ -424,7 +405,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IFieldCondition startsWith(String field, Object value) {
-    return new FieldCondition(field, QueryOperator.STARTS, value);
+    return createFieldCondition(field, QueryOperator.STARTS, value);
   }
 
   /*
@@ -434,7 +415,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IFieldCondition endsWith(String field, Object value) {
-    return new FieldCondition(field, QueryOperator.ENDS, value);
+    return createFieldCondition(field, QueryOperator.ENDS, value);
   }
 
   /*
@@ -444,7 +425,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IFieldCondition contains(String field, Object value) {
-    return new FieldCondition(field, QueryOperator.CONTAINS, value);
+    return createFieldCondition(field, QueryOperator.CONTAINS, value);
   }
 
   /*
@@ -454,7 +435,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public IFieldCondition near(String field, double x, double y, int maxDistance) {
-    return new FieldCondition(field, QueryOperator.NEAR,
+    return createFieldCondition(field, QueryOperator.NEAR,
         new GeoSearchArgument(new GeoPoint(new Position(x, y, new double[0])), maxDistance));
   }
 
@@ -479,5 +460,27 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   @Override
   public ISearchConditionContainer or(ISearchCondition... searchConditions) {
     return new QueryOr(searchConditions);
+  }
+
+  /**
+   * Create a new field condition object with the given values. Checks if the value is a variable. If yes, creates a
+   * {@link VariableFieldCondition} to replace the variable with its actual value during execution.
+   *
+   * @param field
+   *          the field of the condition
+   * @param operator
+   *          the logic operator for the condition
+   * @param value
+   *          the value of the condition
+   * @return a new field condition object
+   */
+  private IFieldCondition createFieldCondition(String field, QueryOperator operator, Object value) {
+    if (value instanceof String && StringUtils.isNotBlank((String) value)) {
+      String stringValue = (String) value;
+      if (stringValue.startsWith("${") && stringValue.endsWith("}")) {
+        return new VariableFieldCondition(field, operator, stringValue.substring(2, stringValue.length() - 1));
+      }
+    }
+    return new FieldCondition(field, operator, value);
   }
 }

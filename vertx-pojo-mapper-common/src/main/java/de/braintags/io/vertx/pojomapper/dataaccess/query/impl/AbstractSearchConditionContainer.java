@@ -24,9 +24,9 @@ import io.vertx.codegen.annotations.Nullable;
 
 /**
  * An abstract implementation of {@link ISearchConditionContainer}
- * 
+ *
  * @author sschmitt
- * 
+ *
  */
 public abstract class AbstractSearchConditionContainer implements ISearchConditionContainer {
 
@@ -34,7 +34,7 @@ public abstract class AbstractSearchConditionContainer implements ISearchConditi
 
   /**
    * Initializes the container with zero or more sub conditions
-   * 
+   *
    * @param conditions
    */
   public AbstractSearchConditionContainer(@Nullable ISearchCondition... conditions) {
@@ -44,7 +44,7 @@ public abstract class AbstractSearchConditionContainer implements ISearchConditi
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchConditionContainer#getConditions()
    */
   @Override
@@ -54,7 +54,7 @@ public abstract class AbstractSearchConditionContainer implements ISearchConditi
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

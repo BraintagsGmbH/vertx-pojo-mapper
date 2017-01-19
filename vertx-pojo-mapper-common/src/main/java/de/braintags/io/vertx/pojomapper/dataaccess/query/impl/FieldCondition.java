@@ -12,6 +12,9 @@
  */
 package de.braintags.io.vertx.pojomapper.dataaccess.query.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition;
@@ -23,7 +26,7 @@ import io.vertx.codegen.annotations.Nullable;
  * <br>
  * Copyright: Copyright (c) 20.12.2016 <br>
  * Company: Braintags GmbH <br>
- * 
+ *
  * @author sschmitt
  */
 
@@ -33,9 +36,32 @@ public class FieldCondition implements IFieldCondition {
   private QueryOperator operator;
   private Object value;
 
+  private Map<Class<? extends IQueryExpression>, Object> cacheMap = new HashMap<>(1);
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchCondition#setIntermediateResult(java.lang.Class,
+   * java.lang.Object)
+   */
+  @Override
+  public void setIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass, Object result) {
+    cacheMap.put(queryExpressionClass, result);
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchCondition#getIntermediateResult(java.lang.Class)
+   */
+  @Override
+  public Object getIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass) {
+    return cacheMap.get(queryExpressionClass);
+  }
+
   /**
    * Creates a complete field condition
-   * 
+   *
    * @param field
    *          the field of this condition
    * @param logic
@@ -75,7 +101,7 @@ public class FieldCondition implements IFieldCondition {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

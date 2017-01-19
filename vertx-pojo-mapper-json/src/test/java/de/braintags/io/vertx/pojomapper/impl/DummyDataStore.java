@@ -37,10 +37,10 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 /**
- * 
- * 
+ *
+ *
  * @author Michael Remme
- * 
+ *
  */
 
 public class DummyDataStore implements IDataStore {
@@ -55,7 +55,7 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#createQuery(java.lang.Class)
    */
   @Override
@@ -65,7 +65,7 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#createWrite(java.lang.Class)
    */
   @Override
@@ -75,7 +75,7 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#createDelete(java.lang.Class)
    */
   @Override
@@ -85,7 +85,7 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getMapperFactory()
    */
   @Override
@@ -110,7 +110,7 @@ public class DummyDataStore implements IDataStore {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#executeExplain(io.vertx.core.Handler)
      */
     @Override
@@ -120,7 +120,7 @@ public class DummyDataStore implements IDataStore {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery#addNativeCommand(java.lang.Object)
      */
     @Override
@@ -130,17 +130,7 @@ public class DummyDataStore implements IDataStore {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#buildQueryExpression(io.vertx.core.Handler)
-     */
-    @Override
-    public void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler) {
-      setUnsupported(resultHandler);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
+     *
      * @see
      * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#internalExecute(de.braintags.io.vertx.pojomapper.
      * dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
@@ -154,7 +144,7 @@ public class DummyDataStore implements IDataStore {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#internalExecuteCount(de.braintags.io.vertx.
      * pojomapper.dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
      */
@@ -167,7 +157,7 @@ public class DummyDataStore implements IDataStore {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.braintags.io.vertx.pojomapper.dataaccess.query.impl.Query#getQueryExpressionClass()
      */
     @Override
@@ -189,7 +179,7 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getDatabase()
    */
   @Override
@@ -199,7 +189,7 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getMetaData()
    */
   @Override
@@ -209,7 +199,7 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getProperties()
    */
   @Override
@@ -219,7 +209,7 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getKeyGenerator(java.lang.String)
    */
   @Override
@@ -229,7 +219,7 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultKeyGenerator()
    */
   @Override
@@ -239,7 +229,7 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getVertx()
    */
   @Override
@@ -249,7 +239,7 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#shutdown(io.vertx.core.Handler)
    */
   @Override
@@ -272,7 +262,7 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getClient()
    */
   @Override
@@ -282,12 +272,22 @@ public class DummyDataStore implements IDataStore {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.io.vertx.pojomapper.IDataStore#getEncoder(java.lang.String)
    */
   @Override
   public IEncoder getEncoder(String name) {
     return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultQueryLimit()
+   */
+  @Override
+  public int getDefaultQueryLimit() {
+    return 500;
   }
 
 }
