@@ -20,6 +20,7 @@ see: http://stackoverflow.com/questions/21585037/maven-reporting-and-site-genera
 	</parent>
 
 	<modules>
+		<module>vertx-pojo-mapper-parent</module>
 		<module>vertx-pojo-mapper-common</module>
 		<module>vertx-pojo-mapper-common-test</module>
 		<module>vertx-pojo-mapper-json</module>
@@ -36,29 +37,6 @@ see: http://stackoverflow.com/questions/21585037/maven-reporting-and-site-genera
 		<sonar.skip>false</sonar.skip>
 	</properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-util</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-key-generator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-key-generator</artifactId>
-			<classifier>tests</classifier>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-unit</artifactId>
-		</dependency>
-	</dependencies>
 
 	<scm>
 		<connection>scm:git:git@github.com:BraintagsGmbH/vertx-pojo-mapper.git</connection>

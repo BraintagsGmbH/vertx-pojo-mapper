@@ -7,8 +7,8 @@
 
 	<parent>
 		<groupId>de.braintags</groupId>
-		<artifactId>btVertxBasePOM</artifactId>
-		<version>20-SNAPSHOT</version>
+		<artifactId>vertx-pojo-mapper-parent</artifactId>
+		<version>1.4.0-SNAPSHOT</version>
 	</parent>
 	
 	<properties>
@@ -55,27 +55,7 @@
 			<version>1.7.12</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-util</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-key-generator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.braintags</groupId>
-			<artifactId>vertx-key-generator</artifactId>
-			<classifier>tests</classifier>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-unit</artifactId>
-		</dependency>
+		
 	</dependencies>
 
 <!-- 	<build>
