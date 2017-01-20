@@ -39,7 +39,7 @@ public class TQuery {
     logger.info("--- start Rambler");
 
     final IQuery<Person> exQuery = query;
-    exQuery.buildQueryExpression(result -> {
+    exQuery.buildQueryExpression(null, result -> {
       if (result.failed()) {
         logger.error("Error building expression", result.cause());
       } else {
