@@ -2,9 +2,11 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+<!-- 
+IMPORTANT: keep aggregator pom separate and DON'T use it as parent pom for modules!!
+see: http://stackoverflow.com/questions/21585037/maven-reporting-and-site-generation-for-multiple-module-project/21590120#21590120
+ -->
 	<modelVersion>4.0.0</modelVersion>
-
 	<packaging>pom</packaging>
 
 	<artifactId>vertx-pojo-mapper</artifactId>
@@ -14,7 +16,7 @@
 	<parent>
 		<groupId>de.braintags</groupId>
 		<artifactId>btVertxBasePOM</artifactId>
-		<version>19-SNAPSHOT</version>
+		<version>20-SNAPSHOT</version>
 	</parent>
 
 	<modules>
@@ -31,6 +33,7 @@
 		<doc.skip>true</doc.skip>
 		<maven.test.skip>true</maven.test.skip>
 		<source.skip>true</source.skip>
+		<sonar.skip>false</sonar.skip>
 	</properties>
 
 	<dependencies>

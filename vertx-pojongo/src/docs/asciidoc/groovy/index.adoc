@@ -1,0 +1,29 @@
+== Implementation of pojo mapper for Mongo
+
+We provide an implementation of `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` which uses the Vert.x
+`link:../../apidocs/io/vertx/ext/mongo/MongoClient.html[MongoClient]` to perform mapping of POJOs into the datastore
+
+To create an instance of MongoDataStore programmatically:
+
+[source,java]
+----
+import io.vertx.ext.mongo.MongoClient
+def config = [:]
+config.connection_string = "mongodb://localhost:27017"
+config.db_name = "PojongoTestDatabase"
+def mongoClient = MongoClient.createNonShared(vertx, config)
+new de.braintags.io.vertx.pojomapper.mongo.MongoDataStore(vertx, mongoClient, config)
+
+----
+
+=== Initialize by DataStoreSettings
+PLease take the possible properties, which can be set from
+`link:../../apidocs/de/braintags/io/vertx/pojomapper/mongo/init/MongoDataStoreInit.html[MongoDataStoreInit]`
+Michael Remme
+
+
+The rest of the usage is the same than described in the documentation of
+https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.
+
+adoc[vertx-pojo-mapper-common]
+Michael Remme

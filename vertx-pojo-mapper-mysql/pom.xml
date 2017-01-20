@@ -2,15 +2,15 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<parent>
-		<artifactId>vertx-pojo-mapper</artifactId>
-		<groupId>de.braintags</groupId>
-		<version>1.4.0-SNAPSHOT</version>
-	</parent>
 	<modelVersion>4.0.0</modelVersion>
-
 	<artifactId>vertx-pojo-mapper-mysql</artifactId>
 
+	<parent>
+		<groupId>de.braintags</groupId>
+		<artifactId>btVertxBasePOM</artifactId>
+		<version>20-SNAPSHOT</version>
+	</parent>
+	
 	<properties>
 		<maven.test.skip>false</maven.test.skip>
 		<doc.skip>false</doc.skip>
@@ -18,6 +18,8 @@
 		<testjar.skip>false</testjar.skip>
 		<skipAssembly>false</skipAssembly>
         <ignoreFailedTests>true</ignoreFailedTests>
+		<sonar.skip>false</sonar.skip>
+		<surefireArgLine> -DdefaultKeyGenerator=DEBUG -DstartMongoLocal=true -DMySqlDataStoreContainer.password=${MySqlDataStoreContainer.password} -DMySqlDataStoreContainer.username=${MySqlDataStoreContainer.username} -DMySqlDataStoreContainer.host=${MySqlDataStoreContainer.host} -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer</surefireArgLine>
 	</properties>
 
 	<dependencies>
@@ -52,37 +54,28 @@
 	      <version>1.6.2</version>
 	      <scope>provided</scope>
 	    </dependency>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-util</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-key-generator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.braintags</groupId>
+			<artifactId>vertx-key-generator</artifactId>
+			<classifier>tests</classifier>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-unit</artifactId>
+		</dependency>
 	</dependencies>
-	
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.18</version>
-					<configuration>
-						<!-- Testing shall be executed by one Suites, which are calling each other test class -->
-						<includes>
-							<include>**/TestAll*.java</include>
-						</includes>
-						<failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
-						<systemPropertyVariables>
-							<io.netty.leakDetectionLevel>PARANOID</io.netty.leakDetectionLevel>
-							<IDatastoreContainer>de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer</IDatastoreContainer>
-                			<MySqlDataStoreContainer.host>${MySqlDataStoreContainer.host}</MySqlDataStoreContainer.host>
-							<MySqlDataStoreContainer.username>${MySqlDataStoreContainer.username}</MySqlDataStoreContainer.username>
-                			<MySqlDataStoreContainer.password>${MySqlDataStoreContainer.password}</MySqlDataStoreContainer.password>
-							<startMongoLocal>true</startMongoLocal>
-							<defaultKeyGenerator>DEBUG</defaultKeyGenerator>						
-						</systemPropertyVariables>
-                        <testFailureIgnore>${ignoreFailedTests}</testFailureIgnore>                    						<argLine>-server -Xmx1200M</argLine>
-						<forkCount>1</forkCount>
-						<reuseForks>true</reuseForks>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
 	
 	<url>https://github.com/BraintagsGmbH/vertx-pojo-mapper</url>
 	<description>implementation of a pojo mapper for MySql

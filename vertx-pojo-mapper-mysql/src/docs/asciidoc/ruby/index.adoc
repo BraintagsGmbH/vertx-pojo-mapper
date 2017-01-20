@@ -1,0 +1,32 @@
+== Implementation of pojo mapper for MySql
+
+We provide an implementation of `link:unavailable[IDataStore]` which uses the Vert.x
+`link:../../yardoc/VertxMysqlPostgresql/MySQLClient.html[MySQLClient]` to perform mapping of POJOs into the datastore
+
+To create an instance of MySqlDataStore programmatically:
+
+[source,java]
+----
+Objects.requireNonNull(username, "Username is required");
+Objects.requireNonNull(password, "Password is required");
+Objects.requireNonNull(database, "database is required");
+
+JsonObject mySQLClientConfig = new JsonObject().put("host", "localhost").put("username", username)
+    .put("password", password).put("database", database).put("port", 3306)
+    .put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DefaultKeyGenerator.NAME);
+
+mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
+datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig);
+----
+
+=== Initialize by DataStoreSettings
+PLease take the possible properties, which can be set from
+`link:unavailable[MySqlDataStoreinit]`
+Michael Remme
+
+
+The rest of the usage is the same than described in the documentation of
+https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.
+
+adoc[vertx-pojo-mapper-common]
+Michael Remme
