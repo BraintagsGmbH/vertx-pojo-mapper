@@ -12,18 +12,18 @@
  */
 package examples;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.dataaccess.delete.IDelete;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
-import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
-import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteEntry;
-import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
-import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
-import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
-import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
-import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
-import de.braintags.io.vertx.util.exception.InitException;
+import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
+import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
+import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
+import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
+import de.braintags.vertx.jomnigate.init.IDataStoreInit;
+import de.braintags.vertx.jomnigate.mongo.MongoDataStore;
+import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
+import de.braintags.vertx.util.exception.InitException;
 import examples.mapper.DemoMapper;
 import examples.mapper.DemoSubMapper;
 import io.vertx.core.AsyncResult;

@@ -1,6 +1,6 @@
 == Implementation of pojo mapper for MySql
 
-We provide an implementation of `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` which uses the Vert.x
+We provide an implementation of `link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]` which uses the Vert.x
 `link:../../apidocs/io/vertx/ext/asyncsql/MySQLClient.html[MySQLClient]` to perform mapping of POJOs into the datastore
 
 To create an instance of MySqlDataStore programmatically:
@@ -21,7 +21,7 @@ datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig);
 
 === Initialize by DataStoreSettings
 PLease take the possible properties, which can be set from
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mysql/init/MySqlDataStoreinit.html[MySqlDataStoreinit]`
+`link:../../apidocs/de/braintags/vertx/jomnigate/mysql/init/MySqlDataStoreinit.html[MySqlDataStoreinit]`
 Michael Remme
 
 

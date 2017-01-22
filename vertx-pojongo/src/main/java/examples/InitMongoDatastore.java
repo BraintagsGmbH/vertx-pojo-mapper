@@ -14,7 +14,7 @@ package examples;
 
 import java.util.Objects;
 
-import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
+import de.braintags.vertx.jomnigate.mongo.MongoDataStore;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.docgen.Source;

@@ -12,17 +12,17 @@
  */
 package examples.mapper;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterDelete;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterLoad;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.AfterSave;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeDelete;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeLoad;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.mapping.ITriggerContext;
+import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.annotation.field.Id;
+import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterDelete;
+import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad;
+import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterSave;
+import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeDelete;
+import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
+import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.mapping.ITriggerContext;
 import io.vertx.docgen.Source;
 
 @Source(translate = false)
