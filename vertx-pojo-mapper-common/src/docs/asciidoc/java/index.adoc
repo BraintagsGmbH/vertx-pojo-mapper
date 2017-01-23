@@ -44,7 +44,7 @@ replace maven-artifactId against one of
 
 
 === Initializing an IDataStore
-The initialization of the `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` is the only action, where you are
+The initialization of the `link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]` is the only action, where you are
 directly referring to a concrete implementation. In this example we will use a Mongo-DB as datastore:
 
 [source, java]
@@ -62,7 +62,7 @@ With this MongoClient we are then able to create a MongoDataStore, which will be
 
 ==== Initialize by DataStoreSettings
 In contrast to a programmatical initialization of an IDataStore, you may initialize it by using
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/init/DataStoreSettings.html[DataStoreSettings]`, which you can simply store as
+`link:../../apidocs/de/braintags/vertx/jomnigate/init/DataStoreSettings.html[DataStoreSettings]`, which you can simply store as
 a local file.
 
 [source, java]
@@ -82,10 +82,10 @@ try {
   handler.handle(Future.failedFuture(e));
 }
 ----
-In this example first the `link:../../apidocs/de/braintags/io/vertx/pojomapper/init/DataStoreSettings.html[DataStoreSettings]` are loaded from a local
-file. Afterwards the `link:../../apidocs/de/braintags/io/vertx/pojomapper/init/IDataStoreInit.html[IDataStoreInit]` is instantiated and then the
+In this example first the `link:../../apidocs/de/braintags/vertx/jomnigate/init/DataStoreSettings.html[DataStoreSettings]` are loaded from a local
+file. Afterwards the `link:../../apidocs/de/braintags/vertx/jomnigate/init/IDataStoreInit.html[IDataStoreInit]` is instantiated and then the
 method IDataStoreInit#initDataStore is called.
-This method uses the `link:../../apidocs/de/braintags/io/vertx/pojomapper/init/DataStoreSettings.html#getProperties--[getProperties]` to create a
+This method uses the `link:../../apidocs/de/braintags/vertx/jomnigate/init/DataStoreSettings.html#getProperties--[getProperties]` to create a
 suitable IDataStore.
 The properties, which can be set here, are depending from the implementation of IDataStoreInit, please refer to the
 extensions for MySql and MongoDb, for instance.
@@ -133,9 +133,9 @@ public class MiniMapper {
 ----
 As you can see, you can specify any java class as a mapper by adding two annotations:
 
-* `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/Entity.html[@Entity]`
+* `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/Entity.html[@Entity]`
 is added at the class level and defines, that the class, where this annotation is added, is mappable by a datastore
-* `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Id.html[@Id]`
+* `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/field/Id.html[@Id]`
 is added at one property field of the class and defines this field to be the key field, where inside the
 identifyer of a record is generated and stored
 
@@ -174,14 +174,14 @@ write.save(result -> {
 ----
 
 To save one or more instances inside the datastore, we are first creating an
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/write/IWrite.html[IWrite]`. As soon as we added the instance
+`link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/write/IWrite.html[IWrite]`. As soon as we added the instance
 into the IWrite, we are able to execute the save action on it and therefore save our MiniMapper into the
 connected datastore.
 In return we are receiving information about the action performed in an asynchrone way. The
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/write/IWriteResult.html[IWriteResult]`, which was delivered to our
+`link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/write/IWriteResult.html[IWriteResult]`, which was delivered to our
 handler contains general informations about the action and specific information about each object, which was
 saved by the current action. These information - delivered as
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/write/IWriteEntry.html[IWriteEntry]` -
+`link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/write/IWriteEntry.html[IWriteEntry]` -
 include the type of action performed ( insert / update ), the id
 of the instance ( especially for new instances ) and the native format of the instance, like it was translated to fit
 the requirements of the connected datastore.
@@ -199,7 +199,7 @@ Its this behaviour, why the vertx-pojo-mapper has only a very little overhead on
 === Searching data in a datastore
 
 To search inside the connected datastore, we are creating first an instance of
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/query/IQuery.html[IQuery]`, then we are adding the query arguments on it.
+`link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/query/IQuery.html[IQuery]`, then we are adding the query arguments on it.
 
 [source,java]
 ----
@@ -226,7 +226,7 @@ In the current example we are only searching for the name, but as IQuery support
 we could simply and quickly add further arguments. Again - with the creation of the IQuery - the system checks wether
 the mapper class was mapped already and performs the mapping if not. +
 The query is processed by calling the execute method, which in turn will deliver an
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/query/IQueryResult.html[IQueryResult]`. The IQueryResult contains several
+`link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/query/IQueryResult.html[IQueryResult]`. The IQueryResult contains several
 information like the native query and a reference to found records. The found records can be requested step by step
 by an Iterator or once as Array by requesting the method toArray.
 
@@ -239,9 +239,9 @@ created, if not done already.
 === Deleting data
 
 To delete instanced from the datastore, we are using
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/delete/IDelete.html[IDelete]`, where
+`link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/delete/IDelete.html[IDelete]`, where
 we can add some concrete objects to be deleted or add an
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/query/IQuery.html[IQuery]`, which defines
+`link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/query/IQuery.html[IQuery]`, which defines
 the criteria for a deletion. Mixing both isn't possible.
 
 [source,java]
@@ -258,10 +258,10 @@ delete.delete(deleteResult -> {
 ----
 
 In the current example we are deleting an object, which we are expecting to exist in the datastore. First we are
-creating an `link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/delete/IDelete.html[IDelete]` and add the instance to be deleted.
+creating an `link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/delete/IDelete.html[IDelete]` and add the instance to be deleted.
 The execution of the delete is processed by calling the method delete, which will return an instance of
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/delete/IDeleteResult.html[IDeleteResult]`. The method
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/delete/IDeleteResult.html#getOriginalCommand--[getOriginalCommand]` returns the native
+`link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/delete/IDeleteResult.html[IDeleteResult]`. The method
+`link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/delete/IDeleteResult.html#getOriginalCommand--[getOriginalCommand]` returns the native
 arguments which were used to perform the delete action
 
 [source,java]
@@ -280,14 +280,14 @@ delete.delete(deleteResult -> {
 ----
 
 This example shows how to perform a delete action by using an
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/query/IQuery.html[IQuery]`.
+`link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/query/IQuery.html[IQuery]`.
 All records, which are fitting the arguments of the query are deleted.
 
 === Executing native, database specific commands
 If the facilities of vertx-pojo-mapper aren't enough, you are able to execute native commands directly in two ways:
 
 ==== Using the internal driver
-The method `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html#getClient--[getClient]` returns the internall client, which is
+The method `link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html#getClient--[getClient]` returns the internall client, which is
 used to communicate with the database. Casting this to the correct Class will allow you to send native commands in
 any form to the database and deal with the native format, like in the example here for a MongoDb:
 
@@ -308,7 +308,7 @@ any form to the database and deal with the native format, like in the example he
 </pre>
 
 ==== Using IQuery for a native command
-The method `link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/query/IQuery.html#setNativeCommand-java.lang.Object-[setNativeCommand]` allows you to
+The method `link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/query/IQuery.html#setNativeCommand-java.lang.Object-[setNativeCommand]` allows you to
 define
 an object with a native, database specific query expression. If this argument is passed and the IQuery is executed,
 then the system will use this command to perform the query and will transform the result into instances of the
@@ -354,7 +354,7 @@ the subobjects, typically the key of the subobjects
 ===== Storing subobjects embedded
 
 To define, that a subobject shall be saved embedded is simply done by adding the annotation
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Embedded.html[@Embedded]` to the appropriate field
+`link:../../apidocs/de/braintags/vertx/jomnigate/annotation/field/Embedded.html[@Embedded]` to the appropriate field
 
 [source,java]
 ----
@@ -373,7 +373,7 @@ public class PersonEmbed {
 }
 ----
 
-How the embedding is technically processed, is decided by the `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`. In
+How the embedding is technically processed, is decided by the `link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]`. In
 the same way you are storing simple child objects, you are able to integrate lists, maps and arrays.
 
 Subobjects as array of Animal:
@@ -436,7 +436,7 @@ public class PersonEmbedMap {
 ===== Storing subobjects referenced
 
 According the previous description, storing subobjects referenced is done by adding the annotation
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Referenced.html[@Referenced]` to the appropriate fields of the
+`link:../../apidocs/de/braintags/vertx/jomnigate/annotation/field/Referenced.html[@Referenced]` to the appropriate fields of the
 mapper. Of course here, too, you are able to store lists, maps and arrays either.
 
 [source,java]
@@ -520,22 +520,22 @@ public class LifecycleMapper {
 
 Currently are existing 6 lifecycle annotations
 
-* `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/BeforeSave.html[@BeforeSave]` +
+* `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/BeforeSave.html[@BeforeSave]` +
 methods annotated with this, will be executed just before saving an instance into the datastore
-* `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/AfterSave.html[@AfterSave]` +
+* `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/AfterSave.html[@AfterSave]` +
 methods annotated with this, will be executed just after saving an instance into the datastore
-* `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/BeforeLoad.html[@BeforeLoad]` +
+* `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/BeforeLoad.html[@BeforeLoad]` +
 methods annotated with this, will be executed just before loading an instance from the datastore
-* `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/AfterLoad.html[@AfterLoad]` +
+* `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/AfterLoad.html[@AfterLoad]` +
 methods annotated with this, will be executed just after loading an instance from the datastore
-* `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/BeforeDelete.html[@BeforeDelete]` +
+* `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/BeforeDelete.html[@BeforeDelete]` +
 methods annotated with this, will be executed just before deleting an instance from the datastore
-* `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/AfterDelete.html[@AfterDelete]` +
+* `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/AfterDelete.html[@AfterDelete]` +
 methods annotated with this, will be executed just after deleting an instance from the datastore
 
 The trigger methods can be empty, or get the parameter
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/ITriggerContext.html[ITriggerContext]`, by which you are able to access the current
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` for instance, like shown in the example method afterLoad
+`link:../../apidocs/de/braintags/vertx/jomnigate/mapping/ITriggerContext.html[ITriggerContext]`, by which you are able to access the current
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]` for instance, like shown in the example method afterLoad
 
 [source,java]
 ----
@@ -554,7 +554,7 @@ q.execute(qr -> {
 ----
 
 ==== Encryption
-By using the annotation `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Encoder.html[@Encoder]` you can encrypt field
+By using the annotation `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/field/Encoder.html[@Encoder]` you can encrypt field
 contents like passwords for instance.
 
 [source,java]
@@ -576,12 +576,12 @@ public class MiniMapperEncoded {
 ----
 
 In the above example the field password is annotated with
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Encoder.html[@Encoder]`, which is getting the name of the encoder as
+`link:../../apidocs/de/braintags/vertx/jomnigate/annotation/field/Encoder.html[@Encoder]`, which is getting the name of the encoder as
 reference. Each datastore integrates one decoder by default,
-`link:../../apidocs/de/braintags/io/vertx/util/security/crypt/impl/StandardEncoder.html[StandardEncoder]` with the name StandardEncoder, which we are
+`link:../../apidocs/de/braintags/vertx/util/security/crypt/impl/StandardEncoder.html[StandardEncoder]` with the name StandardEncoder, which we are
 referencing here. If you want to add another encoder, you can do that by modifying the
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/init/DataStoreSettings.html[DataStoreSettings]` by adding an instance of
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/init/EncoderSettings.html[EncoderSettings]`
+`link:../../apidocs/de/braintags/vertx/jomnigate/init/DataStoreSettings.html[DataStoreSettings]` by adding an instance of
+`link:../../apidocs/de/braintags/vertx/jomnigate/init/EncoderSettings.html[EncoderSettings]`
 
 === Working with geodata
 Specification of datatypes following the GeoJSON spec from http://geojson.org/
@@ -596,7 +596,7 @@ For more infos on how you can influence the mapping process, see the further des
 == More details about vertx-pojo-mapper
 
 === IDataStore
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` is the startpoint and the center of vertx-pojo-mapper.
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]` is the startpoint and the center of vertx-pojo-mapper.
 By IDataStore you will access all the main instances you need, to deal with the underlaying datastore.
 To instantiate a certain implementation of IDataStore, it should be the only time, where you are directly referencing
 to a certain datastore or database. The way, how an implementation is instantiated, is depending on the
@@ -625,7 +625,7 @@ in the following parts we will go into the detail for some concepts of the api.
 If you are inserting new records into a database, those records normally need to get a unique identifyer, typically a
 primary key. All databases can generate such a key in an automatic manner, but not every database is returning the
 generated key. For those databases, which don't return the generated key, like MySql, the concept of
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IKeyGenerator.html[IKeyGenerator]` was implemented to allow a key generation with local
+`link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IKeyGenerator.html[IKeyGenerator]` was implemented to allow a key generation with local
 access before a new instance is saved into the datastore. Another use case is, when the datastore itself creates a
 cryptic ID and a numeric one is needed +
 The config below defines a default datastore, which is used for all mappers, where no KeyGenerator is defined.
@@ -639,33 +639,33 @@ IDataStore datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig)
 ----
 
 To add an IKeyGenerator to a mapper, you will add the annotation
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/KeyGenerator.html[@KeyGenerator]` to the classes head and optionally define the type
+`link:../../apidocs/de/braintags/vertx/jomnigate/annotation/KeyGenerator.html[@KeyGenerator]` to the classes head and optionally define the type
 of keygenerator, which shall be used.
 
-Currently there are existing three implementations of `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IKeyGenerator.html[IKeyGenerator]`:
+Currently there are existing three implementations of `link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IKeyGenerator.html[IKeyGenerator]`:
 
-* `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/impl/keygen/DefaultKeyGenerator.html[DefaultKeyGenerator]` +
+* `link:../../apidocs/de/braintags/vertx/jomnigate/mapping/impl/keygen/DefaultKeyGenerator.html[DefaultKeyGenerator]` +
 an implementation which uses the eventbus to request a key from
-`link:../../apidocs/de/braintags/io/vertx/keygenerator/KeyGeneratorVerticle.html[KeyGeneratorVerticle]`. To init and launch the KeyGeneratorVerticle, please
+`link:../../apidocs/de/braintags/vertx/keygenerator/KeyGeneratorVerticle.html[KeyGeneratorVerticle]`. To init and launch the KeyGeneratorVerticle, please
 refer to the doscumentation of the project
 link:https://github.com/BraintagsGmbH/vertx-key-generator/blob/master/src/docs/asciidoc/java/index.adoc[*vertx-key-
 generator*]
 
-* `link:../../apidocs/de/braintags/io/vertx/keygenerator/impl/DebugGenerator.html[DebugGenerator]` +
+* `link:../../apidocs/de/braintags/vertx/keygenerator/impl/DebugGenerator.html[DebugGenerator]` +
 a local implementation which starts at zero by each launch and maybe useful for unint tests etc.
 
 * NULL as a special solution +
-use `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/KeyGenerator.html#NULL_KEY_GENERATOR[KeyGenerator.NULL_KEY_GENERATOR]` as value to define, that no
+use `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/KeyGenerator.html#NULL_KEY_GENERATOR[KeyGenerator.NULL_KEY_GENERATOR]` as value to define, that no
 keygenerator shall be used. This value is useful, when a default keygenerator is set and a certain class shal not use
 one.
 
-An `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` implementation might contain a set of
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IKeyGenerator.html[IKeyGenerator]`, which are supported by this implementation.
+An `link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]` implementation might contain a set of
+`link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IKeyGenerator.html[IKeyGenerator]`, which are supported by this implementation.
 KeyGenerators are stored inside a map by their name and an instance. When initializing an
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` you can add the property
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IKeyGenerator.html#DEFAULT_KEY_GENERATOR[IKeyGenerator.DEFAULT_KEY_GENERATOR]` together
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]` you can add the property
+`link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IKeyGenerator.html#DEFAULT_KEY_GENERATOR[IKeyGenerator.DEFAULT_KEY_GENERATOR]` together
 with the name of the KeyGenerator, which shall be used as default. Additionally you can add the annotation
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/KeyGenerator.html[@KeyGenerator]` to a mapper, where you are specifying the name of
+`link:../../apidocs/de/braintags/vertx/jomnigate/annotation/KeyGenerator.html[@KeyGenerator]` to a mapper, where you are specifying the name of
 the KeyGenerator, which shall be used for this mapper.
 
 === Mapping of Java classes
@@ -675,7 +675,7 @@ the underlaying database and includes the automatic table creation and synchroni
 The mapping process
 in vertx-pojo-mapper is performed exactly then, when it is needed.
 
-When you are creating an `link:../../apidocs/de/braintags/io/vertx/pojomapper/dataaccess/query/IQuery.html[IQuery]` for instance, the system
+When you are creating an `link:../../apidocs/de/braintags/vertx/jomnigate/dataaccess/query/IQuery.html[IQuery]` for instance, the system
 checks, wether the mapper was initialized already. If not, then the initialization is performed, which implements
 the automatic creation and update of tables, collections etc. inside the connected datastore - so you don’t have
 to care about that, either. Its this behaviour, why the vertx-pojo-mapper has only a very little overhead on startup!
@@ -687,33 +687,33 @@ which are defined as getter / setter-method must be added to the underlaying fie
 definitions check the QuickStart.
 
 ==== Mapper
-The result of the mapping process is an `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IMapper.html[IMapper]`, which is created by
-and stored inside the `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IMapperFactory.html[IMapperFactory]` implementation, which fits the
+The result of the mapping process is an `link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IMapper.html[IMapper]`, which is created by
+and stored inside the `link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IMapperFactory.html[IMapperFactory]` implementation, which fits the
 needs of the underlaying datastore or database. The IMapper contains general information about the mapped class and
 the generated, respectively connected table in the datastore. Additionally it contains per property of the mapper an
-instance of `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IField.html[IField]`, where the field and its behaviour regarding the
+instance of `link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IField.html[IField]`, where the field and its behaviour regarding the
 mapping are desribed. Additionally per field the information about the connected column inside the datastore are kept
-inside an instance of `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/datastore/IColumnInfo.html[IColumnInfo]`
+inside an instance of `link:../../apidocs/de/braintags/vertx/jomnigate/mapping/datastore/IColumnInfo.html[IColumnInfo]`
 
 ==== TableGenerator and ColumnHandler
 As explained above, vertx-pojo-mapper is able to generate needed structures in the underlaying datastore, like tables
 for sql databases. Base for the generation is the
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/datastore/IColumnHandler.html[IColumnHandler]`, from which the suitable instance is stored
+`link:../../apidocs/de/braintags/vertx/jomnigate/mapping/datastore/IColumnHandler.html[IColumnHandler]`, from which the suitable instance is stored
 inside the IField. The IColumnHandler is detected during the mapping process by requesting a suitable one from the
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/datastore/ITableGenerator.html[ITableGenerator]` used by a datastore implementation.
+`link:../../apidocs/de/braintags/vertx/jomnigate/mapping/datastore/ITableGenerator.html[ITableGenerator]` used by a datastore implementation.
 The process of creation and synchronization is performed by
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IDataStoreSynchronizer.html[IDataStoreSynchronizer]`
+`link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IDataStoreSynchronizer.html[IDataStoreSynchronizer]`
 Michael Remme
 
 === TypeHandlers
 When objects shall be stored into or read from a datastore, the values must be converted in many
 cases.
 
-This is the job of an `link:../../apidocs/de/braintags/io/vertx/pojomapper/typehandler/ITypeHandler.html[ITypeHandler]`. During the mapping of
+This is the job of an `link:../../apidocs/de/braintags/vertx/jomnigate/typehandler/ITypeHandler.html[ITypeHandler]`. During the mapping of
 a mapper property the suitable ITypeHandler is detected by requesting the
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/typehandler/ITypeHandlerFactory.html[ITypeHandlerFactory]` of the underlaying
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`. The found ITypeHandler is stored inside the appropriate
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IField.html[IField]` and from there used, when a value is read from or shall be
+`link:../../apidocs/de/braintags/vertx/jomnigate/typehandler/ITypeHandlerFactory.html[ITypeHandlerFactory]` of the underlaying
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]`. The found ITypeHandler is stored inside the appropriate
+`link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IField.html[IField]` and from there used, when a value is read from or shall be
 written into the datastore.
 Michael Remme
 
@@ -723,27 +723,27 @@ header of the pojo or to the single properties, to define the behavior of this c
 
 Existing annotations are:
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/Entity.html[@Entity]`
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/Entity.html[@Entity]`
 
 ( name = "tableName" ) +
-The annotation `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/Entity.html[@Entity]` defines a POJO to be mappable.
+The annotation `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/Entity.html[@Entity]` defines a POJO to be mappable.
 Additionally you are able to set the name of the table, which is used to store the information in the
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`. By default the system will use the short classname of the
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]`. By default the system will use the short classname of the
 mapper.
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Id.html[@Id]`
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/field/Id.html[@Id]`
 
-One field of the mapper must be annotated by `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Id.html[@Id]`, which
+One field of the mapper must be annotated by `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/field/Id.html[@Id]`, which
 will mark the annotated field as primary key
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Property.html[@Property]`
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/field/Property.html[@Property]`
 
-Properties of a mapper are stored inside the `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` by using the
+Properties of a mapper are stored inside the `link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]` by using the
 field name by default. By annotating a field with the annotation Property, you are able to modify the name of the
 column in the table. Additionally you are able to define other attributes, which are very datastore specific, so you
 should use them never or only very carefully:
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Referenced.html[@Referenced]`
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/field/Referenced.html[@Referenced]`
 
 When you define a mapper, which internally references with one property to another mapper ( see example Person and
 his animals ), then you can define the way, how subobjects are stored inside the datastore. With this annotation you
@@ -751,55 +751,55 @@ define, that the subobjects are stored inside a separate table, and in the field
 the identifier - is saved. When reading the instance then from the datastore, the references are resolved
 automatically.
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Embedded.html[@Embedded]`
-The counterpart to `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Referenced.html[@Referenced]`. A property, which is marked
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/field/Embedded.html[@Embedded]`
+The counterpart to `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/field/Referenced.html[@Referenced]`. A property, which is marked
 with this annotation will be saved completely inside the table. How this is done, is decided by the implementation of
-the `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` you are using.
+the `link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]` you are using.
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/ObjectFactory.html[@ObjectFactory]`
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/ObjectFactory.html[@ObjectFactory]`
 
-By default the `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IObjectFactory.html[IObjectFactory]` is defined inside each
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IMapper.html[IMapper]` by using a default implementation. If you need another
+By default the `link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IObjectFactory.html[IObjectFactory]` is defined inside each
+`link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IMapper.html[IMapper]` by using a default implementation. If you need another
 implementation you are able to set it by adding this annotation to the mapper class and reference the class of the
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IObjectFactory.html[IObjectFactory]` you want to use.
+`link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IObjectFactory.html[IObjectFactory]` you want to use.
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/AfterLoad.html[@AfterLoad]`
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/AfterLoad.html[@AfterLoad]`
 
 All methods, which are annotated by this annotation are executed after an instance was loaded from the
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]`
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/BeforeLoad.html[@BeforeLoad]`
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/BeforeLoad.html[@BeforeLoad]`
 
 All methods, which are annotated by this annotation are executed before an instance is loaded from the
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`. That means, first the new instance is created, then the
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]`. That means, first the new instance is created, then the
 method is executed and then the data are transferred into the instance
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/AfterSave.html[@AfterSave]`
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/AfterSave.html[@AfterSave]`
 
 All methods, which are annotated by this annotation are executed after an instance was saved into the
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]`
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/BeforeSave.html[@BeforeSave]`
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/BeforeSave.html[@BeforeSave]`
 
 All methods, which are annotated by this annotation are executed before an instance is saved into the
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]`
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/AfterDelete.html[@AfterDelete]`
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/AfterDelete.html[@AfterDelete]`
 
 All methods, which are annotated by this annotation are executed after an instance was deleted from the
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]`
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/lifecycle/BeforeDelete.html[@BeforeDelete]`
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/BeforeDelete.html[@BeforeDelete]`
 
 All methods, which are annotated by this annotation are executed before an instance is deleted from the
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]`
 
 
-===== `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/KeyGenerator.html[@KeyGenerator]`
-With this annotation you may define the `link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/IKeyGenerator.html[IKeyGenerator]`, which shall
+===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/KeyGenerator.html[@KeyGenerator]`
+With this annotation you may define the `link:../../apidocs/de/braintags/vertx/jomnigate/mapping/IKeyGenerator.html[IKeyGenerator]`, which shall
 be used for the mapper. Normally the IKeyGenerator is used, which is defined as default by
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html#getDefaultKeyGenerator--[getDefaultKeyGenerator]`, which should be normally
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/mapping/impl/keygen/DefaultKeyGenerator.html[DefaultKeyGenerator]`. As a value for this annotation you
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html#getDefaultKeyGenerator--[getDefaultKeyGenerator]`, which should be normally
+`link:../../apidocs/de/braintags/vertx/jomnigate/mapping/impl/keygen/DefaultKeyGenerator.html[DefaultKeyGenerator]`. As a value for this annotation you
 are defining the name of the IKeyGenerator, which shall be used
 
 [source, java]
@@ -820,7 +820,7 @@ tbd
 
 == Further links
 To get specific information about the concrete implementation of an
-`link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]`, especially the initialization, go to:
+`link:../../apidocs/de/braintags/vertx/jomnigate/IDataStore.html[IDataStore]`, especially the initialization, go to:
 
 * link:https://github.com/BraintagsGmbH/vertx-pojo-mapper/tree/master/vertx-pojo-mapper-mysql[implementation for
 MySql]

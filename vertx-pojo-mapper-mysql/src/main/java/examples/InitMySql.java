@@ -14,9 +14,9 @@ package examples;
 
 import java.util.Objects;
 
-import de.braintags.io.vertx.pojomapper.mapping.IKeyGenerator;
-import de.braintags.io.vertx.pojomapper.mapping.impl.keygen.DefaultKeyGenerator;
-import de.braintags.io.vertx.pojomapper.mysql.MySqlDataStore;
+import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
+import de.braintags.vertx.jomnigate.mapping.impl.keygen.DefaultKeyGenerator;
+import de.braintags.vertx.jomnigate.mysql.MySqlDataStore;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.docgen.Source;

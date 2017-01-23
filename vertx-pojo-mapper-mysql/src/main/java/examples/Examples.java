@@ -12,10 +12,10 @@
  */
 package examples;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.MiniMapper;
-import de.braintags.io.vertx.util.IteratorAsync;
+import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapper;
+import de.braintags.vertx.util.IteratorAsync;
 import io.vertx.docgen.Source;
 
 @Source(translate = false)

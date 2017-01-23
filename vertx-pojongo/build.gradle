@@ -9,7 +9,7 @@ dependencies {
 }
 
 test {
-  systemProperty 'IDatastoreContainer', 'de.braintags.io.vertx.pojomapper.mongo.vertxunit.MongoDataStoreContainer'
+  systemProperty 'IDatastoreContainer', 'de.braintags.vertx.jomnigate.mongo.vertxunit.MongoDataStoreContainer'
   systemProperty 'startMongoLocal', 'true'
   systemProperty 'db_name', 'PojongoTestDatabase'
 }

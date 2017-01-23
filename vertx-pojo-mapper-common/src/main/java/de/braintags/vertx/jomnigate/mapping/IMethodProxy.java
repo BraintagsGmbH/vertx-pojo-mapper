@@ -1,0 +1,38 @@
+/*
+ * #%L
+ * vertx-pojo-mapper-common
+ * %%
+ * Copyright (C) 2017 Braintags GmbH
+ * %%
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * #L%
+ */
+package de.braintags.vertx.jomnigate.mapping;
+
+import java.lang.reflect.Method;
+
+/**
+ * A wrapper for a {@link Method}
+ * 
+ * @author Michael Remme
+ * 
+ */
+public interface IMethodProxy {
+
+  /**
+   * Get the underlaying method
+   * 
+   * @return the method
+   */
+  public Method getMethod();
+
+  /**
+   * Get the parameter types for a method call
+   * 
+   * @return
+   */
+  public Object[] getParameterTypes();
+}
