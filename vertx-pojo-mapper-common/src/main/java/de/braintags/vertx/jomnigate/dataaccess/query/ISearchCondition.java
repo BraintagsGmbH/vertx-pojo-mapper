@@ -17,10 +17,9 @@ package de.braintags.vertx.jomnigate.dataaccess.query;
  * <br>
  * Copyright: Copyright (c) 20.12.2016 <br>
  * Company: Braintags GmbH <br>
- * 
+ *
  * @author sschmitt
  */
-
 public interface ISearchCondition {
 
 }

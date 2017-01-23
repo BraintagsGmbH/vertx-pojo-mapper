@@ -37,10 +37,10 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 /**
- * 
- * 
+ *
+ *
  * @author Michael Remme
- * 
+ *
  */
 
 public class DummyDataStore implements IDataStore {
@@ -130,17 +130,7 @@ public class DummyDataStore implements IDataStore {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.Query#buildQueryExpression(io.vertx.core.Handler)
-     */
-    @Override
-    public void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler) {
-      setUnsupported(resultHandler);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
+     *
      * @see
      * de.braintags.vertx.jomnigate.dataaccess.query.impl.Query#internalExecute(de.braintags.vertx.jomnigate.
      * dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
@@ -288,6 +278,16 @@ public class DummyDataStore implements IDataStore {
   @Override
   public IEncoder getEncoder(String name) {
     return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.IDataStore#getDefaultQueryLimit()
+   */
+  @Override
+  public int getDefaultQueryLimit() {
+    return 500;
   }
 
 }

@@ -57,8 +57,10 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    */
   public FindOptions getFindOptions() {
     FindOptions findOptions = new FindOptions();
-    findOptions.setSkip(getOffset());
-    findOptions.setLimit(getLimit());
+    if (getLimit() > 0)
+      findOptions.setLimit(getLimit());
+    if (getOffset() > 0)
+      findOptions.setSkip(getOffset());
     if (getSortArguments() != null && !getSortArguments().isEmpty()) {
       findOptions.setSort(getSortArguments());
     }
@@ -114,9 +116,10 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /*
    * (non-Javadoc)
-   *
-   * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#buildFieldConditionResult(de.
-   * braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#buildFieldConditionResult(de.braintags.
+   * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
    */
   @Override
   protected JsonObject buildFieldConditionResult(IFieldCondition fieldCondition, String columnName, Object parsedValue)
@@ -152,9 +155,10 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /*
    * (non-Javadoc)
-   *
-   * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#handleNullConditionValue(de.
-   * braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#handleNullConditionValue(de.braintags.
+   * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
    */
   @Override
   protected void handleNullConditionValue(IFieldCondition condition, String columnName,
@@ -267,7 +271,8 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    */
   @Override
   public String toString() {
-    return String.valueOf(searchCondition) + " | sort: " + sortArguments;
+    return String.valueOf(searchCondition) + " | sort: " + sortArguments + " | limit: " + getOffset() + "/"
+        + getLimit();
   }
 
 }

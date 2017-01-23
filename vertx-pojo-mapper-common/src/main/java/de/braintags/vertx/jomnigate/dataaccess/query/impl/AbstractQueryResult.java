@@ -24,7 +24,7 @@ import io.vertx.core.Handler;
 
 /**
  * An abstract implementation of IQueryResult. Extensions must implement one method to generate single pojos
- * 
+ *
  * @author Michael Remme
  * @param <T>
  *          the class of the mapper, which builds the result
@@ -34,7 +34,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(AbstractQueryResult.class);
 
-  private IMapper mapper;
+  private IMapper<T> mapper;
   private IDataStore datastore;
   private T[] pojoResult;
   private IQueryExpression originalQuery;
@@ -42,7 +42,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
 
   /**
    * Constructor
-   * 
+   *
    * @param datastore
    *          the datastore which was used
    * @param mapper
@@ -53,7 +53,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
    *          the original query which was processed to create the current result
    */
   @SuppressWarnings("unchecked")
-  public AbstractQueryResult(IDataStore datastore, IMapper mapper, int resultSize, IQueryExpression originalQuery) {
+  public AbstractQueryResult(IDataStore datastore, IMapper<T> mapper, int resultSize, IQueryExpression originalQuery) {
     this.datastore = datastore;
     this.mapper = mapper;
     this.originalQuery = originalQuery;
@@ -73,7 +73,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
   /**
    * Create a Pojo from the information read from the datastore at position i and return it to the handler. The handler
    * will place the object into the internal array at the same position
-   * 
+   *
    * @param i
    *          the position inside the result from the datastore
    * @param handler
@@ -96,7 +96,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
    * @see de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult#getMapper()
    */
   @Override
-  public IMapper getMapper() {
+  public IMapper<T> getMapper() {
     return mapper;
   }
 

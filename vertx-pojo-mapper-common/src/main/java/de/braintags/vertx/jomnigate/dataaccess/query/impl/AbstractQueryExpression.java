@@ -17,12 +17,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition;
+import de.braintags.vertx.jomnigate.dataaccess.query.IFieldValueResolver;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer;
+import de.braintags.vertx.jomnigate.dataaccess.query.IVariableFieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryOperator;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryLogicException;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryOperatorException;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownSearchConditionException;
+import de.braintags.vertx.jomnigate.dataaccess.query.exception.VariableSyntaxException;
 import de.braintags.vertx.jomnigate.exception.QueryParameterException;
 import de.braintags.vertx.jomnigate.mapping.IField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
@@ -143,8 +146,9 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    * pojomapper.dataaccess.query.ISearchCondition, io.vertx.core.Handler)
    */
   @Override
-  public void buildSearchCondition(ISearchCondition searchCondition, Handler<AsyncResult<Void>> handler) {
-    internalBuildSearchCondition(searchCondition, result -> {
+  public void buildSearchCondition(ISearchCondition searchCondition, IFieldValueResolver resolver,
+      Handler<AsyncResult<Void>> handler) {
+    internalBuildSearchCondition(searchCondition, resolver, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
@@ -166,17 +170,39 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
   /**
    * Build the abstract search condition into the native search condition of the query. Can be used recursively for
    * conditions that contain more than one sub condition (AND, OR, ..)
+   * If the condition is an {@link IFieldCondition}, and was already built before and cached, this method
+   * directly returns the result without rebuilding it
    *
    * @param searchCondition
    *          the query search condition
    * @param handler
    *          returns the internal object that represents the given search condition
    */
-  protected void internalBuildSearchCondition(ISearchCondition searchCondition, Handler<AsyncResult<T>> handler) {
+  @SuppressWarnings("unchecked")
+  protected void internalBuildSearchCondition(ISearchCondition searchCondition, IFieldValueResolver resolver,
+      Handler<AsyncResult<T>> handler) {
     if (searchCondition instanceof IFieldCondition) {
-      parseFieldCondition((IFieldCondition) searchCondition, handler);
+      IFieldCondition fieldCondition = (IFieldCondition) searchCondition;
+      Object cachedResult = fieldCondition.getIntermediateResult(getClass());
+      if (cachedResult != null) {
+        /*
+         * the returned result is specific to the query expression class, so only the correct
+         * result type should be returned
+         */
+        handler.handle(Future.succeededFuture((T) cachedResult));
+      } else {
+        parseFieldCondition(fieldCondition, resolver, result -> {
+          if (result.failed()) {
+            handler.handle(Future.failedFuture(result.cause()));
+          } else {
+            // cache the result in the search condition before forwarding it to the handler
+            fieldCondition.setIntermediateResult(getClass(), result.result());
+            handler.handle(Future.succeededFuture(result.result()));
+          }
+        });
+      }
     } else if (searchCondition instanceof ISearchConditionContainer) {
-      parseSearchConditionContainer((ISearchConditionContainer) searchCondition, handler);
+      parseSearchConditionContainer((ISearchConditionContainer) searchCondition, resolver, handler);
     } else {
       handler.handle(Future.failedFuture(new UnknownSearchConditionException(searchCondition)));
     }
@@ -184,19 +210,29 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
 
   /**
    * Parses a {@link IFieldCondition}. The operator and value will be transformed into a format fitting the concrete
-   * database. The java field name will be converted to the matching column name of the database.
+   * database. The java field name will be converted to the matching column name of the database. If its an
+   * {@link IVariableFieldCondition}, the variable will be resolved with the given resolver
    *
    * @param fieldCondition
    *          the field condition to parse
    * @param handler
    *          returns the internal object that represents the given field condition
    */
-  protected void parseFieldCondition(IFieldCondition fieldCondition, Handler<AsyncResult<T>> handler) {
+  protected void parseFieldCondition(IFieldCondition fieldCondition, IFieldValueResolver resolver,
+      Handler<AsyncResult<T>> handler) {
     IField field = getMapper().getField(fieldCondition.getField());
     String columnName = field.getColumnInfo().getName();
-
-    if (fieldCondition.getValue() != null) {
-      transformValue(field, fieldCondition.getOperator(), fieldCondition.getValue(), result -> {
+    Object fieldValue = fieldCondition.getValue();
+    if (fieldValue != null) {
+      if (fieldCondition instanceof IVariableFieldCondition) {
+        try {
+          fieldValue = resolver.resolve((String) fieldValue);
+        } catch (VariableSyntaxException e) {
+          handler.handle(Future.failedFuture(e));
+          return;
+        }
+      }
+      transformValue(field, fieldCondition.getOperator(), fieldValue, result -> {
         if (result.failed()) {
           handler.handle(Future.failedFuture(result.cause()));
         } else {
@@ -250,13 +286,14 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    * @param handler
    *          returns the result of the condition parsing
    */
-  protected void parseSearchConditionContainer(ISearchConditionContainer container, Handler<AsyncResult<T>> handler) {
+  protected void parseSearchConditionContainer(ISearchConditionContainer container, IFieldValueResolver resolver,
+      Handler<AsyncResult<T>> handler) {
     @SuppressWarnings("rawtypes")
     List<Future> futures = new ArrayList<>();
     for (ISearchCondition searchCondition : container.getConditions()) {
       Future<T> future = Future.future();
       futures.add(future);
-      internalBuildSearchCondition(searchCondition, future.completer());
+      internalBuildSearchCondition(searchCondition, resolver, future.completer());
     }
 
     CompositeFuture.all(futures).setHandler(result -> {
@@ -301,14 +338,16 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
   /**
    * @return the limit for this query
    */
-  protected int getLimit() {
+  @Override
+  public int getLimit() {
     return limit;
   }
 
   /**
    * @return the offset (starting position) for this query
    */
-  protected int getOffset() {
+  @Override
+  public int getOffset() {
     return offset;
   }
 

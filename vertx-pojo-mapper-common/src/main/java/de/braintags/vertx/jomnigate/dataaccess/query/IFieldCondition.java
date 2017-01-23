@@ -12,12 +12,14 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.query;
 
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression;
+
 /**
  * A single condition statement of a query, to filter the result based on the value of a field<br>
  * <br>
  * Copyright: Copyright (c) 20.12.2016 <br>
  * Company: Braintags GmbH <br>
- * 
+ *
  * @author sschmitt
  */
 
@@ -37,5 +39,26 @@ public interface IFieldCondition extends ISearchCondition {
    * @return the value of the condition
    */
   public Object getValue();
+
+  /**
+   * Cache the intermediate result of the conversion from this object to the native database object
+   *
+   * @param queryExpressionClass
+   *          the class of the query expression that did this conversion. The class is used as cache key to enable
+   *          storing different results for different datastores
+   * @param result
+   *          the intermediate result of the conversion of this single object
+   */
+  public void setIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass, Object result);
+
+  /**
+   * Get the cached result of the conversion, if it was converted before
+   *
+   * @param queryExpressionClass
+   *          the class of the query expression that did this conversion. The class is used as cache key to enable
+   *          storing different results for different datastores
+   * @return the intermediate result, if it was generated and cached, null otherwise
+   */
+  public Object getIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass);
 
 }

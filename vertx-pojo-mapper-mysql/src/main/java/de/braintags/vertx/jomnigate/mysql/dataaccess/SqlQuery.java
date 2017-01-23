@@ -28,13 +28,13 @@ import io.vertx.core.Handler;
 import io.vertx.ext.sql.ResultSet;
 
 /**
- * 
+ *
  * An implementation of {@link IQuery} for sql databases
- * 
+ *
  * @param <T>
  *          the type of the mapper, which is handled here
  * @author Michael Remme
- * 
+ *
  */
 
 public class SqlQuery<T> extends Query<T> {
@@ -126,7 +126,7 @@ public class SqlQuery<T> extends Query<T> {
       Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     SqlQueryResult<T> qR = new SqlQueryResult<>(resultSet, (MySqlDataStore) getDataStore(), getMapper(), statement);
     if (isReturnCompleteCount()) {
-      if (getStart() == 0 && getLimit() > 0 && qR.size() < getLimit()) {
+      if (statement.getOffset() == 0 && statement.getLimit() > 0 && qR.size() < statement.getLimit()) {
         qR.setCompleteResult(qR.size());
         resultHandler.handle(Future.succeededFuture(qR));
       } else {
@@ -139,18 +139,12 @@ public class SqlQuery<T> extends Query<T> {
   }
 
   private void fetchCompleteCount(SqlQueryResult<T> qR, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    int bLimit = getLimit();
-    int bStart = getStart();
-    setLimit(0);
-    setStart(0);
     executeCount(cr -> {
       if (cr.failed()) {
         resultHandler.handle(Future.failedFuture(cr.cause()));
       } else {
         long count = cr.result().getCount();
         qR.setCompleteResult(count);
-        setLimit(bLimit);
-        setStart(bStart);
         resultHandler.handle(Future.succeededFuture(qR));
       }
     });

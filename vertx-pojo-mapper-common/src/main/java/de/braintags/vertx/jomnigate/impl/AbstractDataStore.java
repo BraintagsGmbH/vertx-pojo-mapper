@@ -33,12 +33,13 @@ import io.vertx.core.json.JsonObject;
 
 /**
  * An abstract implementation of {@link IDataStore}
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 
 public abstract class AbstractDataStore implements IDataStore {
+
   private Vertx vertx;
   private JsonObject properties;
   private IMapperFactory mapperFactory;
@@ -47,10 +48,11 @@ public abstract class AbstractDataStore implements IDataStore {
   private Map<String, IKeyGenerator> keyGeneratorMap = new HashMap<>();
   private ITriggerContextFactory triggerContextFactory = new TriggerContextFactory();
   private Map<String, IEncoder> encoderMap = new HashMap<>();
+  private int defaultQueryLimit;
 
   /**
    * Create a new instance. The possible properties are defined by its concete implementation
-   * 
+   *
    * @param vertx
    *          the instance if {@link Vertx} used
    * @param properties
@@ -60,6 +62,7 @@ public abstract class AbstractDataStore implements IDataStore {
     this.vertx = vertx;
     this.properties = properties;
     initSupportedKeyGenerators();
+    defaultQueryLimit = properties.getInteger(DEFAULT_QUERY_LIMIT, 500);
   }
 
   /*
@@ -124,7 +127,7 @@ public abstract class AbstractDataStore implements IDataStore {
 
   /**
    * Add an {@link IKeyGenerator} supported by the current instance
-   * 
+   *
    * @param generator
    */
   protected void addSupportedKeyGenerator(IKeyGenerator generator) {
@@ -180,7 +183,7 @@ public abstract class AbstractDataStore implements IDataStore {
 
   /**
    * The map contains the {@link IEncoder} which are defined for the current instance
-   * 
+   *
    * @return the encoderMap
    */
   public Map<String, IEncoder> getEncoderMap() {
@@ -195,6 +198,16 @@ public abstract class AbstractDataStore implements IDataStore {
   @Override
   public IEncoder getEncoder(String name) {
     return getEncoderMap().get(name);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.IDataStore#getDefaultQueryLimit()
+   */
+  @Override
+  public int getDefaultQueryLimit() {
+    return defaultQueryLimit;
   }
 
 }

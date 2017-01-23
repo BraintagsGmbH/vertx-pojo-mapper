@@ -93,7 +93,7 @@ public class CollectionTypeHandlerReferenced extends CollectionTypeHandler imple
    * 
    * @see
    * de.braintags.vertx.jomnigate.json.typehandler.handler.CollectionTypeHandler#handleObjectFromStore(de.braintags.
-   * io.vertx.pojomapper.mapping.IField, de.braintags.vertx.jomnigate.typehandler.ITypeHandler, java.lang.Object)
+   * vertx.jomnigate.mapping.IField, de.braintags.vertx.jomnigate.typehandler.ITypeHandler, java.lang.Object)
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override

@@ -20,32 +20,14 @@ import de.braintags.vertx.jomnigate.dataaccess.query.ISortDefinition;
 
 /**
  * Implementation of {@link ISortDefinition}
- * 
+ *
  * @author Michael Remme
  * @param <T>
  *          the parent container
- * 
+ *
  */
 public class SortDefinition<T> implements ISortDefinition<T> {
   private List<SortArgument> sortArgs = new ArrayList<>();
-  private IQuery<T> parent;
-
-  /**
-   * 
-   */
-  public SortDefinition(IQuery<T> parent) {
-    this.parent = parent;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.dataaccess.query.ISortDefinition#parent()
-   */
-  @Override
-  public IQuery<T> parent() {
-    return parent;
-  }
 
   /*
    * (non-Javadoc)
@@ -77,7 +59,7 @@ public class SortDefinition<T> implements ISortDefinition<T> {
 
   /**
    * Get the list of defined sort arguments
-   * 
+   *
    * @return the sortArgs
    */
   public final List<SortArgument> getSortArguments() {

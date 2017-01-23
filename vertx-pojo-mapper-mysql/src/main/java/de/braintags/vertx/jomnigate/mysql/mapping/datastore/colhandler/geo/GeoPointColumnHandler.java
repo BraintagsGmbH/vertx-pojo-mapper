@@ -36,8 +36,9 @@ public class GeoPointColumnHandler extends AbstractGeoColumnHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#applyMetaData(de.
-   * braintags.io.vertx.pojomapper.mysql.mapping.datastore.SqlColumnInfo)
+   * @see
+   * de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#applyMetaData(de.braintags
+   * .vertx.jomnigate.mysql.mapping.datastore.SqlColumnInfo)
    */
   @Override
   public void applyMetaData(SqlColumnInfo column) {
@@ -53,8 +54,8 @@ public class GeoPointColumnHandler extends AbstractGeoColumnHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#checkColumnModified(de
-   * .braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo,
+   * de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#checkColumnModified(de.
+   * braintags.vertx.jomnigate.mapping.datastore.IColumnInfo,
    * de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo)
    */
   @Override

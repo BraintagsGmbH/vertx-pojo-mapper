@@ -79,7 +79,7 @@ public class MongoQuery<T> extends Query<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.vertx.jomnigate.dataaccess.query.impl.Query#internalExecuteCount(de.braintags.vertx.jomnigate.
    * dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
@@ -129,7 +129,8 @@ public class MongoQuery<T> extends Query<T> {
     MongoQueryResult<T> qR = new MongoQueryResult<>(findList, (MongoDataStore) getDataStore(),
         (MongoMapper) getMapper(), queryExpression);
     if (isReturnCompleteCount()) {
-      if (getStart() == 0 && getLimit() > 0 && qR.size() < getLimit()) {
+      if (queryExpression.getOffset() == 0 && queryExpression.getLimit() > 0
+          && qR.size() < queryExpression.getLimit()) {
         qR.setCompleteResult(qR.size());
         resultHandler.handle(Future.succeededFuture(qR));
       } else {
@@ -142,18 +143,12 @@ public class MongoQuery<T> extends Query<T> {
   }
 
   private void fetchCompleteCount(MongoQueryResult<T> qR, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    int bLimit = getLimit();
-    int bStart = getStart();
-    setLimit(0);
-    setStart(0);
     executeCount(cr -> {
       if (cr.failed()) {
         resultHandler.handle(Future.failedFuture(cr.cause()));
       } else {
         long count = cr.result().getCount();
         qR.setCompleteResult(count);
-        setLimit(bLimit);
-        setStart(bStart);
         resultHandler.handle(Future.succeededFuture(qR));
       }
     });

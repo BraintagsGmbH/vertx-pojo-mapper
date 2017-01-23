@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import de.braintags.vertx.jomnigate.dataaccess.query.TestFieldConditionCache;
 import de.braintags.vertx.jomnigate.testdatastore.typehandler.TypeHandlerTestSuite;
 
 /**
@@ -28,7 +29,7 @@ import de.braintags.vertx.jomnigate.testdatastore.typehandler.TypeHandlerTestSui
 @SuiteClasses({ TestBaseTest.class, TestSimpleMapper.class, TestStoreObject.class, TestQueryHelper.class,
     TestIndex.class, TestRoundtrip.class, TestSimpleMapperQuery.class, TestOnlyIdMapper.class, TestTrigger.class,
     TypeHandlerTestSuite.class, TestMassInsert.class, TestKeyGenerator.class, TestGeoSearch.class, TestEncoder.class,
-    TestEmbeddedEntity.class, TestListExtrems.class })
+    TestEmbeddedEntity.class, TestListExtrems.class, TestFieldConditionCache.class })
 public class AllTestsCommon {
 
 }

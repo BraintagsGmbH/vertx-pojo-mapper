@@ -106,8 +106,9 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#handleNullConditionValue(de.
-   * braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
+   * @see
+   * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#handleNullConditionValue(de.braintags.
+   * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
    */
   @Override
   protected void handleNullConditionValue(IFieldCondition fieldCondition, final String columnName,
@@ -129,8 +130,9 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#buildFieldConditionResult(de.
-   * braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
+   * @see
+   * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#buildFieldConditionResult(de.braintags.
+   * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
    */
   @Override
   protected SqlWhereFragment buildFieldConditionResult(IFieldCondition fieldCondition, String columnName,

@@ -44,10 +44,10 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 /**
  * Base test to init an IDataStore for working with an {@link IDataStore}. See method {@link #getDataStore(TestContext)}
  * on how to init
- * 
- * 
+ *
+ *
  * @author Michael Remme
- * 
+ *
  */
 
 @RunWith(VertxUnitRunner.class)
@@ -76,8 +76,8 @@ public abstract class DatastoreBaseTest {
    * </UL>
    * For datastore specific system properties to be set see MySqlDataStoreinit.createSettings() or
    * MongoDataStoreInit.createSettings()
-   * 
-   * 
+   *
+   *
    * @param context
    * @return
    */
@@ -91,7 +91,7 @@ public abstract class DatastoreBaseTest {
 
   /**
    * save the list of records
-   * 
+   *
    * @param records
    *          the records to be saved
    * @param waittime
@@ -165,19 +165,57 @@ public abstract class DatastoreBaseTest {
 
   /**
    * Executes a query and checks for the expected result
-   * 
+   *
+   * @param context
+   *          the current test context
    * @param query
    *          the query to be executed
    * @param expectedResult
    *          the expected number of records
    * @return ResultContainer with certain informations
    */
-  @SuppressWarnings("rawtypes")
   public static ResultContainer find(TestContext context, IQuery<?> query, int expectedResult) {
+    return find(context, query, expectedResult, 0, 0);
+  }
+
+  /**
+   * Executes a query and checks for the expected result
+   *
+   * @param context
+   *          the current test context
+   * @param query
+   *          the query to be executed
+   * @param expectedResult
+   *          the expected number of records
+   * @param limit
+   *          the limit the query should be executed with
+   * @return ResultContainer with certain informations
+   */
+  public static ResultContainer find(TestContext context, IQuery<?> query, int expectedResult, int limit) {
+    return find(context, query, expectedResult, limit, 0);
+  }
+
+  /**
+   * Executes a query and checks for the expected result
+   *
+   * @param context
+   *          the current test context
+   * @param query
+   *          the query to be executed
+   * @param expectedResult
+   *          the expected number of records
+   * @param limit
+   *          the limit the query should be executed with
+   * @param offset
+   *          the offset/start position the query should be executed with
+   * @return ResultContainer with certain informations
+   */
+  @SuppressWarnings("rawtypes")
+  public static ResultContainer find(TestContext context, IQuery<?> query, int expectedResult, int limit, int offset) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
     ErrorObject err = new ErrorObject<>(null);
-    query.execute(result -> {
+    query.execute(null, limit, offset, result -> {
       try {
         resultFine(result);
         resultContainer.queryResult = result.result();
@@ -199,7 +237,7 @@ public abstract class DatastoreBaseTest {
 
   /**
    * Executes a query for a record with the given ID
-   * 
+   *
    * @param context
    * @param mapperClass
    * @param id
@@ -228,7 +266,7 @@ public abstract class DatastoreBaseTest {
 
   /**
    * Executes a query and returns directly the first record
-   * 
+   *
    * @param context
    *          the context to be used
    * @param query
@@ -259,7 +297,7 @@ public abstract class DatastoreBaseTest {
 
   /**
    * Executes a query and returns all found records
-   * 
+   *
    * @param context
    *          the context to be used
    * @param query
@@ -290,7 +328,7 @@ public abstract class DatastoreBaseTest {
 
   /**
    * Executes a query and checks for the expected result
-   * 
+   *
    * @param query
    *          the query to be executed
    * @param expectedResult
@@ -324,7 +362,7 @@ public abstract class DatastoreBaseTest {
 
   /**
    * Performs the delete action and processes the checkQuery to improve the correct result
-   * 
+   *
    * @param delete
    *          the {@link IDelete} to be executed
    * @param checkQuery
@@ -420,7 +458,7 @@ public abstract class DatastoreBaseTest {
 
   /**
    * Calls {@link IDatastoreContainer#clearTable(String, io.vertx.core.Handler)} and waits for it.
-   * 
+   *
    * @param context
    * @param tableName
    */
@@ -463,7 +501,7 @@ public abstract class DatastoreBaseTest {
 
   /**
    * Calls {@link IDatastoreContainer#clearTable(String, io.vertx.core.Handler)} and waits for it.
-   * 
+   *
    * @param context
    * @param tableName
    */
@@ -501,11 +539,11 @@ public abstract class DatastoreBaseTest {
 
   /**
    * Validates the existence of an index
-   * 
+   *
    * @param context
    * @param q
    */
-  protected void checkIndex(TestContext context, IMapper mapper, String indexName) {
+  protected void checkIndex(TestContext context, IMapper<?> mapper, String indexName) {
     Async async = context.async();
     getDataStore(context).getMetaData().getIndexInfo(indexName, mapper, result -> {
       if (result.failed()) {

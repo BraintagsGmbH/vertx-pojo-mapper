@@ -31,20 +31,46 @@ import io.vertx.core.Handler;
 public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
-   * Execute the query
+   * Execute the query with the default limit of the current datastore. Any variables in the search condition will
+   * result in an error. For queries with variables and custom limit, see
+   * {@link #execute(IFieldValueResolver, int, int, Handler)}
    *
    * @param resultHandler
-   *          contains the {@link IQueryResult}
    */
   void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
 
   /**
+   * Execute the query
+   *
+   * @param resolver
+   *          replaces potential variables in the search condition with an actual value, can be null
+   * @param limit
+   *          the maximum number of results to search
+   * @param offset
+   *          the offset of the first row to return
+   * @param resultHandler
+   *          contains the {@link IQueryResult}
+   */
+  void execute(IFieldValueResolver resolver, int limit, int offset,
+      Handler<AsyncResult<IQueryResult<T>>> resultHandler);
+
+  /**
+   * Execute the query by counting the fitting objects. Any variables in the search condition will result in an error.
+   * For queries with variables, see {@link #executeCount(IFieldValueResolver, Handler)}
+   *
+   * @param resultHandler
+   */
+  void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler);
+
+  /**
    * Execute the query by counting the fitting objects
    *
+   * @param resolver
+   *          replaces potential variables in the search condition with an actual value, can be null
    * @param resultHandler
    *          contains the {@link IQueryCountResult}
    */
-  void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler);
+  void executeCount(IFieldValueResolver resolver, Handler<AsyncResult<IQueryCountResult>> resultHandler);
 
   /**
    * Execute the query with the option explain and sends back the suitable information
@@ -55,22 +81,15 @@ public interface IQuery<T> extends IDataAccessObject<T> {
   void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler);
 
   /**
-   * Set the maximum number of records to be returned
+   * Build the query expression that contains the info needed to execute this query against the current
+   * datastore
    *
-   * @param limit
-   *          the maximum number of records to be returned
-   * @return the query itself for fluent access
+   * @param resolver
+   *          replaces potential variables in the search condition with an actual value, can be null
+   * @param resultHandler
+   *          handler for the completed {@link IQueryExpression}
    */
-  IQuery<T> setLimit(int limit);
-
-  /**
-   * Set the first record to be returned
-   *
-   * @param start
-   *          the number of the first record to be returned
-   * @return the query itself for fluent access
-   */
-  IQuery<T> setStart(int start);
+  void buildQueryExpression(IFieldValueResolver resolver, Handler<AsyncResult<IQueryExpression>> resultHandler);
 
   /**
    * If {@link #setLimit(int)} is defined with a value > 0 and this value is set to true, then the
@@ -334,12 +353,4 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    */
   ISearchConditionContainer and(ISearchCondition... searchConditions);
 
-  /**
-   * Build the complete query expression that contains all info needed to execute this query against the current
-   * datastore
-   *
-   * @param resultHandler
-   *          handler for the completed {@link IQueryExpression}
-   */
-  public void buildQueryExpression(Handler<AsyncResult<IQueryExpression>> resultHandler);
 }
