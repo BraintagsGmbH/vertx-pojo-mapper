@@ -15,9 +15,13 @@ package de.braintags.vertx.jomnigate.dataaccess.query;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.VariableSyntaxException;
 
 /**
- * Resolves any variable inside a {@link IFieldCondition} with an actual object. The value can come from anywhere,
- * routing context, request parameter, field content of another POJO...
- *
+ * Resolves any variable inside an {@link IVariableFieldCondition} with an actual object. The value can come from
+ * anywhere, routing context, request parameter, field content of another POJO...
+ * 
+ * For example, the variable name might be "request.page". If the implementation of the resolver recognizes this
+ * variable, it might look for a request parameter named "page" and return the value of the parameter.
+ * The actual resolution is dependent on the implementation.
+ * 
  * @author sschmitt
  *
  */

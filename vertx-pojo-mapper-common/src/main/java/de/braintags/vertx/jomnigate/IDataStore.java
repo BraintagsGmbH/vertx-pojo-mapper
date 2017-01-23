@@ -48,6 +48,12 @@ public interface IDataStore {
   public static final String HANDLE_REFERENCED_RECURSIVE = "handleReferencedRecursive";
 
   /**
+   * The name of the property that defines the limit of queries where no limit is given. It should not be too high to
+   * prevent overloading the system when querying large tables without limit.
+   */
+  public static final String DEFAULT_QUERY_LIMIT = "defaultQueryLimit";
+
+  /**
    * Get the instance of {@link Vertx} where the current instance is belonging to
    *
    * @return the instance of Vertx where inside the current instance was created

@@ -14,7 +14,9 @@ package de.braintags.vertx.jomnigate.dataaccess.query;
 
 /**
  * Marker interface to mark a field condition that has a variable as value and must be passed through an
- * {@link IFieldValueResolver}
+ * {@link IFieldValueResolver}.
+ * The variable value must be set without any tags that were used to identify a value as variable. Only the true name of
+ * the variable should be set as value, to ensure everything resolving the variable has the same value to work with.
  *
  * @author sschmitt
  *

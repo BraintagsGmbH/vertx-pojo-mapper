@@ -39,6 +39,7 @@ import io.vertx.core.json.JsonObject;
  */
 
 public abstract class AbstractDataStore implements IDataStore {
+
   private Vertx vertx;
   private JsonObject properties;
   private IMapperFactory mapperFactory;
@@ -61,7 +62,7 @@ public abstract class AbstractDataStore implements IDataStore {
     this.vertx = vertx;
     this.properties = properties;
     initSupportedKeyGenerators();
-    defaultQueryLimit = properties.getInteger("defaultQueryLimit", 500);
+    defaultQueryLimit = properties.getInteger(DEFAULT_QUERY_LIMIT, 500);
   }
 
   /*

@@ -31,7 +31,8 @@ import io.vertx.core.Handler;
 public interface IQuery<T> extends IDataAccessObject<T> {
 
   /**
-   * Execute the query. Any variables in the search condition will result in an error. For queries with variables, see
+   * Execute the query with the default limit of the current datastore. Any variables in the search condition will
+   * result in an error. For queries with variables and custom limit, see
    * {@link #execute(IFieldValueResolver, int, int, Handler)}
    *
    * @param resultHandler
