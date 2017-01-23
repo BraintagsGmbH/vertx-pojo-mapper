@@ -19,7 +19,7 @@
 		<skipAssembly>false</skipAssembly>
         <ignoreFailedTests>true</ignoreFailedTests>
 		<sonar.skip>false</sonar.skip>
-		<surefireArgLine> -DdefaultKeyGenerator=DEBUG -DstartMongoLocal=true -DMySqlDataStoreContainer.password=${MySqlDataStoreContainer.password} -DMySqlDataStoreContainer.username=${MySqlDataStoreContainer.username} -DMySqlDataStoreContainer.host=${MySqlDataStoreContainer.host} -DIDatastoreContainer=de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer</surefireArgLine>
+		<surefireArgLine> -DdefaultKeyGenerator=DEBUG -DstartMongoLocal=true -DMySqlDataStoreContainer.password=${MySqlDataStoreContainer.password} -DMySqlDataStoreContainer.username=${MySqlDataStoreContainer.username} -DMySqlDataStoreContainer.host=${MySqlDataStoreContainer.host} -DIDatastoreContainer=de.braintags.vertx.jomnigate.mysql.MySqlDataStoreContainer</surefireArgLine>
 	</properties>
 
 	<dependencies>

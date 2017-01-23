@@ -11,7 +11,7 @@ dependencies {
 }
 
 test {
-  systemProperty 'IDatastoreContainer', 'de.braintags.io.vertx.pojomapper.mysql.MySqlDataStoreContainer'
+  systemProperty 'IDatastoreContainer', 'de.braintags.vertx.jomnigate.mysql.MySqlDataStoreContainer'
   systemProperty 'startMongoLocal', 'true'
   systemProperty 'defaultKeyGenerator', 'DEBUG'
   systemProperty 'MySqlDataStoreContainer.host', System.properties['MySqlDataStoreContainer.host']
