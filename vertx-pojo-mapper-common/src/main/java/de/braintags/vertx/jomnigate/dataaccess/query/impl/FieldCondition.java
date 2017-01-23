@@ -40,8 +40,8 @@ public class FieldCondition implements IFieldCondition {
 
   /*
    * (non-Javadoc)
-   *
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchCondition#setIntermediateResult(java.lang.Class,
+   * 
+   * @see de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition#setIntermediateResult(java.lang.Class,
    * java.lang.Object)
    */
   @Override
@@ -51,8 +51,8 @@ public class FieldCondition implements IFieldCondition {
 
   /*
    * (non-Javadoc)
-   *
-   * @see de.braintags.io.vertx.pojomapper.dataaccess.query.ISearchCondition#getIntermediateResult(java.lang.Class)
+   * 
+   * @see de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition#getIntermediateResult(java.lang.Class)
    */
   @Override
   public Object getIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass) {

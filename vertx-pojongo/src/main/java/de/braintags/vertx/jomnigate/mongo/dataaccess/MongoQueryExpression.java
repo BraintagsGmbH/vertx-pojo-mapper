@@ -116,9 +116,10 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /*
    * (non-Javadoc)
-   *
-   * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#buildFieldConditionResult(de.
-   * braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#buildFieldConditionResult(de.braintags.
+   * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
    */
   @Override
   protected JsonObject buildFieldConditionResult(IFieldCondition fieldCondition, String columnName, Object parsedValue)
@@ -154,9 +155,10 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /*
    * (non-Javadoc)
-   *
-   * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#handleNullConditionValue(de.
-   * braintags.io.vertx.pojomapper.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#handleNullConditionValue(de.braintags.
+   * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
    */
   @Override
   protected void handleNullConditionValue(IFieldCondition condition, String columnName,

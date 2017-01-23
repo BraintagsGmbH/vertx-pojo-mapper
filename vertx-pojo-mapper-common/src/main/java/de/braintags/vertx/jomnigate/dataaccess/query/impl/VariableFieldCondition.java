@@ -43,10 +43,9 @@ public class VariableFieldCondition extends FieldCondition implements IVariableF
 
   /*
    * (non-Javadoc)
-   *
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractSearchCondition#setIntermediateResult(java.lang.
-   * Class, java.lang.Object)
+   * 
+   * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.FieldCondition#setIntermediateResult(java.lang.Class,
+   * java.lang.Object)
    */
   @Override
   public void setIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass, Object result) {
@@ -55,10 +54,8 @@ public class VariableFieldCondition extends FieldCondition implements IVariableF
 
   /*
    * (non-Javadoc)
-   *
-   * @see
-   * de.braintags.io.vertx.pojomapper.dataaccess.query.impl.AbstractSearchCondition#getIntermediateResult(java.lang.
-   * Class)
+   * 
+   * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.FieldCondition#getIntermediateResult(java.lang.Class)
    */
   @Override
   public Object getIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass) {

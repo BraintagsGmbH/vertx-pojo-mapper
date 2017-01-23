@@ -46,8 +46,8 @@ public class BooleanColumnHandler extends AbstractSqlColumnHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#checkColumnModified(de
-   * .braintags.io.vertx.pojomapper.mapping.datastore.IColumnInfo,
+   * de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler.AbstractSqlColumnHandler#checkColumnModified(de.
+   * braintags.vertx.jomnigate.mapping.datastore.IColumnInfo,
    * de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo)
    */
   @Override

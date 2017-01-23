@@ -283,7 +283,7 @@ public class DummyDataStore implements IDataStore {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.IDataStore#getDefaultQueryLimit()
+   * @see de.braintags.vertx.jomnigate.IDataStore#getDefaultQueryLimit()
    */
   @Override
   public int getDefaultQueryLimit() {
