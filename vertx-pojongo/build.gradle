@@ -3,9 +3,10 @@ dependencies {
   compile project(':vertx-pojo-mapper-common-test')
   compile project(':vertx-pojo-mapper-json')
   compile group: 'io.vertx', name: 'vertx-mongo-embedded-db', version:vertxVersion
+  compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.7'
   
   testCompile project(':vertx-pojo-mapper-json').sourceSets.test.output
-  testCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.12'
+  
 }
 
 test {
