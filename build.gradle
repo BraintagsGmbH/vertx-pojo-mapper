@@ -22,3 +22,11 @@ sonarqube{
     property 'sonar.modules', 'vertx-pojo-mapper-common,vertx-pojo-mapper-json, vertx-pojongo, vertx-pojo-mapper-mysql'
    }
 }
+
+
+task generateDocumentation {
+	//added here to enable task if this is an included build
+	subprojects.each { subproject ->
+        dependsOn subproject.path+':generateDocumentation'
+    } 
+}

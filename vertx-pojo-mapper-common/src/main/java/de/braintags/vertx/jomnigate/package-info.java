@@ -106,7 +106,7 @@
  * Next we want to save this MiniMapper into the connected datastore.
  * [source,java]
  * ----
- * {@link examples.Examples#example3(IDataStore, examples.mapper.MiniMapper)}
+ * {@link examples.Examples#example3(IDataStore, examples.mapper.DemoMapper)}
  * ----
  * 
  * To save one or more instances inside the datastore, we are first creating an
@@ -166,7 +166,7 @@
  * 
  * [source,java]
  * ----
- * {@link examples.Examples#example5(IDataStore, examples.mapper.MiniMapper)}
+ * {@link examples.Examples#example5(IDataStore, examples.mapper.DemoMapper)}
  * ----
  * 
  * In the current example we are deleting an object, which we are expecting to exist in the datastore. First we are

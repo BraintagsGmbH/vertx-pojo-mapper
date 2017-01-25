@@ -13,8 +13,9 @@
 package examples;
 
 import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
-import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapper;
 import de.braintags.vertx.util.IteratorAsync;
 import io.vertx.docgen.Source;
 
@@ -24,16 +25,24 @@ public class Examples {
       .getLogger(Examples.class);
 
   public void executeNative(IDataStore datastore) {
-    IQuery<MiniMapper> query = datastore.createQuery(MiniMapper.class);
-    String qs = "select * from MiniMapper where name LIKE \"native%\"";
+    IQuery<ExampleMapper> query = datastore.createQuery(ExampleMapper.class);
+    String qs = "select * from ExampleMapper where name LIKE \"native%\"";
     query.setNativeCommand(qs);
     query.execute(qr -> {
       if (qr.succeeded()) {
-        IteratorAsync<MiniMapper> it = qr.result().iterator();
+        IteratorAsync<ExampleMapper> it = qr.result().iterator();
         while (it.hasNext()) {
 
         }
       }
     });
   }
+
+  @Entity
+  private static class ExampleMapper {
+    @Id
+    public String id = null;
+    public String name = "testName";
+  }
+
 }
