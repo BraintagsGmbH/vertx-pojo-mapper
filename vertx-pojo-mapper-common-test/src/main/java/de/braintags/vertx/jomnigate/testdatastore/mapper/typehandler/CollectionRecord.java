@@ -25,7 +25,7 @@ import de.braintags.vertx.jomnigate.annotation.Entity;
  */
 @Entity
 public class CollectionRecord extends BaseRecord {
-  public Collection<String> collection = new ArrayList<String>();
+  public Collection<String> collection = new ArrayList<>();
 
   public CollectionRecord() {
     collection.add("Eins");

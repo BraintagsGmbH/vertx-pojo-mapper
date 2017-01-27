@@ -22,7 +22,6 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
  * @author Michael Remme
  * 
  */
-
 public interface IDeleteResult {
 
   /**
