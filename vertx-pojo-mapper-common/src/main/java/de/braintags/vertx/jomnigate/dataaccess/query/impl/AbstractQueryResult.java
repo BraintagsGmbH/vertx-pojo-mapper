@@ -130,15 +130,11 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
         LOGGER
             .debug("generating pojo on index " + thisIndex + " for mapper " + mapper.getMapperClass().getSimpleName());
         generatePojo(thisIndex, result -> {
-          try {
-            if (result.failed()) {
-              handler.handle(Future.failedFuture(result.cause()));
-            } else {
-              pojoResult[thisIndex] = result.result();
-              handler.handle(Future.succeededFuture(pojoResult[thisIndex]));
-            }
-          } catch (Exception e) {
-            handler.handle(Future.failedFuture(e));
+          if (result.failed()) {
+            handler.handle(Future.failedFuture(result.cause()));
+          } else {
+            pojoResult[thisIndex] = result.result();
+            handler.handle(Future.succeededFuture(pojoResult[thisIndex]));
           }
         });
       } else {
