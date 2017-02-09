@@ -3,9 +3,14 @@ subprojects {
   dependencies {
     compile group: 'de.braintags', name:'vertx-util', version:btVertxVersion
     compile group: 'de.braintags', name:'vertx-key-generator', version:btVertxVersion
-
-    testCompile group: 'de.braintags', name:'vertx-util', version:btVertxVersion, classifier:'tests'
-    testCompile group: 'de.braintags', name:'vertx-key-generator', version:btVertxVersion, classifier:'tests'
+    
+    if (isIncludedBuild) {
+      testCompile group: 'de.braintags', name:'vertx-util', version:btVertxVersion, configuration:'commonTests'
+      testCompile group: 'de.braintags', name:'vertx-key-generator', version:btVertxVersion, configuration:'commonTests'
+    } else {
+      testCompile group: 'de.braintags', name:'vertx-util', version:btVertxVersion, classifier:'tests'
+      testCompile group: 'de.braintags', name:'vertx-key-generator', version:btVertxVersion, classifier:'tests'
+    }
   }
 }
 
@@ -23,10 +28,15 @@ sonarqube{
    }
 }
 
+task test {
+      subprojects.each { subproject ->
+        dependsOn subproject.path+':test'
+    } 
+}
 
 task generateDocumentation {
-	//added here to enable task if this is an included build
-	subprojects.each { subproject ->
+    //added here to enable task if this is an included build
+    subprojects.each { subproject ->
         dependsOn subproject.path+':generateDocumentation'
     } 
 }

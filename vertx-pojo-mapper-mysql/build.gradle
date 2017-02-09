@@ -4,7 +4,8 @@ dependencies {
 
   compile group: 'io.vertx', name: 'vertx-mysql-postgresql-client', version:vertxVersion
 
-  testCompile project(':vertx-pojo-mapper-common-test')
+  commonTestCompile project(':vertx-pojo-mapper-common-test')
+  
   testCompile project(':vertx-pojo-mapper-json').sourceSets.test.output
 
   provided group: 'org.slf4j', name: 'slf4j-api', version: '1.6.2'
