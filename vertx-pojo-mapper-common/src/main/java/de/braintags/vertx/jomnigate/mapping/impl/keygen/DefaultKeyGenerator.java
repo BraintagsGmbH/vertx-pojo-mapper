@@ -12,9 +12,9 @@
  */
 package de.braintags.vertx.jomnigate.mapping.impl.keygen;
 
-import de.braintags.vertx.keygenerator.KeyGeneratorVerticle;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.keygenerator.KeyGeneratorVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;

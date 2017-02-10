@@ -4,7 +4,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.testdatastore.DatastoreBaseTest;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapper;
 import io.vertx.core.Future;
@@ -25,7 +24,7 @@ public class TestQueryInterator extends DatastoreBaseTest {
     Async async = context.async();
 
     IQuery<MiniMapper> query = getDataStore(context).createQuery(MiniMapper.class);
-    query.setSearchCondition(query.isEqual("name", "test"));
+    query.setSearchCondition(ISearchCondition.isEqual("name", "test"));
     query.execute(result -> {
       if (result.succeeded()) {
         result.result().iterator().next(fut.completer());

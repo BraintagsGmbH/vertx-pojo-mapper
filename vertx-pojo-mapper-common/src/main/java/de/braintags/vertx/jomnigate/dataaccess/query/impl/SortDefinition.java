@@ -15,7 +15,6 @@ package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISortDefinition;
 
 /**

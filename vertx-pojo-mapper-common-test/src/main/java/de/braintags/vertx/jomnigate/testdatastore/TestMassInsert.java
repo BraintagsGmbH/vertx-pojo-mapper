@@ -18,6 +18,7 @@ import java.util.List;
 import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniNumberMapper;
 import io.vertx.ext.unit.TestContext;
@@ -48,7 +49,7 @@ public class TestMassInsert extends DatastoreBaseTest {
       LOGGER.warn("size of writeresult is incorrect - checking records in datastore");
       // check wether records weren't written or "only" IWriteResult is incomplete
       IQuery<MiniNumberMapper> query = getDataStore(context).createQuery(MiniNumberMapper.class);
-      query.setSearchCondition(query.isEqual("name", "looper"));
+      query.setSearchCondition(ISearchCondition.isEqual("name", "looper"));
       find(context, query, LOOP);
       context.assertEquals(LOOP, resultContainer.writeResult.size());
       context.fail("The write result hasn't got the right content, the records in the datastore are correct");

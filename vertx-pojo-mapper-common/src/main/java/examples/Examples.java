@@ -16,6 +16,7 @@ import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
+import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
@@ -97,7 +98,7 @@ public class Examples {
    */
   public void example4(IDataStore dataStore) {
     IQuery<DemoMapper> query = dataStore.createQuery(DemoMapper.class);
-    query.setSearchCondition(query.isEqual("name", "my mini mapper"));
+    query.setSearchCondition(ISearchCondition.isEqual("name", "my mini mapper"));
     query.execute(rResult -> {
       if (rResult.failed()) {
         logger.error(rResult.cause());
@@ -135,7 +136,7 @@ public class Examples {
 
   public void example6(IDataStore dataStore) {
     IQuery<DemoMapper> query = dataStore.createQuery(DemoMapper.class);
-    query.setSearchCondition(query.isEqual("name", "test"));
+    query.setSearchCondition(ISearchCondition.isEqual("name", "test"));
     IDelete<DemoMapper> delete = dataStore.createDelete(DemoMapper.class);
     delete.setQuery(query);
     delete.delete(deleteResult -> {

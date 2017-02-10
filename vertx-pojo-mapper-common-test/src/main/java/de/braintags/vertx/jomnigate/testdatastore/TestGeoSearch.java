@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
 import de.braintags.vertx.jomnigate.datatypes.geojson.Position;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.GeoMapper;
@@ -39,17 +40,17 @@ public class TestGeoSearch extends DatastoreBaseTest {
     clearTable(context, GeoMapper.class.getSimpleName());
     createDemoRecords(context);
     IQuery<GeoMapper> query = getDataStore(context).createQuery(GeoMapper.class);
-    query.setSearchCondition(query.near("position", sLong, sLat, 10));
+    query.setSearchCondition(ISearchCondition.near("position", sLong, sLat, 10));
     List<GeoMapper> found = findAll(context, query);
     context.assertEquals(found.size(), 1, "wrong number of records");
 
     query = getDataStore(context).createQuery(GeoMapper.class);
-    query.setSearchCondition(query.near("position", sLong, sLat, 70000));
+    query.setSearchCondition(ISearchCondition.near("position", sLong, sLat, 70000));
     found = findAll(context, query);
     context.assertEquals(found.size(), 2, "wrong number of records");
 
     query = getDataStore(context).createQuery(GeoMapper.class);
-    query.setSearchCondition(query.near("position", sLong, sLat, 700000));
+    query.setSearchCondition(ISearchCondition.near("position", sLong, sLat, 700000));
     found = findAll(context, query);
     context.assertEquals(found.size(), 3, "wrong number of records");
 

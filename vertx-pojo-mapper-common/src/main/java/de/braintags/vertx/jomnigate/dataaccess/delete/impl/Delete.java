@@ -24,6 +24,7 @@ import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
 import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.mapping.IField;
 import de.braintags.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.AsyncResult;
@@ -205,7 +206,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   protected void deleteRecordsById(IField idField, List<Object> objectIds,
       Handler<AsyncResult<IDeleteResult>> resultHandler) {
     IQuery<T> q = getDataStore().createQuery(getMapperClass());
-    q.setSearchCondition(q.in(idField.getName(), objectIds));
+    q.setSearchCondition(ISearchCondition.in(idField.getName(), objectIds));
     deleteQuery(q, dr -> {
       if (dr.failed()) {
         resultHandler.handle(dr);

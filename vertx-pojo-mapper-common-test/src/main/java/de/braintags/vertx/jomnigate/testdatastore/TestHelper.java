@@ -15,11 +15,11 @@ package de.braintags.vertx.jomnigate.testdatastore;
 import java.util.concurrent.CountDownLatch;
 
 import de.braintags.vertx.BtVertxTestBase;
+import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.vertx.keygenerator.KeyGeneratorSettings;
 import de.braintags.vertx.keygenerator.KeyGeneratorVerticle;
 import de.braintags.vertx.keygenerator.impl.MongoKeyGenerator;
-import de.braintags.vertx.jomnigate.IDataStore;
-import de.braintags.vertx.jomnigate.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.vertx.util.ErrorObject;
 import de.braintags.vertx.util.ExceptionUtil;
 import de.braintags.vertx.util.exception.ParameterRequiredException;

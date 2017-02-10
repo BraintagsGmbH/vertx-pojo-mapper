@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression;
 import de.braintags.vertx.jomnigate.impl.DummyDataStore;
 import de.braintags.vertx.jomnigate.mapper.Person;
@@ -35,7 +36,7 @@ public class TQuery {
   public void test() {
     IQuery<Person> query = dataStore.createQuery(Person.class);
     query.setSearchCondition(
-        query.and(query.isEqual("name", "peter"), query.in("secName", "eins", "zwei"), query.isEqual("weight", 15)));
+        ISearchCondition.and(ISearchCondition.isEqual("name", "peter"), ISearchCondition.in("secName", "eins", "zwei"), ISearchCondition.isEqual("weight", 15)));
     logger.info("--- start Rambler");
 
     final IQuery<Person> exQuery = query;

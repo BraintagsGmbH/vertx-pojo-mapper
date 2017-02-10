@@ -17,6 +17,7 @@ import java.lang.annotation.Annotation;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.exception.MappingException;
@@ -110,7 +111,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     LOGGER.debug("start getReferencedObjectById");
     IQuery<?> query = store.createQuery(subMapper.getMapperClass());
-    query.setSearchCondition(query.isEqual(subMapper.getIdField().getName(), id));
+    query.setSearchCondition(ISearchCondition.isEqual(subMapper.getIdField().getName(), id));
     query.execute(result -> {
       if (result.failed()) {
         fail(result.cause(), resultHandler);

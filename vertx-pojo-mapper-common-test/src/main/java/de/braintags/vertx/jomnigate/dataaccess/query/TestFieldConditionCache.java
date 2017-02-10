@@ -46,7 +46,7 @@ public class TestFieldConditionCache extends DatastoreBaseTest {
     TestFieldCondition fixedCondition = new TestFieldCondition("name", QueryOperator.EQUALS, "test");
     TestVariableFieldCondition variableCondition = new TestVariableFieldCondition("name", QueryOperator.EQUALS,
         "${variable}");
-    query.setSearchCondition(query.and(fixedCondition, variableCondition));
+    query.setSearchCondition(ISearchCondition.and(fixedCondition, variableCondition));
     final AtomicInteger variableResolved = new AtomicInteger(0);
     query.execute(resolve -> {
       variableResolved.incrementAndGet();
