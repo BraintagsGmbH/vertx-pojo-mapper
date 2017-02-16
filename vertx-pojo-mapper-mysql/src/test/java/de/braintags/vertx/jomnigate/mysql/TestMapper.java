@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
-import de.braintags.vertx.jomnigate.exception.MappingException;
+import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
 import de.braintags.vertx.jomnigate.mapper.Person;
 import de.braintags.vertx.jomnigate.mapping.IField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
@@ -88,7 +88,7 @@ public class TestMapper extends DatastoreBaseTest {
     try {
       field = mapper.getField("doesntexist");
       context.fail("this should throw an exception here");
-    } catch (MappingException e) {
+    } catch (NoSuchFieldException e) {
       // this is the expected result
     }
 

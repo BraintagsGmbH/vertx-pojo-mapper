@@ -26,14 +26,14 @@ import de.braintags.vertx.jomnigate.annotation.Entity;
 @Entity
 public class MapRecord extends BaseRecord {
   public Map<String, String> map = new HashMap<>();
-  public Map<String, CollectionRecord> map2 = new HashMap<>();
+  // public Map<String, CollectionRecord> map2 = new HashMap<>();
 
   public MapRecord() {
     map.put("Eins", "1");
     map.put("Zwei", "2");
     map.put("Drei", "3");
 
-    map2.put("tk", new CollectionRecord());
+    // map2.put("tk", new CollectionRecord());
   }
 
 }

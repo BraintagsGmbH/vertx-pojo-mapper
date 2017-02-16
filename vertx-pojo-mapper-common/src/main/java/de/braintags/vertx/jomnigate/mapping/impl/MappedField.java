@@ -37,6 +37,7 @@ import de.braintags.vertx.jomnigate.annotation.field.ConstructorArguments;
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Encoder;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
+import de.braintags.vertx.jomnigate.annotation.field.Ignore;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.exception.MappingException;
@@ -75,7 +76,8 @@ public class MappedField implements IField {
    * Annotations which shall be checked for a field definition
    */
   private static final List<Class<? extends Annotation>> FIELD_ANNOTATIONS = Arrays.asList(Id.class, Property.class,
-      Referenced.class, Embedded.class, ConcreteClass.class, Encoder.class);
+      Referenced.class, Embedded.class, ConcreteClass.class, Encoder.class, Ignore.class);
+
   /**
    * If for the current field an Annotation {@link Embedded} or {@link Referenced} is defined, then it is stored in here
    */
@@ -503,6 +505,15 @@ public class MappedField implements IField {
   @Override
   public boolean isCollection() {
     return isCollection;
+  }
+
+  /**
+   * returns true if annotation {@link Ignore} is set
+   * 
+   * @return
+   */
+  public boolean isIgnore() {
+    return hasAnnotation(Ignore.class);
   }
 
   /*

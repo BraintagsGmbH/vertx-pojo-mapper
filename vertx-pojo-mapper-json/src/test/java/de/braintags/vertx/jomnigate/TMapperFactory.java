@@ -35,6 +35,7 @@ import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
+import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
 import de.braintags.vertx.jomnigate.impl.DummyDataStore;
 import de.braintags.vertx.jomnigate.impl.DummyObjectFactory;
 import de.braintags.vertx.jomnigate.json.typehandler.handler.ArrayTypeHandler;
@@ -84,6 +85,23 @@ public class TMapperFactory {
   @Test
   public void testNumberOfProperties() {
     Assert.assertEquals("unexpected numer of properties", NUMBER_OF_PROPERTIES, mapperDef.getFieldNames().size());
+  }
+
+  @Test
+  public void testIgnore() {
+    try {
+      mapperDef.getField("ignoreField");
+      Assert.fail("expected NoSuchFieldException");
+    } catch (NoSuchFieldException e) {
+      // expected result
+    }
+    try {
+      mapperDef.getField("ignoreField2");
+      Assert.fail("expected NoSuchFieldException");
+    } catch (NoSuchFieldException e) {
+      // expected result
+    }
+
   }
 
   @Test

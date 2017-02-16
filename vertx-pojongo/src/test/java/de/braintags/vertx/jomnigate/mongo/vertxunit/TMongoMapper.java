@@ -17,7 +17,7 @@ import java.util.List;
 import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.annotation.field.Id;
-import de.braintags.vertx.jomnigate.exception.MappingException;
+import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.EncoderSettings;
 import de.braintags.vertx.jomnigate.mapping.IField;
@@ -93,7 +93,7 @@ public class TMongoMapper extends DatastoreBaseTest {
     try {
       field = mapper.getField("doesntexist");
       context.fail("this should throw an exception here");
-    } catch (MappingException e) {
+    } catch (NoSuchFieldException e) {
       // this is the expected result
     }
 
@@ -106,7 +106,7 @@ public class TMongoMapper extends DatastoreBaseTest {
     try {
       IField trField = mapper.getField("transientString");
       context.fail("transient fields should be mapped");
-    } catch (MappingException e) {
+    } catch (NoSuchFieldException e) {
       // this is the expected result
     }
 

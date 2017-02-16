@@ -25,6 +25,7 @@ import de.braintags.vertx.jomnigate.annotation.IndexOptions;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
+import de.braintags.vertx.jomnigate.annotation.field.Ignore;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
@@ -38,7 +39,7 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 
 @Entity(name = "PersonColumn")
 @Indexes(@Index(fields = { @IndexField(fieldName = "name"),
-    @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false) ))
+    @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
 public class Person extends AbstractPerson {
   public static final int NUMBER_OF_PROPERTIES = 23;
 
@@ -95,6 +96,11 @@ public class Person extends AbstractPerson {
   public transient String transientString;
   public String[] stringArray = { "eins", "zwei", "drei" };
 
+  @Ignore
+  public String ignoreField = "";
+  @Ignore
+  private String ignoreField2 = "";
+
   /**
    * @return the name
    */
@@ -121,6 +127,21 @@ public class Person extends AbstractPerson {
   @BeforeLoad
   public void beforeLoadFromInterface() {
     System.out.println("handleBeforeLoad");
+  }
+
+  /**
+   * @return the ignoreField2
+   */
+  public String getIgnoreField2() {
+    return ignoreField2;
+  }
+
+  /**
+   * @param ignoreField2
+   *          the ignoreField2 to set
+   */
+  public void setIgnoreField2(String ignoreField2) {
+    this.ignoreField2 = ignoreField2;
   }
 
 }

@@ -288,25 +288,41 @@ public class Mapper<T> implements IMapper<T> {
     for (int i = 0; i < fieldArray.length; i++) {
       Field field = fieldArray[i];
       int fieldModifiers = field.getModifiers();
-      if (!Modifier.isTransient(fieldModifiers)
+      JavaFieldAccessor accessor = new JavaFieldAccessor(field);
+      MappedField mf = createMappedField(field, accessor);
+      if (!mf.isIgnore() && !Modifier.isTransient(fieldModifiers)
           && (Modifier.isPublic(fieldModifiers) && !Modifier.isStatic(fieldModifiers))) {
-        JavaFieldAccessor accessor = new JavaFieldAccessor(field);
         addMappedField(accessor.getName(), createMappedField(field, accessor));
       }
     }
   }
 
+  /**
+   * Create a new instance of {@link MappedField}
+   * 
+   * @param field
+   * @param accessor
+   * @return
+   */
   protected MappedField createMappedField(Field field, IPropertyAccessor accessor) {
     return new MappedField(field, accessor, this);
   }
 
+  /**
+   * Adds a mapped field into the list of properties
+   * 
+   * @param name
+   * @param mf
+   */
   protected void addMappedField(String name, MappedField mf) {
     if (mf.hasAnnotation(Id.class)) {
       if (idField != null)
         throw new MappingException("duplicate Id field definition found for mapper " + getMapperClass());
       idField = mf;
     }
-    mappedFields.put(name, mf);
+    if (!mf.isIgnore()) {
+      mappedFields.put(name, mf);
+    }
   }
 
   /**
@@ -338,7 +354,7 @@ public class Mapper<T> implements IMapper<T> {
   public IField getField(String name) {
     IField field = mappedFields.get(name);
     if (field == null)
-      throw new MappingException(String.format("Field '%s' does not exist in %s", name, getMapperClass().getName()));
+      throw new de.braintags.vertx.jomnigate.exception.NoSuchFieldException(this, name);
     return field;
   }
 
