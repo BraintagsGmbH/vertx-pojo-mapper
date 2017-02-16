@@ -44,7 +44,7 @@ import io.vertx.ext.unit.TestContext;
 
 public class TMongoDirect extends DatastoreBaseTest {
   private static Logger LOGGER = LoggerFactory.getLogger(TMongoDirect.class);
-  private static final int LOOP = 500;
+  private static final int LOOP = 50000;
   private static final String EXPECTED_VERSION_STARTS_WITH = "3.";
 
   @Test
@@ -117,14 +117,16 @@ public class TMongoDirect extends DatastoreBaseTest {
   @Test
   public void massInsert(TestContext context) {
     LOGGER.info("-->>test");
+    String COLLECTION = "massInsert";
     MongoDataStore ds = (MongoDataStore) getDataStore(context);
     MongoClient client = (MongoClient) ds.getClient();
+    dropTable(context, COLLECTION);
     List<Future> fl = new ArrayList<>();
     for (int i = 0; i < LOOP; i++) {
       Future<String> f = Future.future();
       fl.add(f);
       JsonObject jsonCommand = new JsonObject().put("name", "testName " + i);
-      client.insert("massInsert", jsonCommand, f.completer());
+      client.insert(COLLECTION, jsonCommand, f.completer());
     }
 
     ResultObject<List> ro = new ResultObject<>(null);
@@ -137,12 +139,27 @@ public class TMongoDirect extends DatastoreBaseTest {
       } else {
         LOGGER.info("number of saved records: " + cf.list().size());
         ro.setResult(cf.list());
+
         async.complete();
       }
     });
 
     async.await();
-    context.assertEquals(LOOP, ro.getResult().size());
+    if (ro.isError()) {
+      LOGGER.error("", ro.getThrowable());
+      context.fail(ro.getThrowable());
+    } else {
+      context.assertEquals(LOOP, ro.getResult().size());
+      client.count(COLLECTION, new JsonObject(), fr -> {
+        if (fr.failed()) {
+          LOGGER.error("", fr.cause());
+          context.fail(fr.cause());
+        } else {
+          context.assertEquals(LOOP, fr.result().intValue());
+        }
+      });
+
+    }
   }
 
   @Test
