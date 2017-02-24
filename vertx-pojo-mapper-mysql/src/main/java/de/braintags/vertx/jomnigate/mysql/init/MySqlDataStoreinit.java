@@ -27,6 +27,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
 import io.vertx.ext.asyncsql.MySQLClient;
+import io.vertx.ext.sql.SQLConnection;
 
 /**
  * 
@@ -75,11 +76,47 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
     try {
       mySQLClient = shared ? MySQLClient.createShared(vertx, getConfig())
           : MySQLClient.createNonShared(vertx, getConfig());
-      datastore = new MySqlDataStore(vertx, mySQLClient, getConfig());
-      handler.handle(Future.succeededFuture(datastore));
+
+      if (isClearDatabaseOnInit()) {
+        mySQLClient.getConnection(result -> {
+          if (result.failed())
+            handler.handle(Future.failedFuture(result.cause()));
+          else {
+            SQLConnection connection = result.result();
+            clearDatabase(connection, clearResult -> {
+              connection.close();
+              if (clearResult.failed())
+                handler.handle(Future.failedFuture(clearResult.cause()));
+              else {
+                datastore = new MySqlDataStore(vertx, mySQLClient, getConfig());
+                handler.handle(Future.succeededFuture(datastore));
+              }
+            });
+          }
+        });
+      } else {
+        datastore = new MySqlDataStore(vertx, mySQLClient, getConfig());
+        handler.handle(Future.succeededFuture(datastore));
+      }
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }
+  }
+
+  private void clearDatabase(SQLConnection connection, Handler<AsyncResult<Void>> handler) {
+    connection.execute("DROP DATABASE " + getDatabaseName(), dropResult -> {
+      if (dropResult.failed())
+        handler.handle(Future.failedFuture(dropResult.cause()));
+      else {
+        connection.execute("CREATE DATABASE " + getDatabaseName(), createResult -> {
+          if (createResult.failed())
+            handler.handle(Future.failedFuture(dropResult.cause()));
+          else {
+            handler.handle(Future.succeededFuture());
+          }
+        });
+      }
+    });
   }
 
   /**

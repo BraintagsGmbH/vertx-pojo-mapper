@@ -32,6 +32,7 @@ public class DataStoreSettings {
   private Properties properties = new Properties();
   private String databaseName;
   private List<EncoderSettings> encoders = new ArrayList<>();
+  private boolean clearDatabaseOnInit = false;
 
   /**
    * Standard constructor needed for saving as local file
@@ -138,5 +139,28 @@ public class DataStoreSettings {
    */
   public void setEncoders(List<EncoderSettings> encoders) {
     this.encoders = encoders;
+  }
+
+  /**
+   * Get if the database should be completely wiped on initialization, deleting everything stored beforehand. Should
+   * only be
+   * used for unit tests to ensure an empty database for each test.
+   * 
+   * @return if the database should be cleared on initialization
+   */
+  public boolean isClearDatabaseOnInit() {
+    return clearDatabaseOnInit;
+  }
+
+  /**
+   * Set if the database should be completely wiped on initialization, deleting everything stored beforehand. Should
+   * only be
+   * used for unit tests to ensure an empty database for each test.
+   * 
+   * @param clearDatabaseOnInit
+   *          if the database should be cleared on initialization
+   */
+  public void setClearDatabaseOnInit(boolean clearDatabaseOnInit) {
+    this.clearDatabaseOnInit = clearDatabaseOnInit;
   }
 }
