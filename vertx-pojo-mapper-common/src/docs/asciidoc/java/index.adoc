@@ -150,16 +150,15 @@ First we are creating an instance like - lets say - instances are created in jav
 
 [source,java]
 ----
-MiniMapper miniMapper = new MiniMapper();
-miniMapper.name = "my mini mapper";
-miniMapper.number = 20;
+DemoMapper demoMapper = new DemoMapper();
+demoMapper.setName("my mini mapper");
 ----
 
 Next we want to save this MiniMapper into the connected datastore.
 [source,java]
 ----
-IWrite<MiniMapper> write = dataStore.createWrite(MiniMapper.class);
-write.add(miniMapper);
+IWrite<DemoMapper> write = dataStore.createWrite(DemoMapper.class);
+write.add(demoMapper);
 write.save(result -> {
   if (result.failed()) {
     logger.error(result.cause());
@@ -203,18 +202,18 @@ To search inside the connected datastore, we are creating first an instance of
 
 [source,java]
 ----
-IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
-query.setSearchCondition(query.isEqual("name", "my mini mapper"));
+IQuery<DemoMapper> query = dataStore.createQuery(DemoMapper.class);
+query.setSearchCondition(ISearchCondition.isEqual("name", "my mini mapper"));
 query.execute(rResult -> {
   if (rResult.failed()) {
     logger.error(rResult.cause());
   } else {
-    IQueryResult<MiniMapper> qr = rResult.result();
+    IQueryResult<DemoMapper> qr = rResult.result();
     qr.iterator().next(itResult -> {
       if (itResult.failed()) {
         logger.error(itResult.cause());
       } else {
-        MiniMapper readMapper = itResult.result();
+        DemoMapper readMapper = itResult.result();
         logger.info("Query found id " + readMapper.id);
       }
     });
@@ -246,7 +245,7 @@ the criteria for a deletion. Mixing both isn't possible.
 
 [source,java]
 ----
-IDelete<MiniMapper> delete = dataStore.createDelete(MiniMapper.class);
+IDelete<DemoMapper> delete = dataStore.createDelete(DemoMapper.class);
 delete.add(mapper);
 delete.delete(deleteResult -> {
   if (deleteResult.failed()) {
@@ -266,9 +265,9 @@ arguments which were used to perform the delete action
 
 [source,java]
 ----
-IQuery<MiniMapper> query = dataStore.createQuery(MiniMapper.class);
-query.setSearchCondition(query.isEqual("name", "test"));
-IDelete<MiniMapper> delete = dataStore.createDelete(MiniMapper.class);
+IQuery<DemoMapper> query = dataStore.createQuery(DemoMapper.class);
+query.setSearchCondition(ISearchCondition.isEqual("name", "test"));
+IDelete<DemoMapper> delete = dataStore.createDelete(DemoMapper.class);
 delete.setQuery(query);
 delete.delete(deleteResult -> {
   if (deleteResult.failed()) {
@@ -484,7 +483,7 @@ public class LifecycleMapper {
     name = "just after load";
     IDataStore ds = triggerContext.getMapper().getMapperFactory().getDataStore();
     IQuery<MiniMapper> q = ds.createQuery(MiniMapper.class);
-    q.setSearchCondition(q.isEqual("name", "test"));
+    q.setSearchCondition(ISearchCondition.isEqual("name", "test"));
     q.execute(qr -> {
       if (qr.failed()) {
         triggerContext.fail(qr.cause());
@@ -542,7 +541,7 @@ The trigger methods can be empty, or get the parameter
 name = "just after load";
 IDataStore ds = triggerContext.getMapper().getMapperFactory().getDataStore();
 IQuery<MiniMapper> q = ds.createQuery(MiniMapper.class);
-q.setSearchCondition(q.isEqual("name", "test"));
+q.setSearchCondition(ISearchCondition.isEqual("name", "test"));
 q.execute(qr -> {
   if (qr.failed()) {
     triggerContext.fail(qr.cause());

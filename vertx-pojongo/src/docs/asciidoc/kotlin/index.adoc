@@ -7,11 +7,13 @@ To create an instance of MongoDataStore programmatically:
 
 [source,java]
 ----
-def config = [:]
-config.connection_string = "mongodb://localhost:27017"
-config.db_name = "PojongoTestDatabase"
-def mongoClient = MongoClient.createNonShared(vertx, config)
-new de.braintags.vertx.jomnigate.mongo.MongoDataStore(vertx, mongoClient, config)
+var config = json {
+  obj()
+}
+config.put("connection_string", "mongodb://localhost:27017")
+config.put("db_name", "PojongoTestDatabase")
+var mongoClient = MongoClient.createNonShared(vertx, config)
+de.braintags.vertx.jomnigate.mongo.MongoDataStore(vertx, mongoClient, config)
 
 ----
 
