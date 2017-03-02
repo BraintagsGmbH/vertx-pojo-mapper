@@ -30,7 +30,8 @@ import de.braintags.vertx.jomnigate.testdatastore.typehandler.TypeHandlerTestSui
 @SuiteClasses({ TestBaseTest.class, TestSimpleMapper.class, TestStoreObject.class, TestQueryHelper.class,
     TestIndex.class, TestRoundtrip.class, TestSimpleMapperQuery.class, TestOnlyIdMapper.class, TestTrigger.class,
     TypeHandlerTestSuite.class, TestMassInsert.class, TestKeyGenerator.class, TestGeoSearch.class, TestEncoder.class,
-    TestEmbeddedEntity.class, TestListExtrems.class, TestFieldConditionCache.class, TestQueryInterator.class })
+    TestEmbeddedEntity.class, TestListExtrems.class, TestFieldConditionCache.class, TestQueryInterator.class,
+    TestClearDatastore.class })
 public class AllTestsCommon {
 
 }

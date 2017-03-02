@@ -173,11 +173,12 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     try {
       LOGGER.info("init MongoClient with " + settings);
       JsonObject jconfig = getConfig();
-      mongoClient = shared ? MongoClient.createShared(vertx, jconfig) : MongoClient.createNonShared(vertx, jconfig);
-      if (mongoClient == null) {
+      MongoClient tempClient = shared ? MongoClient.createShared(vertx, jconfig)
+          : MongoClient.createNonShared(vertx, jconfig);
+      if (tempClient == null) {
         handler.handle(Future.failedFuture(new InitException("No MongoClient created")));
       } else {
-        mongoClient.getCollections(resultHandler -> {
+        tempClient.getCollections(resultHandler -> {
           if (resultHandler.failed()) {
             LOGGER.error("", resultHandler.cause());
             handler.handle(Future.failedFuture(resultHandler.cause()));
@@ -190,17 +191,21 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
               List<Future> futures = new ArrayList<>();
               for (String collection : collections) {
                 Future<Void> future = Future.future();
-                mongoClient.dropCollection(collection, future.completer());
+                tempClient.dropCollection(collection, future.completer());
                 futures.add(future);
               }
               CompositeFuture.all(futures).setHandler(clearResult -> {
-                if (clearResult.failed())
+                if (clearResult.failed()) {
                   handler.handle(Future.failedFuture(clearResult.cause()));
-                else
+                } else {
+                  this.mongoClient = tempClient;
                   handler.handle(Future.succeededFuture());
+                }
               });
-            } else
+            } else {
+              this.mongoClient = tempClient;
               handler.handle(Future.succeededFuture());
+            }
           }
         });
       }

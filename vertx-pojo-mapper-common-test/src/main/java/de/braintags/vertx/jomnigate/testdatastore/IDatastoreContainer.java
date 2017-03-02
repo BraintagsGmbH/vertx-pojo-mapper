@@ -14,6 +14,7 @@
 package de.braintags.vertx.jomnigate.testdatastore;
 
 import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.AbstractTypeHandlerTest;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import io.vertx.core.AsyncResult;
@@ -31,6 +32,8 @@ public interface IDatastoreContainer {
   public static final String PROPERTY = "IDatastoreContainer";
 
   public IDataStore getDataStore();
+
+  public DataStoreSettings createSettings();
 
   public void startup(Vertx vertx, Handler<AsyncResult<Void>> handler);
 

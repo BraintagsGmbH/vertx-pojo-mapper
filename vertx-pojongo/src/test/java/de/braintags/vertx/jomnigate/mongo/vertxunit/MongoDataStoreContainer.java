@@ -77,7 +77,8 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
     }
   }
 
-  private DataStoreSettings createSettings() {
+  @Override
+  public DataStoreSettings createSettings() {
     DataStoreSettings settings = MongoDataStoreInit.createDefaultSettings();
     settings.setDatabaseName("UnitTestDatabase");
     settings.getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY,

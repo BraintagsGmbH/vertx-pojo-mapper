@@ -74,27 +74,14 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
   @Override
   protected void internalInit(Handler<AsyncResult<IDataStore>> handler) {
     try {
-      mySQLClient = shared ? MySQLClient.createShared(vertx, getConfig())
-          : MySQLClient.createNonShared(vertx, getConfig());
-
       if (isClearDatabaseOnInit()) {
-        mySQLClient.getConnection(result -> {
-          if (result.failed())
-            handler.handle(Future.failedFuture(result.cause()));
-          else {
-            SQLConnection connection = result.result();
-            clearDatabase(connection, clearResult -> {
-              connection.close();
-              if (clearResult.failed())
-                handler.handle(Future.failedFuture(clearResult.cause()));
-              else {
-                datastore = new MySqlDataStore(vertx, mySQLClient, getConfig());
-                handler.handle(Future.succeededFuture(datastore));
-              }
-            });
-          }
+        AsyncSQLClient tempClient = createMySqlClient();
+        initWithClearDatabase(tempClient, result -> {
+          tempClient.close();
+          handler.handle(result);
         });
       } else {
+        this.mySQLClient = createMySqlClient();
         datastore = new MySqlDataStore(vertx, mySQLClient, getConfig());
         handler.handle(Future.succeededFuture(datastore));
       }
@@ -103,7 +90,48 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
     }
   }
 
-  private void clearDatabase(SQLConnection connection, Handler<AsyncResult<Void>> handler) {
+  /**
+   * Clears the configured database and initializes the MYSQL client and datastore
+   * 
+   * @param tempClient
+   * 
+   * @param handler
+   *          returns the created datastore
+   */
+  public void initWithClearDatabase(AsyncSQLClient tempClient, Handler<AsyncResult<IDataStore>> handler) {
+    tempClient.getConnection(result -> {
+      if (result.failed()) {
+        tempClient.close();
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        SQLConnection connection = result.result();
+        clearDatabase(connection, clearResult -> {
+          connection.close();
+          if (clearResult.failed()) {
+            tempClient.close();
+            handler.handle(Future.failedFuture(clearResult.cause()));
+          } else {
+            // reinitialize the client because we dropped the database the temporary client used
+            this.mySQLClient = createMySqlClient();
+            datastore = new MySqlDataStore(vertx, tempClient, getConfig());
+            handler.handle(Future.succeededFuture(datastore));
+          }
+        });
+      }
+    });
+
+  }
+
+  /**
+   * Create a new MySQL client with the current vertx instance and configuration
+   * 
+   * @return a new MySQL client
+   */
+  private AsyncSQLClient createMySqlClient() {
+    return shared ? MySQLClient.createShared(vertx, getConfig()) : MySQLClient.createNonShared(vertx, getConfig());
+  }
+
+  private void clearDatabase(SQLConnection connection, Handler<AsyncResult<SQLConnection>> handler) {
     connection.execute("DROP DATABASE " + getDatabaseName(), dropResult -> {
       if (dropResult.failed())
         handler.handle(Future.failedFuture(dropResult.cause()));
@@ -112,7 +140,8 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
           if (createResult.failed())
             handler.handle(Future.failedFuture(dropResult.cause()));
           else {
-            handler.handle(Future.succeededFuture());
+            mySQLClient = createMySqlClient();
+            handler.handle(Future.succeededFuture(connection));
           }
         });
       }
