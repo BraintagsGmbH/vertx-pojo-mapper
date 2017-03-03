@@ -110,6 +110,17 @@ public abstract class AbstractDataStoreInit implements IDataStoreInit {
   }
 
   /**
+   * Get if the database should be completely wiped on initialization, deleting everything stored beforehand. Should
+   * only be
+   * used for unit tests to ensure an empty database for each test.
+   * 
+   * @return if the database should be cleared on initialization
+   */
+  protected boolean isClearDatabaseOnInit() {
+    return settings.isClearDatabaseOnInit();
+  }
+
+  /**
    * Get a property with the given key as boolean
    * 
    * @param name

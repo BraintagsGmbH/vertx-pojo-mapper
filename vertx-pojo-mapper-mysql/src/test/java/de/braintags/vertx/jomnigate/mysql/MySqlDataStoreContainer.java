@@ -104,7 +104,7 @@ public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
     LOGGER.info("Startup of " + getClass().getSimpleName());
     try {
       if (datastore == null) {
-        DataStoreSettings settings = MySqlDataStoreinit.createSettings();
+        DataStoreSettings settings = createSettings();
         IDataStoreInit dsInit = settings.getDatastoreInit().newInstance();
         dsInit.initDataStore(vertx, settings, initResult -> {
           if (initResult.failed()) {
@@ -122,6 +122,11 @@ public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
       LOGGER.error("", e);
       handler.handle(Future.failedFuture(e));
     }
+  }
+
+  @Override
+  public DataStoreSettings createSettings() {
+    return MySqlDataStoreinit.createSettings();
   }
 
   /*

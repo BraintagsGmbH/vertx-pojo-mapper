@@ -13,6 +13,8 @@
 package de.braintags.vertx.jomnigate.mongo.init;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.init.AbstractDataStoreInit;
@@ -32,6 +34,7 @@ import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.runtime.Network;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
@@ -170,17 +173,39 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     try {
       LOGGER.info("init MongoClient with " + settings);
       JsonObject jconfig = getConfig();
-      mongoClient = shared ? MongoClient.createShared(vertx, jconfig) : MongoClient.createNonShared(vertx, jconfig);
-      if (mongoClient == null) {
+      MongoClient tempClient = shared ? MongoClient.createShared(vertx, jconfig)
+          : MongoClient.createNonShared(vertx, jconfig);
+      if (tempClient == null) {
         handler.handle(Future.failedFuture(new InitException("No MongoClient created")));
       } else {
-        mongoClient.getCollections(resultHandler -> {
+        tempClient.getCollections(resultHandler -> {
           if (resultHandler.failed()) {
             LOGGER.error("", resultHandler.cause());
             handler.handle(Future.failedFuture(resultHandler.cause()));
           } else {
-            LOGGER.info(String.format("found %d collections", resultHandler.result().size()));
-            handler.handle(Future.succeededFuture());
+            List<String> collections = resultHandler.result();
+            LOGGER.info(String.format("found %d collections", collections.size()));
+            if (isClearDatabaseOnInit()) {
+              LOGGER.info("Deleting all collections because 'clearDatabaseOnInit' is true");
+              @SuppressWarnings("rawtypes")
+              List<Future> futures = new ArrayList<>();
+              for (String collection : collections) {
+                Future<Void> future = Future.future();
+                tempClient.dropCollection(collection, future.completer());
+                futures.add(future);
+              }
+              CompositeFuture.all(futures).setHandler(clearResult -> {
+                if (clearResult.failed()) {
+                  handler.handle(Future.failedFuture(clearResult.cause()));
+                } else {
+                  this.mongoClient = tempClient;
+                  handler.handle(Future.succeededFuture());
+                }
+              });
+            } else {
+              this.mongoClient = tempClient;
+              handler.handle(Future.succeededFuture());
+            }
           }
         });
       }
