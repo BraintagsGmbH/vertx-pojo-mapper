@@ -13,38 +13,28 @@
 package de.braintags.vertx.jomnigate.exception;
 
 /**
- * This exception is thrown, when a record shall be inserted with an id, which already exists in the datastore
+ * This exception is thrown when a record can not be inserted because it violates a unique key constraint, mostly (but
+ * not always) a duplicate ID
  * 
  * @author Michael Remme
  * 
  */
 public class DuplicateKeyException extends RuntimeException {
 
-  /**
-   * 
-   */
+  private static final long serialVersionUID = 1L;
+
   public DuplicateKeyException() {
     super();
   }
 
-  /**
-   * @param message
-   * @param cause
-   */
   public DuplicateKeyException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  /**
-   * @param message
-   */
   public DuplicateKeyException(String message) {
     super(message);
   }
 
-  /**
-   * @param cause
-   */
   public DuplicateKeyException(Throwable cause) {
     super(cause);
   }

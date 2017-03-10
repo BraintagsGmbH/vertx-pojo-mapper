@@ -15,12 +15,15 @@ package de.braintags.vertx.jomnigate.mongo.dataaccess;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mongodb.MongoException;
+
 import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
 import de.braintags.vertx.jomnigate.dataaccess.write.impl.WriteEntry;
+import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
 import de.braintags.vertx.jomnigate.exception.WriteException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mongo.MongoDataStore;
@@ -142,20 +145,27 @@ public class MongoWrite<T> extends AbstractWrite<T> {
    */
   private void handleInsertError(Throwable t, T entity, MongoStoreObject<T> storeObject,
       Handler<AsyncResult<IWriteEntry>> resultHandler) {
-    if (t.getMessage().indexOf("duplicate key error") >= 0) {
-      if (getMapper().getKeyGenerator() != null) {
-        LOG.info("duplicate key, regenerating a new key");
-        storeObject.getNextId(niResult -> {
-          if (niResult.failed()) {
-            resultHandler.handle(Future.failedFuture(
-                new WriteException("Could not generate new ID after duplicate key error", niResult.cause())));
-          } else {
-            doInsert(entity, storeObject, resultHandler);
-          }
-        });
+    // 11000 is the code for duplicate key error
+    if (t instanceof MongoException && ((MongoException) t).getCode() == 11000) {
+      MongoException mongoException = (MongoException) t;
+      // duplicate key can mean any index with unique constraint, not just ID
+      if (mongoException.getMessage().indexOf("_id_") >= 0) {
+        if (getMapper().getKeyGenerator() != null) {
+          LOG.info("duplicate key, regenerating a new key");
+          storeObject.getNextId(niResult -> {
+            if (niResult.failed()) {
+              resultHandler.handle(Future.failedFuture(
+                  new DuplicateKeyException("Could not generate new ID after duplicate key error", niResult.cause())));
+            } else {
+              doInsert(entity, storeObject, resultHandler);
+            }
+          });
+        } else {
+          resultHandler.handle(Future.failedFuture(
+              new DuplicateKeyException("Duplicate key error on insert, but no KeyGenerator is defined", t)));
+        }
       } else {
-        resultHandler.handle(Future
-            .failedFuture(new WriteException("Duplicate key error on insert, but no KeyGenerator is defined", t)));
+        resultHandler.handle(Future.failedFuture(new DuplicateKeyException(t)));
       }
     } else {
       resultHandler.handle(Future.failedFuture(new WriteException(t)));
