@@ -14,6 +14,7 @@ package de.braintags.vertx.jomnigate.mongo.vertxunit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
 
@@ -25,12 +26,14 @@ import de.braintags.vertx.jomnigate.testdatastore.ResultContainer;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapper;
 import de.braintags.vertx.util.ErrorObject;
 import de.braintags.vertx.util.ResultObject;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -44,8 +47,32 @@ import io.vertx.ext.unit.TestContext;
 
 public class TMongoDirect extends DatastoreBaseTest {
   private static Logger LOGGER = LoggerFactory.getLogger(TMongoDirect.class);
-  private static final int LOOP = 50000;
+  private static final int LOOP = 500;
   private static final String EXPECTED_VERSION_STARTS_WITH = "3.";
+
+  private List<JsonObject> handleResult(MongoClient client, AsyncResult<List<JsonObject>> seachResult)
+      throws Throwable {
+    CountDownLatch latch = new CountDownLatch(1);
+    ResultObject<List<JsonObject>> ro = new ResultObject(null);
+    FindOptions fo = new FindOptions().setLimit(5000);
+    client.findWithOptions("MiniMapper", new JsonObject(), fo, result -> {
+      LOGGER.info("query executed");
+      try {
+        ro.setResult(handleResult(client, result));
+      } catch (Throwable e) {
+        ro.setThrowable(e);
+      }
+      latch.countDown();
+    });
+
+    latch.await();
+
+    if (ro.isError()) {
+      throw ro.getRuntimeException();
+    } else {
+      return ro.getResult();
+    }
+  }
 
   @Test
   public void checkVersion(TestContext context) {

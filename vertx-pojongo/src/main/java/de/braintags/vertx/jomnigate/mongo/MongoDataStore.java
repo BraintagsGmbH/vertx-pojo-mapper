@@ -17,7 +17,7 @@ import de.braintags.vertx.jomnigate.IDataStoreMetaData;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
-import de.braintags.vertx.jomnigate.impl.AbstractDataStore;
+import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mongo.dataaccess.MongoDelete;
@@ -41,7 +41,7 @@ import io.vertx.ext.mongo.MongoClient;
  * 
  */
 
-public class MongoDataStore extends AbstractDataStore implements IDataStore {
+public class MongoDataStore extends JsonDatastore implements IDataStore {
 
   /**
    * The minimal version of MongoDb, which is expected by the current implementation

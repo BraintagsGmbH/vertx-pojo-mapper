@@ -221,4 +221,11 @@ public interface IField {
    */
   IEncoder getEncoder();
 
+  /**
+   * Get the {@link Type} of the field. If this field uses generics to define its type. This is included as well.
+   * 
+   * @return the generic {@link Type} of the field
+   */
+  public Type getGenericType();
+
 }

@@ -16,14 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
-import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
 
 @Entity
 public class Country extends BaseRecord {
   public String name;
 
-  @Embedded
-  public List<City> cities = new ArrayList<City>();
+  public List<City> cities = new ArrayList<>();
 
 }

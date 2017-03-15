@@ -29,9 +29,41 @@ public class NumericMapper extends BaseRecord {
   public Double myDouble;
   public short mySh;
   public Short myShort;
-  public BigDecimal bigDecimal;
+  private BigDecimal bigDecimal2;
   public BigInteger bigInteger;
   public byte byteValue = 123;
   public Byte byteObject = 88;
+
+  private BigDecimal bigDecimal;
+
+  /**
+   * @return the bigDecimal
+   */
+  public BigDecimal getBigDecimal() {
+    return bigDecimal;
+  }
+
+  /**
+   * @param bigDecimal
+   *          the bigDecimal to set
+   */
+  public void setBigDecimal(BigDecimal bigDecimal) {
+    this.bigDecimal = bigDecimal;
+  }
+
+  /**
+   * @return the bigDecimal2
+   */
+  public BigDecimal getBigDecimal2() {
+    return bigDecimal2;
+  }
+
+  /**
+   * @param bigDecimal2
+   *          the bigDecimal2 to set
+   */
+  public void setBigDecimal2(BigDecimal bigDecimal2) {
+    this.bigDecimal2 = bigDecimal2;
+  }
 
 }

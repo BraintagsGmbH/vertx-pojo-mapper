@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.init.AbstractDataStoreInit;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
@@ -26,18 +28,22 @@ import de.braintags.vertx.jomnigate.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.vertx.jomnigate.mongo.MongoDataStore;
 import de.braintags.vertx.util.exception.InitException;
 import de.braintags.vertx.util.security.crypt.impl.StandardEncoder;
+import de.flapdoodle.embed.mongo.Command;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
 import de.flapdoodle.embed.mongo.config.IMongodConfig;
 import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
 import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.config.RuntimeConfigBuilder;
 import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.runtime.Network;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.SLF4JLogDelegateFactory;
 import io.vertx.ext.mongo.MongoClient;
 
 /**
@@ -263,7 +269,12 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
       try {
         IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
             .net(new Net(localPort, Network.localhostIsIPv6())).build();
-        exe = MongodStarter.getDefaultInstance().prepare(config);
+        Logger logger = (Logger) new SLF4JLogDelegateFactory()
+            .createDelegate(MongoDataStoreInit.class.getCanonicalName()).unwrap();
+
+        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaultsWithLogger(Command.MongoD, logger).build();
+
+        exe = MongodStarter.getInstance(runtimeConfig).prepare(config);
         exe.start();
       } catch (IOException e) {
         throw new RuntimeException(e);

@@ -30,8 +30,8 @@ import de.braintags.vertx.jomnigate.testdatastore.TestHelper;
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ AllTestsPojoJson.class, TMongoDatabaseExists.class, TMongoDirect.class, TMongoDirectMassInsert.class,
-    TMongoMapper.class, AllTestsCommon.class })
+@SuiteClasses({ TMongoDatabaseExists.class, TMongoDirect.class, TMongoDirectMassInsert.class, TMongoMapper.class,
+    AllTestsPojoJson.class, AllTestsCommon.class })
 public class TestAllMongo {
   // -DIDatastoreContainer=de.braintags.vertx.jomnigate.mongo.vertxunit.MongoDataStoreContainer
   // -DBlockedThreadCheckInterval=10000000 -DWarningExceptionTime=10000000

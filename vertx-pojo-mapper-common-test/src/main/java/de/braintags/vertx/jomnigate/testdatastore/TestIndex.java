@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.GeoMapper2;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapperIndex;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -36,6 +37,14 @@ public class TestIndex extends DatastoreBaseTest {
     IQuery<GeoMapper2> q = getDataStore(context).createQuery(GeoMapper2.class);
     findAll(context, q);
     checkIndex(context, q.getMapper(), "testindex");
+  }
+
+  @Test
+  public void testIndexMiniMapper(TestContext context) {
+    clearTable(context, MiniMapperIndex.class.getSimpleName());
+    IQuery<MiniMapperIndex> q = getDataStore(context).createQuery(MiniMapperIndex.class);
+    findAll(context, q);
+    checkIndex(context, q.getMapper(), "testindexMiniMapper");
   }
 
   @BeforeClass

@@ -33,6 +33,7 @@ import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
 import de.braintags.vertx.jomnigate.annotation.ObjectFactory;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
+import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterSave;
@@ -62,7 +63,8 @@ import io.vertx.core.Handler;
  * can be defined by adding several annotations to the field
  *
  * @author Michael Remme
- *
+ * @param <T>
+ *          the class of the underlaying mapper
  */
 
 public class Mapper<T> implements IMapper<T> {
@@ -79,6 +81,7 @@ public class Mapper<T> implements IMapper<T> {
   private ITableInfo tableInfo;
   private boolean syncNeeded = true;
   private IKeyGenerator keyGenerator;
+  private boolean hasReferencedFields = false;
 
   /**
    * all annotations which shall be examined for the mapper class itself
@@ -139,14 +142,26 @@ public class Mapper<T> implements IMapper<T> {
     computeObjectFactory();
     computeKeyGenerator();
     generateTableInfo();
+    checkReferencedFields();
     validate();
+  }
+
+  /**
+   * Checks wether fields of the mapper or of children of the mapper are annotated with {@link Referenced}
+   */
+  private void checkReferencedFields() {
+    for (MappedField field : mappedFields.values()) {
+      if (field.hasAnnotation(Referenced.class, true)) {
+        this.hasReferencedFields = true;
+        break;
+      }
+    }
   }
 
   private void computeIndize() {
     if (mapperClass.isAnnotationPresent(Indexes.class)) {
       indexes = mapperClass.getAnnotation(Indexes.class);
     }
-
   }
 
   private void computeKeyGenerator() {
@@ -553,5 +568,14 @@ public class Mapper<T> implements IMapper<T> {
   @Override
   public IKeyGenerator getKeyGenerator() {
     return keyGenerator;
+  }
+
+  /**
+   * Returns true if at least one field of the mapper is annotated with {@link Referenced}
+   * 
+   * @return
+   */
+  public boolean hasReferencedFields() {
+    return hasReferencedFields;
   }
 }

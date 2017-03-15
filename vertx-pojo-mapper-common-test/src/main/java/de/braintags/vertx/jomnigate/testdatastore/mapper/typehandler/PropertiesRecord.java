@@ -27,9 +27,9 @@ public class PropertiesRecord extends BaseRecord {
   public Properties properties = new Properties();
 
   public PropertiesRecord() {
-    properties.put("Eins", 1);
-    properties.put("Zwei", 2);
-    properties.put("Drei", 3);
+    properties.put("Eins", "1");
+    properties.put("Zwei", "2");
+    properties.put("Drei", "3");
   }
 
 }

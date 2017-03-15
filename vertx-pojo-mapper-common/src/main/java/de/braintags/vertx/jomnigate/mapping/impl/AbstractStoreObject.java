@@ -106,7 +106,7 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
    * 
    * @param handler
    */
-  public final void initToEntity(Handler<AsyncResult<Void>> handler) {
+  public void initToEntity(Handler<AsyncResult<Void>> handler) {
     T tmpObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
     LOGGER.debug("start initToEntity");
     iterateFields(tmpObject, fieldResult -> {

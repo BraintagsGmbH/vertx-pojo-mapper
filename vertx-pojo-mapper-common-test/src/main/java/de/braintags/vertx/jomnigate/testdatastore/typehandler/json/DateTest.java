@@ -37,6 +37,7 @@ public class DateTest extends AbstractTypeHandlerTest {
     record.myTime = null;
     record.myTimeStamp = null;
     record.sqlDate = null;
+    record.jodaDate = null;
     saveRecord(context, record);
     IQuery<DateMapper> query = getDataStore(context).createQuery(DateMapper.class);
     List list = findAll(context, query);
@@ -46,6 +47,7 @@ public class DateTest extends AbstractTypeHandlerTest {
     context.assertNull(loaded.myTime);
     context.assertNull(loaded.myTimeStamp);
     context.assertNull(loaded.sqlDate);
+    context.assertNull(loaded.jodaDate);
   }
 
   /*

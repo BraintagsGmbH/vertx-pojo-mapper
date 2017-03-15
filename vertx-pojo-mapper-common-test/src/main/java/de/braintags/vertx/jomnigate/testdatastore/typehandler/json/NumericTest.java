@@ -35,7 +35,7 @@ public class NumericTest extends AbstractTypeHandlerTest {
   public void extreme(TestContext context) {
     clearTable(context, NumericMapper.class.getSimpleName());
     NumericMapper record = new NumericMapper();
-    record.bigDecimal = null;
+    record.setBigDecimal(null);
     record.bigInteger = null;
     record.myDouble = null;
     record.myFloatOb = null;
@@ -47,7 +47,7 @@ public class NumericTest extends AbstractTypeHandlerTest {
     List list = findAll(context, query);
     context.assertEquals(1, list.size());
     NumericMapper loaded = (NumericMapper) list.get(0);
-    context.assertNull(loaded.bigDecimal);
+    context.assertNull(loaded.getBigDecimal());
     context.assertNull(loaded.bigInteger);
     context.assertNull(loaded.myDouble);
     context.assertNull(loaded.myFloatOb);
@@ -64,7 +64,7 @@ public class NumericTest extends AbstractTypeHandlerTest {
   @Override
   public BaseRecord createInstance(TestContext context) {
     NumericMapper mapper = new NumericMapper();
-    mapper.bigDecimal = new BigDecimal(23.44);
+    mapper.setBigDecimal(new BigDecimal(23.44));
     mapper.bigInteger = new BigInteger("9987");
     mapper.myDoub = 333.5555;
     mapper.myDouble = new Double(678.1234);

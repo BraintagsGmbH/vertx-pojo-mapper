@@ -24,8 +24,6 @@ import de.braintags.vertx.jomnigate.annotation.Entity;
 public class StringTestMapper extends BaseRecord {
   public int counter;
   public String stringField = "myString";
-  public StringBuffer stringBufferField = new StringBuffer("myStringbuffer");
-  public StringBuilder stringBuilderField = new StringBuilder("myStringbuilder");
 
   public StringTestMapper() {
   }
@@ -33,8 +31,6 @@ public class StringTestMapper extends BaseRecord {
   public StringTestMapper(int counter) {
     this.counter = counter;
     stringField += " " + counter;
-    stringBufferField.append(" ").append(counter);
-    stringBuilderField.append(" ").append(counter);
   }
 
   /*

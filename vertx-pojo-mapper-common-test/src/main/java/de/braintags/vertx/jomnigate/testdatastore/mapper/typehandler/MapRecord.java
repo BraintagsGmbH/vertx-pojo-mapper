@@ -25,8 +25,7 @@ import de.braintags.vertx.jomnigate.annotation.Entity;
  */
 @Entity
 public class MapRecord extends BaseRecord {
-  public Map<String, String> map = new HashMap<>();
-  // public Map<String, CollectionRecord> map2 = new HashMap<>();
+  private Map<String, String> map = new HashMap<>();
 
   public MapRecord() {
     map.put("Eins", "1");
@@ -34,6 +33,21 @@ public class MapRecord extends BaseRecord {
     map.put("Drei", "3");
 
     // map2.put("tk", new CollectionRecord());
+  }
+
+  /**
+   * @return the map
+   */
+  public Map<String, String> getMap() {
+    return map;
+  }
+
+  /**
+   * @param map
+   *          the map to set
+   */
+  public void setMap(Map<String, String> map) {
+    this.map = map;
   }
 
 }

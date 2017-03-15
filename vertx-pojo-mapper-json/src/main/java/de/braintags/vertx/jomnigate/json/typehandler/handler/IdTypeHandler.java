@@ -66,12 +66,14 @@ public class IdTypeHandler extends AbstractTypeHandler {
         internalId = convertToInt(id);
       } else if (fieldClass.equals(String.class)) {
         internalId = convertToString(id);
-      } else
+      } else {
         throw new UnsupportedOperationException("unsupported type for id field: " + fieldClass.getName());
-      getInternalTypeHandler(field).fromStore(internalId, field, cls, resultHandler);
-    } catch (Exception e) {
+      }
+    } catch (UnsupportedOperationException e) {
       resultHandler.handle(Future.failedFuture(e));
+      return;
     }
+    getInternalTypeHandler(field).fromStore(internalId, field, cls, resultHandler);
   }
 
   private final Object convertToString(Object id) {

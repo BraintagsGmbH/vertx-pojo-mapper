@@ -19,9 +19,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import de.braintags.vertx.jomnigate.AllTestsPojoJson;
 import de.braintags.vertx.jomnigate.testdatastore.AllTestsCommon;
 import de.braintags.vertx.jomnigate.testdatastore.TestHelper;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.TypeHandlerTestSuite;
 
 /**
  * 
@@ -30,7 +30,8 @@ import de.braintags.vertx.jomnigate.testdatastore.TestHelper;
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ AllTestsPojoJson.class, TestMapper.class, AllTestsCommon.class })
+@SuiteClasses({ TSqlMapperFactory.class, TQuery.class, TReflection.class, TestMapper.class, TypeHandlerTestSuite.class,
+    AllTestsCommon.class })
 public class TestAllMySql {
   /*
    * 

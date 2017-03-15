@@ -12,14 +12,47 @@
  */
 package de.braintags.vertx.jomnigate.mongo.vertxunit;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.IDataStoreInit;
+import de.braintags.vertx.jomnigate.json.typehandler.handler.ArrayTypeHandlerReferenced;
+import de.braintags.vertx.jomnigate.json.typehandler.handler.CollectionTypeHandlerReferenced;
+import de.braintags.vertx.jomnigate.json.typehandler.handler.MapTypeHandlerReferenced;
+import de.braintags.vertx.jomnigate.json.typehandler.handler.ObjectTypeHandler;
+import de.braintags.vertx.jomnigate.json.typehandler.handler.ObjectTypeHandlerReferenced;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mongo.MongoDataStore;
 import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
 import de.braintags.vertx.jomnigate.testdatastore.AbstractDataStoreContainer;
 import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.AbstractTypeHandlerTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.ArrayTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.BooleanTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.CalendarTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.CollectionTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.DateTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.EmbeddedArrayTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.EmbeddedListTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.EmbeddedMapTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.EmbeddedSingleTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.EmbeddedSingleTest_Null;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.EnumTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.JsonTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.LocaleTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.MapTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.MiscTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.NumericTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.PriceTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.PropertiesTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.ReferencedArrayTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.ReferencedListTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.ReferencedMapTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.ReferencedSingleTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.StringTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.geo.GeoPointTest;
+import de.braintags.vertx.jomnigate.typehandler.stringbased.handlers.JsonTypeHandler;
 import de.braintags.vertx.util.exception.InitException;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import io.vertx.core.AsyncResult;
@@ -46,6 +79,44 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
 
   private static MongodExecutable exe;
   private MongoDataStore mongoDataStore;
+  private Map<String, String> thMap = new HashMap<>();
+
+  /**
+   * 
+   */
+  public MongoDataStoreContainer() {
+    thMap.put(StringTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(NumericTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(PriceTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(MiscTest.class.getName(), ObjectTypeHandler.class.getName());
+
+    thMap.put(EnumTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(GeoPointTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(LocaleTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(JsonTest.class.getName(), ObjectTypeHandler.class.getName());
+
+    thMap.put(BooleanTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(DateTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(CalendarTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(JsonTest.class.getName(), JsonTypeHandler.class.getName());
+    thMap.put(PropertiesTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(MapTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(ArrayTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(CollectionTest.class.getName(), ObjectTypeHandler.class.getName());
+
+    thMap.put(GeoPointTest.class.getName(), ObjectTypeHandler.class.getName());
+
+    thMap.put(EmbeddedListTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(EmbeddedMapTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(EmbeddedArrayTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(EmbeddedSingleTest_Null.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(EmbeddedSingleTest.class.getName(), ObjectTypeHandler.class.getName());
+
+    thMap.put(ReferencedSingleTest.class.getName(), ObjectTypeHandlerReferenced.class.getName());
+    thMap.put(ReferencedArrayTest.class.getName(), ArrayTypeHandlerReferenced.class.getName());
+    thMap.put(ReferencedListTest.class.getName(), CollectionTypeHandlerReferenced.class.getName());
+    thMap.put(ReferencedMapTest.class.getName(), MapTypeHandlerReferenced.class.getName());
+  }
 
   /*
    * (non-Javadoc)
@@ -178,6 +249,8 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
 
   @Override
   public String getExpectedTypehandlerName(Class<? extends AbstractTypeHandlerTest> testClass, String defaultName) {
+    if (thMap.containsKey(testClass.getName()))
+      return thMap.get(testClass.getName());
     return defaultName;
   }
 

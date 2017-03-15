@@ -46,8 +46,8 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     find(context, query, 2);
 
     query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setSearchCondition(
-        ISearchCondition.or(ISearchCondition.isEqual("secondProperty", "erste"), ISearchCondition.isEqual("secondProperty", "zweite")));
+    query.setSearchCondition(ISearchCondition.or(ISearchCondition.isEqual("secondProperty", "erste"),
+        ISearchCondition.isEqual("secondProperty", "zweite")));
     find(context, query, 2);
   }
 
@@ -56,7 +56,8 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     createDemoRecords(context);
 
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setSearchCondition(ISearchCondition.and(ISearchCondition.isEqual("name", "Dublette"), ISearchCondition.isEqual("secondProperty", "erste")));
+    query.setSearchCondition(ISearchCondition.and(ISearchCondition.isEqual("name", "Dublette"),
+        ISearchCondition.isEqual("secondProperty", "erste")));
     ResultContainer resultContainer = find(context, query, 1);
     logger.info(resultContainer.queryResult.getOriginalQuery().toString());
   }
@@ -66,7 +67,8 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     createDemoRecords(context);
 
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setSearchCondition(ISearchCondition.and(ISearchCondition.isEqual("name", "Dublette"), ISearchCondition.isEqual("secondProperty", "erste")));
+    query.setSearchCondition(ISearchCondition.and(ISearchCondition.isEqual("name", "Dublette"),
+        ISearchCondition.isEqual("secondProperty", "erste")));
     findCount(context, query, 1);
   }
 
@@ -77,7 +79,8 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
     query.setSearchCondition(ISearchCondition.isEqual("name", "Dublette"));
     find(context, query, 2);
 
-    query.setSearchCondition(ISearchCondition.and(ISearchCondition.isEqual("name", "Dublette"), ISearchCondition.isEqual("secondProperty", "erste")));
+    query.setSearchCondition(ISearchCondition.and(ISearchCondition.isEqual("name", "Dublette"),
+        ISearchCondition.isEqual("secondProperty", "erste")));
     find(context, query, 1);
   }
 
@@ -89,8 +92,8 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testAndOr(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setSearchCondition(ISearchCondition.and(ISearchCondition.isEqual("name", "AndOr"),
-        ISearchCondition.or(ISearchCondition.isEqual("secondProperty", "AndOr 1"), ISearchCondition.isEqual("secondProperty", "AndOr 2"))));
+    query.setSearchCondition(ISearchCondition.and(ISearchCondition.isEqual("name", "AndOr"), ISearchCondition.or(
+        ISearchCondition.isEqual("secondProperty", "AndOr 1"), ISearchCondition.isEqual("secondProperty", "AndOr 2"))));
     find(context, query, -1);
   }
 
@@ -240,7 +243,7 @@ public class TestSimpleMapperQuery extends DatastoreBaseTest {
   public void testFindByEnumContains(TestContext context) {
     createDemoRecords(context);
     IQuery<EnumRecord> query = getDataStore(context).createQuery(EnumRecord.class);
-    query.setSearchCondition(ISearchCondition.contains("enumEnum", "IN"));
+    query.setSearchCondition(ISearchCondition.contains("enumEnum", "INSER"));
     List<EnumRecord> list = findAll(context, query);
     list.forEach(sm -> logger.info(sm.enumEnum));
     context.assertEquals(1, list.size(), "incorrect result");

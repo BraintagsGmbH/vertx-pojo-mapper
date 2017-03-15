@@ -26,9 +26,11 @@ import de.braintags.vertx.jomnigate.json.typehandler.JsonTypeHandlerFactory;
 import de.braintags.vertx.jomnigate.mapping.IDataStoreSynchronizer;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
+import de.braintags.vertx.jomnigate.mapping.IPropertyMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.ITriggerContextFactory;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
 import de.braintags.vertx.jomnigate.mapping.impl.MapperFactory;
+import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import de.braintags.vertx.util.security.crypt.IEncoder;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -51,6 +53,10 @@ public class DummyDataStore implements IDataStore {
   private ITriggerContextFactory triggerContextFactory;
 
   public DummyDataStore() {
+  }
+
+  public DummyDataStore(ITypeHandlerFactory tf, IPropertyMapperFactory pf) {
+    this.mf = new MapperFactory(this, tf, pf, null);
   }
 
   /*

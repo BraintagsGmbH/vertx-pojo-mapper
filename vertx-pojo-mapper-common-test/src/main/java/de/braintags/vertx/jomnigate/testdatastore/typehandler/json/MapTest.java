@@ -34,22 +34,22 @@ public class MapTest extends AbstractTypeHandlerTest {
   public void extreme(TestContext context) {
     clearTable(context, MapRecord.class.getSimpleName());
     MapRecord record = new MapRecord();
-    record.map = null;
+    record.setMap(null);
     saveRecord(context, record);
     IQuery<MapRecord> query = getDataStore(context).createQuery(MapRecord.class);
     List list = findAll(context, query);
     context.assertEquals(1, list.size());
     MapRecord loaded = (MapRecord) list.get(0);
-    context.assertNull(loaded.map);
+    context.assertNull(loaded.getMap());
 
-    record.map = new HashMap<>();
+    record.setMap(new HashMap<>());
     saveRecord(context, record);
     query = getDataStore(context).createQuery(MapRecord.class);
     list = findAll(context, query);
     context.assertEquals(1, list.size());
     loaded = (MapRecord) list.get(0);
-    context.assertNotNull(loaded.map);
-    context.assertEquals(0, loaded.map.size());
+    context.assertNotNull(loaded.getMap());
+    context.assertEquals(0, loaded.getMap().size());
 
   }
 

@@ -18,7 +18,6 @@ import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.impl.AbstractDataStore;
-import de.braintags.vertx.jomnigate.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.vertx.jomnigate.mysql.dataaccess.SqlDelete;
@@ -27,6 +26,7 @@ import de.braintags.vertx.jomnigate.mysql.dataaccess.SqlStoreObjectFactory;
 import de.braintags.vertx.jomnigate.mysql.dataaccess.SqlWrite;
 import de.braintags.vertx.jomnigate.mysql.mapping.SqlDataStoreSynchronizer;
 import de.braintags.vertx.jomnigate.mysql.mapping.SqlMapperFactory;
+import de.braintags.vertx.jomnigate.mysql.mapping.SqlPropertyMapperFactory;
 import de.braintags.vertx.jomnigate.mysql.mapping.datastore.SqlTableGenerator;
 import de.braintags.vertx.jomnigate.mysql.typehandler.SqlTypeHandlerFactory;
 import io.vertx.core.AsyncResult;
@@ -62,7 +62,7 @@ public class MySqlDataStore extends AbstractDataStore {
     super(vertx, properties);
     this.sqlClient = sqlClient;
     metaData = new MySqlMetaData(this);
-    setMapperFactory(new SqlMapperFactory(this, new SqlTypeHandlerFactory(), new JsonPropertyMapperFactory(),
+    setMapperFactory(new SqlMapperFactory(this, new SqlTypeHandlerFactory(), new SqlPropertyMapperFactory(),
         new SqlStoreObjectFactory()));
     setDataStoreSynchronizer(new SqlDataStoreSynchronizer(this));
     setTableGenerator(new SqlTableGenerator());

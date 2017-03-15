@@ -516,14 +516,18 @@ public class MappedField implements IField {
     return hasAnnotation(Ignore.class);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.mapping.IField#hasAnnotation(java.lang.Class)
-   */
   @Override
   public boolean hasAnnotation(final Class<? extends Annotation> ann) {
-    return existingClassAnnotations.containsKey(ann);
+    return hasAnnotation(ann, false);
+  }
+
+  public boolean hasAnnotation(final Class<? extends Annotation> ann, boolean deep) {
+    if (existingClassAnnotations.containsKey(ann)) {
+      return true;
+    } else {
+
+    }
+    return false;
   }
 
   /**
@@ -633,5 +637,10 @@ public class MappedField implements IField {
    */
   public void setEncoder(IEncoder encoder) {
     this.encoder = encoder;
+  }
+
+  @Override
+  public Type getGenericType() {
+    return genericType;
   }
 }

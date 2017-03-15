@@ -23,6 +23,21 @@ import de.braintags.vertx.jomnigate.datatypes.Price;
  */
 @Entity
 public class PriceMapper extends BaseRecord {
-  public Price price;
+  private Price price;
+
+  /**
+   * @return the price
+   */
+  public Price getPrice() {
+    return price;
+  }
+
+  /**
+   * @param price
+   *          the price to set
+   */
+  public void setPrice(Price price) {
+    this.price = price;
+  }
 
 }

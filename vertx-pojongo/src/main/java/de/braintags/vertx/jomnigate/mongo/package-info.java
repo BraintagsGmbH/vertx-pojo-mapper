@@ -27,6 +27,9 @@
  * === Initialize by DataStoreSettings
  * {@link de.braintags.vertx.jomnigate.mongo.init}
  * 
+ * === Information about JsonDatastore
+ * {@link de.braintags.vertx.jomnigate.json.jackson}
+ * 
  * 
  * The rest of the usage is the same than described in the documentation of
  * https://github.com/BraintagsGmbH/vertx-pojo-mapper/blob/master/vertx-pojo-mapper-common/src/main/asciidoc/java/index.

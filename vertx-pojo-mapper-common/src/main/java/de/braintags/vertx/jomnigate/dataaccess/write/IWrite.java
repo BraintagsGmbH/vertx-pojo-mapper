@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.write;
 
-import java.util.List;
+import java.util.Collection;
 
 import de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject;
 import io.vertx.core.AsyncResult;
@@ -42,7 +42,7 @@ public interface IWrite<T> extends IDataAccessObject<T> {
    * @param mapperList
    *          the objects to be saved
    */
-  public void addAll(List<T> mapperList);
+  public void addAll(Collection<T> mapperList);
 
   /**
    * Save the entities inside the current instance

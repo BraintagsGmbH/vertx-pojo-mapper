@@ -33,13 +33,13 @@ public class JsonTest extends AbstractTypeHandlerTest {
   public void extreme(TestContext context) {
     clearTable(context, JsonMapper.class.getSimpleName());
     JsonMapper record = new JsonMapper();
-    record.json = null;
+    record.setJson(null);
     saveRecord(context, record);
     IQuery<JsonMapper> query = getDataStore(context).createQuery(JsonMapper.class);
     List list = findAll(context, query);
     context.assertEquals(1, list.size());
     JsonMapper loaded = (JsonMapper) list.get(0);
-    context.assertNull(loaded.json);
+    context.assertNull(loaded.getJson());
   }
 
   /*

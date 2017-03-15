@@ -34,13 +34,13 @@ public class PriceTest extends AbstractTypeHandlerTest {
   public void extreme(TestContext context) {
     clearTable(context, PriceMapper.class.getSimpleName());
     PriceMapper record = new PriceMapper();
-    record.price = null;
+    record.setPrice(null);
     saveRecord(context, record);
     IQuery<PriceMapper> query = getDataStore(context).createQuery(PriceMapper.class);
     List list = findAll(context, query);
     context.assertEquals(1, list.size());
     PriceMapper loaded = (PriceMapper) list.get(0);
-    context.assertNull(loaded.price);
+    context.assertNull(loaded.getPrice());
   }
 
   /*
@@ -51,7 +51,7 @@ public class PriceTest extends AbstractTypeHandlerTest {
   @Override
   public BaseRecord createInstance(TestContext context) {
     PriceMapper mapper = new PriceMapper();
-    mapper.price = new Price("20.88");
+    mapper.setPrice(new Price("20.88"));
     return mapper;
   }
 

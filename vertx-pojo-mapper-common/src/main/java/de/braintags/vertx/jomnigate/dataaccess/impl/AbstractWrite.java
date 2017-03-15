@@ -14,6 +14,7 @@
 package de.braintags.vertx.jomnigate.dataaccess.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.IDataStore;
@@ -87,7 +88,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * @see de.braintags.vertx.jomnigate.dataaccess.write.IWrite#add(java.util.List)
    */
   @Override
-  public void addAll(List<T> mapperList) {
+  public void addAll(Collection<T> mapperList) {
     for (T mapper : mapperList) {
       add(mapper);
     }
@@ -114,13 +115,9 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    *          the handler to be informed
    */
   protected void setIdValue(Object id, IStoreObject<T, ?> storeObject, Handler<AsyncResult<Void>> resultHandler) {
-    try {
-      IField idField = getMapper().getIdField();
-      storeObject.put(idField, id);
-      idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
-    } catch (Exception e) {
-      resultHandler.handle(Future.failedFuture(e));
-    }
+    IField idField = getMapper().getIdField();
+    storeObject.put(idField, id);
+    idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
   }
 
   /*

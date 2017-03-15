@@ -35,23 +35,50 @@ public class TestSimpleMapper extends DatastoreBaseTest {
   private static boolean dropTable = false;
 
   @Test
+  public void findById(TestContext context) {
+    clearTable(context, "SimpleMapper");
+    SimpleMapper sm = new SimpleMapper();
+    sm.name = "testName";
+    sm.setSecondProperty("my second property");
+    context.assertNull(sm.id);
+    ResultContainer resultContainer = saveRecord(context, sm);
+    IWriteEntry we = resultContainer.writeResult.iterator().next();
+    context.assertEquals(WriteAction.INSERT, we.getAction());
+    context.assertNotNull(we.getStoreObject());
+    context.assertNotNull(we.getStoreObject());
+
+    context.assertNotNull(sm.id);
+    context.assertTrue(sm.id.hashCode() != 0, "ID wasn't set by insert statement");
+    logger.info("ID is: " + sm.id);
+
+    // SimpleQuery for all records
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField().getName(), sm.id));
+    resultContainer = find(context, query, 1);
+  }
+
+  @Test
   public void testSimpleMapper(TestContext context) {
     clearTable(context, "SimpleMapper");
     SimpleMapper sm = new SimpleMapper();
     sm.name = "testName";
     sm.setSecondProperty("my second property");
+    context.assertNull(sm.id);
     ResultContainer resultContainer = saveRecord(context, sm);
     IWriteEntry we = resultContainer.writeResult.iterator().next();
-    context.assertEquals(we.getAction(), WriteAction.INSERT);
+    context.assertEquals(WriteAction.INSERT, we.getAction());
+    context.assertNotNull(we.getStoreObject());
+    context.assertNotNull(we.getStoreObject());
+
     context.assertNotNull(sm.id);
-    context.assertTrue(sm.id.hashCode() != 0); // "ID wasn't set by insert statement",
+    context.assertTrue(sm.id.hashCode() != 0, "ID wasn't set by insert statement");
     logger.info("ID is: " + sm.id);
 
     sm.name = "testNameModified";
     sm.setSecondProperty("my modified property");
     resultContainer = saveRecord(context, sm);
     we = resultContainer.writeResult.iterator().next();
-    context.assertEquals(we.getAction(), WriteAction.UPDATE);
+    context.assertEquals(WriteAction.UPDATE, we.getAction());
 
     // SimpleQuery for all records
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
@@ -62,6 +89,9 @@ public class TestSimpleMapper extends DatastoreBaseTest {
         logger.error("", result.cause());
         context.fail(result.cause().toString());
       } else {
+        SimpleMapper sm2 = (SimpleMapper) result.result();
+        context.assertEquals("testNameModified", sm2.name, "record was not updated");
+
         context.assertTrue(sm.equals(result.result()));
 
         // search inside name field

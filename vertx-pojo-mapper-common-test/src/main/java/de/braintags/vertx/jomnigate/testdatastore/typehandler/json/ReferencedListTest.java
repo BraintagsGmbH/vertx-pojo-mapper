@@ -32,7 +32,7 @@ public class ReferencedListTest extends AbstractTypeHandlerTest {
   @Test
   public void extreme(TestContext context) {
     clearTable(context, ReferenceMapper_List.class.getSimpleName());
-    ReferenceMapper_List record = new ReferenceMapper_List();
+    ReferenceMapper_List record = new ReferenceMapper_List(5);
     record.simpleMapper = null;
     saveRecord(context, record);
     IQuery<ReferenceMapper_List> query = getDataStore(context).createQuery(ReferenceMapper_List.class);

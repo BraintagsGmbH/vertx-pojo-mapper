@@ -33,7 +33,7 @@ import io.vertx.ext.mongo.MongoClient;
  * 
  * only objecttypehandler active: 2020 ms, 1947 ms, 2280 ms
  * 
- * 
+ * removed typehandler, use jackson: 978 ms, 946 ms, 950 ms
  * 
  * @author Michael Remme
  * 

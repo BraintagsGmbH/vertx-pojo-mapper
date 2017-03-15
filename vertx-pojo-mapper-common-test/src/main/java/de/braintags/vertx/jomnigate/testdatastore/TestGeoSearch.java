@@ -32,6 +32,9 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class TestGeoSearch extends DatastoreBaseTest {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(TestGeoSearch.class);
+
   private double sLong = 6.775763;
   private double sLat = 51.224906;
 

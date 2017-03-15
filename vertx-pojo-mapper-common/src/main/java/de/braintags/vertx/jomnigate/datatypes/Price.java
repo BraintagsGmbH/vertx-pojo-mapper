@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 /**
  * An extension of {@link BigDecimal} to handle Prices
  * 
@@ -27,6 +29,7 @@ public class Price extends BigDecimal {
   /**
    * @param val
    */
+  @JsonCreator
   public Price(BigDecimal val) {
     super(val.doubleValue());
   }

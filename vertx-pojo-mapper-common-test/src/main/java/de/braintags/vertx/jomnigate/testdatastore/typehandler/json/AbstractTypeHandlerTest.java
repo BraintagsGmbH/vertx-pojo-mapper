@@ -50,7 +50,8 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
       context.assertNotNull(th);
       String typeHandlerName = TestHelper.getDatastoreContainer(context).getExpectedTypehandlerName(getClass(),
           getExpectedTypeHandlerClassName());
-      String message = "Not the expected TypeHandler!! DID YOU OVERWRITE ONE AND DIDN'T YOU CHANGE LOOKUP IN MySqlDataStoreContainer?";
+      String message = "Not the expected TypeHandler!! DID YOU OVERWRITE ONE AND DIDN'T YOU CHANGE LOOKUP IN "
+          + TestHelper.getDatastoreContainer(context).getClass() + "?";
       context.assertEquals(typeHandlerName, th.getClass().getName(), message);
     } catch (Exception e) {
       LOGGER.info("", e);
@@ -85,7 +86,7 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
       Iterator<IWriteEntry> it = resultContainer.writeResult.iterator();
       while (it.hasNext()) {
         IWriteEntry we = it.next();
-        IStoreObject< ? , ? > entry = we.getStoreObject();
+        IStoreObject<?, ?> entry = we.getStoreObject();
         LOGGER.info("written entry: " + entry.toString() + " | " + we.getAction());
       }
 

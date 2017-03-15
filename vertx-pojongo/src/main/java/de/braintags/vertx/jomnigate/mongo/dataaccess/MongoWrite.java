@@ -129,7 +129,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
       if (result.failed()) {
         handleInsertError(result.cause(), entity, storeObject, resultHandler);
       } else {
-        Object id = result.result() == null ? storeObject.generatedId : result.result();
+        Object id = result.result() == null ? storeObject.getGeneratedId() : result.result();
         finishInsert(id, entity, storeObject, resultHandler);
       }
     });
@@ -199,34 +199,28 @@ public class MongoWrite<T> extends AbstractWrite<T> {
         resultHandler.handle(Future.failedFuture(result.cause()));
         return;
       }
-      try {
-        executePostSave(entity, lcr -> {
-          if (lcr.failed()) {
-            resultHandler.handle(Future.failedFuture(lcr.cause()));
-          } else {
-            resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.INSERT)));
-          }
-        });
-      } catch (Exception e) {
-        resultHandler.handle(Future.failedFuture(e));
-      }
+      executePostSave(entity, lcr -> {
+        if (lcr.failed()) {
+          resultHandler.handle(Future.failedFuture(lcr.cause()));
+        } else {
+          resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.INSERT)));
+        }
+      });
+
     });
   }
 
   @SuppressWarnings("rawtypes")
   private void finishUpdate(Object id, T entity, MongoStoreObject storeObject,
       Handler<AsyncResult<IWriteEntry>> resultHandler) {
-    try {
-      executePostSave(entity, lcr -> {
-        if (lcr.failed()) {
-          resultHandler.handle(Future.failedFuture(lcr.cause()));
-        } else {
-          resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.UPDATE)));
-        }
-      });
-    } catch (Exception e) {
-      resultHandler.handle(Future.failedFuture(e));
-    }
+
+    executePostSave(entity, lcr -> {
+      if (lcr.failed()) {
+        resultHandler.handle(Future.failedFuture(lcr.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.UPDATE)));
+      }
+    });
   }
 
 }

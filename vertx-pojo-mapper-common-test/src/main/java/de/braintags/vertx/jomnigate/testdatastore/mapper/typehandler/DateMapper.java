@@ -16,6 +16,8 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import org.joda.time.DateTime;
+
 import de.braintags.vertx.jomnigate.annotation.Entity;
 
 /**
@@ -30,5 +32,6 @@ public class DateMapper extends BaseRecord {
   public Timestamp myTimeStamp = new Timestamp(System.currentTimeMillis());
   public Date javaDate = new Date(System.currentTimeMillis());
   public java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+  public DateTime jodaDate = new DateTime(System.currentTimeMillis());
 
 }

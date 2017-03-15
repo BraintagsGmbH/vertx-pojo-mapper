@@ -23,7 +23,7 @@ import io.vertx.core.json.JsonObject;
  */
 @Entity
 public class JsonMapper extends BaseRecord {
-  public JsonObject json;
+  private JsonObject json;
 
   /**
    * 
@@ -32,6 +32,21 @@ public class JsonMapper extends BaseRecord {
     json = new JsonObject();
     json.put("testkey", 50);
     json.put("testkey2", "my text");
+  }
+
+  /**
+   * @return the json
+   */
+  public JsonObject getJson() {
+    return json;
+  }
+
+  /**
+   * @param json
+   *          the json to set
+   */
+  public void setJson(JsonObject json) {
+    this.json = json;
   }
 
 }

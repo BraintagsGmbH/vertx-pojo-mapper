@@ -35,7 +35,8 @@ import io.vertx.core.Handler;
  * IMapper is responsible to collect information about the mapped class
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the class of the underlaying mapper
  */
 
 public interface IMapper<T> {
@@ -136,7 +137,7 @@ public interface IMapper<T> {
    * @param entity
    *          the entity to be handled
    */
-  public void executeLifecycle(Class< ? extends Annotation> annotationClass, T entity,
+  public void executeLifecycle(Class<? extends Annotation> annotationClass, T entity,
       Handler<AsyncResult<Void>> handler);
 
   /**

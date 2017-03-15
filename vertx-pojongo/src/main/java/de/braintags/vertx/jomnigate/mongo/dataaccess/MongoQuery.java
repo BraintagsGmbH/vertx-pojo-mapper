@@ -28,6 +28,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
 
 /**
@@ -38,6 +39,9 @@ import io.vertx.ext.mongo.MongoClient;
  *          the type of the underlaying mapper
  */
 public class MongoQuery<T> extends Query<T> {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(MongoQuery.class);
+  private static final String SEARCH_LOG = "executing query in collection %s with %s";
 
   /**
    * Constructor
@@ -112,16 +116,19 @@ public class MongoQuery<T> extends Query<T> {
 
   private void doFind(MongoQueryExpression queryExpression, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
-    String column = getMapper().getTableInfo().getName();
-    mongoClient.findWithOptions(column, queryExpression.getQueryDefinition(), queryExpression.getFindOptions(),
-        qResult -> {
-          if (qResult.failed()) {
-            Future<IQueryResult<T>> future = Future.failedFuture(new QueryException(queryExpression, qResult.cause()));
-            resultHandler.handle(future);
-          } else {
-            createQueryResult(qResult.result(), queryExpression, resultHandler);
-          }
-        });
+    String collection = getMapper().getTableInfo().getName();
+    LOGGER.debug(String.format(SEARCH_LOG, collection, queryExpression.getQueryDefinition()));
+
+    JsonObject qDef = queryExpression.getQueryDefinition();
+    FindOptions fo = queryExpression.getFindOptions();
+    mongoClient.findWithOptions(collection, qDef, fo, qResult -> {
+      if (qResult.failed()) {
+        Future<IQueryResult<T>> future = Future.failedFuture(new QueryException(queryExpression, qResult.cause()));
+        resultHandler.handle(future);
+      } else {
+        createQueryResult(qResult.result(), queryExpression, resultHandler);
+      }
+    });
   }
 
   private void createQueryResult(List<JsonObject> findList, MongoQueryExpression queryExpression,

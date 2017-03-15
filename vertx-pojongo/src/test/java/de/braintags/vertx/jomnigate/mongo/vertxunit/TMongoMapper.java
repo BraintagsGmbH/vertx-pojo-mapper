@@ -16,10 +16,13 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.EncoderSettings;
+import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.mapping.IField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
@@ -28,6 +31,7 @@ import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
 import de.braintags.vertx.jomnigate.testdatastore.DatastoreBaseTest;
 import de.braintags.vertx.jomnigate.testdatastore.TestHelper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapper;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.MapRecord;
 import de.braintags.vertx.util.security.crypt.impl.StandardEncoder;
 import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
@@ -43,6 +47,19 @@ import io.vertx.ext.unit.TestContext;
 
 public class TMongoMapper extends DatastoreBaseTest {
   private static Logger LOGGER = LoggerFactory.getLogger(TMongoMapper.class);
+
+  @Test
+  public void testSerializeDeser(TestContext context) {
+    try {
+      MapRecord record = new MapRecord();
+      ObjectMapper mapper = ((JsonDatastore) getDataStore(context)).getJacksonMapper();
+      String serialized = mapper.writeValueAsString(record);
+      MapRecord rec = mapper.readValue(serialized, MapRecord.class);
+    } catch (Exception e) {
+      LOGGER.error("", e);
+      context.fail(e);
+    }
+  }
 
   @Test
   public void storeDatastoreSettings(TestContext context) {

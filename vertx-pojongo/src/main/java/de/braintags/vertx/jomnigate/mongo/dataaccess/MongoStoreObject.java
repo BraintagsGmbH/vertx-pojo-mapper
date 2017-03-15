@@ -13,14 +13,7 @@
 package de.braintags.vertx.jomnigate.mongo.dataaccess;
 
 import de.braintags.vertx.jomnigate.json.dataaccess.JsonStoreObject;
-import de.braintags.vertx.jomnigate.mapping.IField;
-import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
-import de.braintags.vertx.jomnigate.mapping.impl.DefaultPropertyMapper;
-import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -29,7 +22,6 @@ import io.vertx.core.json.JsonObject;
  */
 
 public class MongoStoreObject<T> extends JsonStoreObject<T> {
-  protected Object generatedId = null;
 
   /**
    * Creates a new instance, where the internal container is filled from the contents of the given entity
@@ -53,55 +45,6 @@ public class MongoStoreObject<T> extends JsonStoreObject<T> {
    */
   public MongoStoreObject(JsonObject json, IMapper<T> mapper) {
     super(json, mapper);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.json.dataaccess.JsonStoreObject#initFromEntity(io.vertx.core.Handler)
-   */
-  @Override
-  public void initFromEntity(Handler<AsyncResult<Void>> handler) {
-    super.initFromEntity(res -> {
-      if (res.failed()) {
-        handler.handle(res);
-      } else {
-        if (isNewInstance() && getMapper().getKeyGenerator() != null) {
-          getNextId(handler);
-        } else if (isNewInstance()) {
-          getContainer().remove(getMapper().getIdField().getColumnInfo().getName());
-          handler.handle(res);
-        } else {
-          handler.handle(res);
-        }
-      }
-    });
-  }
-
-  /**
-   * IN case of a defined {@link IKeyGenerator} the next id is requested for a new record
-   * 
-   * @param handler
-   */
-  public void getNextId(Handler<AsyncResult<Void>> handler) {
-    IKeyGenerator gen = getMapper().getKeyGenerator();
-    gen.generateKey(getMapper(), keyResult -> {
-      if (keyResult.failed()) {
-        handler.handle(Future.failedFuture(keyResult.cause()));
-      } else {
-        generatedId = keyResult.result().getKey();
-        IField field = getMapper().getIdField();
-        ITypeHandler th = field.getTypeHandler();
-        DefaultPropertyMapper.intoStoreObject(this, field, th, generatedId, result -> {
-          if (result.failed()) {
-            handler.handle(result);
-          } else {
-            setNewInstance(true);
-            handler.handle(result);
-          }
-        });
-      }
-    });
   }
 
 }

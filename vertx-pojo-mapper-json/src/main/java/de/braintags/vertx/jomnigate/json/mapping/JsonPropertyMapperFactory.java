@@ -18,7 +18,8 @@ import de.braintags.vertx.jomnigate.mapping.IPropertyMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.impl.DefaultPropertyMapper;
 
 /**
- * default implementation of {@link IPropertyMapperFactory}
+ * implementation of {@link IPropertyMapperFactory} for Json based datastores. The implementation uses jackson to
+ * serialize and deserialize mapper instances
  * 
  * @author Michael Remme
  * 
@@ -35,6 +36,9 @@ public class JsonPropertyMapperFactory implements IPropertyMapperFactory {
   public IPropertyMapper getPropertyMapper(IField field) {
     if (field == null)
       throw new NullPointerException("parameter must be specified: field");
+    if (field.isIdField()) {
+      return new IdPropertyMapper(field);
+    }
     return new DefaultPropertyMapper();
   }
 
