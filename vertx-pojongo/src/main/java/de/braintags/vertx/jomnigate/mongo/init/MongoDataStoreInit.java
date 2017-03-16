@@ -18,6 +18,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 
+import org.slf4j.Logger;
+
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.init.AbstractDataStoreInit;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
