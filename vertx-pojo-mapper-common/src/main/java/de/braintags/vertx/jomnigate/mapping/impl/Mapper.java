@@ -287,10 +287,9 @@ public class Mapper<T> implements IMapper<T> {
         JavaBeanAccessor accessor = new JavaBeanAccessor(beanDescriptors[i]);
         String name = accessor.getName();
         Field field = ClassUtil.getDeclaredField(mapperClass, name);
-        if (field == null) {
-          throw new NoSuchFieldException("Field not found: " + name);
+        if (field != null) {
+          addMappedField(name, createMappedField(field, accessor));
         }
-        addMappedField(name, createMappedField(field, accessor));
       }
     }
   }
