@@ -103,7 +103,7 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
 
   @SuppressWarnings("rawtypes")
   private void checkId(IDataStore store, Object embeddedObject, IMapper mapper, Handler<AsyncResult<Void>> handler) {
-    IField field = mapper.getIdField();
+    IField field = mapper.getIdField().getField();
     Object id = field.getPropertyAccessor().readData(embeddedObject);
     if (id != null) {
       handler.handle(Future.succeededFuture());

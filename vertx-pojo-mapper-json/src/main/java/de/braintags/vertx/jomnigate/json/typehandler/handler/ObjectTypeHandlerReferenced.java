@@ -111,7 +111,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     LOGGER.debug("start getReferencedObjectById");
     IQuery<?> query = store.createQuery(subMapper.getMapperClass());
-    query.setSearchCondition(ISearchCondition.isEqual(subMapper.getIdField().getName(), id));
+    query.setSearchCondition(ISearchCondition.isEqual(subMapper.getIdField(), id));
     query.execute(result -> {
       if (result.failed()) {
         fail(result.cause(), resultHandler);
@@ -180,7 +180,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
         resultHandler.handle(Future.failedFuture(saveResult.cause()));
       }
       IWriteEntry we = saveResult.result().iterator().next();
-      IField idField = subMapper.getIdField();
+      IField idField = subMapper.getIdField().getField();
       Object id = we.getId() == null ? idField.getPropertyAccessor().readData(referencedObject) : we.getId();
       if (id == null) {
         resultHandler.handle(Future.failedFuture(new MappingException(String.format(

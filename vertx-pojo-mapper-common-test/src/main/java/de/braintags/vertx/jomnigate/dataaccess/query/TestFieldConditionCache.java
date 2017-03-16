@@ -43,8 +43,8 @@ public class TestFieldConditionCache extends DatastoreBaseTest {
     Async async = context.async();
 
     IQuery<MiniMapper> query = getDataStore(context).createQuery(MiniMapper.class);
-    TestFieldCondition fixedCondition = new TestFieldCondition("name", QueryOperator.EQUALS, "test");
-    TestVariableFieldCondition variableCondition = new TestVariableFieldCondition("name", QueryOperator.EQUALS,
+    TestFieldCondition fixedCondition = new TestFieldCondition(MiniMapper.NAME, QueryOperator.EQUALS, "test");
+    TestVariableFieldCondition variableCondition = new TestVariableFieldCondition(MiniMapper.NAME, QueryOperator.EQUALS,
         "${variable}");
     query.setSearchCondition(ISearchCondition.and(fixedCondition, variableCondition));
     final AtomicInteger variableResolved = new AtomicInteger(0);
@@ -78,7 +78,7 @@ public class TestFieldConditionCache extends DatastoreBaseTest {
     private int cachedResultReturned = 0;
     private int resultCached = 0;
 
-    public TestFieldCondition(String field, QueryOperator logic, @Nullable Object value) {
+    public TestFieldCondition(IIndexedField field, QueryOperator logic, @Nullable Object value) {
       super(field, logic, value);
     }
 
@@ -101,7 +101,7 @@ public class TestFieldConditionCache extends DatastoreBaseTest {
    * Extension of variable field condition to check cache result
    */
   private class TestVariableFieldCondition extends VariableFieldCondition {
-    public TestVariableFieldCondition(String field, QueryOperator logic, @Nullable Object value) {
+    public TestVariableFieldCondition(IIndexedField field, QueryOperator logic, @Nullable Object value) {
       super(field, logic, value);
     }
 

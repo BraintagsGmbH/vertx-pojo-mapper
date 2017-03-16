@@ -174,7 +174,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
    */
   private String generateColumnPart(IMapper mapper) {
     StringBuilder buffer = new StringBuilder();
-    IField idField = mapper.getIdField();
+    IField idField = mapper.getIdField().getField();
     ITableInfo ti = mapper.getTableInfo();
     Set<String> fieldNames = mapper.getFieldNames();
 

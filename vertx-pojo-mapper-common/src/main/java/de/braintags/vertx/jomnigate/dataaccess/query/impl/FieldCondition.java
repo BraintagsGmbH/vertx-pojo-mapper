@@ -18,6 +18,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition;
+import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryOperator;
 import io.vertx.codegen.annotations.Nullable;
 
@@ -32,11 +33,27 @@ import io.vertx.codegen.annotations.Nullable;
 
 public class FieldCondition implements IFieldCondition {
 
-  private String field;
+  private IIndexedField field;
   private QueryOperator operator;
   private Object value;
 
   private Map<Class<? extends IQueryExpression>, Object> cacheMap = new HashMap<>(1);
+
+  /**
+   * Creates a complete field condition
+   *
+   * @param field
+   *          the field of this condition
+   * @param logic
+   *          the compare logic of this condition
+   * @param value
+   *          the value of this condition, can be null
+   */
+  public FieldCondition(IIndexedField field, QueryOperator logic, @Nullable Object value) {
+    this.field = field;
+    this.operator = logic;
+    this.value = value;
+  }
 
   /*
    * (non-Javadoc)
@@ -60,26 +77,10 @@ public class FieldCondition implements IFieldCondition {
   }
 
   /**
-   * Creates a complete field condition
-   *
-   * @param field
-   *          the field of this condition
-   * @param logic
-   *          the compare logic of this condition
-   * @param value
-   *          the value of this condition, can be null
-   */
-  public FieldCondition(String field, QueryOperator logic, @Nullable Object value) {
-    this.field = field;
-    this.operator = logic;
-    this.value = value;
-  }
-
-  /**
    * @return the POJO field of this condition
    */
   @Override
-  public String getField() {
+  public IIndexedField getField() {
     return field;
   }
 

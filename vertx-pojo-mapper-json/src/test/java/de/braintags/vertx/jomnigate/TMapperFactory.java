@@ -220,7 +220,7 @@ public class TMapperFactory {
     if (ann == null)
       Assert.fail("Annotation Id must not be null");
 
-    IField field = mapperDef.getIdField();
+    IField field = mapperDef.getIdField().getField();
     assertNotNull(field);
     IField field2 = mapperDef.getField(field.getName());
     Assert.assertSame(field, field2);

@@ -15,9 +15,12 @@ package de.braintags.vertx.jomnigate.mongo.mapper;
 import java.lang.reflect.Field;
 
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
+import de.braintags.vertx.jomnigate.mapping.MappedIdField;
 import de.braintags.vertx.jomnigate.mapping.impl.MappedField;
+import de.braintags.vertx.jomnigate.mapping.impl.MappedIdFieldImpl;
 import de.braintags.vertx.jomnigate.mapping.impl.Mapper;
 import de.braintags.vertx.jomnigate.mapping.impl.MapperFactory;
+import de.braintags.vertx.jomnigate.mongo.mapper.datastore.MongoColumnInfo;
 
 /**
  * An extension of {@link Mapper} for use with Mongo
@@ -48,12 +51,23 @@ public class MongoMapper extends Mapper {
     return new MongoMappedField(field, accessor, this);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.mapping.impl.Mapper#createIdField(de.braintags.vertx.jomnigate.mapping.impl.
+   * MappedField)
+   */
+  @Override
+  protected MappedIdField createIdField(MappedField mappedField) {
+    return new MappedIdFieldImpl(mappedField, MongoColumnInfo.ID_FIELD_NAME);
+  }
+
   /**
    * Currently the id field for mongo must be character
    */
   @SuppressWarnings("rawtypes")
   private void checkIdField() {
-    Class idClass = getIdField().getType();
+    Class idClass = getIdField().getField().getType();
     if (!CharSequence.class.isAssignableFrom(idClass))
       throw new UnsupportedOperationException(
           "Currently the id field must be Character based for mongo driver. Class: " + getMapperClass());

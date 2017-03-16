@@ -26,6 +26,7 @@ import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.MappedIdField;
 import de.braintags.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -101,8 +102,8 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   }
 
   private void doDeleteRecords(Handler<AsyncResult<IDeleteResult>> resultHandler) {
-    IField idField = getMapper().getIdField();
-    CompositeFuture cf = CompositeFuture.all(getRecordIds(idField));
+    MappedIdField idField = getMapper().getIdField();
+    CompositeFuture cf = CompositeFuture.all(getRecordIds(idField.getField()));
     cf.setHandler(res -> {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
@@ -203,10 +204,10 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * @param resultHandler
    *          the handler to be informed
    */
-  protected void deleteRecordsById(IField idField, List<Object> objectIds,
+  protected void deleteRecordsById(MappedIdField idField, List<Object> objectIds,
       Handler<AsyncResult<IDeleteResult>> resultHandler) {
     IQuery<T> q = getDataStore().createQuery(getMapperClass());
-    q.setSearchCondition(ISearchCondition.in(idField.getName(), objectIds));
+    q.setSearchCondition(ISearchCondition.in(idField, objectIds));
     deleteQuery(q, dr -> {
       if (dr.failed()) {
         resultHandler.handle(dr);

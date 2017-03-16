@@ -47,6 +47,7 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
+import de.braintags.vertx.jomnigate.mapping.MappedIdField;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
@@ -73,7 +74,7 @@ public class Mapper<T> implements IMapper<T> {
 
   private IObjectFactory objectFactory;
   private Map<String, MappedField> mappedFields = new HashMap<>();
-  private IField idField;
+  private MappedIdField idField;
   private MapperFactory mapperFactory;
   private Class<T> mapperClass;
   private Entity entity;
@@ -306,7 +307,7 @@ public class Mapper<T> implements IMapper<T> {
       MappedField mf = createMappedField(field, accessor);
       if (!mf.isIgnore() && !Modifier.isTransient(fieldModifiers)
           && (Modifier.isPublic(fieldModifiers) && !Modifier.isStatic(fieldModifiers))) {
-        addMappedField(accessor.getName(), createMappedField(field, accessor));
+        addMappedField(accessor.getName(), mf);
       }
     }
   }
@@ -332,11 +333,22 @@ public class Mapper<T> implements IMapper<T> {
     if (mf.hasAnnotation(Id.class)) {
       if (idField != null)
         throw new MappingException("duplicate Id field definition found for mapper " + getMapperClass());
-      idField = mf;
+      idField = createIdField(mf);
     }
     if (!mf.isIgnore()) {
       mappedFields.put(name, mf);
     }
+  }
+
+  /**
+   * Create the id field for this mapper
+   * 
+   * @param mappedField
+   *          the field with the {@link Id} annotation
+   * @return an id field
+   */
+  protected MappedIdField createIdField(MappedField mappedField) {
+    return new MappedIdFieldImpl(mappedField);
   }
 
   /**
@@ -529,7 +541,7 @@ public class Mapper<T> implements IMapper<T> {
   }
 
   @Override
-  public IField getIdField() {
+  public MappedIdField getIdField() {
     return idField;
   }
 

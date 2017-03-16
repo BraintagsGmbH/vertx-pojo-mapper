@@ -56,7 +56,8 @@ public class TestClearDatastore {
   }
 
   /**
-   * Initializes a datastore and writes a record to it. Aftewards, initializes a second datastore with the same settings
+   * Initializes a datastore and writes a record to it. Afterwards, initializes a second datastore with the same
+   * settings
    * and checks if the record is still there.
    * If shouldClear is 'true', it should not be there anymore, otherwise it must still be there.
    * 
@@ -93,7 +94,7 @@ public class TestClearDatastore {
 
         init2.initDataStore(TestHelper.vertx, settings, context.asyncAssertSuccess((IDataStore datastore2) -> {
           IQuery<SimpleMapper> query = datastore2.createQuery(SimpleMapper.class);
-          query.setSearchCondition(ISearchCondition.isEqual("id", mapper.id));
+          query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField(), mapper.id));
           query.execute(context.asyncAssertSuccess(queryResult -> {
             context.assertEquals(queryResult.iterator().hasNext(), !shouldClear,
                 "The record saved on one datastore should " + (shouldClear ? "not" : "still")

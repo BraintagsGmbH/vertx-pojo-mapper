@@ -95,7 +95,7 @@ public class TMongoMapper extends DatastoreBaseTest {
     if (ann == null)
       context.fail("Annotation Id must not be null");
 
-    IField field = mapper.getIdField();
+    IField field = mapper.getIdField().getField();
     context.assertNotNull(field);
     context.assertTrue(field == idField);
 

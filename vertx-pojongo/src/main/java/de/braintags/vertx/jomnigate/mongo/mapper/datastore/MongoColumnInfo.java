@@ -26,7 +26,7 @@ import de.braintags.vertx.jomnigate.mapping.datastore.impl.DefaultColumnInfo;
  */
 
 public class MongoColumnInfo extends DefaultColumnInfo {
-  private static final String ID_FIELD_NAME = "_id";
+  public static final String ID_FIELD_NAME = "_id";
 
   /**
    * @param field

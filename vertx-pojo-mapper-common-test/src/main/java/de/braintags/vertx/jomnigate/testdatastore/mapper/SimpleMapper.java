@@ -16,6 +16,8 @@ import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterSave;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
+import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
 
 /**
@@ -27,6 +29,10 @@ import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
 
 @Entity
 public class SimpleMapper extends BaseRecord {
+
+  public static final IIndexedField NAME = new IndexedField("name");
+  public static final IIndexedField SECOND_PROPERTY = new IndexedField("secondProperty");
+
   public String name;
   private String secondProperty;
   public int intValue;

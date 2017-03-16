@@ -28,7 +28,7 @@ public interface IFieldCondition extends ISearchCondition {
   /**
    * @return the field of the condition
    */
-  public String getField();
+  public IIndexedField getField();
 
   /**
    * @return the operator of the condition

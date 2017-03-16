@@ -15,6 +15,8 @@ package de.braintags.vertx.jomnigate.testdatastore.mapper;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
+import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 
 /**
  * 
@@ -25,6 +27,8 @@ import de.braintags.vertx.jomnigate.annotation.field.Id;
 
 @Entity
 public class MiniMapper {
+  public static final IIndexedField NAME = new IndexedField("name");
+
   @Id
   public String id = null;
   public String name = "testName";

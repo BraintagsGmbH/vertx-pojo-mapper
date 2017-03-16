@@ -12,6 +12,8 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoJsonObject;
 
 /**
@@ -20,6 +22,8 @@ import de.braintags.vertx.jomnigate.datatypes.geojson.GeoJsonObject;
  * @author Michael Remme
  * 
  */
+
+@JsonSerialize(using = GeoSearchArgumentSerializer.class)
 public class GeoSearchArgument {
   private final GeoJsonObject geoJson;
   private int distance = -1;
@@ -42,5 +46,4 @@ public class GeoSearchArgument {
   public int getDistance() {
     return distance;
   }
-
 }

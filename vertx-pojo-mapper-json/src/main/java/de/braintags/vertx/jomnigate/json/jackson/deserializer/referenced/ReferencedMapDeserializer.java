@@ -103,7 +103,7 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
       return null;
     }
     IQuery q = getDatastore().createQuery(mapperClass);
-    q.setSearchCondition(ISearchCondition.in(q.getMapper().getIdField().getName(), createIdList(rawMap)));
+    q.setSearchCondition(ISearchCondition.in(q.getMapper().getIdField(), createIdList(rawMap)));
     Future<Void> f = Future.future();
     QueryHelper.executeToList(q, res -> {
       if (res.failed()) {
@@ -111,7 +111,7 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
       } else {
         List recList = res.result();
         try {
-          fillMap(q.getMapper().getIdField(), recList, rawMap, resultMap);
+          fillMap(q.getMapper().getIdField().getField(), recList, rawMap, resultMap);
           f.complete();
         } catch (Exception e) {
           f.fail(e);

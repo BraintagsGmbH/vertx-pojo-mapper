@@ -97,7 +97,7 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
     }
     LOGGER.debug("start getReferencedObjectsById");
     IQuery q = getDatastore().createQuery(mapperClass);
-    q.setSearchCondition(ISearchCondition.in(q.getMapper().getIdField().getName(), createIdList(node)));
+    q.setSearchCondition(ISearchCondition.in(q.getMapper().getIdField(), createIdList(node)));
     Future<Collection<?>> f = Future.future();
     QueryHelper.executeToList(q, res -> {
       if (res.failed()) {
@@ -127,7 +127,7 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
     Future f = Future.future();
     if (node.size() > 0) {
       IQuery q = getDatastore().createQuery(mapperClass);
-      q.setSearchCondition(ISearchCondition.in(q.getMapper().getIdField().getName(), createIdList(node)));
+      q.setSearchCondition(ISearchCondition.in(q.getMapper().getIdField(), createIdList(node)));
       QueryHelper.executeToList(q, res -> {
         if (res.failed()) {
           f.fail(res.cause());

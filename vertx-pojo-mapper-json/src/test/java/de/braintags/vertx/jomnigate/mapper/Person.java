@@ -29,6 +29,8 @@ import de.braintags.vertx.jomnigate.annotation.field.Ignore;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
+import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 
 /**
  * Person is used as mapper class
@@ -41,6 +43,10 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 @Indexes(@Index(fields = { @IndexField(fieldName = "name"),
     @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
 public class Person extends AbstractPerson {
+  public static final IIndexedField NAME = new IndexedField("name");
+  public static final IIndexedField SEC_NAME = new IndexedField("secName");
+  public static final IIndexedField WEIGHT = new IndexedField("weight");
+
   public static final int NUMBER_OF_PROPERTIES = 23;
 
   @Id
