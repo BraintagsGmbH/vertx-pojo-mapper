@@ -40,6 +40,7 @@ import de.braintags.vertx.jomnigate.dataaccess.datatypetests.ReferencedMapTest;
 import de.braintags.vertx.jomnigate.dataaccess.datatypetests.ReferencedSingleTest;
 import de.braintags.vertx.jomnigate.dataaccess.datatypetests.StringTest;
 import de.braintags.vertx.jomnigate.dataaccess.datatypetests.geo.GeoPointTest;
+import de.braintags.vertx.jomnigate.testdatastore.TestPolymorphMapper;
 
 /**
  * Testing different datatypes for insert, update and query
@@ -52,7 +53,8 @@ import de.braintags.vertx.jomnigate.dataaccess.datatypetests.geo.GeoPointTest;
     DateTest.class, EnumTest.class, LocaleTest.class, MapTest.class, MiscTest.class, NumericTest.class, PriceTest.class,
     PropertiesTest.class, GeoPointTest.class, ObjectNodeTest.class, EmbeddedSingleTest.class,
     EmbeddedSingleTest_Null.class, EmbeddedArrayTest.class, EmbeddedListTest.class, EmbeddedMapTest.class,
-    ReferencedSingleTest.class, ReferencedArrayTest.class, ReferencedListTest.class, ReferencedMapTest.class })
+    ReferencedSingleTest.class, ReferencedArrayTest.class, ReferencedListTest.class, ReferencedMapTest.class,
+    TestPolymorphMapper.class })
 public class DataTypesTestSuite {
 
 }
