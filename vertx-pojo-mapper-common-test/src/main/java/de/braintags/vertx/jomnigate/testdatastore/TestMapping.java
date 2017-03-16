@@ -49,7 +49,17 @@ public class TestMapping extends DatastoreBaseTest {
   @Test
   public void testJsonMapping(TestContext context) {
     ObjectMapper mapper = Json.mapper;
-    JavaType type = mapper.constructType(MiniMapper.class);
+    examine(mapper, MiniMapper.class);
+    examine(mapper, MiniMapper_BeanMethodWithoutField.class);
+
+  }
+
+  /**
+   * @param mapper
+   */
+  private void examine(ObjectMapper mapper, Class mapperClass) {
+    LOGGER.info("examine " + mapperClass.getName());
+    JavaType type = mapper.constructType(mapperClass);
     BeanDescription desc = mapper.getSerializationConfig().introspect(type);
 
     for (BeanPropertyDefinition def : desc.findProperties()) {

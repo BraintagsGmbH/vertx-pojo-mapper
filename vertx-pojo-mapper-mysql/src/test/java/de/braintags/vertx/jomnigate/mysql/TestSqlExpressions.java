@@ -21,6 +21,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.testdatastore.DatastoreBaseTest;
 import de.braintags.vertx.jomnigate.testdatastore.ResultContainer;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapper;
+import de.braintags.vertx.util.ResultObject;
 import de.braintags.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
@@ -48,18 +49,57 @@ public class TestSqlExpressions extends DatastoreBaseTest {
   @Test
   public void executeNativeQuery(TestContext context) {
     MySqlDataStore ds = (MySqlDataStore) getDataStore(context);
+    prepare(context);
+    String qs = "select * from MiniMapper where name LIKE \"native%\"";
+
+    findNative(context, (AsyncSQLClient) ds.getClient(), qs);
+
+  }
+
+  public static ResultObject findNative(TestContext context, AsyncSQLClient sqlClient, String query) {
+    Async async = context.async();
+    ResultObject<ResultSet> ro = new ResultObject<>(null);
+    SqlUtil.query(sqlClient, query, result -> {
+      try {
+        resultFine(result);
+        ro.setResult(result.result());
+        LOGGER.info("found records: " + result.result().getNumColumns());
+        LOGGER.info(result.result().getRows());
+      } catch (Throwable e) {
+        ro.setThrowable(e);
+      } finally {
+        async.complete();
+      }
+    });
+
+    async.await();
+    if (ro.isError()) {
+      throw new AssertionError(ro.getThrowable());
+    }
+    return ro;
+  }
+
+  @Test
+  public void executeAPI_NativeQuery(TestContext context) {
+    MySqlDataStore ds = (MySqlDataStore) getDataStore(context);
+    prepare(context);
+    IQuery<MiniMapper> query = ds.createQuery(MiniMapper.class);
+    String qs = "select * from MiniMapper where name LIKE \"native%\"";
+    query.setNativeCommand(qs);
+    ResultContainer resultContainer = find(context, query, 10);
+  }
+
+  /**
+   * @param context
+   * @return
+   */
+  private void prepare(TestContext context) {
     clearTable(context, MiniMapper.class);
     List<MiniMapper> write = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
       write.add(new MiniMapper("native " + i));
     }
     saveRecords(context, write);
-    IQuery<MiniMapper> query = ds.createQuery(MiniMapper.class);
-    String qs = "select * from MiniMapper where name LIKE \"native%\"";
-    query.setNativeCommand(qs);
-
-    ResultContainer resultContainer = find(context, query, 10);
-
   }
 
   @Test

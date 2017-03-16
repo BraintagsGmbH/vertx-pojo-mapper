@@ -30,8 +30,8 @@ import de.braintags.vertx.jomnigate.testdatastore.typehandler.TypeHandlerTestSui
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ TSqlMapperFactory.class, TQuery.class, TReflection.class, TestMapper.class, TypeHandlerTestSuite.class,
-    AllTestsCommon.class })
+@SuiteClasses({ TSqlMapperFactory.class, TestSqlExpressions.class, TQuery.class, TReflection.class, TestMapper.class,
+    TypeHandlerTestSuite.class, AllTestsCommon.class })
 public class TestAllMySql {
   /*
    * 
