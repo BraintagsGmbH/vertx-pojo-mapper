@@ -14,7 +14,7 @@
 package de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler;
 
 import de.braintags.vertx.jomnigate.annotation.field.Property;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mysql.mapping.datastore.SqlColumnInfo;
 
 /**
@@ -41,7 +41,7 @@ public class ArrayColumnHandler extends StringColumnHandler {
   }
 
   @Override
-  public short matches(IField field) {
+  public short matches(IProperty field) {
     if (field.isArray())
       return MATCH_MAJOR;
 

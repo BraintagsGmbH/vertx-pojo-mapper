@@ -14,7 +14,7 @@ package de.braintags.vertx.jomnigate.typehandler.stringbased.handlers;
 
 import java.net.URI;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerResult;
@@ -47,7 +47,7 @@ public class URITypeHandler extends AbstractTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
+  public void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     success(source == null ? source : URI.create((String) source), resultHandler);
   }
@@ -59,7 +59,7 @@ public class URITypeHandler extends AbstractTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     success(source == null ? source : ((URI) source).toString(), resultHandler);
   }
 

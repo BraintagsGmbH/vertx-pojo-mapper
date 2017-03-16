@@ -26,7 +26,7 @@ import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
 import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator.SerializationReference;
 import de.braintags.vertx.jomnigate.json.jackson.deserializer.referenced.ReferencedPostHandler;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
@@ -110,7 +110,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    */
   private void storeJson(String js, Handler<AsyncResult<Void>> handler) {
     container = new JsonObject(js);
-    IField idField = getMapper().getIdField();
+    IProperty idField = getMapper().getIdField();
     container.remove(idField.getName()); // do not write the java fieldname of id, but the column
     Object javaValue = idField.getPropertyAccessor().readData(getEntity());
     put(idField, javaValue == null ? null : String.valueOf(javaValue));
@@ -156,7 +156,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
   @Override
   public void initToEntity(Handler<AsyncResult<Void>> handler) {
     try {
-      IField idField = getMapper().getIdField();
+      IProperty idField = getMapper().getIdField();
       String id = (String) getContainer().remove(idField.getColumnInfo().getName());
       getContainer().put(idField.getName(), id);
       doMapping(res -> {
@@ -223,7 +223,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * @see de.braintags.vertx.jomnigate.mapping.IStoreObject#get(de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public Object get(IField field) {
+  public Object get(IProperty field) {
     String colName = field.getColumnInfo().getName();
     return getContainer().getValue(colName);
   }
@@ -235,7 +235,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * de.braintags.vertx.jomnigate.mapping.IStoreObject#hasProperty(de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public boolean hasProperty(IField field) {
+  public boolean hasProperty(IProperty field) {
     String colName = field.getColumnInfo().getName();
     return getContainer().containsKey(colName);
   }
@@ -247,7 +247,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * java.lang.Object)
    */
   @Override
-  public IStoreObject<T, JsonObject> put(IField field, Object value) {
+  public IStoreObject<T, JsonObject> put(IProperty field, Object value) {
     IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     if (ci == null) {
       throw new MappingException("Can't find columninfo for field " + field.getFullName());
@@ -275,7 +275,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
         handler.handle(Future.failedFuture(keyResult.cause()));
       } else {
         generatedId = keyResult.result().getKey();
-        IField field = getMapper().getIdField();
+        IProperty field = getMapper().getIdField();
         this.put(field, String.valueOf(generatedId));
         setNewInstance(true);
         handler.handle(Future.succeededFuture());

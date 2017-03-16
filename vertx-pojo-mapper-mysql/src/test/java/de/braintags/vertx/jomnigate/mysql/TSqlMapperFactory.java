@@ -45,7 +45,7 @@ import de.braintags.vertx.jomnigate.json.typehandler.handler.ObjectTypeHandler;
 import de.braintags.vertx.jomnigate.json.typehandler.handler.StringTypeHandler;
 import de.braintags.vertx.jomnigate.mapper.Animal;
 import de.braintags.vertx.jomnigate.mapper.Person;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
@@ -175,7 +175,7 @@ public class TSqlMapperFactory {
     checkTypeHandler(mapperDef, "chicken", SqlObjectTypehandlerEmbedded.class, null);
     checkTypeHandler(mapperDef, "animal", SqlObjectTypehandlerReferenced.class, null);
 
-    IField field = mapperDef.getField("myMap"); // public Map<Integer, Double> myMap;
+    IProperty field = mapperDef.getField("myMap"); // public Map<Integer, Double> myMap;
     assertTrue("wrong TypeHandler: " + field.getTypeHandler(), field.getTypeHandler() instanceof MapTypeHandler);
     MapTypeHandler mth = (MapTypeHandler) field.getTypeHandler();
     ITypeHandler keyTh = mth.getKeyTypeHandler(new Integer(5), field);
@@ -202,14 +202,14 @@ public class TSqlMapperFactory {
 
   private void checkPropertyhandler(IMapper mapperdef, String fieldName,
       Class<? extends IPropertyMapper> expectedPropertyMapper) {
-    IField field = mapperDef.getField(fieldName);
+    IProperty field = mapperDef.getField(fieldName);
     assertNotNull("property mapper must not be null for field: " + field.getFullName(), field.getPropertyMapper());
     assertEquals("wrong property mapper for field: " + field.getFullName(), expectedPropertyMapper,
         field.getPropertyMapper().getClass());
   }
 
   private void checkTypeHandler(IMapper mapperdef, String fieldName, Class expectedTh, Class expectedSubTypeHandler) {
-    IField field = mapperDef.getField(fieldName);
+    IProperty field = mapperDef.getField(fieldName);
     assertNotNull("Typehandler must not be null for field: " + field.getFullName(), field.getTypeHandler());
     assertEquals("wrong TypeHandler for field: " + field.getFullName(), expectedTh, field.getTypeHandler().getClass());
     if (expectedSubTypeHandler != null)
@@ -228,7 +228,7 @@ public class TSqlMapperFactory {
 
   @Test
   public void testConstructor() {
-    IField mapperField = mapperDef.getField("timeStamp");
+    IProperty mapperField = mapperDef.getField("timeStamp");
     Constructor<?> con = mapperField.getConstructor();
     con = mapperField.getConstructor();
     Assert.assertNull(con);
@@ -253,16 +253,16 @@ public class TSqlMapperFactory {
     if (ann == null)
       Assert.fail("Annotation Id must not be null");
 
-    IField field = mapperDef.getIdField();
+    IProperty field = mapperDef.getIdField();
     assertNotNull(field);
-    IField field2 = mapperDef.getField(field.getName());
+    IProperty field2 = mapperDef.getField(field.getName());
     Assert.assertSame(field, field2);
 
   }
 
   @Test
   public void testReferenced() {
-    IField field = mapperDef.getField("animal");
+    IProperty field = mapperDef.getField("animal");
     Referenced ann = (Referenced) field.getAnnotation(Referenced.class);
     if (ann == null)
       Assert.fail("Annotation Referenced must not be null");
@@ -270,21 +270,21 @@ public class TSqlMapperFactory {
 
   @Test
   public void testArray() {
-    IField field = mapperDef.getField("stringArray");
+    IProperty field = mapperDef.getField("stringArray");
     assertTrue(field.isArray());
     assertEquals(SqlArrayTypehandler.class, field.getTypeHandler().getClass());
   }
 
   @Test
   public void testGetAnnotatedFields() {
-    IField[] fields = mapperDef.getAnnotatedFields(Referenced.class);
+    IProperty[] fields = mapperDef.getAnnotatedFields(Referenced.class);
     if (fields == null || fields.length == 0)
       fail("WrongNumber of annotated fields with Referenced");
   }
 
   @Test
   public void testParametrizedField() {
-    IField field = mapperDef.getField("stories");
+    IProperty field = mapperDef.getField("stories");
     assertFalse("this should not be a single value", field.isSingleValue());
     Assert.assertFalse("this should not be an array", field.isArray());
     assertTrue("this should be a Collection", field.isCollection());
@@ -292,7 +292,7 @@ public class TSqlMapperFactory {
 
     field = mapperDef.getField("myMap");
     boolean parametrizedField = false;
-    for (IField parField : field.getTypeParameters()) {
+    for (IProperty parField : field.getTypeParameters()) {
       if (parField instanceof ParametrizedMappedField)
         parametrizedField = true;
     }
@@ -302,7 +302,7 @@ public class TSqlMapperFactory {
 
   @Test
   public void testSubType() {
-    IField field = mapperDef.getField("stories");
+    IProperty field = mapperDef.getField("stories");
     Assert.assertEquals("subtype should be String", String.class, field.getSubType());
     Assert.assertEquals("subclass should be String", String.class, field.getSubClass());
 
@@ -314,13 +314,13 @@ public class TSqlMapperFactory {
 
   @Test
   public void testWildcard() {
-    IField field = mapperDef.getField("myClass");
+    IProperty field = mapperDef.getField("myClass");
     Assert.assertEquals(1, field.getTypeParameters().size());
   }
 
   @Test
   public void testMap() {
-    IField field = mapperDef.getField("myMap");
+    IProperty field = mapperDef.getField("myMap");
 
     Assert.assertTrue(field.isMap());
     Assert.assertEquals(2, field.getTypeParameters().size());
@@ -331,7 +331,7 @@ public class TSqlMapperFactory {
 
   @Test
   public void testList() {
-    IField field = mapperDef.getField("listAnimals");
+    IProperty field = mapperDef.getField("listAnimals");
     Assert.assertTrue(field.isCollection());
     Class subClass = field.getSubClass();
     Type subType = field.getSubType();
@@ -342,7 +342,7 @@ public class TSqlMapperFactory {
 
   @Test
   public void testUnknownSubtype() {
-    IField field = mapperDef.getField("unknownSubType");
+    IProperty field = mapperDef.getField("unknownSubType");
     Assert.assertTrue(field.isCollection());
     Class subClass = field.getSubClass();
     Type subType = field.getSubType();

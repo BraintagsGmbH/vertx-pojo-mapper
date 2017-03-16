@@ -18,7 +18,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import de.braintags.vertx.jomnigate.json.typehandler.handler.CalendarTypeHandler;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
@@ -51,7 +51,7 @@ public class SqlCalendarTypehandler extends CalendarTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
+  public void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (source != null) {
       long millis = formater.parseMillis((String) source);
@@ -70,7 +70,7 @@ public class SqlCalendarTypehandler extends CalendarTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     Object value = source == null ? source : formater.print(((Calendar) source).getTimeInMillis());
     success(value, resultHandler);
   }

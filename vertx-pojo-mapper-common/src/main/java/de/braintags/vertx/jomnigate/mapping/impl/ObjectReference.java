@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.mapping.impl;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
 
 /**
@@ -22,7 +22,7 @@ import de.braintags.vertx.jomnigate.mapping.IObjectReference;
  * 
  */
 public class ObjectReference implements IObjectReference {
-  private IField field;
+  private IProperty field;
   private Object dbSource;
 
   /**
@@ -35,7 +35,7 @@ public class ObjectReference implements IObjectReference {
    * @param mapperClass
    *          the mapper class
    */
-  public ObjectReference(IField field, Object dbSource) {
+  public ObjectReference(IProperty field, Object dbSource) {
     this.field = field;
     this.dbSource = dbSource;
   }
@@ -46,7 +46,7 @@ public class ObjectReference implements IObjectReference {
    * @see de.braintags.vertx.jomnigate.mapping.impl.IObjectReference#getField()
    */
   @Override
-  public IField getField() {
+  public IProperty getField() {
     return field;
   }
 

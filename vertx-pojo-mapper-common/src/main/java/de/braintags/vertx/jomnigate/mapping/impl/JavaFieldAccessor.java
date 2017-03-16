@@ -14,7 +14,7 @@ package de.braintags.vertx.jomnigate.mapping.impl;
 
 import java.lang.reflect.Field;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
 import de.braintags.vertx.util.exception.PropertyAccessException;
 
@@ -32,7 +32,7 @@ public class JavaFieldAccessor implements IPropertyAccessor {
   /**
    * 
    * @param field
-   *          the underlaying {@link IField}
+   *          the underlaying {@link IProperty}
    */
   public JavaFieldAccessor(Field field) {
     this.name = field.getName();

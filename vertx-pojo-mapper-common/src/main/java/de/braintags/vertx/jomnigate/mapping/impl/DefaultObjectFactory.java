@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
 import de.braintags.vertx.util.ClassUtil;
@@ -79,7 +79,7 @@ public class DefaultObjectFactory implements IObjectFactory {
   }
 
   @Override
-  public Collection<?> createCollection(IField field) {
+  public Collection<?> createCollection(IProperty field) {
     if (field.isSet()) {
       return createSet(field);
     } else if (field.isCollection())
@@ -89,12 +89,12 @@ public class DefaultObjectFactory implements IObjectFactory {
   }
 
   @SuppressWarnings("rawtypes")
-  private Set createSet(IField field) {
+  private Set createSet(IProperty field) {
     return (Set) newInstance(field.getConstructor(), DEFAULT_SET_CLASS);
   }
 
   @SuppressWarnings("rawtypes")
-  private List createList(IField field) {
+  private List createList(IProperty field) {
     return (List) newInstance(field.getConstructor(), DEFAULT_LIST_CLASS);
   }
 
@@ -114,7 +114,7 @@ public class DefaultObjectFactory implements IObjectFactory {
   }
 
   @Override
-  public Map<?, ?> createMap(IField field) {
+  public Map<?, ?> createMap(IProperty field) {
     return (Map<?, ?>) newInstance(field.getConstructor(), DEFAULT_MAP_CLASS);
   }
 

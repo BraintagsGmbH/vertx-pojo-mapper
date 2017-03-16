@@ -26,7 +26,7 @@ import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
 import de.braintags.vertx.jomnigate.dataaccess.write.impl.WriteEntry;
 import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
 import de.braintags.vertx.jomnigate.exception.WriteException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.mysql.MySqlDataStore;
 import de.braintags.vertx.jomnigate.mysql.SqlUtil;
@@ -282,7 +282,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    */
   @Override
   protected void setIdValue(Object id, IStoreObject<T, ?> storeObject, Handler<AsyncResult<Void>> resultHandler) {
-    IField idField = getMapper().getIdField();
+    IProperty idField = getMapper().getIdField();
     idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
   }
 

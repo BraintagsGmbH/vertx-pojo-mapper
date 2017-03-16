@@ -13,7 +13,7 @@
 
 package de.braintags.vertx.jomnigate.mapping.datastore;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 
 /**
@@ -36,13 +36,13 @@ public interface ITableGenerator {
   ITableInfo createTableInfo(IMapper mapper);
 
   /**
-   * Creates an instance of {@link IColumnHandler} which is suitable for the given {@link IField} and the connected
+   * Creates an instance of {@link IColumnHandler} which is suitable for the given {@link IProperty} and the connected
    * datastore
    * 
    * @param field
    *          the field to be handled
    * @return an instance of {@link IColumnHandler}
    */
-  IColumnHandler getColumnHandler(IField field);
+  IColumnHandler getColumnHandler(IProperty field);
 
 }

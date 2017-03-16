@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.SyncAction;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
@@ -52,7 +52,7 @@ public class SqlTableInfo extends DefaultTableInfo {
    * pojomapper.mapping.IField, de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler)
    */
   @Override
-  protected IColumnInfo generateColumnInfo(IField field, IColumnHandler columnHandler) {
+  protected IColumnInfo generateColumnInfo(IProperty field, IColumnHandler columnHandler) {
     return new SqlColumnInfo(field, columnHandler);
   }
 

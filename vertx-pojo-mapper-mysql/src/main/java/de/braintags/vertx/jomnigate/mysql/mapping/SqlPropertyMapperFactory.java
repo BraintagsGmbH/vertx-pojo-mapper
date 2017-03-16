@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.mysql.mapping;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapper;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.impl.DefaultPropertyMapper;
@@ -33,7 +33,7 @@ public class SqlPropertyMapperFactory implements IPropertyMapperFactory {
    * IField)
    */
   @Override
-  public IPropertyMapper getPropertyMapper(IField field) {
+  public IPropertyMapper getPropertyMapper(IProperty field) {
     if (field == null)
       throw new NullPointerException("parameter must be specified: field");
     return new DefaultPropertyMapper();

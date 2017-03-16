@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.impl.DefaultPropertyMapper;
 import de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
@@ -67,7 +67,7 @@ public class ObjectTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.vertx.jomnigate.typehandler.ITypeHandler#fromStore(java.lang.Object)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
+  public void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
 
     try {
@@ -104,7 +104,7 @@ public class ObjectTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.vertx.jomnigate.typehandler.ITypeHandler#intoStore(java.lang.Object)
    */
   @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     try {
       if (source == null) {
         success(null, resultHandler);

@@ -33,31 +33,31 @@ public interface IStoreObject<T, F> {
    * Checks wether for the given IField an entry is defined inside the current instance
    * 
    * @param field
-   *          the {@link IField} to be checked
+   *          the {@link IProperty} to be checked
    * @return true, if property is defined
    */
-  public boolean hasProperty(IField field);
+  public boolean hasProperty(IProperty field);
 
   /**
    * Get the defined property in the propriate format of the current driver
    * 
    * @param field
-   *          the {@link IField} describing the property
+   *          the {@link IProperty} describing the property
    * @return the value of the property in the propriate format of the current implementation of the {@link IDataStore}
    */
-  Object get(IField field);
+  Object get(IProperty field);
 
   /**
    * Adds a new property into the internal container
    * 
    * @param field
-   *          the {@link IField} used to describe the property
+   *          the {@link IProperty} used to describe the property
    * @param value
    *          the value to be stored in the proprietary format
    * @return a reference to itself
    */
   @Fluent
-  IStoreObject<T, F> put(IField field, Object value);
+  IStoreObject<T, F> put(IProperty field, Object value);
 
   /**
    * Get the raw container, which stores the information

@@ -25,7 +25,7 @@ import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
 import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -101,7 +101,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   }
 
   private void doDeleteRecords(Handler<AsyncResult<IDeleteResult>> resultHandler) {
-    IField idField = getMapper().getIdField();
+    IProperty idField = getMapper().getIdField();
     CompositeFuture cf = CompositeFuture.all(getRecordIds(idField));
     cf.setHandler(res -> {
       if (res.failed()) {
@@ -183,7 +183,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * @param resultHandler
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private List<Future> getRecordIds(IField idField) {
+  private List<Future> getRecordIds(IProperty idField) {
     List<Future> fList = new ArrayList<>();
     for (T record : getRecordList()) {
       Future f = Future.future();
@@ -203,7 +203,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * @param resultHandler
    *          the handler to be informed
    */
-  protected void deleteRecordsById(IField idField, List<Object> objectIds,
+  protected void deleteRecordsById(IProperty idField, List<Object> objectIds,
       Handler<AsyncResult<IDeleteResult>> resultHandler) {
     IQuery<T> q = getDataStore().createQuery(getMapperClass());
     q.setSearchCondition(ISearchCondition.in(idField.getName(), objectIds));

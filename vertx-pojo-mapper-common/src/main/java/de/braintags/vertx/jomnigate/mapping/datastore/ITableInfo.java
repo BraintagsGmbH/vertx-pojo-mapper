@@ -15,7 +15,7 @@ package de.braintags.vertx.jomnigate.mapping.datastore;
 
 import java.util.List;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 
 /**
@@ -35,23 +35,23 @@ public interface ITableInfo {
   public String getName();
 
   /**
-   * Generate an instance of {@link IColumnInfo} from the information inside the given {@link IField}
+   * Generate an instance of {@link IColumnInfo} from the information inside the given {@link IProperty}
    * 
    * @param field
    *          the field to be used to create an {@link IColumnInfo}
    * @param columnHandler
    *          the {@link IColumnHandler} to be used by the current column
    */
-  public void createColumnInfo(IField field, IColumnHandler columnHandler);
+  public void createColumnInfo(IProperty field, IColumnHandler columnHandler);
 
   /**
-   * Get the instance of IColumnInfo for the given {@link IField}
+   * Get the instance of IColumnInfo for the given {@link IProperty}
    * 
    * @param field
    *          the field to get the {@link IColumnInfo} for
    * @return an instance of IColumnInfo or null, if none existing
    */
-  public IColumnInfo getColumnInfo(IField field);
+  public IColumnInfo getColumnInfo(IProperty field);
 
   /**
    * Get the instance of {@link IColumnInfo} by the name of the column inside the datastore

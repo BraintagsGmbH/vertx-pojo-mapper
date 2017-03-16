@@ -16,13 +16,13 @@ import java.lang.annotation.Annotation;
 
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 /**
  * The ITypehandler is responsible to change original values into the required format of the used datastore. Cause
- * {@link ITypeHandler} can have stateful information based on the {@link IField}, where an {@link ITypeHandler} is
+ * {@link ITypeHandler} can have stateful information based on the {@link IProperty}, where an {@link ITypeHandler} is
  * belonging to, each IField is getting its own clone
  * 
  * @author Michael Remme
@@ -32,19 +32,19 @@ import io.vertx.core.Handler;
 public interface ITypeHandler extends Cloneable {
 
   /**
-   * Returned by method {@link #matches(IField)} to specify that the current typehandler won't handle the given field
+   * Returned by method {@link #matches(IProperty)} to specify that the current typehandler won't handle the given field
    */
   public static final short MATCH_NONE = 0;
 
   /**
-   * Returned by method {@link #matches(IField)} to specify that the current typehandler handles the given field in a
+   * Returned by method {@link #matches(IProperty)} to specify that the current typehandler handles the given field in a
    * minor way. For instance, if the class of the field is not direct the class, which the typehandler deals with, but
    * an instance of
    */
   public static final short MATCH_MINOR = 1;
 
   /**
-   * Returned by method {@link #matches(IField)} to specify that the current typehandler handles the given field in a
+   * Returned by method {@link #matches(IProperty)} to specify that the current typehandler handles the given field in a
    * major way. For instance, if the class of the field is the direct class
    */
   public static final short MATCH_MAJOR = 2;
@@ -58,11 +58,11 @@ public interface ITypeHandler extends Cloneable {
    * @param field
    *          the underlaying field information
    * @param cls
-   *          if a caller can't access some {@link IField} information, then the resulting class should be defined here
+   *          if a caller can't access some {@link IProperty} information, then the resulting class should be defined here
    * @param resultHandler
    *          the method will store the result inside the {@link ITypeHandlerResult}
    */
-  void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> resultHandler);
+  void fromStore(Object source, IProperty field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> resultHandler);
 
   /**
    * This method is called when an object shall be persisted into the datastore and shall change the value into the
@@ -75,10 +75,10 @@ public interface ITypeHandler extends Cloneable {
    * @param resultHandler
    *          the method will store the result inside the {@link ITypeHandlerResult}
    */
-  void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler);
+  void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler);
 
   /**
-   * Checks wether the given {@link IField} is matching the criteria in the current instance. The method returns a
+   * Checks wether the given {@link IProperty} is matching the criteria in the current instance. The method returns a
    * graded result, one of {@link #MATCH_NONE}, {@link #MATCH_MINOR} or {@link #MATCH_MAJOR}
    * 
    * @param field
@@ -86,7 +86,7 @@ public interface ITypeHandler extends Cloneable {
    * @return MATCH_NONE if the field is not handled by the current instance, MATCH_MINOR if it is fitting partially (
    *         like a subclass for instance ) or MATCH_MAJOR if it is highly fitting, like the exact class for instance
    */
-  public short matches(IField field);
+  public short matches(IProperty field);
 
   /**
    * Checks wether the given {@link Class} is matching the criteria in the current instance. The method returns a graded

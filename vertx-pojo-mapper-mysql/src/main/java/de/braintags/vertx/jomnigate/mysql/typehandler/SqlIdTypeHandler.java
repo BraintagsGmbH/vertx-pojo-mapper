@@ -14,7 +14,7 @@
 package de.braintags.vertx.jomnigate.mysql.typehandler;
 
 import de.braintags.vertx.jomnigate.json.typehandler.handler.IdTypeHandler;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mysql.SqlUtil;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
@@ -51,7 +51,7 @@ public class SqlIdTypeHandler extends IdTypeHandler {
    * pojomapper.mapping.IField)
    */
   @Override
-  protected boolean isCharacterColumn(IField field) {
+  protected boolean isCharacterColumn(IProperty field) {
     return SqlUtil.isCharacter(field.getColumnInfo());
   }
 
@@ -62,7 +62,7 @@ public class SqlIdTypeHandler extends IdTypeHandler {
    * pojomapper.mapping.IField)
    */
   @Override
-  protected boolean isNumericColumn(IField field) {
+  protected boolean isNumericColumn(IProperty field) {
     return SqlUtil.isNumeric(field.getColumnInfo());
   }
 

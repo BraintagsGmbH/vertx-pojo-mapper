@@ -14,7 +14,7 @@ package de.braintags.vertx.jomnigate.mapping.impl;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.exception.TypeHandlerException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapper;
@@ -38,7 +38,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
       .getLogger(DefaultPropertyMapper.class);
 
   @Override
-  public <T> void intoStoreObject(T mapper, IStoreObject<T, ? > storeObject, IField field,
+  public <T> void intoStoreObject(T mapper, IStoreObject<T, ? > storeObject, IProperty field,
       Handler<AsyncResult<Void>> handler) {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
@@ -64,7 +64,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
    * @param handler
    *          the handler to be informed
    */
-  public static <T> void intoStoreObject(IStoreObject<T, ?> storeObject, IField field, ITypeHandler th,
+  public static <T> void intoStoreObject(IStoreObject<T, ?> storeObject, IProperty field, ITypeHandler th,
       Object javaValue, Handler<AsyncResult<Void>> handler) {
     LOGGER.debug(
         "starting intoStoreObject for field " + field.getFullName() + " with typehandler " + th.getClass().getName());
@@ -81,7 +81,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
   }
 
   @Override
-  public <T> void readForStore(T mapper, IField field, Handler<AsyncResult<Object>> handler) {
+  public <T> void readForStore(T mapper, IProperty field, Handler<AsyncResult<Object>> handler) {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
     Object javaValue = pAcc.readData(mapper);
@@ -103,7 +103,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
   }
 
   @Override
-  public <T> void fromStoreObject(T mapper, IStoreObject<T, ?> storeObject, IField field,
+  public <T> void fromStoreObject(T mapper, IStoreObject<T, ?> storeObject, IProperty field,
       Handler<AsyncResult<Void>> handler) {
     ITypeHandler th = field.getTypeHandler();
     LOGGER.debug(
@@ -123,7 +123,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
   }
 
   private <T> void handleInstanceFromStore(IStoreObject<T, ? > storeObject, T mapper, Object javaValue, Object dbValue,
-      IField field, Handler<AsyncResult<Void>> handler) {
+      IProperty field, Handler<AsyncResult<Void>> handler) {
     try {
       if (javaValue instanceof IObjectReference) {
         storeObject.getObjectReferences().add((IObjectReference) javaValue);
@@ -146,7 +146,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
     IDataStore store = reference.getField().getMapper().getMapperFactory().getDataStore();
     ITypeHandlerReferenced th = (ITypeHandlerReferenced) reference.getField().getTypeHandler();
     Object dbValue = reference.getDbSource();
-    IField field = reference.getField();
+    IProperty field = reference.getField();
     if (dbValue == null) { // nothing to work with? Must null be set?
       LOGGER.debug("nothing to do here - finished");
       handler.handle(Future.succeededFuture());

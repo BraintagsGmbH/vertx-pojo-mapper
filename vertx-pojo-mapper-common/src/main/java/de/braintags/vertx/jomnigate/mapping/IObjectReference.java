@@ -37,7 +37,7 @@ public interface IObjectReference {
    * 
    * @return
    */
-  IField getField();
+  IProperty getField();
 
   /**
    * Get the information like they were stored in the datastore. This may be a single ID, a list of Ids or else format.

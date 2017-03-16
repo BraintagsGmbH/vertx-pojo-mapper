@@ -21,7 +21,7 @@ import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterSave;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -115,7 +115,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    *          the handler to be informed
    */
   protected void setIdValue(Object id, IStoreObject<T, ?> storeObject, Handler<AsyncResult<Void>> resultHandler) {
-    IField idField = getMapper().getIdField();
+    IProperty idField = getMapper().getIdField();
     storeObject.put(idField, id);
     idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
   }

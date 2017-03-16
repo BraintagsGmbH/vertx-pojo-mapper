@@ -13,7 +13,7 @@
 package de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler.geo;
 
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.mysql.mapping.datastore.SqlColumnInfo;
 
@@ -46,7 +46,7 @@ public class GeoPointColumnHandler extends AbstractGeoColumnHandler {
   }
 
   @Override
-  protected StringBuilder generateColumn(IField field, IColumnInfo ci) {
+  protected StringBuilder generateColumn(IProperty field, IColumnInfo ci) {
     return new StringBuilder(String.format("%s %s ", ci.getName(), ci.getType()));
   }
 

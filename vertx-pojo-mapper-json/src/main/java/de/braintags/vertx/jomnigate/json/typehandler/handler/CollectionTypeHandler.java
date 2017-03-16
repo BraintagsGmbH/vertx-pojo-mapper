@@ -19,7 +19,7 @@ import java.util.List;
 
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
@@ -71,7 +71,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
+  public void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (source == null) {
       success(null, resultHandler);
@@ -92,7 +92,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
   }
 
   @SuppressWarnings("rawtypes")
-  private CompositeFuture handleObjectsFromStore(IField field, JsonArray source) {
+  private CompositeFuture handleObjectsFromStore(IProperty field, JsonArray source) {
     List<Future> fl = new ArrayList<>();
     ITypeHandler subHandler = field.getSubTypeHandler();
     for (int i = 0; i < source.size(); i++) {
@@ -116,7 +116,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
    *          the handler to be informed
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected Future handleObjectFromStore(IField field, ITypeHandler subHandler, Object o) {
+  protected Future handleObjectFromStore(IProperty field, ITypeHandler subHandler, Object o) {
     Future f = Future.future();
     if (subHandler != null) {
       LOGGER.debug("subtypehandler: " + subHandler.getClass().getName());
@@ -141,7 +141,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
    */
   @SuppressWarnings("rawtypes")
   @Override
-  public final void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public final void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (source == null) {
       success(null, resultHandler);
     } else if (((Collection<?>) source).isEmpty()) {
@@ -193,7 +193,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
     return result;
   }
 
-  protected CompositeFuture encodeSubValues(Collection coll, IField field) {
+  protected CompositeFuture encodeSubValues(Collection coll, IProperty field) {
     List<Future> fl = new ArrayList<>();
     ITypeHandler subHandler = field.getSubTypeHandler();
     // no generics were defined, so that subhandler could not be defined from mapping
@@ -214,7 +214,7 @@ public class CollectionTypeHandler extends AbstractTypeHandler {
     return CompositeFuture.all(fl);
   }
 
-  private Future encodeSubValue(IField field, ITypeHandler subHandler, Object value) {
+  private Future encodeSubValue(IProperty field, ITypeHandler subHandler, Object value) {
     Future f = Future.future();
     subHandler.intoStore(value, field, f.completer());
     return f;

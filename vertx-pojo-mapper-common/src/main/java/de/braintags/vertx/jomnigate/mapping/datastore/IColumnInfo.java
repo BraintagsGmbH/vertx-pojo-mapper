@@ -15,10 +15,10 @@ package de.braintags.vertx.jomnigate.mapping.datastore;
 
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 
 /**
- * IColumn keeps information about the structure of the column inside the connected datastore for an {@link IField}. If
+ * IColumn keeps information about the structure of the column inside the connected datastore for an {@link IProperty}. If
  * the column is existing already inside the connected datastore, the information in here are filled by the existing
  * column. If it doesn't exist yet, the information are created by a defined {@link Property} annotation
  * 

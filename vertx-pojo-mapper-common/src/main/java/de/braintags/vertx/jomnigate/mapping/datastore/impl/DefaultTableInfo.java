@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
@@ -67,21 +67,21 @@ public abstract class DefaultTableInfo implements ITableInfo {
    * .IField, de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler)
    */
   @Override
-  public final void createColumnInfo(IField field, IColumnHandler columnHandler) {
+  public final void createColumnInfo(IProperty field, IColumnHandler columnHandler) {
     IColumnInfo ci = generateColumnInfo(field, columnHandler);
     addColumnInfo(field, ci);
     addColumnInfo(ci);
   }
 
   /**
-   * Add an {@link IColumnInfo} so that it can be looked up by the {@link IField}.
+   * Add an {@link IColumnInfo} so that it can be looked up by the {@link IProperty}.
    * 
    * @param field
-   *          the instance of {@link IField} to be used as lookup
+   *          the instance of {@link IProperty} to be used as lookup
    * @param ci
    *          the {@link IColumnInfo} to be looked up
    */
-  protected void addColumnInfo(IField field, IColumnInfo ci) {
+  protected void addColumnInfo(IProperty field, IColumnInfo ci) {
     colsByJavaFieldName.put(field.getName().toLowerCase(), ci);
   }
 
@@ -104,7 +104,7 @@ public abstract class DefaultTableInfo implements ITableInfo {
    *          the instance of {@link IColumnHandler}
    * @return the implementation of {@link IColumnInfo}
    */
-  protected abstract IColumnInfo generateColumnInfo(IField field, IColumnHandler columnHandler);
+  protected abstract IColumnInfo generateColumnInfo(IProperty field, IColumnHandler columnHandler);
 
   /*
    * (non-Javadoc)
@@ -112,7 +112,7 @@ public abstract class DefaultTableInfo implements ITableInfo {
    * @see de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo#getColumnInfo(java.lang.String)
    */
   @Override
-  public final IColumnInfo getColumnInfo(IField field) {
+  public final IColumnInfo getColumnInfo(IProperty field) {
     return colsByJavaFieldName.get(field.getName().toLowerCase());
   }
 

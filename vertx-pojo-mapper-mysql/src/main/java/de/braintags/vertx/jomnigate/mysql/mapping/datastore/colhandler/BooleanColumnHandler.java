@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.mysql.mapping.datastore.SqlColumnInfo;
 
@@ -38,7 +38,7 @@ public class BooleanColumnHandler extends AbstractSqlColumnHandler {
   }
 
   @Override
-  protected StringBuilder generateColumn(IField field, IColumnInfo ci) {
+  protected StringBuilder generateColumn(IProperty field, IColumnInfo ci) {
     return new StringBuilder(String.format("%s %s ", ci.getName(), ci.getType()));
   }
 

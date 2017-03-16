@@ -17,7 +17,7 @@ import java.lang.annotation.Annotation;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 
 /**
  * The ITypeHandlerFactory is used to create the convenient {@link ITypeHandler} for an implementation of
@@ -36,7 +36,7 @@ public interface ITypeHandlerFactory {
    *          the field
    * @return a fitting {@link ITypeHandler}
    */
-  ITypeHandler getTypeHandler(IField field);
+  ITypeHandler getTypeHandler(IProperty field);
 
   /**
    * Get the conventient {@link ITypeHandler} for the given Class

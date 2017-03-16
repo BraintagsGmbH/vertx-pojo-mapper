@@ -20,7 +20,7 @@ import java.util.Map;
 
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 
 /**
  * An abstract implementation of {@link ITypeHandlerFactory}
@@ -50,7 +50,7 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
    * .mapping.IField)
    */
   @Override
-  public ITypeHandler getTypeHandler(IField field) {
+  public ITypeHandler getTypeHandler(IProperty field) {
     // here we should NOT use a cache, otherwise the method examineMatch of the TypeHandler isn't called,
     // which is important, cause this method can decide on other parameters than the class
     ITypeHandler handler = examineMatch(field);
@@ -105,7 +105,7 @@ public abstract class AbstractTypeHandlerFactory implements ITypeHandlerFactory 
    * @param field
    * @return
    */
-  private ITypeHandler examineMatch(IField field) {
+  private ITypeHandler examineMatch(IProperty field) {
     ITypeHandler returnHandler = null;
     List<ITypeHandler> ths = getDefinedTypeHandlers();
     for (ITypeHandler th : ths) {

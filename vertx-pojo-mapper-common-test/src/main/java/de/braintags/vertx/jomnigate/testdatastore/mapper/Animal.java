@@ -1,6 +1,6 @@
 /*
  * #%L
- * vertx-pojo-mapper-common
+ * vertx-pojo-mapper-json
  * %%
  * Copyright (C) 2017 Braintags GmbH
  * %%
@@ -10,11 +10,23 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
+package de.braintags.vertx.jomnigate.testdatastore.mapper;
+
 /**
- * Package contains annotations which can be used to define {@link de.braintags.vertx.jomnigate.mapping.IProperty}
+ * 
  * 
  * @author Michael Remme
  * 
  */
 
-package de.braintags.vertx.jomnigate.annotation.field;
+public class Animal {
+
+  public String name;
+
+  /**
+   * 
+   */
+  public Animal() {
+  }
+
+}

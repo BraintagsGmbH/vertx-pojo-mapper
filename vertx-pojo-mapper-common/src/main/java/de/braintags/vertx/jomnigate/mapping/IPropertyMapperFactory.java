@@ -22,11 +22,11 @@ package de.braintags.vertx.jomnigate.mapping;
 public interface IPropertyMapperFactory {
 
   /**
-   * Get an instance of {@link IPropertyMapper} for the given {@link IField}
+   * Get an instance of {@link IPropertyMapper} for the given {@link IProperty}
    * 
    * @param field
    *          the field to request a property mapper for
    * @return the generated {@link IPropertyMapper} for the given field
    */
-  public IPropertyMapper getPropertyMapper(IField field);
+  public IPropertyMapper getPropertyMapper(IProperty field);
 }

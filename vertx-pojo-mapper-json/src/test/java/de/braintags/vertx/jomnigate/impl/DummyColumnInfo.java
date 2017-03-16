@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.impl;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.impl.DefaultColumnInfo;
 
@@ -35,7 +35,7 @@ public class DummyColumnInfo extends DefaultColumnInfo {
    * @param field
    * @param columnHandler
    */
-  public DummyColumnInfo(IField field, IColumnHandler columnHandler) {
+  public DummyColumnInfo(IProperty field, IColumnHandler columnHandler) {
     super(field, columnHandler);
   }
 

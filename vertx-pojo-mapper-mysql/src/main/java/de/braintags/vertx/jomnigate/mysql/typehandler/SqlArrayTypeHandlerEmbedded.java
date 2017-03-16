@@ -13,7 +13,7 @@
 package de.braintags.vertx.jomnigate.mysql.typehandler;
 
 import de.braintags.vertx.jomnigate.json.typehandler.handler.ArrayTypeHandlerEmbedded;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
@@ -42,7 +42,7 @@ public class SqlArrayTypeHandlerEmbedded extends ArrayTypeHandlerEmbedded {
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void fromStore(Object source, IProperty field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     try {
       JsonArray sourceArray = source == null ? null : new JsonArray((String) source);
       super.fromStore(sourceArray, field, cls, handler);
@@ -58,7 +58,7 @@ public class SqlArrayTypeHandlerEmbedded extends ArrayTypeHandlerEmbedded {
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public void intoStore(Object javaValues, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void intoStore(Object javaValues, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     super.intoStore(javaValues, field, result -> {
       if (result.failed()) {
         handler.handle(result);

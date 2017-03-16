@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.typehandler.stringbased.handlers;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerResult;
@@ -43,7 +43,7 @@ public abstract class AbstractDecimalTypeHandler extends AbstractNumericTypeHand
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public final void fromStore(Object source, IField field, Class<?> cls,
+  public final void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     String s = source == null || ((String) source).trim().hashCode() == 0 ? "0" : ((String) source).trim();
     try {

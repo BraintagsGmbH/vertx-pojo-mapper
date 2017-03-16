@@ -19,7 +19,7 @@ import java.util.List;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
@@ -71,7 +71,7 @@ public class ArrayTypeHandlerReferenced extends ArrayTypeHandler implements ITyp
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void fromStore(Object source, IProperty field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     Class<?> mapperClass = cls != null ? cls : field.getType();
     if (mapperClass == null) {
       fail(new NullPointerException("undefined mapper class"), handler);
@@ -91,7 +91,7 @@ public class ArrayTypeHandlerReferenced extends ArrayTypeHandler implements ITyp
   public void resolveReferencedObject(IDataStore store, IObjectReference reference,
       Handler<AsyncResult<ITypeHandlerResult>> handler) {
     IMapperFactory mf = store.getMapperFactory();
-    IField field = reference.getField();
+    IProperty field = reference.getField();
     IMapper subMapper = mf.getMapper(field.getSubClass());
     JsonArray jsonArray = (JsonArray) reference.getDbSource();
     if (jsonArray == null) {
@@ -117,7 +117,7 @@ public class ArrayTypeHandlerReferenced extends ArrayTypeHandler implements ITyp
    * @param cf
    * @return
    */
-  private Object transferValues(IField field, JsonArray jsonArray, CompositeFuture cf) {
+  private Object transferValues(IProperty field, JsonArray jsonArray, CompositeFuture cf) {
     final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
     List<ITypeHandlerResult> results = cf.list();
     for (int i = 0; i < results.size(); i++) {
@@ -130,7 +130,7 @@ public class ArrayTypeHandlerReferenced extends ArrayTypeHandler implements ITyp
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private CompositeFuture resolveSubReferences(IDataStore store, IMapper subMapper, IField field, JsonArray jsonArray) {
+  private CompositeFuture resolveSubReferences(IDataStore store, IMapper subMapper, IProperty field, JsonArray jsonArray) {
     List<Future> fl = new ArrayList<>();
     ObjectTypeHandlerReferenced subTypehandler = (ObjectTypeHandlerReferenced) field.getSubTypeHandler();
     for (int i = 0; i < jsonArray.size(); i++) {

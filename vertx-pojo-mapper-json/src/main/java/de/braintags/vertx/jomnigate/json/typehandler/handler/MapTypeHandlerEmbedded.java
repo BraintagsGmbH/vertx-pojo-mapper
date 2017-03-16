@@ -15,7 +15,7 @@ package de.braintags.vertx.jomnigate.json.typehandler.handler;
 import java.lang.annotation.Annotation;
 
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import io.vertx.core.AsyncResult;
@@ -60,7 +60,7 @@ public class MapTypeHandlerEmbedded extends MapTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  protected ITypeHandler getValueTypeHandler(Object value, IField field) {
+  protected ITypeHandler getValueTypeHandler(Object value, IProperty field) {
     return th;
   }
 
@@ -72,7 +72,7 @@ public class MapTypeHandlerEmbedded extends MapTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  protected void convertValueFromStore(Object valueIn, IField field, Handler<AsyncResult<Object>> resultHandler) {
+  protected void convertValueFromStore(Object valueIn, IProperty field, Handler<AsyncResult<Object>> resultHandler) {
     th.fromStore(valueIn, field, field.getSubClass(), valueResult -> {
       if (valueResult.failed()) {
         resultHandler.handle(Future.failedFuture(valueResult.cause()));

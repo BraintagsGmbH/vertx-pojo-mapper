@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
@@ -138,7 +138,7 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
     for (String fieldName : fieldNames) {
       Future<Void> f = Future.future();
       fl.add(f);
-      IField field = getMapper().getField(fieldName);
+      IProperty field = getMapper().getField(fieldName);
       LOGGER.debug("handling field " + field.getFullName());
       field.getPropertyMapper().fromStoreObject(tmpObject, this, field, f.completer());
     }
@@ -201,7 +201,7 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
   @SuppressWarnings({ "rawtypes", "unchecked" })
   protected Future initFieldFromEntity(String fieldName) {
     Future f = Future.future();
-    IField field = mapper.getField(fieldName);
+    IProperty field = mapper.getField(fieldName);
     field.getPropertyMapper().intoStoreObject(entity, this, field, f.completer());
     return f;
   }

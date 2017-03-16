@@ -16,14 +16,19 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -35,9 +40,43 @@ import io.vertx.core.Handler;
  * 
  */
 public class JacksonMapper<T> implements IMapper<T> {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(JacksonMapper.class);
+
+  private JacksonMapperFactory mapperFactory;
+  private BeanDescription beanDescription;
+  private Class<T> mapperClass;
 
   public JacksonMapper(Class<T> mapperClass, JacksonMapperFactory mapperFactory) {
+    this.mapperFactory = mapperFactory;
+    this.mapperClass = mapperClass;
+    init();
+  }
 
+  private void init() {
+    LOGGER.debug("examining " + mapperClass.getName());
+    ObjectMapper mapper = ((JsonDatastore) mapperFactory.getDataStore()).getJacksonMapper();
+    JavaType type = mapper.constructType(mapperClass);
+    this.beanDescription = mapper.getSerializationConfig().introspect(type);
+
+    computeLifeCycleAnnotations();
+    computeClassAnnotations();
+    computeEntity();
+    computeIndize();
+    computeObjectFactory();
+    computeKeyGenerator();
+    generateTableInfo();
+    checkReferencedFields();
+    validate();
+  }
+
+  /**
+   * Get the underlaying instance of {@link BeanDescription}, which was created for the mapper class
+   * 
+   * @return
+   */
+  public BeanDescription getBeanDescription() {
+    return beanDescription;
   }
 
   /*
@@ -86,7 +125,7 @@ public class JacksonMapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#getField(java.lang.String)
    */
   @Override
-  public IField getField(String name) {
+  public IProperty getField(String name) {
     return null;
   }
 
@@ -96,7 +135,7 @@ public class JacksonMapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#getIdField()
    */
   @Override
-  public IField getIdField() {
+  public IProperty getIdField() {
     return null;
   }
 
@@ -146,7 +185,7 @@ public class JacksonMapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#getAnnotatedFields(java.lang.Class)
    */
   @Override
-  public IField[] getAnnotatedFields(Class<? extends Annotation> annotationClass) {
+  public IProperty[] getAnnotatedFields(Class<? extends Annotation> annotationClass) {
     return null;
   }
 

@@ -16,7 +16,7 @@ import java.lang.annotation.Annotation;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
@@ -72,7 +72,7 @@ public class MapTypeHandlerReferenced extends MapTypeHandler implements ITypeHan
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  protected void convertValueFromStore(Object valueIn, IField field, Handler<AsyncResult<Object>> resultHandler) {
+  protected void convertValueFromStore(Object valueIn, IProperty field, Handler<AsyncResult<Object>> resultHandler) {
     ITypeHandler subHandler = field.getSubTypeHandler();
     if (subHandler instanceof ObjectTypeHandlerReferenced) {
       IDataStore store = field.getMapper().getMapperFactory().getDataStore();

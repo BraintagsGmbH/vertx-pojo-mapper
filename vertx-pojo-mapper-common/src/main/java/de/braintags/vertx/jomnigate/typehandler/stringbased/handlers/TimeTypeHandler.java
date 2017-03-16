@@ -18,7 +18,7 @@ import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerResult;
@@ -52,7 +52,7 @@ public class TimeTypeHandler extends AbstractDateTypeHandler {
    * @see de.braintags.vertx.jomnigate.typehandler.ITypeHandler#fromStore(java.lang.Object)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
+  public void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     Object result = null;
     if (source != null) {
@@ -76,7 +76,7 @@ public class TimeTypeHandler extends AbstractDateTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     Calendar cal = Calendar.getInstance();
     cal.setTime((Date) source);
     success(source == null ? source : formatTime(cal), resultHandler);

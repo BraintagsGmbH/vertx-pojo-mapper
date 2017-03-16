@@ -30,7 +30,7 @@ import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.util.QueryHelper;
 import io.vertx.core.Future;
 
@@ -122,7 +122,7 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private void fillMap(IField idField, List recList, Map<?, String> rawMap, Map resultMap) {
+  private void fillMap(IProperty idField, List recList, Map<?, String> rawMap, Map resultMap) {
     rawMap.entrySet().forEach(entry -> {
       resultMap.put(entry.getKey(), findInstance(idField, entry.getValue(), recList));
     });
@@ -141,7 +141,7 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
    * @return
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private Object findInstance(IField idField, Object id, List queryResult) {
+  private Object findInstance(IProperty idField, Object id, List queryResult) {
     Object ret = queryResult.stream().filter(o -> idField.getPropertyAccessor().readData(o).equals(id)).findFirst()
         .orElse(null);
     return ret;

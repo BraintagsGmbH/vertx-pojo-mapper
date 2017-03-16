@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
@@ -46,7 +46,7 @@ public abstract class DefaultTableGenerator implements ITableGenerator {
    * pojomapper .mapping.IField)
    */
   @Override
-  public IColumnHandler getColumnHandler(IField field) {
+  public IColumnHandler getColumnHandler(IProperty field) {
     Class<?> fieldClass = field.getType();
     if (cachedColumnHandler.containsKey(fieldClass))
       return cachedColumnHandler.get(fieldClass);
@@ -63,7 +63,7 @@ public abstract class DefaultTableGenerator implements ITableGenerator {
    * @param field
    * @return
    */
-  private IColumnHandler examineMatch(IField field) {
+  private IColumnHandler examineMatch(IProperty field) {
     IColumnHandler returnHandler = null;
     List<IColumnHandler> ths = getDefinedColumnHandlers();
     for (IColumnHandler ch : ths) {

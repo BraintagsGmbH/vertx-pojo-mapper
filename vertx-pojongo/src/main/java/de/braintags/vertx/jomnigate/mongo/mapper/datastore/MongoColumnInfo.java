@@ -14,7 +14,7 @@
 package de.braintags.vertx.jomnigate.mongo.mapper.datastore;
 
 import de.braintags.vertx.jomnigate.annotation.field.Id;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.impl.DefaultColumnInfo;
 
@@ -32,12 +32,12 @@ public class MongoColumnInfo extends DefaultColumnInfo {
    * @param field
    * @param columnHandler
    */
-  public MongoColumnInfo(IField field, IColumnHandler columnHandler) {
+  public MongoColumnInfo(IProperty field, IColumnHandler columnHandler) {
     super(field, columnHandler);
   }
 
   @Override
-  protected String computePropertyName(IField field) {
+  protected String computePropertyName(IProperty field) {
     if (field.hasAnnotation(Id.class)) {
       return ID_FIELD_NAME;
     }

@@ -13,7 +13,7 @@
 package de.braintags.vertx.jomnigate.mysql.typehandler;
 
 import de.braintags.vertx.jomnigate.json.typehandler.handler.MapTypeHandlerEmbedded;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerResult;
@@ -44,7 +44,7 @@ public class SqlMapTypeHandlerEmbedded extends MapTypeHandlerEmbedded {
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void fromStore(Object source, IProperty field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     try {
       JsonArray sourceArray = source == null ? null : new JsonArray((String) source);
       super.fromStore(sourceArray, field, cls, handler);
@@ -66,7 +66,7 @@ public class SqlMapTypeHandlerEmbedded extends MapTypeHandlerEmbedded {
    * Object, de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  protected ITypeHandler getValueTypeHandler(Object value, IField field) {
+  protected ITypeHandler getValueTypeHandler(Object value, IProperty field) {
     return th;
   }
 

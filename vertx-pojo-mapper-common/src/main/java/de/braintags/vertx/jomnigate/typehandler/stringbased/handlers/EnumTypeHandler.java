@@ -14,7 +14,7 @@ package de.braintags.vertx.jomnigate.typehandler.stringbased.handlers;
 
 import java.util.List;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerResult;
@@ -48,7 +48,7 @@ public class EnumTypeHandler extends AbstractTypeHandler {
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
+  public void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     try {
       Class enumClass = field == null ? cls : getEnumClass(field);
@@ -62,13 +62,13 @@ public class EnumTypeHandler extends AbstractTypeHandler {
     }
   }
 
-  private Class getEnumClass(IField field) {
+  private Class getEnumClass(IProperty field) {
     Class enClass = field.getType();
     if (enClass.isEnum()) {
       return enClass;
     }
 
-    List<IField> tp = field.getTypeParameters();
+    List<IProperty> tp = field.getTypeParameters();
     if (!tp.isEmpty()) {
       return tp.get(0).getType();
     }
@@ -82,7 +82,7 @@ public class EnumTypeHandler extends AbstractTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     success(source == null ? source : getName((Enum) source), resultHandler);
   }
 

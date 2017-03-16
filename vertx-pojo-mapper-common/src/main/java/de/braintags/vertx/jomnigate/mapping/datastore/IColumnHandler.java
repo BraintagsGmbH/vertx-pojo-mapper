@@ -13,7 +13,7 @@
 
 package de.braintags.vertx.jomnigate.mapping.datastore;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 
 /**
@@ -26,32 +26,32 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
 
 public interface IColumnHandler {
   /**
-   * Returned by method {@link #matches(IField)} to specify that the current columnhandler won't handle the given field
+   * Returned by method {@link #matches(IProperty)} to specify that the current columnhandler won't handle the given field
    */
   public static final short MATCH_NONE = 0;
 
   /**
-   * Returned by method {@link #matches(IField)} to specify that the current columnhandler handles the given field in a
+   * Returned by method {@link #matches(IProperty)} to specify that the current columnhandler handles the given field in a
    * minor way. For instance, if the class of the field is not direct the class, which the typehandler deals with, but
    * an instance of
    */
   public static final short MATCH_MINOR = 1;
 
   /**
-   * Returned by method {@link #matches(IField)} to specify that the current columnhandler handles the given field in a
+   * Returned by method {@link #matches(IProperty)} to specify that the current columnhandler handles the given field in a
    * major way. For instance, if the class of the field is the direct class
    */
   public static final short MATCH_MAJOR = 2;
 
   /**
-   * Checks wether the given {@link IField} is matching the criteria in the current instance. The method returns a
+   * Checks wether the given {@link IProperty} is matching the criteria in the current instance. The method returns a
    * graded result, one of {@link #MATCH_NONE}, {@link #MATCH_MINOR} or {@link #MATCH_MAJOR}
    * 
    * @param field
    *          the field to be checked
    * @return 0 ( zero ) if the Typ
    */
-  public short matches(IField field);
+  public short matches(IProperty field);
 
   /**
    * This method generates the command, which is used to create a column in the connected datastore
@@ -60,7 +60,7 @@ public interface IColumnHandler {
    *          the field which shall be generated in the datastore
    * @return the creation object, like a column creation string
    */
-  public Object generate(IField field);
+  public Object generate(IProperty field);
 
   /**
    * Method checks, wether the {@link IColumnInfo} plannedCi has some modifications to be done in comparison to

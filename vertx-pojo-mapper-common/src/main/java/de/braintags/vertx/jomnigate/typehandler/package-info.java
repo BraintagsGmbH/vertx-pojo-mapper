@@ -16,7 +16,7 @@
  * a mapper property the suitable ITypeHandler is detected by requesting the
  * {@link de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory} of the underlaying
  * {@link de.braintags.vertx.jomnigate.IDataStore}. The found ITypeHandler is stored inside the appropriate
- * {@link de.braintags.vertx.jomnigate.mapping.IField} and from there used, when a value is read from or shall be
+ * {@link de.braintags.vertx.jomnigate.mapping.IProperty} and from there used, when a value is read from or shall be
  * written into the datastore.
  * 
  * 

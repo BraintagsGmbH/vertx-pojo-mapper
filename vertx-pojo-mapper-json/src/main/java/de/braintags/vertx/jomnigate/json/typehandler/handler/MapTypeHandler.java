@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
@@ -72,7 +72,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
+  public void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (source == null) {
       success(null, resultHandler);
@@ -102,7 +102,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
    */
   @SuppressWarnings("rawtypes")
   @Override
-  public final void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public final void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (source == null) {
       success(null, resultHandler);
     } else if (((Map) source).isEmpty()) {
@@ -125,7 +125,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
   }
 
   @SuppressWarnings("rawtypes")
-  private CompositeFuture handleObjectsFromStore(IField field, JsonArray source) {
+  private CompositeFuture handleObjectsFromStore(IProperty field, JsonArray source) {
     List<Future> fl = new ArrayList<>();
     for (int i = 0; i < source.size(); i++) {
       fl.add(i, handleObjectFromStore(field, source.getJsonArray(i)));
@@ -148,7 +148,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
    *          the handler to be informed
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected Future handleObjectFromStore(IField field, JsonArray array) {
+  protected Future handleObjectFromStore(IProperty field, JsonArray array) {
     Future f = Future.future();
     Object keyIn = array.getValue(0);
     ITypeHandler keyTypehandler = field.getMapper().getMapperFactory().getTypeHandlerFactory()
@@ -186,7 +186,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
    * @param resultHandler
    *          the {@link Handler} to be informed
    */
-  protected void convertValueFromStore(Object valueIn, IField field, Handler<AsyncResult<Object>> resultHandler) {
+  protected void convertValueFromStore(Object valueIn, IProperty field, Handler<AsyncResult<Object>> resultHandler) {
     if (field.getSubTypeHandler() == null) {
       resultHandler.handle(Future.succeededFuture(valueIn));
       return;
@@ -222,7 +222,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
   }
 
   @SuppressWarnings("rawtypes")
-  protected CompositeFuture encodeSubValues(Map map, IField field) {
+  protected CompositeFuture encodeSubValues(Map map, IProperty field) {
     List<Future> fl = new ArrayList<>();
     Iterator<?> it = map.entrySet().iterator();
     while (it.hasNext()) {
@@ -232,7 +232,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected Future encodeSubValue(IField field, Entry entry) {
+  protected Future encodeSubValue(IProperty field, Entry entry) {
     Future f = Future.future();
     ITypeHandler keyTh = getKeyTypeHandler(entry.getKey(), field);
 
@@ -273,7 +273,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
    * @return the {@link ITypeHandler} to be used
    */
   @SuppressWarnings("rawtypes")
-  protected ITypeHandler getValueTypeHandler(Object value, IField field) {
+  protected ITypeHandler getValueTypeHandler(Object value, IProperty field) {
     Class valueClass = field.getSubClass();
     if (valueClass == null || valueClass == Object.class)
       valueClass = value.getClass();
@@ -290,7 +290,7 @@ public class MapTypeHandler extends AbstractTypeHandler {
    * @return the {@link ITypeHandler} to be used
    */
   @SuppressWarnings("rawtypes")
-  public ITypeHandler getKeyTypeHandler(Object value, IField field) {
+  public ITypeHandler getKeyTypeHandler(Object value, IProperty field) {
     Class keyClass = field.getMapKeyClass();
     if (keyClass == null || keyClass == Object.class)
       keyClass = value.getClass();

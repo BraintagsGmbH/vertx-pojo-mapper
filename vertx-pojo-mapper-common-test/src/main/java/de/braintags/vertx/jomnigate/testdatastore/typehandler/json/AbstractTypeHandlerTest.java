@@ -18,7 +18,7 @@ import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.testdatastore.DatastoreBaseTest;
@@ -45,7 +45,7 @@ public abstract class AbstractTypeHandlerTest extends DatastoreBaseTest {
       LOGGER.info("executing testTypeHandler");
       BaseRecord record = createInstance(null);
       IMapper mapper = getDataStore(context).getMapperFactory().getMapper(record.getClass());
-      IField field = mapper.getField(getTestFieldName());
+      IProperty field = mapper.getField(getTestFieldName());
       ITypeHandler th = field.getTypeHandler();
       context.assertNotNull(th);
       String typeHandlerName = TestHelper.getDatastoreContainer(context).getExpectedTypehandlerName(getClass(),

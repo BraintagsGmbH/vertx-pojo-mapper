@@ -36,11 +36,11 @@ public interface IObjectFactory {
    * Create a new instance of {@link Collection}
    * 
    * @param field
-   *          the {@link IField} definition
+   *          the {@link IProperty} definition
    * @return a new {@link Collection}
    */
   @SuppressWarnings("rawtypes")
-  Collection createCollection(IField field);
+  Collection createCollection(IProperty field);
 
   /**
    * Create a new instance of {@link Map}
@@ -50,7 +50,7 @@ public interface IObjectFactory {
    * @return the new instance
    */
   @SuppressWarnings("rawtypes")
-  Map createMap(IField field);
+  Map createMap(IProperty field);
 
   /**
    * Set the Mapper, where the IObjectFactory is contained

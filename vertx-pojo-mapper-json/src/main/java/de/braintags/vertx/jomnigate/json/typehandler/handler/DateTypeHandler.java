@@ -17,7 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
@@ -52,7 +52,7 @@ public class DateTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.vertx.jomnigate.typehandler.ITypeHandler#fromStore(java.lang.Object)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
+  public void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     Object result = null;
     if (source != null) {
@@ -78,7 +78,7 @@ public class DateTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.vertx.jomnigate.typehandler.ITypeHandler#intoStore(java.lang.Object)
    */
   @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     success(source == null ? source : ((Date) source).getTime(), resultHandler);
   }
 

@@ -17,7 +17,7 @@ import java.lang.annotation.Annotation;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IStoreObjectFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
@@ -60,7 +60,7 @@ public class ObjectTypeHandlerEmbedded extends ObjectTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object dbValue, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void fromStore(Object dbValue, IProperty field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     IDataStore store = field.getMapper().getMapperFactory().getDataStore();
     Class<?> internalMapperClass = cls != null ? cls : field.getType();
     if (store.getMapperFactory().isMapper(internalMapperClass)) {
@@ -109,7 +109,7 @@ public class ObjectTypeHandlerEmbedded extends ObjectTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public void intoStore(Object embeddedObject, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void intoStore(Object embeddedObject, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     if (embeddedObject == null) {
       success(null, handler);
     } else {
@@ -137,7 +137,7 @@ public class ObjectTypeHandlerEmbedded extends ObjectTypeHandler {
    *          the hander to be informed
    */
   protected void writeSingleValueAsMapper(IDataStore<?, ?> store, Object embeddedObject, IMapper embeddedMapper,
-      IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+      IProperty field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     store.getStoreObjectFactory().createStoreObject(embeddedMapper, embeddedObject, result -> {
       if (result.failed()) {
         fail(result.cause(), handler);

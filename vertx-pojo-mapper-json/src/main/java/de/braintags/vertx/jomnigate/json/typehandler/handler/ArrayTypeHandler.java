@@ -17,7 +17,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
@@ -75,7 +75,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void fromStore(Object source, IProperty field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     JsonArray jsonArray = (JsonArray) source;
     if (jsonArray == null) {
       success(null, handler);
@@ -100,7 +100,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
    * @param cf
    * @return
    */
-  private Object transferValues(IField field, JsonArray jsonArray, CompositeFuture cf) {
+  private Object transferValues(IProperty field, JsonArray jsonArray, CompositeFuture cf) {
     List<ITypeHandlerResult> thl = cf.list();
     final Object resultArray = Array.newInstance(field.getSubClass(), jsonArray.size());
     for (int i = 0; i < thl.size(); i++) {
@@ -113,7 +113,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
   }
 
   @SuppressWarnings("rawtypes")
-  private List<Future> extractSubValues(IField field, JsonArray jsonArray) {
+  private List<Future> extractSubValues(IProperty field, JsonArray jsonArray) {
     List<Future> fl = new ArrayList<>(jsonArray.size());
     ITypeHandler subTypehandler = field.getSubTypeHandler();
     for (int i = 0; i < jsonArray.size(); i++) {
@@ -123,7 +123,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
     return fl;
   }
 
-  private Future<ITypeHandlerResult> extractSubValue(IField field, ITypeHandler subTypeHandler, Object jo) {
+  private Future<ITypeHandlerResult> extractSubValue(IProperty field, ITypeHandler subTypeHandler, Object jo) {
     Future<ITypeHandlerResult> f = Future.future();
     subTypeHandler.fromStore(jo, field, field.getSubClass(), f.completer());
     return f;
@@ -136,7 +136,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public void intoStore(Object javaValues, IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void intoStore(Object javaValues, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     int length = javaValues == null ? 0 : Array.getLength(javaValues);
     if (javaValues == null) {
       success(null, handler);
@@ -170,7 +170,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
   }
 
   @SuppressWarnings("rawtypes")
-  private CompositeFuture writeEntries(ITypeHandler subTypehandler, IField field, Object javaValues, int length) {
+  private CompositeFuture writeEntries(ITypeHandler subTypehandler, IProperty field, Object javaValues, int length) {
     List<Future> fl = new ArrayList<>(length);
     for (int i = 0; i < length; i++) {
       Object value = Array.get(javaValues, i);
@@ -179,7 +179,7 @@ public class ArrayTypeHandler extends AbstractTypeHandler {
     return CompositeFuture.all(fl);
   }
 
-  private Future<ITypeHandlerResult> writeEntry(ITypeHandler subTypehandler, IField field, Object javaValue) {
+  private Future<ITypeHandlerResult> writeEntry(ITypeHandler subTypehandler, IProperty field, Object javaValue) {
     Future<ITypeHandlerResult> f = Future.future();
     subTypehandler.intoStore(javaValue, field, f.completer());
     return f;

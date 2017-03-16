@@ -16,7 +16,7 @@ package de.braintags.vertx.jomnigate.mapping.datastore.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 
 /**
@@ -46,7 +46,7 @@ public abstract class AbstractColumnHandler implements IColumnHandler {
    * .IField)
    */
   @Override
-  public short matches(IField field) {
+  public short matches(IProperty field) {
     return matches(field.getType());
   }
 

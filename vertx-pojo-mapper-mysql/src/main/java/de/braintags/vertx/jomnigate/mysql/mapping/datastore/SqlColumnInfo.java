@@ -14,7 +14,7 @@
 package de.braintags.vertx.jomnigate.mysql.mapping.datastore;
 
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.mapping.datastore.impl.DefaultColumnInfo;
@@ -41,12 +41,12 @@ public class SqlColumnInfo extends DefaultColumnInfo {
    * @param field
    * @param columnHandler
    */
-  public SqlColumnInfo(IField field, IColumnHandler columnHandler) {
+  public SqlColumnInfo(IProperty field, IColumnHandler columnHandler) {
     super(field, columnHandler);
   }
 
   @Override
-  protected void init(IField field, IColumnHandler columnHandler) {
+  protected void init(IProperty field, IColumnHandler columnHandler) {
     super.init(field, columnHandler);
     ((AbstractSqlColumnHandler) columnHandler).applyColumnMetaData(this);
 

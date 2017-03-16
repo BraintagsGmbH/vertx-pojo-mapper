@@ -16,7 +16,7 @@ import java.lang.annotation.Annotation;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
@@ -66,7 +66,7 @@ public class CollectionTypeHandlerReferenced extends CollectionTypeHandler imple
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void fromStore(Object source, IProperty field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
     Class<?> mapperClass = cls != null ? cls : field.getType();
     if (mapperClass == null) {
       fail(new NullPointerException("undefined mapper class"), handler);
@@ -97,7 +97,7 @@ public class CollectionTypeHandlerReferenced extends CollectionTypeHandler imple
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
-  protected Future handleObjectFromStore(IField field, ITypeHandler subHandler, Object o) {
+  protected Future handleObjectFromStore(IProperty field, ITypeHandler subHandler, Object o) {
     if (subHandler instanceof ObjectTypeHandlerReferenced) {
       Future f = Future.future();
       IDataStore store = field.getMapper().getMapperFactory().getDataStore();

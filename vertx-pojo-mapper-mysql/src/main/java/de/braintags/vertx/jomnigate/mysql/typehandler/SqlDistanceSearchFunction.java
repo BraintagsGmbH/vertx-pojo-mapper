@@ -15,7 +15,7 @@ package de.braintags.vertx.jomnigate.mysql.typehandler;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.GeoSearchArgument;
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 
 /**
  * An SqlFunction can be used as return type by TypeHandlers as value. This function is used as return type, when
@@ -33,7 +33,7 @@ public class SqlDistanceSearchFunction {
   private String functionSequence;
   private GeoSearchArgument source;
 
-  public SqlDistanceSearchFunction(GeoSearchArgument source, IField field) {
+  public SqlDistanceSearchFunction(GeoSearchArgument source, IProperty field) {
     this.source = source;
     GeoPoint searchPoint = (GeoPoint) source.getGeoJson();
     String longitude = searchPoint.getCoordinates().getValues().get(0).toString();

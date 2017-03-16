@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.mysql.typehandler;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerResult;
@@ -38,13 +38,13 @@ public class BooleanTypeHandler extends AbstractTypeHandler {
   }
 
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
+  public void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     success(source == null ? null : ((byte) source == 1) ? true : false, resultHandler);
   }
 
   @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     success(source == null ? source : ((Boolean) source).booleanValue() == Boolean.TRUE ? 1 : 0, resultHandler);
   }
 

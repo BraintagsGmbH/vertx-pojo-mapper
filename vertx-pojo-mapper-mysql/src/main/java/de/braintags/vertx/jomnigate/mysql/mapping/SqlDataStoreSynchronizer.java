@@ -20,7 +20,7 @@ import java.util.Set;
 import de.braintags.vertx.jomnigate.annotation.EntityOption;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.ISyncResult;
 import de.braintags.vertx.jomnigate.mapping.SyncAction;
@@ -174,7 +174,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
    */
   private String generateColumnPart(IMapper mapper) {
     StringBuilder buffer = new StringBuilder();
-    IField idField = mapper.getIdField();
+    IProperty idField = mapper.getIdField();
     ITableInfo ti = mapper.getTableInfo();
     Set<String> fieldNames = mapper.getFieldNames();
 
@@ -187,7 +187,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
   }
 
   private String generateColumn(IMapper mapper, ITableInfo ti, String fieldName) {
-    IField field = mapper.getField(fieldName);
+    IProperty field = mapper.getField(fieldName);
     IColumnInfo ci = ti.getColumnInfo(field);
     IColumnHandler ch = ci.getColumnHandler();
     if (ch == null)

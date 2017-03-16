@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.json.typehandler.handler;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
@@ -54,7 +54,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public final void fromStore(final Object id, IField field, Class<?> cls,
+  public final void fromStore(final Object id, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     @SuppressWarnings("rawtypes")
     Class fieldClass = field.getType();
@@ -122,7 +122,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public final void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public final void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     // getInternalTypeHandler(field).intoStore(source, field, resultHandler);
     // here we would need an ITypehandler reacting to the column type in spite of the java field, if types are different
     if (isCharacterColumn(field)) {
@@ -137,16 +137,16 @@ public class IdTypeHandler extends AbstractTypeHandler {
     resultHandler.handle(Future.succeededFuture(thResult));
   }
 
-  protected boolean isCharacterColumn(IField field) {
+  protected boolean isCharacterColumn(IProperty field) {
     return CharSequence.class.isAssignableFrom(field.getType());
   }
 
-  protected boolean isNumericColumn(IField field) {
+  protected boolean isNumericColumn(IProperty field) {
     return Number.class.isAssignableFrom(field.getType()) || field.getType().equals(long.class)
         || field.getType().equals(int.class);
   }
 
-  private final ITypeHandler getInternalTypeHandler(IField field) {
+  private final ITypeHandler getInternalTypeHandler(IProperty field) {
     if (internalTypehandler == null) {
       internalTypehandler = getTypeHandlerFactory().getTypeHandler(field.getType(), field.getEmbedRef());
     }
@@ -161,7 +161,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
    * IField)
    */
   @Override
-  public final short matches(IField field) {
+  public final short matches(IProperty field) {
     if (field.getMapper().getIdField() == field)
       return MATCH_MAJOR;
     return MATCH_NONE;

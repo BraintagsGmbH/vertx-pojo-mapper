@@ -36,18 +36,18 @@ import io.vertx.core.Handler;
 public interface IPropertyMapper {
 
   /**
-   * place the content of the given {@link IField} into the {@link IStoreObject}
+   * place the content of the given {@link IProperty} into the {@link IStoreObject}
    * 
    * @param entity
    *          the mapper object to be handled
    * @param storeObject
    *          the instance of {@link IStoreObject} where the content shall be placed
    * @param field
-   *          the {@link IField} to be handled
+   *          the {@link IProperty} to be handled
    * @param handler
    *          the handler to be called
    */
-  <T> void intoStoreObject(T entity, IStoreObject<T, ? > storeObject, IField field, Handler<AsyncResult<Void>> handler);
+  <T> void intoStoreObject(T entity, IStoreObject<T, ? > storeObject, IProperty field, Handler<AsyncResult<Void>> handler);
 
   /**
    * This method reads the field value of the entity and converts the value into a suitable format for the datastore
@@ -59,7 +59,7 @@ public interface IPropertyMapper {
    * @param handler
    *          the handler to be informed about the result
    */
-  <T> void readForStore(T entity, IField field, Handler<AsyncResult<Object>> handler);
+  <T> void readForStore(T entity, IProperty field, Handler<AsyncResult<Object>> handler);
 
   /**
    * This method fetches the content for the given field from the {@link IStoreObject}, changes it into the propriate
@@ -70,15 +70,15 @@ public interface IPropertyMapper {
    * @param storeObject
    *          the instance of {@link IStoreObject}, where the content shall be fetched from
    * @param field
-   *          the {@link IField} to be handled
+   *          the {@link IProperty} to be handled
    * @param handler
    *          the handler to be called
    */
-  <T> void fromStoreObject(T entity, IStoreObject<T, ? > storeObject, IField field, Handler<AsyncResult<Void>> handler);
+  <T> void fromStoreObject(T entity, IStoreObject<T, ? > storeObject, IProperty field, Handler<AsyncResult<Void>> handler);
 
   /**
    * This method resolves the given {@link IObjectReference} into the real value and stores this value inside the
-   * {@link IField} of the given entity
+   * {@link IProperty} of the given entity
    * 
    * @param entity
    *          the entity to be filled

@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.typehandler.stringbased.handlers;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
@@ -43,7 +43,7 @@ public abstract class AbstractNumericTypeHandler extends AbstractTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
+  public void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     String s = source == null || ((String) source).trim().hashCode() == 0 ? "0" : ((String) source).trim();
     success(createInstance(s), resultHandler);
@@ -64,7 +64,7 @@ public abstract class AbstractNumericTypeHandler extends AbstractTypeHandler {
    * @see de.braintags.vertx.jomnigate.typehandler.ITypeHandler#intoStore(java.lang.Object)
    */
   @Override
-  public final void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public final void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     success(source == null ? "0" : ((Number) source).toString(), resultHandler);
   }
 }

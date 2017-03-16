@@ -32,7 +32,7 @@
  * and stored inside the {@link de.braintags.vertx.jomnigate.mapping.IMapperFactory} implementation, which fits the
  * needs of the underlaying datastore or database. The IMapper contains general information about the mapped class and
  * the generated, respectively connected table in the datastore. Additionally it contains per property of the mapper an
- * instance of {@link de.braintags.vertx.jomnigate.mapping.IField}, where the field and its behaviour regarding the
+ * instance of {@link de.braintags.vertx.jomnigate.mapping.IProperty}, where the field and its behaviour regarding the
  * mapping are desribed. Additionally per field the information about the connected column inside the datastore are kept
  * inside an instance of {@link de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo}
  * 

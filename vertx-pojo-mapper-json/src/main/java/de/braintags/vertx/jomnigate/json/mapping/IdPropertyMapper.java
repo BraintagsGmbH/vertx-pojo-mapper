@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.json.mapping;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
@@ -48,7 +48,7 @@ public class IdPropertyMapper implements IPropertyMapper {
    * @param field
    *          the field to be mapped
    */
-  public IdPropertyMapper(IField field) {
+  public IdPropertyMapper(IProperty field) {
     if (isCharacterColumn(field)) {
       idTrans = charTrans;
     } else if (isNumericColumn(field)) {
@@ -66,7 +66,7 @@ public class IdPropertyMapper implements IPropertyMapper {
    * io.vertx.core.Handler)
    */
   @Override
-  public <T> void intoStoreObject(T entity, IStoreObject<T, ?> storeObject, IField field,
+  public <T> void intoStoreObject(T entity, IStoreObject<T, ?> storeObject, IProperty field,
       Handler<AsyncResult<Void>> handler) {
     Object javaValue = field.getPropertyAccessor().readData(entity);
     storeObject.put(field, javaValue == null ? null : String.valueOf(javaValue));
@@ -80,7 +80,7 @@ public class IdPropertyMapper implements IPropertyMapper {
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public <T> void readForStore(T entity, IField field, Handler<AsyncResult<Object>> handler) {
+  public <T> void readForStore(T entity, IProperty field, Handler<AsyncResult<Object>> handler) {
     Object javaValue = field.getPropertyAccessor().readData(entity);
     handler.handle(Future.succeededFuture(javaValue == null ? null : String.valueOf(javaValue)));
   }
@@ -93,7 +93,7 @@ public class IdPropertyMapper implements IPropertyMapper {
    * io.vertx.core.Handler)
    */
   @Override
-  public <T> void fromStoreObject(T entity, IStoreObject<T, ?> storeObject, IField field,
+  public <T> void fromStoreObject(T entity, IStoreObject<T, ?> storeObject, IProperty field,
       Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("starting fromStoreObject for field " + field.getFullName());
     Object javaValue = idTrans.translate(storeObject.get(field));
@@ -108,11 +108,11 @@ public class IdPropertyMapper implements IPropertyMapper {
     }
   }
 
-  protected boolean isCharacterColumn(IField field) {
+  protected boolean isCharacterColumn(IProperty field) {
     return CharSequence.class.isAssignableFrom(field.getType());
   }
 
-  protected boolean isNumericColumn(IField field) {
+  protected boolean isNumericColumn(IProperty field) {
     return Number.class.isAssignableFrom(field.getType()) || field.getType().equals(long.class)
         || field.getType().equals(int.class);
   }

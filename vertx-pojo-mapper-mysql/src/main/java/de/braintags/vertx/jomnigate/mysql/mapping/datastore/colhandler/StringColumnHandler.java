@@ -14,7 +14,7 @@
 package de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler;
 
 import de.braintags.vertx.jomnigate.annotation.field.Property;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.mysql.mapping.datastore.SqlColumnInfo;
 
@@ -88,7 +88,7 @@ public class StringColumnHandler extends AbstractSqlColumnHandler {
   }
 
   @Override
-  protected StringBuilder generateColumn(IField field, IColumnInfo ci) {
+  protected StringBuilder generateColumn(IProperty field, IColumnInfo ci) {
     StringBuilder result = new StringBuilder();
     if (ci.getType().equalsIgnoreCase(CHAR_TYPE) || ci.getType().equals(VARCHAR_TYPE))
       generateChar(result, ci);

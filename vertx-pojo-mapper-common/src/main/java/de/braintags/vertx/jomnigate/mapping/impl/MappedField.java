@@ -41,7 +41,7 @@ import de.braintags.vertx.jomnigate.annotation.field.Ignore;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapper;
@@ -59,7 +59,7 @@ import io.vertx.core.logging.LoggerFactory;
  * 
  */
 
-public class MappedField implements IField {
+public class MappedField implements IProperty {
   private static final Logger LOGGER = LoggerFactory.getLogger(MappedField.class);
 
   private IPropertyAccessor accessor;
@@ -69,7 +69,7 @@ public class MappedField implements IField {
   private ITypeHandler subTypeHandler;
   private boolean subTypeHandlerComputed = false;
   private IPropertyMapper propertyMapper;
-  private final List<IField> typeParameters = new ArrayList<>();
+  private final List<IProperty> typeParameters = new ArrayList<>();
   private IEncoder encoder;
 
   /**
@@ -483,7 +483,7 @@ public class MappedField implements IField {
    * @see de.braintags.vertx.jomnigate.mapping.IField#getTypeParameters()
    */
   @Override
-  public List<IField> getTypeParameters() {
+  public List<IProperty> getTypeParameters() {
     return typeParameters;
   }
 

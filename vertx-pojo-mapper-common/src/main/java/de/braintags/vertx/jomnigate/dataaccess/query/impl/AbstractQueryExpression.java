@@ -27,7 +27,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryOpera
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownSearchConditionException;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.VariableSyntaxException;
 import de.braintags.vertx.jomnigate.exception.QueryParameterException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.util.Size;
 import io.vertx.core.AsyncResult;
@@ -65,7 +65,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    * @param handler
    *          returns the transformed value
    */
-  private void transformValue(IField field, QueryOperator operator, Object value,
+  private void transformValue(IProperty field, QueryOperator operator, Object value,
       Handler<AsyncResult<Object>> handler) {
     if (operator.isMultiValueOperator()) {
       if (value instanceof Iterable) {
@@ -89,7 +89,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    * @param handler
    *          returns the transformed value
    */
-  private void handleSingleValue(IField field, Object value, Handler<AsyncResult<Object>> handler) {
+  private void handleSingleValue(IProperty field, Object value, Handler<AsyncResult<Object>> handler) {
     field.getTypeHandler().intoStore(value, field, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -109,7 +109,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    * @param handler
    *          returns a {@link List} with the transformed values
    */
-  private void handleMultipleValues(IField field, Iterable<?> value, Handler<AsyncResult<Object>> handler) {
+  private void handleMultipleValues(IProperty field, Iterable<?> value, Handler<AsyncResult<Object>> handler) {
     int count = Size.size(value);
     if (count == 0) {
       String message = String.format("Multivalued argument, but no values defined for search in field %s.%s",
@@ -220,7 +220,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    */
   protected void parseFieldCondition(IFieldCondition fieldCondition, IFieldValueResolver resolver,
       Handler<AsyncResult<T>> handler) {
-    IField field = getMapper().getField(fieldCondition.getField());
+    IProperty field = getMapper().getField(fieldCondition.getField());
     String columnName = field.getColumnInfo().getName();
     Object fieldValue = fieldCondition.getValue();
     if (fieldValue != null) {

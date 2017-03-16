@@ -20,7 +20,7 @@ import java.util.List;
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.impl.DefaultTypeHandlerResult;
 import de.braintags.vertx.util.ClassUtil;
 import de.braintags.vertx.util.ExceptionUtil;
@@ -59,7 +59,7 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
    * de.braintags.vertx.jomnigate.typehandler.ITypeHandler#matches(de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public short matches(IField field) {
+  public short matches(IProperty field) {
     return matches(field.getType(), field.getEmbedRef());
   }
 
@@ -116,7 +116,7 @@ public abstract class AbstractTypeHandler implements ITypeHandler {
    * @return a fitting {@link Constructor}
    */
   @SuppressWarnings("rawtypes")
-  public Constructor getConstructor(IField field, Class<?> cls, Class<?>... arguments) {
+  public Constructor getConstructor(IProperty field, Class<?> cls, Class<?>... arguments) {
     if (field == null && cls == null)
       throw new NullPointerException("Class and field is null");
     if (field != null) {

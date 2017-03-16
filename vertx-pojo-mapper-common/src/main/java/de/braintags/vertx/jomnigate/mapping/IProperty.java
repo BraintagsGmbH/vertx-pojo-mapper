@@ -30,13 +30,12 @@ import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.util.security.crypt.IEncoder;
 
 /**
- * Describes a java field of an {@link IMapper}
+ * Describes a property of an {@link IMapper}
  * 
  * @author Michael Remme
  * 
  */
-
-public interface IField {
+public interface IProperty {
 
   /**
    * Get the simple name of the field, like defined in the mapper class
@@ -184,7 +183,7 @@ public interface IField {
    * 
    * @return the list of type parameters
    */
-  public List<IField> getTypeParameters();
+  public List<IProperty> getTypeParameters();
 
   /**
    * Get the information whether the field defines an array

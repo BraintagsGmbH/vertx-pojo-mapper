@@ -23,7 +23,7 @@ import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.EncoderSettings;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
@@ -88,14 +88,14 @@ public class TMongoMapper extends DatastoreBaseTest {
   public void testId(TestContext context) {
     LOGGER.info("-->> testId");
     IMapper mapper = getDataStore(context).getMapperFactory().getMapper(MiniMapper.class);
-    IField idField = mapper.getField("id");
+    IProperty idField = mapper.getField("id");
     context.assertNotNull(idField); // "Improve that the name of the id field is 'id'",
 
     Id ann = (Id) idField.getAnnotation(Id.class);
     if (ann == null)
       context.fail("Annotation Id must not be null");
 
-    IField field = mapper.getIdField();
+    IProperty field = mapper.getIdField();
     context.assertNotNull(field);
     context.assertTrue(field == idField);
 
@@ -121,7 +121,7 @@ public class TMongoMapper extends DatastoreBaseTest {
     IMapper mapper = getDataStore(context).getMapperFactory().getMapper(MiniMapper.class);
 
     try {
-      IField trField = mapper.getField("transientString");
+      IProperty trField = mapper.getField("transientString");
       context.fail("transient fields should be mapped");
     } catch (NoSuchFieldException e) {
       // this is the expected result

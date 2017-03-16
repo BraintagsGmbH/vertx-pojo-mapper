@@ -15,7 +15,7 @@ package de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler;
 import java.util.Calendar;
 import java.util.Date;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.mysql.mapping.datastore.SqlColumnInfo;
 
@@ -55,7 +55,7 @@ public class DateColumnHandler extends AbstractSqlColumnHandler {
    * braintags.vertx.jomnigate.mapping.IField, de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo)
    */
   @Override
-  protected StringBuilder generateColumn(IField field, IColumnInfo ci) {
+  protected StringBuilder generateColumn(IProperty field, IColumnInfo ci) {
     return new StringBuilder(String.format("%s %s (3) ", ci.getName(), ci.getType()));
   }
 

@@ -14,7 +14,7 @@
 package de.braintags.vertx.jomnigate.mapping.datastore.impl;
 
 import de.braintags.vertx.jomnigate.annotation.field.Property;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 
@@ -53,17 +53,17 @@ public abstract class DefaultColumnInfo implements IColumnInfo {
    * Initializes an instance by using a defined {@link Property} and adds the defined {@link IColumnHandler}
    * 
    * @param field
-   *          the {@link IField} to be used for init
+   *          the {@link IProperty} to be used for init
    * @param columnHandler
    *          the {@link IColumnHandler} to be used
    */
-  public DefaultColumnInfo(IField field, IColumnHandler columnHandler) {
+  public DefaultColumnInfo(IProperty field, IColumnHandler columnHandler) {
     this.columnHandler = columnHandler;
     colName = computePropertyName(field);
     init(field, columnHandler);
   }
 
-  protected String computePropertyName(IField field) {
+  protected String computePropertyName(IProperty field) {
     Property prop = (Property) field.getAnnotation(Property.class);
     if (prop != null) {
       String propName = prop.value();
@@ -73,7 +73,7 @@ public abstract class DefaultColumnInfo implements IColumnInfo {
     return field.getName();
   }
 
-  protected void init(IField field, IColumnHandler columnHandler) {
+  protected void init(IProperty field, IColumnHandler columnHandler) {
     Property prop = (Property) field.getAnnotation(Property.class);
     if (prop != null) {
       type = prop.columnType();

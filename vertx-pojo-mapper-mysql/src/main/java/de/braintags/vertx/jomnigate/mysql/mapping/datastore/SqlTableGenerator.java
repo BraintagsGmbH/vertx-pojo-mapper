@@ -14,7 +14,7 @@
 package de.braintags.vertx.jomnigate.mysql.mapping.datastore;
 
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
@@ -95,7 +95,7 @@ public class SqlTableGenerator extends DefaultTableGenerator {
    * The sql implementation does not allow NULL as return value here
    */
   @Override
-  public IColumnHandler getColumnHandler(IField field) {
+  public IColumnHandler getColumnHandler(IProperty field) {
     IColumnHandler handler = super.getColumnHandler(field);
     if (handler == null)
       throw new MappingException("Could not identfy a valid ColumnHandler for field " + field.getFullName());

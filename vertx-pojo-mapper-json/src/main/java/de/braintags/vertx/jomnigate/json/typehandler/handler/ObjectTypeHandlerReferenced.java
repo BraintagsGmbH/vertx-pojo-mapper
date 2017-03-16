@@ -21,7 +21,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
@@ -71,7 +71,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object id, IField field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void fromStore(Object id, IProperty field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (id == null) {
       success(null, resultHandler);
     } else if (field.getMapper().handleReferencedRecursive()) {
@@ -141,7 +141,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public void intoStore(Object referencedObject, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void intoStore(Object referencedObject, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     IDataStore store = field.getMapper().getMapperFactory().getDataStore();
     if (referencedObject == null) {
       success(null, resultHandler);
@@ -156,7 +156,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
     }
   }
 
-  private void storeId(IDataStore store, IField field, Object id,
+  private void storeId(IDataStore store, IProperty field, Object id,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     ITypeHandler th = store.getMapperFactory().getTypeHandlerFactory().getTypeHandler(id.getClass(), null);
     th.intoStore(id, field, tmpResult -> {
@@ -180,7 +180,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
         resultHandler.handle(Future.failedFuture(saveResult.cause()));
       }
       IWriteEntry we = saveResult.result().iterator().next();
-      IField idField = subMapper.getIdField();
+      IProperty idField = subMapper.getIdField();
       Object id = we.getId() == null ? idField.getPropertyAccessor().readData(referencedObject) : we.getId();
       if (id == null) {
         resultHandler.handle(Future.failedFuture(new MappingException(String.format(

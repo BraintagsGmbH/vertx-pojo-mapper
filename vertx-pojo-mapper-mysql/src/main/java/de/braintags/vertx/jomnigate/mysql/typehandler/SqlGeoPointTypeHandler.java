@@ -19,7 +19,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.impl.GeoSearchArgument;
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
 import de.braintags.vertx.jomnigate.datatypes.geojson.Position;
 import de.braintags.vertx.jomnigate.exception.TypeHandlerException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerResult;
@@ -57,7 +57,7 @@ public class SqlGeoPointTypeHandler extends AbstractTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
+  public void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     success(parse((String) source), resultHandler);
   }
@@ -97,7 +97,7 @@ public class SqlGeoPointTypeHandler extends AbstractTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (source instanceof GeoPoint) {
       encode((GeoPoint) source, resultHandler);
     } else if (source instanceof GeoSearchArgument) {
@@ -118,7 +118,7 @@ public class SqlGeoPointTypeHandler extends AbstractTypeHandler {
     }
   }
 
-  private void encode(GeoSearchArgument source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  private void encode(GeoSearchArgument source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     try {
       success(new SqlDistanceSearchFunction(source, field), resultHandler);
     } catch (Exception e) {

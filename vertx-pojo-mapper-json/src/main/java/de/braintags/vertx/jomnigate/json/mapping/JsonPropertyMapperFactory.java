@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.json.mapping;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapper;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.impl.DefaultPropertyMapper;
@@ -33,7 +33,7 @@ public class JsonPropertyMapperFactory implements IPropertyMapperFactory {
    * @see de.braintags.vertx.jomnigate.mapping.IPropertyMapperFactory#getPropertyMapper(java.lang.Class)
    */
   @Override
-  public IPropertyMapper getPropertyMapper(IField field) {
+  public IPropertyMapper getPropertyMapper(IProperty field) {
     if (field == null)
       throw new NullPointerException("parameter must be specified: field");
     if (field.isIdField()) {

@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.impl;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
@@ -41,7 +41,7 @@ public class DummyTableInfo extends DefaultTableInfo {
    * pojomapper.mapping.IField, de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler)
    */
   @Override
-  protected IColumnInfo generateColumnInfo(IField field, IColumnHandler columnHandler) {
+  protected IColumnInfo generateColumnInfo(IProperty field, IColumnHandler columnHandler) {
     return new DummyColumnInfo(field, columnHandler);
   }
 

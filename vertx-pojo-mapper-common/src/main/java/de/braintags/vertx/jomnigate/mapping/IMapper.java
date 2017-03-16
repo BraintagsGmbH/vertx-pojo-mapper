@@ -71,20 +71,20 @@ public interface IMapper<T> {
   public Set<String> getFieldNames();
 
   /**
-   * Get the {@link IField} as a descriptor for the given field name
+   * Get the {@link IProperty} as a descriptor for the given field name
    * 
    * @param name
    *          the name of the field
-   * @return an instance of {@link IField} or null, if field does not exist
+   * @return an instance of {@link IProperty} or null, if field does not exist
    */
-  public IField getField(String name);
+  public IProperty getField(String name);
 
   /**
-   * Get the {@link IField} which is defined to be the id
+   * Get the {@link IProperty} which is defined to be the id
    * 
    * @return the id field
    */
-  public IField getIdField();
+  public IProperty getIdField();
 
   /**
    * Get the methods of the mapper which are annotated by the given lifecycle annotation like {@link BeforeLoad},
@@ -120,13 +120,13 @@ public interface IMapper<T> {
   public Annotation getAnnotation(Class<? extends Annotation> annotationClass);
 
   /**
-   * Get all {@link IField} of the current mapper, which are annotated with the specified class
+   * Get all {@link IProperty} of the current mapper, which are annotated with the specified class
    * 
    * @param annotationClass
    *          the annotation class where we are interested in
    * @return found fields or empty array, if none is annotated with the given annotation class
    */
-  public IField[] getAnnotatedFields(Class<? extends Annotation> annotationClass);
+  public IProperty[] getAnnotatedFields(Class<? extends Annotation> annotationClass);
 
   /**
    * Execute those lifecycle methods which are annotated by the given lifecycle annotation like {@link BeforeLoad},

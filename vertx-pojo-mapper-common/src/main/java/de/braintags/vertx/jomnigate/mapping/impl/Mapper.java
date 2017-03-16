@@ -41,7 +41,7 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
@@ -73,11 +73,11 @@ public class Mapper<T> implements IMapper<T> {
 
   private IObjectFactory objectFactory;
   private Map<String, MappedField> mappedFields = new HashMap<>();
-  private IField idField;
+  private IProperty idField;
   private MapperFactory mapperFactory;
   private Class<T> mapperClass;
   private Entity entity;
-  private Map<Class<? extends Annotation>, IField[]> fieldCache = new HashMap<>();
+  private Map<Class<? extends Annotation>, IProperty[]> fieldCache = new HashMap<>();
   private ITableInfo tableInfo;
   private boolean syncNeeded = true;
   private IKeyGenerator keyGenerator;
@@ -181,7 +181,7 @@ public class Mapper<T> implements IMapper<T> {
       ITableGenerator tg = mapperFactory.getDataStore().getTableGenerator();
       this.tableInfo = tg.createTableInfo(this);
       for (String fn : getFieldNames()) {
-        IField field = getField(fn);
+        IProperty field = getField(fn);
         IColumnHandler ch = tg.getColumnHandler(field);
         this.tableInfo.createColumnInfo(field, ch);
       }
@@ -365,8 +365,8 @@ public class Mapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#getField(java.lang.String)
    */
   @Override
-  public IField getField(String name) {
-    IField field = mappedFields.get(name);
+  public IProperty getField(String name) {
+    IProperty field = mappedFields.get(name);
     if (field == null)
       throw new de.braintags.vertx.jomnigate.exception.NoSuchFieldException(this, name);
     return field;
@@ -434,12 +434,12 @@ public class Mapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#getAnnotatedFields(java.lang.Class)
    */
   @Override
-  public IField[] getAnnotatedFields(Class<? extends Annotation> annotationClass) {
+  public IProperty[] getAnnotatedFields(Class<? extends Annotation> annotationClass) {
     if (!fieldCache.containsKey(annotationClass)) {
-      IField[] result = new IField[0];
+      IProperty[] result = new IProperty[0];
       for (MappedField field : mappedFields.values()) {
         if (field.getAnnotation(annotationClass) != null) {
-          IField[] newArray = new IField[result.length + 1];
+          IProperty[] newArray = new IProperty[result.length + 1];
           System.arraycopy(result, 0, newArray, 0, result.length);
           result = newArray;
           result[result.length - 1] = field;
@@ -529,7 +529,7 @@ public class Mapper<T> implements IMapper<T> {
   }
 
   @Override
-  public IField getIdField() {
+  public IProperty getIdField() {
     return idField;
   }
 

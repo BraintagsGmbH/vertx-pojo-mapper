@@ -15,7 +15,7 @@ package de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler;
 
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.mapping.datastore.impl.AbstractColumnHandler;
@@ -39,7 +39,7 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
   }
 
   @Override
-  public final Object generate(IField field) {
+  public final Object generate(IProperty field) {
     IColumnInfo ci = field.getColumnInfo();
     if (field.getMapper().getIdField() == field) {
       return generateIdColumn(ci);
@@ -145,5 +145,5 @@ public abstract class AbstractSqlColumnHandler extends AbstractColumnHandler {
    * @param field
    * @return
    */
-  protected abstract StringBuilder generateColumn(IField field, IColumnInfo ci);
+  protected abstract StringBuilder generateColumn(IProperty field, IColumnInfo ci);
 }

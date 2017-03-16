@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
@@ -68,7 +68,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    */
   @SuppressWarnings("rawtypes")
   @Override
-  public Object get(IField field) {
+  public Object get(IProperty field) {
     String colName = field.getColumnInfo().getName();
     return container instanceof JsonObject ? ((JsonObject) container).getValue(colName)
         : ((Map) container).get(colName);
@@ -99,7 +99,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    */
   @SuppressWarnings("rawtypes")
   @Override
-  public boolean hasProperty(IField field) {
+  public boolean hasProperty(IProperty field) {
     String colName = field.getColumnInfo().getName();
     return container instanceof JsonObject ? ((JsonObject) container).containsKey(colName)
         : ((Map) container).containsKey(colName);
@@ -113,7 +113,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
-  public IStoreObject<T, Object> put(IField field, Object value) {
+  public IStoreObject<T, Object> put(IProperty field, Object value) {
     IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     if (ci == null) {
       throw new MappingException("Can't find columninfo for field " + field.getFullName());
@@ -140,7 +140,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
       SqlSequence sequence = new SqlSequence(tInfo.getName());
       Set<String> fieldNames = getMapper().getFieldNames();
       for (String fieldName : fieldNames) {
-        IField field = getMapper().getField(fieldName);
+        IProperty field = getMapper().getField(fieldName);
         if (field != getMapper().getIdField()) {
           sequence.addEntry(field.getColumnInfo().getName(), get(field));
         }
@@ -163,7 +163,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
         resultHandler.handle(Future.failedFuture(keyResult.cause()));
       } else {
         Object genKey = keyResult.result().getKey();
-        IField idField = getMapper().getIdField();
+        IProperty idField = getMapper().getIdField();
         idField.getTypeHandler().intoStore(genKey, idField, thResult -> {
           if (thResult.failed()) {
             resultHandler.handle(Future.failedFuture(thResult.cause()));
@@ -185,14 +185,14 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    */
   public SqlSequence generateSqlUpdateStatement() {
     ITableInfo tInfo = getMapper().getTableInfo();
-    IField idField = getMapper().getIdField();
+    IProperty idField = getMapper().getIdField();
     Object id = get(idField);
 
     SqlSequence sequence = new SqlSequence(tInfo.getName(), idField.getColumnInfo(), id);
 
     Set<String> fieldNames = getMapper().getFieldNames();
     for (String fieldName : fieldNames) {
-      IField field = getMapper().getField(fieldName);
+      IProperty field = getMapper().getField(fieldName);
       if (field != idField) {
         sequence.addEntry(tInfo.getColumnInfo(field).getName(), get(field));
       }
