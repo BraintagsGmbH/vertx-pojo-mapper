@@ -12,11 +12,10 @@
  */
 package de.braintags.vertx.jomnigate.mongo.mapper;
 
-import de.braintags.vertx.jomnigate.IDataStore;
-import de.braintags.vertx.jomnigate.mapping.IPropertyMapperFactory;
-import de.braintags.vertx.jomnigate.mapping.impl.Mapper;
+import de.braintags.vertx.jomnigate.json.mapping.jackson.JacksonMapperFactory;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.impl.MapperFactory;
-import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
+import de.braintags.vertx.jomnigate.mongo.MongoDataStore;
 
 /**
  * An extension of {@link MapperFactory}
@@ -25,24 +24,18 @@ import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
  * 
  */
 
-public class MongoMapperFactory extends MapperFactory {
+public class MongoMapperFactory extends JacksonMapperFactory {
 
   /**
    * @param dataStore
    */
-  public MongoMapperFactory(IDataStore dataStore, ITypeHandlerFactory typehandlerFactory,
-      IPropertyMapperFactory propertyMapperFactory) {
-    super(dataStore, typehandlerFactory, propertyMapperFactory);
+  public MongoMapperFactory(MongoDataStore dataStore) {
+    super(dataStore);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.mapping.impl.MapperFactory#createMapper(java.lang.Class)
-   */
   @Override
-  protected Mapper createMapper(Class mapperClass) {
-    return new MongoMapper(mapperClass, this);
+  protected <T> IMapper<T> createMapper(Class<T> mapperClass) {
+    return new MongoMapper<>(mapperClass, this);
   }
 
 }

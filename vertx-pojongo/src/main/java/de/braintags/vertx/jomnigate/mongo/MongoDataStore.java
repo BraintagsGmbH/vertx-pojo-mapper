@@ -18,7 +18,6 @@ import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
-import de.braintags.vertx.jomnigate.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mongo.dataaccess.MongoDelete;
 import de.braintags.vertx.jomnigate.mongo.dataaccess.MongoQuery;
@@ -26,7 +25,6 @@ import de.braintags.vertx.jomnigate.mongo.dataaccess.MongoWrite;
 import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreSynchronizer;
 import de.braintags.vertx.jomnigate.mongo.mapper.MongoMapperFactory;
 import de.braintags.vertx.jomnigate.mongo.mapper.datastore.MongoTableGenerator;
-import de.braintags.vertx.jomnigate.mongo.typehandler.MongoTypeHandlerFactory;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -67,8 +65,7 @@ public class MongoDataStore extends JsonDatastore {
     super(vertx, properties);
     this.client = client;
     metaData = new MongoMetaData(this);
-    MongoMapperFactory mf = new MongoMapperFactory(this, new MongoTypeHandlerFactory(),
-        new JsonPropertyMapperFactory());
+    MongoMapperFactory mf = new MongoMapperFactory(this);
     setMapperFactory(mf);
     setStoreObjectFactory(new MongoStoreObjectFactory());
     setDataStoreSynchronizer(new MongoDataStoreSynchronizer(this));

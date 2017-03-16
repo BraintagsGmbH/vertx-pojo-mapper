@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.braintags.vertx.jomnigate.IDataStore;
-import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapperFactory;
@@ -44,27 +43,6 @@ public class MapperFactory extends AbstractMapperFactory {
     this.propertyMapperFactory = propertyMapperFactory;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.mapping.IMapperFactory#getMapper(java.lang.Class)
-   */
-  @Override
-  public final <T> IMapper<T> getMapper(Class<T> mapperClass) {
-    String className = mapperClass.getName();
-    if (mappedClasses.containsKey(className)) {
-      @SuppressWarnings("unchecked")
-      IMapper<T> cachedEntry = mappedClasses.get(className);
-      return cachedEntry;
-    }
-    if (!mapperClass.isAnnotationPresent(Entity.class))
-      throw new UnsupportedOperationException(String
-          .format("The class %s is no mappable entity. Add the annotation Entity to the class", mapperClass.getName()));
-    Mapper<T> mapper = createMapper(mapperClass);
-    mappedClasses.put(className, mapper);
-    return mapper;
-  }
-
   /**
    * Creates a new instance of IMapper for the given class
    * 
@@ -72,15 +50,9 @@ public class MapperFactory extends AbstractMapperFactory {
    *          the class to be mapped
    * @return the mapper
    */
-  protected <T> Mapper<T> createMapper(Class<T> mapperClass) {
-    return new Mapper<>(mapperClass, this);
-  }
-
   @Override
-  public final boolean isMapper(Class<?> mapperClass) {
-    if (mappedClasses.containsKey(mapperClass.getName()) || mapperClass.isAnnotationPresent(Entity.class))
-      return true;
-    return false;
+  protected <T> IMapper<T> createMapper(Class<T> mapperClass) {
+    return new Mapper<>(mapperClass, this);
   }
 
   /**
