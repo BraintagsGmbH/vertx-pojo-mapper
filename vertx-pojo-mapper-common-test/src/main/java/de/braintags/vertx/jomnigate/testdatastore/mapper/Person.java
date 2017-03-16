@@ -18,6 +18,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.annotation.IndexField;
@@ -97,7 +99,9 @@ public class Person extends AbstractPerson {
   public String[] stringArray = { "eins", "zwei", "drei" };
 
   @Ignore
+  @JsonIgnore
   public String ignoreField = "";
+  @JsonIgnore
   @Ignore
   private String ignoreField2 = "";
 

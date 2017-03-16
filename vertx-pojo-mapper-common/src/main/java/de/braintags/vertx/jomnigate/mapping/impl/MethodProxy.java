@@ -14,6 +14,7 @@ package de.braintags.vertx.jomnigate.mapping.impl;
 
 import java.lang.reflect.Method;
 
+import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
 import de.braintags.vertx.jomnigate.mapping.ITriggerContext;
 
@@ -24,18 +25,18 @@ import de.braintags.vertx.jomnigate.mapping.ITriggerContext;
  * @author Michael Remme
  *
  */
-class MethodProxy implements IMethodProxy {
-  Method method;
-  Class<?>[] parameterTypes;
+public class MethodProxy implements IMethodProxy {
+  private Method method;
+  private Class<?>[] parameterTypes;
 
-  public MethodProxy(Method method, Mapper mapper) {
+  public MethodProxy(Method method, IMapper<?> mapper) {
     this.method = method;
     if (method.getParameterTypes().length > 0) {
       compute(mapper);
     }
   }
 
-  private void compute(Mapper mapper) {
+  private void compute(IMapper<?> mapper) {
     parameterTypes = method.getParameterTypes();
     if (parameterTypes.length > 1) {
       throw new UnsupportedOperationException("only 1 parameter supported");

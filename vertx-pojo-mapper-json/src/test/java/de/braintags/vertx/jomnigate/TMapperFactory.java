@@ -37,7 +37,6 @@ import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
 import de.braintags.vertx.jomnigate.impl.DummyDataStore;
-import de.braintags.vertx.jomnigate.impl.DummyObjectFactory;
 import de.braintags.vertx.jomnigate.json.typehandler.handler.ArrayTypeHandlerReferenced;
 import de.braintags.vertx.jomnigate.json.typehandler.handler.CollectionTypeHandlerReferenced;
 import de.braintags.vertx.jomnigate.json.typehandler.handler.MapTypeHandlerReferenced;
@@ -46,10 +45,10 @@ import de.braintags.vertx.jomnigate.json.typehandler.handler.ObjectTypeHandlerRe
 import de.braintags.vertx.jomnigate.mapper.Animal;
 import de.braintags.vertx.jomnigate.mapper.NoReferencedFieldMapper;
 import de.braintags.vertx.jomnigate.mapper.Person;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapper;
 import de.braintags.vertx.jomnigate.mapping.impl.Mapper;
 import de.braintags.vertx.jomnigate.mapping.impl.ParametrizedMappedField;
@@ -108,11 +107,10 @@ public class TMapperFactory {
 
   @Test
   public void testObjectFactory() {
-    IObjectFactory of = mapperDef.getObjectFactory();
-    if (of == null)
-      Assert.fail("ObjectFactory must not be null");
-    else
-      Assert.assertEquals("wrong ObjectFactory", DummyObjectFactory.class, of.getClass());
+    if (!mapperDef.getClass().getName().contains("Mongo")) {
+      IObjectFactory of = mapperDef.getObjectFactory();
+      Assert.assertNotNull("ObjectFactory must not be null", of);
+    }
   }
 
   @Test

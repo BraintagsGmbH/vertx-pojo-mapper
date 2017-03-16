@@ -125,7 +125,9 @@ public interface IProperty {
    * Is this field a {@link Set}?
    * 
    * @return true, if field is an instance of {@link Set}
+   * @deprecated should no longer be used, isCollection() instead
    */
+  @Deprecated
   public boolean isSet();
 
   /**
@@ -226,5 +228,12 @@ public interface IProperty {
    * @return the generic {@link Type} of the field
    */
   public Type getGenericType();
+
+  /**
+   * returns true if this property shall be ignored
+   * 
+   * @return
+   */
+  boolean isIgnore();
 
 }

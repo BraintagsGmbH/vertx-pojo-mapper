@@ -46,7 +46,6 @@ import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapper;
-import de.braintags.vertx.jomnigate.mapping.impl.DefaultPropertyMapper;
 import de.braintags.vertx.jomnigate.mapping.impl.ParametrizedMappedField;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.Animal;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapper;
@@ -89,8 +88,12 @@ public class TestMapping extends DatastoreBaseTest {
 
   @Test
   public void testPropertyMapper() {
-    checkPropertyhandler(mapperDef, "name", DefaultPropertyMapper.class);
-    checkPropertyhandler(mapperDef, "listAnimals", DefaultPropertyMapper.class);
+    String classNamePart = "DefaultPropertyMapper";
+    if (mapperDef.getClass().getName().contains("Mongo")) {
+      classNamePart = "JacksonPropertyMapper";
+    }
+    checkPropertyhandler(mapperDef, "name", classNamePart);
+    checkPropertyhandler(mapperDef, "listAnimals", classNamePart);
   }
 
   @Test
@@ -123,11 +126,13 @@ public class TestMapping extends DatastoreBaseTest {
 
   @Test
   public void testObjectFactory() {
-    IObjectFactory of = mapperDef.getObjectFactory();
-    if (of == null)
-      Assert.fail("ObjectFactory must not be null");
-    else
-      Assert.assertEquals("wrong ObjectFactory", Object.class, of.getClass());
+    if (!mapperDef.getClass().getName().contains("Mongo")) {
+      IObjectFactory of = mapperDef.getObjectFactory();
+      if (of == null)
+        Assert.fail("ObjectFactory must not be null");
+      else
+        Assert.assertEquals("wrong ObjectFactory", Object.class, of.getClass());
+    }
   }
 
   @Test
@@ -160,6 +165,11 @@ public class TestMapping extends DatastoreBaseTest {
   }
 
   @Test
+  public void testPropertyAccessor() {
+    assertNotNull("undefined PropertyAccessor", mapperDef.getField("weight").getPropertyAccessor());
+  }
+
+  @Test
   public void testProperty() {
     assertTrue(mapperDef.getField("weight").getPropertyMapper() instanceof IPropertyMapper);
     assertTrue(mapperDef.getField("animal").getPropertyMapper() instanceof IPropertyMapper);
@@ -170,9 +180,15 @@ public class TestMapping extends DatastoreBaseTest {
 
   @Test
   public void testJsonMapping(TestContext context) {
-    ObjectMapper mapper = Json.mapper;
-    examine(mapper, MiniMapper.class);
-    examine(mapper, MiniMapper_BeanMethodWithoutField.class);
+    try {
+      ObjectMapper mapper = Json.mapper;
+      examine(mapper, MiniMapper.class);
+      examine(mapper, MiniMapper_BeanMethodWithoutField.class);
+      examine(mapper, Person.class);
+    } catch (Throwable e) {
+      LOGGER.error("", e);
+      context.fail(e);
+    }
 
   }
 
@@ -196,23 +212,24 @@ public class TestMapping extends DatastoreBaseTest {
 
   @Test
   public void testConstructor() {
-    IProperty mapperField = mapperDef.getField("timeStamp");
-    Constructor<?> con = mapperField.getConstructor();
-    con = mapperField.getConstructor();
-    Assert.assertNull(con);
-    con = mapperField.getConstructor(long.class);
-    Assert.assertNotNull(con);
-    con = mapperField.getConstructor(Long.class);
-    assertNull(con);
+    if (!mapperDef.getClass().getName().contains("Mongo")) {
+      IProperty mapperField = mapperDef.getField("timeStamp");
+      Constructor<?> con = mapperField.getConstructor();
+      con = mapperField.getConstructor();
+      Assert.assertNull(con);
+      con = mapperField.getConstructor(long.class);
+      Assert.assertNotNull(con);
+      con = mapperField.getConstructor(Long.class);
+      assertNull(con);
 
-    mapperField = mapperDef.getField("name");
-    con = mapperField.getConstructor();
-    Assert.assertNotNull(con);
+      mapperField = mapperDef.getField("name");
+      con = mapperField.getConstructor();
+      Assert.assertNotNull(con);
 
-    mapperField = mapperDef.getField("listWithConstructor");
-    con = mapperField.getConstructor();
-    Assert.assertNotNull(con);
-
+      mapperField = mapperDef.getField("listWithConstructor");
+      con = mapperField.getConstructor();
+      Assert.assertNotNull(con);
+    }
   }
 
   @Test
@@ -240,7 +257,9 @@ public class TestMapping extends DatastoreBaseTest {
   public void testArray() {
     IProperty field = mapperDef.getField("stringArray");
     assertTrue(field.isArray());
-    assertNull(field.getTypeHandler());
+    if (!mapperDef.getClass().getName().contains("Mongo")) {
+      assertNull(field.getTypeHandler());
+    }
   }
 
   @Test
@@ -256,26 +275,34 @@ public class TestMapping extends DatastoreBaseTest {
     assertFalse("this should not be a single value", field.isSingleValue());
     Assert.assertFalse("this should not be an array", field.isArray());
     assertTrue("this should be a Collection", field.isCollection());
-    assertEquals(1, field.getTypeParameters().size());
 
-    field = mapperDef.getField("myMap");
-    boolean parametrizedField = false;
-    for (IProperty parField : field.getTypeParameters()) {
-      if (parField instanceof ParametrizedMappedField)
-        parametrizedField = true;
+    if (!mapperDef.getClass().getName().contains("Mongo")) {
+      // no longer used in Jackson based mapping
+      assertEquals(1, field.getTypeParameters().size());
+      field = mapperDef.getField("myMap");
+      boolean parametrizedField = false;
+      for (IProperty parField : field.getTypeParameters()) {
+        if (parField instanceof ParametrizedMappedField)
+          parametrizedField = true;
+      }
+      Assert.assertTrue("tpyeParameters of field 'myMap' must contain ParametrizedMappedField", parametrizedField);
     }
-    Assert.assertTrue("tpyeParameters of field 'myMap' must contain ParametrizedMappedField", parametrizedField);
 
   }
 
   @Test
   public void testSubType() {
     IProperty field = mapperDef.getField("stories");
-    Assert.assertEquals("subtype should be String", String.class, field.getSubType());
+    if (!mapperDef.getClass().getName().contains("Mongo")) {
+      Assert.assertEquals("subtype should be String", String.class, field.getSubType());
+    }
     Assert.assertEquals("subclass should be String", String.class, field.getSubClass());
 
     field = mapperDef.getField("name");
-    Assert.assertNull(field.getSubType());
+    Assert.assertNotNull(field);
+    if (!mapperDef.getClass().getName().contains("Mongo")) {
+      Assert.assertNull(field.getSubType());
+    }
     Assert.assertNull(field.getSubClass());
 
   }
@@ -283,18 +310,20 @@ public class TestMapping extends DatastoreBaseTest {
   @Test
   public void testWildcard() {
     IProperty field = mapperDef.getField("myClass");
-    Assert.assertEquals(1, field.getTypeParameters().size());
+    if (!mapperDef.getClass().getName().contains("Mongo")) {
+      Assert.assertEquals(1, field.getTypeParameters().size());
+    }
   }
 
   @Test
   public void testMap() {
     IProperty field = mapperDef.getField("myMap");
-
     Assert.assertTrue(field.isMap());
-    Assert.assertEquals(2, field.getTypeParameters().size());
-
     assertEquals(Integer.class, field.getMapKeyClass());
     assertEquals(Double.class, field.getSubClass());
+    if (!mapperDef.getClass().getName().contains("Mongo")) {
+      Assert.assertEquals(2, field.getTypeParameters().size());
+    }
   }
 
   @Test
@@ -302,10 +331,11 @@ public class TestMapping extends DatastoreBaseTest {
     IProperty field = mapperDef.getField("listAnimals");
     Assert.assertTrue(field.isCollection());
     Class subClass = field.getSubClass();
-    Type subType = field.getSubType();
-
     Assert.assertEquals(subClass, Animal.class);
-    Assert.assertEquals(subType, Animal.class);
+    if (!mapperDef.getClass().getName().contains("Mongo")) {
+      Type subType = field.getSubType();
+      Assert.assertEquals(subType, Animal.class);
+    }
   }
 
   @Test
@@ -313,10 +343,18 @@ public class TestMapping extends DatastoreBaseTest {
     IProperty field = mapperDef.getField("unknownSubType");
     Assert.assertTrue(field.isCollection());
     Class subClass = field.getSubClass();
-    Type subType = field.getSubType();
+    if (!mapperDef.getClass().getName().contains("Mongo")) {
+      Assert.assertEquals(Object.class, subClass);
+      Type subType = field.getSubType();
+      Assert.assertEquals(subType, Object.class);
+    } else {
+      Assert.assertNull(subClass);
+    }
+  }
 
-    Assert.assertEquals(subClass, Object.class);
-    Assert.assertEquals(subType, Object.class);
+  @Test
+  public void testReferencedField() {
+    Assert.assertTrue("this mapper has referenced fields", mapperDef.hasReferencedFields());
   }
 
   /**
@@ -333,11 +371,11 @@ public class TestMapping extends DatastoreBaseTest {
     }
   }
 
-  private void checkPropertyhandler(IMapper mapperdef, String fieldName,
-      Class<? extends IPropertyMapper> expectedPropertyMapper) {
+  private void checkPropertyhandler(IMapper mapperdef, String fieldName, String classNamePart) {
     IProperty field = mapperDef.getField(fieldName);
     assertNotNull("property mapper must not be null for field: " + field.getFullName(), field.getPropertyMapper());
-    assertEquals("wrong property mapper for field: " + field.getFullName(), expectedPropertyMapper,
-        field.getPropertyMapper().getClass());
+    String className = field.getPropertyMapper().getClass().getName();
+    assertTrue("wrong property mapper for field: " + field.getFullName(), className.contains(classNamePart));
+
   }
 }

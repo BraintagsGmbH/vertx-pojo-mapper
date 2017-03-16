@@ -20,6 +20,7 @@ import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
+import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterSave;
@@ -54,6 +55,13 @@ public interface IMapper<T> {
    * @return the class
    */
   public Class<T> getMapperClass();
+
+  /**
+   * Returns true if at least one field of the mapper is annotated with {@link Referenced}
+   * 
+   * @return
+   */
+  boolean hasReferencedFields();
 
   /**
    * Get the {@link IObjectFactory} which is defined for the current mapper. To define the {@link IObjectFactory} for

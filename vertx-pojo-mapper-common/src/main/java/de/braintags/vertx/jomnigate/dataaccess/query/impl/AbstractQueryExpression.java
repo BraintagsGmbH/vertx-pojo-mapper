@@ -27,8 +27,8 @@ import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryOpera
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownSearchConditionException;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.VariableSyntaxException;
 import de.braintags.vertx.jomnigate.exception.QueryParameterException;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.util.Size;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -90,13 +90,15 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    *          returns the transformed value
    */
   private void handleSingleValue(IProperty field, Object value, Handler<AsyncResult<Object>> handler) {
-    field.getTypeHandler().intoStore(value, field, result -> {
-      if (result.failed()) {
-        handler.handle(Future.failedFuture(result.cause()));
-      } else {
-        handler.handle(Future.succeededFuture(result.result().getResult()));
-      }
-    });
+    field.getPropertyMapper().readForStore(value, field, handler);
+
+    // field.getTypeHandler().intoStore(value, field, result -> {
+    // if (result.failed()) {
+    // handler.handle(Future.failedFuture(result.cause()));
+    // } else {
+    // handler.handle(Future.succeededFuture(result.result().getResult()));
+    // }
+    // });
   }
 
   /**

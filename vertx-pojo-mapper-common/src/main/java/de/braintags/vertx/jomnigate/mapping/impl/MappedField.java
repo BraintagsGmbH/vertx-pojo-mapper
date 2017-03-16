@@ -24,7 +24,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -35,20 +34,15 @@ import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.ConcreteClass;
 import de.braintags.vertx.jomnigate.annotation.field.ConstructorArguments;
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
-import de.braintags.vertx.jomnigate.annotation.field.Encoder;
-import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.annotation.field.Ignore;
-import de.braintags.vertx.jomnigate.annotation.field.Property;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapper;
-import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.util.ClassUtil;
-import de.braintags.vertx.util.security.crypt.IEncoder;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
@@ -59,34 +53,17 @@ import io.vertx.core.logging.LoggerFactory;
  * 
  */
 
-public class MappedField implements IProperty {
+public class MappedField extends AbstractProperty {
   private static final Logger LOGGER = LoggerFactory.getLogger(MappedField.class);
 
   private IPropertyAccessor accessor;
-  private Field field;
-  private Mapper mapper;
+  protected Field field;
   private ITypeHandler typeHandler;
   private ITypeHandler subTypeHandler;
   private boolean subTypeHandlerComputed = false;
   private IPropertyMapper propertyMapper;
   private final List<IProperty> typeParameters = new ArrayList<>();
-  private IEncoder encoder;
 
-  /**
-   * Annotations which shall be checked for a field definition
-   */
-  private static final List<Class<? extends Annotation>> FIELD_ANNOTATIONS = Arrays.asList(Id.class, Property.class,
-      Referenced.class, Embedded.class, ConcreteClass.class, Encoder.class, Ignore.class);
-
-  /**
-   * If for the current field an Annotation {@link Embedded} or {@link Referenced} is defined, then it is stored in here
-   */
-  private Annotation embedRef;
-
-  /**
-   * Class annotations which were found inside the current definition
-   */
-  private final Map<Class<? extends Annotation>, Annotation> existingClassAnnotations = new HashMap<>();
   private Class<?> realType;
   private Type genericType;
   private boolean isSet;
@@ -98,6 +75,10 @@ public class MappedField implements IProperty {
   private Type mapKeyType;
   private Type subType;
   private Map<String, Constructor<?>> constructors = new HashMap<>();
+  /**
+   * Class annotations which were found inside the current definition
+   */
+  protected final Map<Class<? extends Annotation>, Annotation> existingPropertyAnnotations = new HashMap<>();
 
   /**
    * Constructor which creates a new instance by reading informations from the given {@link Field}
@@ -110,11 +91,11 @@ public class MappedField implements IProperty {
    *          the parent {@link IMapper}
    */
   public MappedField(Field field, IPropertyAccessor accessor, Mapper mapper) {
+    super(mapper);
     this.accessor = accessor;
     this.field = field;
     field.setAccessible(true);
     realType = field.getType();
-    this.mapper = mapper;
     genericType = field.getGenericType();
     init();
   }
@@ -128,7 +109,7 @@ public class MappedField implements IProperty {
    *          the parent {@link IMapper}
    */
   public MappedField(Type type, Mapper mapper) {
-    this.mapper = mapper;
+    super(mapper);
     genericType = type;
     computeType();
   }
@@ -138,6 +119,20 @@ public class MappedField implements IProperty {
     propertyMapper = computePropertyMapper();
     computeType();
     computeMultivalued();
+  }
+
+  protected void computeAnnotations() {
+    for (Class<? extends Annotation> annClass : FIELD_ANNOTATIONS) {
+      Annotation ann = field.getAnnotation(annClass);
+      if (ann != null)
+        existingPropertyAnnotations.put(annClass, ann);
+    }
+    if (hasAnnotation(Referenced.class)) {
+      embedRef = getAnnotation(Referenced.class);
+    } else if (hasAnnotation(Embedded.class)) {
+      embedRef = getAnnotation(Embedded.class);
+    }
+    computeEncoder();
   }
 
   private void computeSubTypeHandler() {
@@ -152,10 +147,9 @@ public class MappedField implements IProperty {
   }
 
   protected final IPropertyMapper computePropertyMapper() {
-    return mapper.getMapperFactory().getPropertyMapperFactory().getPropertyMapper(this);
+    return getMapper().getMapperFactory().getPropertyMapperFactory().getPropertyMapper(this);
   }
 
-  // TODO Yet needed?
   @SuppressWarnings("rawtypes")
   private Constructor computeConstructor() {
     Constructor<?> constructor = null;
@@ -237,7 +231,7 @@ public class MappedField implements IProperty {
     TypeVariable<GenericDeclaration> tv = null;
     if (genericType instanceof TypeVariable) {
       tv = (TypeVariable<GenericDeclaration>) genericType;
-      final Class<?> typeArgument = ClassUtil.getTypeArgument(mapper.getMapperClass(), tv);
+      final Class<?> typeArgument = ClassUtil.getTypeArgument(getMapper().getMapperClass(), tv);
       if (typeArgument != null) {
         realType = typeArgument;
       }
@@ -276,38 +270,6 @@ public class MappedField implements IProperty {
     }
   }
 
-  protected void computeAnnotations() {
-    for (Class<? extends Annotation> annClass : FIELD_ANNOTATIONS) {
-      Annotation ann = field.getAnnotation(annClass);
-      if (ann != null)
-        existingClassAnnotations.put(annClass, ann);
-    }
-    if (hasAnnotation(Referenced.class)) {
-      embedRef = getAnnotation(Referenced.class);
-    } else if (hasAnnotation(Embedded.class)) {
-      embedRef = getAnnotation(Embedded.class);
-    }
-    computeEncoder();
-  }
-
-  private void computeEncoder() {
-    if (hasAnnotation(Encoder.class)) {
-      String encoderName = ((Encoder) getAnnotation(Encoder.class)).name();
-      IEncoder enc = getMapper().getMapperFactory().getDataStore().getEncoder(encoderName);
-      if (enc == null) {
-        throw new UnsupportedOperationException("The encoder with name " + encoderName
-            + " does not exist. You need to add it into the datastore. Field: " + getFullName());
-      }
-      if (CharSequence.class.isAssignableFrom(getType())) {
-        this.encoder = enc;
-      } else {
-        throw new UnsupportedOperationException(
-            "Annotation Encoded can only be used for fields instance of CharSequence. Field: " + getFullName());
-      }
-
-    }
-  }
-
   /*
    * (non-Javadoc)
    * 
@@ -326,18 +288,8 @@ public class MappedField implements IProperty {
   @Override
   public ITypeHandler getTypeHandler() {
     if (typeHandler == null)
-      typeHandler = mapper.getMapperFactory().getTypeHandlerFactory().getTypeHandler(this);
+      typeHandler = getMapper().getMapperFactory().getTypeHandlerFactory().getTypeHandler(this);
     return typeHandler;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.mapping.IField#getAnnotation(java.lang.Class)
-   */
-  @Override
-  public Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
-    return existingClassAnnotations.get(annotationClass);
   }
 
   /**
@@ -349,16 +301,6 @@ public class MappedField implements IProperty {
    */
   public static void addInterestingAnnotation(final Class<? extends Annotation> annotation) {
     FIELD_ANNOTATIONS.add(annotation);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.mapping.IField#getMapper()
-   */
-  @Override
-  public IMapper getMapper() {
-    return mapper;
   }
 
   /*
@@ -512,22 +454,9 @@ public class MappedField implements IProperty {
    * 
    * @return
    */
+  @Override
   public boolean isIgnore() {
     return hasAnnotation(Ignore.class);
-  }
-
-  @Override
-  public boolean hasAnnotation(final Class<? extends Annotation> ann) {
-    return hasAnnotation(ann, false);
-  }
-
-  public boolean hasAnnotation(final Class<? extends Annotation> ann, boolean deep) {
-    if (existingClassAnnotations.containsKey(ann)) {
-      return true;
-    } else {
-
-    }
-    return false;
   }
 
   /**
@@ -541,11 +470,6 @@ public class MappedField implements IProperty {
   }
 
   @Override
-  public String toString() {
-    return getFullName();
-  }
-
-  @Override
   public String getName() {
     return field.getName();
   }
@@ -553,11 +477,6 @@ public class MappedField implements IProperty {
   @Override
   public IPropertyMapper getPropertyMapper() {
     return propertyMapper;
-  }
-
-  @Override
-  public Annotation getEmbedRef() {
-    return embedRef;
   }
 
   /*
@@ -595,48 +514,27 @@ public class MappedField implements IProperty {
   /*
    * (non-Javadoc)
    * 
+   * @see de.braintags.vertx.jomnigate.mapping.IField#getAnnotation(java.lang.Class)
+   */
+  @Override
+  public Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
+    return existingPropertyAnnotations.get(annotationClass);
+  }
+
+  @Override
+  public boolean hasAnnotation(final Class<? extends Annotation> ann) {
+    return existingPropertyAnnotations.containsKey(ann);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see de.braintags.vertx.jomnigate.mapping.IField#getSubTypeHandler()
    */
   @Override
   public ITypeHandler getSubTypeHandler() {
     computeSubTypeHandler();
     return subTypeHandler;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.mapping.IField#getColumnInfo()
-   */
-  @Override
-  public IColumnInfo getColumnInfo() {
-    return getMapper().getTableInfo().getColumnInfo(this);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.mapping.IField#isIdField()
-   */
-  @Override
-  public boolean isIdField() {
-    return hasAnnotation(Id.class);
-  }
-
-  /**
-   * @return the encoder
-   */
-  @Override
-  public IEncoder getEncoder() {
-    return encoder;
-  }
-
-  /**
-   * @param encoder
-   *          the encoder to set
-   */
-  public void setEncoder(IEncoder encoder) {
-    this.encoder = encoder;
   }
 
   @Override
