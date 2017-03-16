@@ -42,7 +42,7 @@ public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSync
    * mapping .IMapper, io.vertx.core.Handler)
    */
   @Override
-  public final void synchronize(IMapper mapper, Handler<AsyncResult<ISyncResult<T>>> resultHandler) {
+  public final <U> void synchronize(IMapper<U> mapper, Handler<AsyncResult<ISyncResult<T>>> resultHandler) {
     if (synchronizedInstances.contains(mapper.getMapperClass().getName())) {
       resultHandler.handle(Future.succeededFuture(getSyncResult()));
     } else {

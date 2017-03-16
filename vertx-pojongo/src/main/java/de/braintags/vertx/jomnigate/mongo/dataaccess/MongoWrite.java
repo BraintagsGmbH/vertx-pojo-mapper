@@ -86,7 +86,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   @SuppressWarnings({ "rawtypes", "unchecked" })
   private Future<IWriteEntry> save(T entity) {
     Future<IWriteEntry> f = Future.future();
-    getDataStore().getMapperFactory().getStoreObjectFactory().createStoreObject(getMapper(), entity, result -> {
+    getDataStore().getStoreObjectFactory().createStoreObject(getMapper(), entity, result -> {
       if (result.failed()) {
         WriteException we = new WriteException(result.cause());
         LOG.info("failed", we);

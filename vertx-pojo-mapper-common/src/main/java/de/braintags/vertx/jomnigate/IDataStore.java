@@ -22,6 +22,7 @@ import de.braintags.vertx.jomnigate.mapping.IDataStoreSynchronizer;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
+import de.braintags.vertx.jomnigate.mapping.IStoreObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.ITriggerContext;
 import de.braintags.vertx.jomnigate.mapping.ITriggerContextFactory;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
@@ -35,10 +36,13 @@ import io.vertx.core.json.JsonObject;
  * IDataStore contains information about the destination datastore and creates the handler objects
  *
  * @author Michael Remme
- *
+ * @param <S>
+ *          the type of the {@link IStoreObjectFactory}
+ * @param <U>
+ *          the format used by the underlaing {@link IDataStoreSynchronizer}
+ * 
  */
-
-public interface IDataStore {
+public interface IDataStore<S, U> {
 
   /**
    * The name of the property, which defines the kind, how referenced objects in a mapper are read. In general this
@@ -95,11 +99,18 @@ public interface IDataStore {
   IMapperFactory getMapperFactory();
 
   /**
+   * Get the {@link IStoreObjectFactory} suitable for the current instance
+   * 
+   * @return the instance of {@link IStoreObjectFactory}
+   */
+  public IStoreObjectFactory<S> getStoreObjectFactory();
+
+  /**
    * Get the instance of {@link IDataStoreSynchronizer} suitable for the current datastore
    *
    * @return the instance of {@link IDataStoreSynchronizer} for the current datastore or null, if no synchronizer needed
    */
-  IDataStoreSynchronizer getDataStoreSynchronizer();
+  IDataStoreSynchronizer<U> getDataStoreSynchronizer();
 
   /**
    * Get the instance of {@link ITableGenerator} suitable for the given datastore

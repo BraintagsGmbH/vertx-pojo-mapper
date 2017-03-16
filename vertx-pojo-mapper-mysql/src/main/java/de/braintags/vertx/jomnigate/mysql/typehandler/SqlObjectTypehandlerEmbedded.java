@@ -80,27 +80,6 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
     });
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  @Override
-  protected void writeSingleValueAsMapper(IDataStore store, Object embeddedObject, IMapper embeddedMapper, IField field,
-      Handler<AsyncResult<ITypeHandlerResult>> handler) {
-    checkId(store, embeddedObject, embeddedMapper, idResult -> {
-      if (idResult.failed()) {
-        fail(idResult.cause(), handler);
-      } else {
-        ((SqlStoreObjectFactory) store.getMapperFactory().getStoreObjectFactory()).createStoreObject(embeddedMapper,
-            embeddedObject, result -> {
-              if (result.failed()) {
-                fail(result.cause(), handler);
-              } else {
-                success(((SqlStoreObject) result.result()).getContainerAsJson(), handler);
-              }
-            });
-      }
-    });
-
-  }
-
   @SuppressWarnings("rawtypes")
   private void checkId(IDataStore store, Object embeddedObject, IMapper mapper, Handler<AsyncResult<Void>> handler) {
     IField field = mapper.getIdField();
@@ -125,4 +104,33 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
       });
     }
   }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.json.typehandler.handler.ObjectTypeHandlerEmbedded#writeSingleValueAsMapper(de.
+   * braintags.vertx.jomnigate.IDataStore, java.lang.Object, de.braintags.vertx.jomnigate.mapping.IMapper,
+   * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Override
+  protected void writeSingleValueAsMapper(IDataStore<?, ?> store, Object embeddedObject, IMapper embeddedMapper,
+      IField field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+    checkId(store, embeddedObject, embeddedMapper, idResult -> {
+      if (idResult.failed()) {
+        fail(idResult.cause(), handler);
+      } else {
+        ((SqlStoreObjectFactory) store.getStoreObjectFactory()).createStoreObject(embeddedMapper, embeddedObject,
+            result -> {
+              if (result.failed()) {
+                fail(result.cause(), handler);
+              } else {
+                success(((SqlStoreObject) result.result()).getContainerAsJson(), handler);
+              }
+            });
+      }
+    });
+
+  }
+
 }

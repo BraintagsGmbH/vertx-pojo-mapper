@@ -76,7 +76,7 @@ public class TestStoreObject extends DatastoreBaseTest {
   private IStoreObject<?, ?> createStoreObject(TestContext context, IMapper mapper, Object entity) {
     Async async = context.async();
     ResultObject<IStoreObject<?, ?>> ro = new ResultObject<>(null);
-    IStoreObjectFactory<?> f = TestHelper.getDataStore().getMapperFactory().getStoreObjectFactory();
+    IStoreObjectFactory<?> f = TestHelper.getDataStore().getStoreObjectFactory();
     f.createStoreObject(mapper, entity, result -> {
       if (result.failed()) {
         ro.setThrowable(result.cause());

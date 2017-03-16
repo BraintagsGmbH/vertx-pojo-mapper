@@ -14,7 +14,6 @@ package de.braintags.vertx.jomnigate.mongo.mapper;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapperFactory;
-import de.braintags.vertx.jomnigate.mapping.IStoreObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.impl.Mapper;
 import de.braintags.vertx.jomnigate.mapping.impl.MapperFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
@@ -32,8 +31,8 @@ public class MongoMapperFactory extends MapperFactory {
    * @param dataStore
    */
   public MongoMapperFactory(IDataStore dataStore, ITypeHandlerFactory typehandlerFactory,
-      IPropertyMapperFactory propertyMapperFactory, IStoreObjectFactory sto) {
-    super(dataStore, typehandlerFactory, propertyMapperFactory, sto);
+      IPropertyMapperFactory propertyMapperFactory) {
+    super(dataStore, typehandlerFactory, propertyMapperFactory);
   }
 
   /*

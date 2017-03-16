@@ -42,7 +42,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * @param mapperClass
    * @param datastore
    */
-  public AbstractWrite(final Class<T> mapperClass, IDataStore datastore) {
+  public AbstractWrite(final Class<T> mapperClass, IDataStore<?, ?> datastore) {
     super(mapperClass, datastore);
   }
 

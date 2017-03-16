@@ -50,19 +50,22 @@ public class SqlQueryResult<T> extends AbstractQueryResult<T> {
     this.resultSet = resultSet;
   }
 
-  /* (non-Javadoc)
-   * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryResult#generatePojo(int, io.vertx.core.Handler)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryResult#generatePojo(int,
+   * io.vertx.core.Handler)
    */
   @Override
   protected void generatePojo(int i, Handler<AsyncResult<T>> handler) {
     JsonObject sourceObject = resultSet.getRows().get(i);
-    SqlStoreObjectFactory sf = (SqlStoreObjectFactory) getDataStore().getMapperFactory().getStoreObjectFactory();
+    SqlStoreObjectFactory sf = (SqlStoreObjectFactory) getDataStore().getStoreObjectFactory();
     sf.createStoreObject(sourceObject, getMapper(), result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
         @SuppressWarnings("unchecked")
-        T pojo = (T) result.result().getEntity();
+        T pojo = result.result().getEntity();
         handler.handle(Future.succeededFuture(pojo));
       }
     });

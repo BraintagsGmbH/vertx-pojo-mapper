@@ -40,7 +40,7 @@ import io.vertx.ext.asyncsql.AsyncSQLClient;
  * @author Michael Remme
  * 
  */
-public class MySqlDataStore extends AbstractDataStore {
+public class MySqlDataStore extends AbstractDataStore<Object, String> {
   /**
    * The name of the property, which describes the database to be used
    */
@@ -62,8 +62,8 @@ public class MySqlDataStore extends AbstractDataStore {
     super(vertx, properties);
     this.sqlClient = sqlClient;
     metaData = new MySqlMetaData(this);
-    setMapperFactory(new SqlMapperFactory(this, new SqlTypeHandlerFactory(), new SqlPropertyMapperFactory(),
-        new SqlStoreObjectFactory()));
+    setMapperFactory(new SqlMapperFactory(this, new SqlTypeHandlerFactory(), new SqlPropertyMapperFactory()));
+    setStoreObjectFactory(new SqlStoreObjectFactory());
     setDataStoreSynchronizer(new SqlDataStoreSynchronizer(this));
     setTableGenerator(new SqlTableGenerator());
   }

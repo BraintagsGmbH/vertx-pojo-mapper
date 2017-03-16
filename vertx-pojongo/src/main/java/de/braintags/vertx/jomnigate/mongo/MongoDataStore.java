@@ -41,7 +41,7 @@ import io.vertx.ext.mongo.MongoClient;
  * 
  */
 
-public class MongoDataStore extends JsonDatastore implements IDataStore {
+public class MongoDataStore extends JsonDatastore {
 
   /**
    * The minimal version of MongoDb, which is expected by the current implementation
@@ -67,9 +67,10 @@ public class MongoDataStore extends JsonDatastore implements IDataStore {
     super(vertx, properties);
     this.client = client;
     metaData = new MongoMetaData(this);
-    MongoMapperFactory mf = new MongoMapperFactory(this, new MongoTypeHandlerFactory(), new JsonPropertyMapperFactory(),
-        new MongoStoreObjectFactory());
+    MongoMapperFactory mf = new MongoMapperFactory(this, new MongoTypeHandlerFactory(),
+        new JsonPropertyMapperFactory());
     setMapperFactory(mf);
+    setStoreObjectFactory(new MongoStoreObjectFactory());
     setDataStoreSynchronizer(new MongoDataStoreSynchronizer(this));
     setTableGenerator(new MongoTableGenerator());
   }

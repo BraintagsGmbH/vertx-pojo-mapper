@@ -27,6 +27,7 @@ import de.braintags.vertx.jomnigate.mapping.IDataStoreSynchronizer;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapperFactory;
+import de.braintags.vertx.jomnigate.mapping.IStoreObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.ITriggerContextFactory;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
 import de.braintags.vertx.jomnigate.mapping.impl.MapperFactory;
@@ -45,8 +46,8 @@ import io.vertx.core.json.JsonObject;
  *
  */
 
-public class DummyDataStore implements IDataStore {
-  IMapperFactory mf = new MapperFactory(this, new JsonTypeHandlerFactory(), new JsonPropertyMapperFactory(), null);
+public class DummyDataStore implements IDataStore<String, String> {
+  MapperFactory mf = new MapperFactory(this, new JsonTypeHandlerFactory(), new JsonPropertyMapperFactory());
   ITableGenerator tg = new DummyTableGenerator();
   String database;
   private JsonObject properties;
@@ -56,7 +57,7 @@ public class DummyDataStore implements IDataStore {
   }
 
   public DummyDataStore(ITypeHandlerFactory tf, IPropertyMapperFactory pf) {
-    this.mf = new MapperFactory(this, tf, pf, null);
+    this.mf = new MapperFactory(this, tf, pf);
   }
 
   /*
@@ -294,6 +295,16 @@ public class DummyDataStore implements IDataStore {
   @Override
   public int getDefaultQueryLimit() {
     return 500;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.IDataStore#getStoreObjectFactory()
+   */
+  @Override
+  public IStoreObjectFactory<String> getStoreObjectFactory() {
+    return null;
   }
 
 }

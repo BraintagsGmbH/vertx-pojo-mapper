@@ -14,7 +14,6 @@ package de.braintags.vertx.jomnigate.mysql.mapping;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapperFactory;
-import de.braintags.vertx.jomnigate.mapping.IStoreObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.impl.Mapper;
 import de.braintags.vertx.jomnigate.mapping.impl.MapperFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
@@ -33,9 +32,9 @@ public class SqlMapperFactory extends MapperFactory {
    * @param propertyMapperFactory
    * @param stf
    */
-  public SqlMapperFactory(IDataStore dataStore, ITypeHandlerFactory typeHandlerFactory,
-      IPropertyMapperFactory propertyMapperFactory, IStoreObjectFactory stf) {
-    super(dataStore, typeHandlerFactory, propertyMapperFactory, stf);
+  public SqlMapperFactory(IDataStore<Object, String> dataStore, ITypeHandlerFactory typeHandlerFactory,
+      IPropertyMapperFactory propertyMapperFactory) {
+    super(dataStore, typeHandlerFactory, propertyMapperFactory);
   }
 
   /*

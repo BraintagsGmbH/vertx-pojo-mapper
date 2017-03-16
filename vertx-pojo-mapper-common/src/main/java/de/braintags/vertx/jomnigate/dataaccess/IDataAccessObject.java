@@ -30,7 +30,7 @@ public interface IDataAccessObject<T> {
    * 
    * @return the {@link IDataStore}
    */
-  IDataStore getDataStore();
+  IDataStore<?, ?> getDataStore();
 
   /**
    * Get the underlaying mapper class of the instance
@@ -44,6 +44,6 @@ public interface IDataAccessObject<T> {
    * 
    * @return the mapper
    */
-  public IMapper getMapper();
+  public IMapper<T> getMapper();
 
 }

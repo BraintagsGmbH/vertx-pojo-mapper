@@ -50,8 +50,7 @@ public class PerfMappingPersonAnimal_List extends DatastoreBaseTest {
     for (int i = 0; i < LOOP; i++) {
       Future f = Future.future();
       fl.add(f);
-      ds.getMapperFactory().getStoreObjectFactory().createStoreObject(mapper, new PersonWithAnimal_List(i),
-          f.completer());
+      ds.getStoreObjectFactory().createStoreObject(mapper, new PersonWithAnimal_List(i), f.completer());
     }
 
     CompositeFuture cf = CompositeFuture.all(fl);

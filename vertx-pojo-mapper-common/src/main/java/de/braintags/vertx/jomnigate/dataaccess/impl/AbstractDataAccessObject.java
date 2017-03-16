@@ -32,7 +32,7 @@ import io.vertx.core.Handler;
 public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T> {
 
   private Class<T> mapperClass;
-  private IDataStore datastore;
+  private IDataStore<?, ?> datastore;
   private IMapper<T> mapper;
 
   /**
@@ -44,7 +44,7 @@ public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T
    * @param datastore
    *          the datastore to be used for all actions of the current instance
    */
-  public AbstractDataAccessObject(final Class<T> mapperClass, IDataStore datastore) {
+  public AbstractDataAccessObject(final Class<T> mapperClass, IDataStore<?, ?> datastore) {
     this.mapperClass = mapperClass;
     this.datastore = datastore;
     this.mapper = datastore.getMapperFactory().getMapper(mapperClass);
@@ -56,7 +56,7 @@ public abstract class AbstractDataAccessObject<T> implements IDataAccessObject<T
    * @see de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject#getDataStore()
    */
   @Override
-  public IDataStore getDataStore() {
+  public IDataStore<?, ?> getDataStore() {
     return datastore;
   }
 

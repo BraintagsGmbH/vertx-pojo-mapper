@@ -56,7 +56,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param mapperClass
    * @param datastore
    */
-  public SqlWrite(Class<T> mapperClass, IDataStore datastore) {
+  public SqlWrite(Class<T> mapperClass, IDataStore<?, ?> datastore) {
     super(mapperClass, datastore);
   }
 
@@ -65,21 +65,20 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     if (getObjectsToSave().isEmpty()) {
       resultHandler.handle(Future.succeededFuture(new SqlWriteResult()));
     } else {
-      getDataStore().getMapperFactory().getStoreObjectFactory().createStoreObjects(getMapper(), getObjectsToSave(),
-          stoResult -> {
-            if (stoResult.failed()) {
-              resultHandler.handle(Future.failedFuture(stoResult.cause()));
+      getDataStore().getStoreObjectFactory().createStoreObjects(getMapper(), getObjectsToSave(), stoResult -> {
+        if (stoResult.failed()) {
+          resultHandler.handle(Future.failedFuture(stoResult.cause()));
+        } else {
+          CompositeFuture cf = saveRecords(stoResult.result());
+          cf.setHandler(cfr -> {
+            if (cfr.failed()) {
+              resultHandler.handle(Future.failedFuture(cfr.cause()));
             } else {
-              CompositeFuture cf = saveRecords(stoResult.result());
-              cf.setHandler(cfr -> {
-                if (cfr.failed()) {
-                  resultHandler.handle(Future.failedFuture(cfr.cause()));
-                } else {
-                  resultHandler.handle(Future.succeededFuture(new SqlWriteResult(cf.list())));
-                }
-              });
+              resultHandler.handle(Future.succeededFuture(new SqlWriteResult(cf.list())));
             }
           });
+        }
+      });
 
     }
   }
@@ -145,7 +144,6 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   private void finishUpdate(SqlStoreObject<T> storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {
     Object id = getMapper().getIdField().getPropertyAccessor().readData(storeObject.getEntity());
     LOGGER.debug("updated record with id " + id);
@@ -200,7 +198,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         }));
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({ "rawtypes" })
   private void insertWithParameters(SqlStoreObject<T> storeObject, SqlSequence seq,
       Handler<AsyncResult<IWriteEntry>> resultHandler) {
     SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), seq.getSqlStatement(), seq.getParameters(),

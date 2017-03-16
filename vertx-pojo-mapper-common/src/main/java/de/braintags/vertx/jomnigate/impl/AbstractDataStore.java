@@ -22,6 +22,7 @@ import de.braintags.vertx.jomnigate.exception.UnsupportedKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IDataStoreSynchronizer;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
+import de.braintags.vertx.jomnigate.mapping.IStoreObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.ITriggerContextFactory;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
 import de.braintags.vertx.jomnigate.mapping.impl.TriggerContextFactory;
@@ -35,16 +36,21 @@ import io.vertx.core.json.JsonObject;
  * An abstract implementation of {@link IDataStore}
  *
  * @author Michael Remme
+ * 
+ * @param <S>
+ *          the type of the {@link IStoreObjectFactory}
+ * @param <U>
+ *          the format used by the underlaing {@link IDataStoreSynchronizer}
  *
  */
 
-public abstract class AbstractDataStore implements IDataStore {
-
+public abstract class AbstractDataStore<S, U> implements IDataStore<S, U> {
   private Vertx vertx;
   private JsonObject properties;
   private IMapperFactory mapperFactory;
+  private IStoreObjectFactory<S> storeObjectFactory;
   private ITableGenerator tableGenerator;
-  private IDataStoreSynchronizer dataStoreSynchronizer;
+  private IDataStoreSynchronizer<U> dataStoreSynchronizer;
   private Map<String, IKeyGenerator> keyGeneratorMap = new HashMap<>();
   private ITriggerContextFactory triggerContextFactory = new TriggerContextFactory();
   private Map<String, IEncoder> encoderMap = new HashMap<>();
@@ -63,6 +69,22 @@ public abstract class AbstractDataStore implements IDataStore {
     this.properties = properties;
     initSupportedKeyGenerators();
     defaultQueryLimit = properties.getInteger(DEFAULT_QUERY_LIMIT, 500);
+  }
+
+  /**
+   * @return the storeObjectFactory
+   */
+  @Override
+  public IStoreObjectFactory<S> getStoreObjectFactory() {
+    return storeObjectFactory;
+  }
+
+  /**
+   * @param storeObjectFactory
+   *          the storeObjectFactory to set
+   */
+  public void setStoreObjectFactory(IStoreObjectFactory<S> storeObjectFactory) {
+    this.storeObjectFactory = storeObjectFactory;
   }
 
   /*
@@ -103,7 +125,7 @@ public abstract class AbstractDataStore implements IDataStore {
    * @return the dataStoreSynchronizer
    */
   @Override
-  public final IDataStoreSynchronizer getDataStoreSynchronizer() {
+  public final IDataStoreSynchronizer<U> getDataStoreSynchronizer() {
     return dataStoreSynchronizer;
   }
 
@@ -111,7 +133,7 @@ public abstract class AbstractDataStore implements IDataStore {
    * @param dataStoreSynchronizer
    *          the dataStoreSynchronizer to set
    */
-  public final void setDataStoreSynchronizer(IDataStoreSynchronizer dataStoreSynchronizer) {
+  public final void setDataStoreSynchronizer(IDataStoreSynchronizer<U> dataStoreSynchronizer) {
     this.dataStoreSynchronizer = dataStoreSynchronizer;
   }
 

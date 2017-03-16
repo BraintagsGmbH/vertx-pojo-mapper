@@ -20,7 +20,6 @@ import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapperFactory;
-import de.braintags.vertx.jomnigate.mapping.IStoreObjectFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 
 /**
@@ -30,24 +29,19 @@ import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
  * 
  */
 
-public class MapperFactory implements IMapperFactory {
-  private IDataStore dataStore;
-  private final Map<String, IMapper> mappedClasses = new HashMap<String, IMapper>();
+public class MapperFactory extends AbstractMapperFactory {
+  private final Map<String, IMapper> mappedClasses = new HashMap<>();
   private ITypeHandlerFactory typeHandlerFactory;
   private IPropertyMapperFactory propertyMapperFactory;
-  private IStoreObjectFactory storeObjectFactory;
 
   /**
    * 
-   * @param dataStore
-   *          the {@link IDataStore} to be used
    */
-  public MapperFactory(IDataStore dataStore, ITypeHandlerFactory typeHandlerFactory,
-      IPropertyMapperFactory propertyMapperFactory, IStoreObjectFactory stf) {
-    this.dataStore = dataStore;
+  public MapperFactory(IDataStore<?, ?> dataStore, ITypeHandlerFactory typeHandlerFactory,
+      IPropertyMapperFactory propertyMapperFactory) {
+    super(dataStore);
     this.typeHandlerFactory = typeHandlerFactory;
     this.propertyMapperFactory = propertyMapperFactory;
-    this.storeObjectFactory = stf;
   }
 
   /*
@@ -79,17 +73,7 @@ public class MapperFactory implements IMapperFactory {
    * @return the mapper
    */
   protected <T> Mapper<T> createMapper(Class<T> mapperClass) {
-    return new Mapper<T>(mapperClass, this);
-  }
-
-  /**
-   * Get the parent datastore, which was creating the current instance
-   * 
-   * @return the datastore
-   */
-  @Override
-  public IDataStore getDataStore() {
-    return dataStore;
+    return new Mapper<>(mapperClass, this);
   }
 
   @Override
@@ -99,11 +83,10 @@ public class MapperFactory implements IMapperFactory {
     return false;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.mapping.IMapperFactory#getTypeHandlerFactory()
+  /**
+   * @deprecated will be removed after complete switch to jackson
    */
+  @Deprecated
   @Override
   public final ITypeHandlerFactory getTypeHandlerFactory() {
     return typeHandlerFactory;
@@ -114,16 +97,18 @@ public class MapperFactory implements IMapperFactory {
    * 
    * @param typeHandlerFactory
    *          the typeHandlerFactory to set
+   * @deprecated will be removed after complete switch to jackson
    */
+  @Deprecated
   protected final void setTypeHandlerFactory(ITypeHandlerFactory typeHandlerFactory) {
     this.typeHandlerFactory = typeHandlerFactory;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * @deprecated will be removed after complete switch to jackson
    * 
-   * @see de.braintags.vertx.jomnigate.IDataStore#getPropertyMapperFactory()
    */
+  @Deprecated
   @Override
   public final IPropertyMapperFactory getPropertyMapperFactory() {
     return propertyMapperFactory;
@@ -132,22 +117,11 @@ public class MapperFactory implements IMapperFactory {
   /**
    * @param propertyMapperFactory
    *          the propertyMapperFactory to set
+   * @deprecated will be removed after complete switch to jackson
    */
+  @Deprecated
   protected final void setPropertyMapperFactory(IPropertyMapperFactory propertyMapperFactory) {
     this.propertyMapperFactory = propertyMapperFactory;
-  }
-
-  @Override
-  public final IStoreObjectFactory getStoreObjectFactory() {
-    return storeObjectFactory;
-  }
-
-  /**
-   * @param storeObjectFactory
-   *          the storeObjectFactory to set
-   */
-  protected final void setStoreObjectFactory(IStoreObjectFactory storeObjectFactory) {
-    this.storeObjectFactory = storeObjectFactory;
   }
 
 }

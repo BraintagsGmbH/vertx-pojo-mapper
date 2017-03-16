@@ -58,14 +58,13 @@ public class MongoQueryResult<T> extends AbstractQueryResult<T> {
   @Override
   protected void generatePojo(int i, Handler<AsyncResult<T>> handler) {
     JsonObject sourceObject = jsonResult.get(i);
-    IStoreObjectFactory<JsonObject> sf = (IStoreObjectFactory<JsonObject>) getDataStore().getMapperFactory()
-        .getStoreObjectFactory();
+    IStoreObjectFactory<JsonObject> sf = getDataStore().getStoreObjectFactory();
     sf.createStoreObject(sourceObject, getMapper(), result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
         @SuppressWarnings("unchecked")
-        T pojo = (T) result.result().getEntity();
+        T pojo = result.result().getEntity();
         handler.handle(Future.succeededFuture(pojo));
       }
     });
