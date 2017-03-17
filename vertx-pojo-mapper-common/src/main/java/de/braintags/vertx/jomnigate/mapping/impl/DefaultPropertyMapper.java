@@ -14,8 +14,8 @@ package de.braintags.vertx.jomnigate.mapping.impl;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.exception.TypeHandlerException;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapper;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
@@ -38,7 +38,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
       .getLogger(DefaultPropertyMapper.class);
 
   @Override
-  public <T> void intoStoreObject(T mapper, IStoreObject<T, ? > storeObject, IProperty field,
+  public <T> void intoStoreObject(T mapper, IStoreObject<T, ?> storeObject, IProperty field,
       Handler<AsyncResult<Void>> handler) {
     ITypeHandler th = field.getTypeHandler();
     IPropertyAccessor pAcc = field.getPropertyAccessor();
@@ -48,6 +48,17 @@ public class DefaultPropertyMapper implements IPropertyMapper {
       pAcc.writeData(mapper, javaValue);
     }
     intoStoreObject(storeObject, field, th, javaValue, handler);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.mapping.IPropertyMapper#convertForStore(java.lang.Object,
+   * de.braintags.vertx.jomnigate.mapping.IProperty, io.vertx.core.Handler)
+   */
+  @Override
+  public <T> void convertForStore(T value, IProperty field, Handler<AsyncResult<Object>> handler) {
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -122,7 +133,7 @@ public class DefaultPropertyMapper implements IPropertyMapper {
 
   }
 
-  private <T> void handleInstanceFromStore(IStoreObject<T, ? > storeObject, T mapper, Object javaValue, Object dbValue,
+  private <T> void handleInstanceFromStore(IStoreObject<T, ?> storeObject, T mapper, Object javaValue, Object dbValue,
       IProperty field, Handler<AsyncResult<Void>> handler) {
     try {
       if (javaValue instanceof IObjectReference) {

@@ -90,15 +90,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    *          returns the transformed value
    */
   private void handleSingleValue(IProperty field, Object value, Handler<AsyncResult<Object>> handler) {
-    field.getPropertyMapper().readForStore(value, field, handler);
-
-    // field.getTypeHandler().intoStore(value, field, result -> {
-    // if (result.failed()) {
-    // handler.handle(Future.failedFuture(result.cause()));
-    // } else {
-    // handler.handle(Future.succeededFuture(result.result().getResult()));
-    // }
-    // });
+    field.getPropertyMapper().convertForStore(value, field, handler);
   }
 
   /**

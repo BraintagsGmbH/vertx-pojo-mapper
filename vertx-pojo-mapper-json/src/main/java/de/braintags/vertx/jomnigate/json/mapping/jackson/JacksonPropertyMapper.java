@@ -41,6 +41,17 @@ public class JacksonPropertyMapper implements IPropertyMapper {
   /*
    * (non-Javadoc)
    * 
+   * @see de.braintags.vertx.jomnigate.mapping.IPropertyMapper#convertForStore(java.lang.Object,
+   * de.braintags.vertx.jomnigate.mapping.IProperty, io.vertx.core.Handler)
+   */
+  @Override
+  public <T> void convertForStore(T value, IProperty field, Handler<AsyncResult<Object>> handler) {
+    throw new UnsupportedOperationException();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see de.braintags.vertx.jomnigate.mapping.IPropertyMapper#intoStoreObject(java.lang.Object,
    * de.braintags.vertx.jomnigate.mapping.IStoreObject, de.braintags.vertx.jomnigate.mapping.IProperty,
    * io.vertx.core.Handler)

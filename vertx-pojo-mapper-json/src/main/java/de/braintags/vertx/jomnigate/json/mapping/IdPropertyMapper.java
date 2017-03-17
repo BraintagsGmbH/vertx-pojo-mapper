@@ -12,9 +12,9 @@
  */
 package de.braintags.vertx.jomnigate.json.mapping;
 
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapper;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
@@ -130,6 +130,17 @@ public class IdPropertyMapper implements IPropertyMapper {
   @FunctionalInterface
   interface IdTranslator {
     Object translate(Object source);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.mapping.IPropertyMapper#convertForStore(java.lang.Object,
+   * de.braintags.vertx.jomnigate.mapping.IProperty, io.vertx.core.Handler)
+   */
+  @Override
+  public <T> void convertForStore(T value, IProperty field, Handler<AsyncResult<Object>> handler) {
+    throw new UnsupportedOperationException();
   }
 
 }
