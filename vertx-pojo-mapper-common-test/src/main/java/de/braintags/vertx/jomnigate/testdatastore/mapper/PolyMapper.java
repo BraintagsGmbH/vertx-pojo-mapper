@@ -13,8 +13,6 @@
 
 package de.braintags.vertx.jomnigate.testdatastore.mapper;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 
@@ -25,12 +23,17 @@ import de.braintags.vertx.jomnigate.annotation.field.Id;
  * 
  */
 @Entity
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class PolyMapper {
+public class PolyMapper implements IPolyMapper {
   @Id
   private String id;
   private String mainField;
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.testdatastore.mapper.IPolyMapper#getId()
+   */
+  @Override
   public String getId() {
     return id;
   }
@@ -39,6 +42,12 @@ public class PolyMapper {
     this.id = id;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.testdatastore.mapper.IPolyMapper#getMainField()
+   */
+  @Override
   public String getMainField() {
     return mainField;
   }

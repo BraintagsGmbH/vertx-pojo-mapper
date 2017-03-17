@@ -13,14 +13,22 @@
 
 package de.braintags.vertx.jomnigate.testdatastore;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+
 import org.junit.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.IPolyMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.PolyMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.PolySubMapper;
+import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.Async;
@@ -49,6 +57,25 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
     polySubMapper.setSubField("testSub");
 
     testMapper(polySubMapper, polyMapper, context);
+  }
+
+  @Test
+  public void testDeserialization(TestContext context) throws JsonProcessingException {
+    clearTable(context, "PolyMapper");
+
+    PolyMapper polyMapper = new PolyMapper();
+    polyMapper.setMainField("testMain1");
+
+    PolySubMapper polySubMapper = new PolySubMapper();
+    polySubMapper.setMainField("testMain2");
+    polySubMapper.setSubField("testSub");
+
+    JsonNode polyTree = Json.mapper.valueToTree(polyMapper);
+    JsonNode polySubTree = Json.mapper.valueToTree(polySubMapper);
+    IPolyMapper sub2 = Json.mapper.treeToValue(polySubTree, IPolyMapper.class);
+    IPolyMapper poly2 = Json.mapper.treeToValue(polyTree, IPolyMapper.class);
+    assertThat(sub2, instanceOf(PolySubMapper.class));
+    assertThat(poly2, instanceOf(PolyMapper.class));
   }
 
   private void testMapper(PolyMapper polyMapper, PolyMapper otherPolyMapper, TestContext context) {
