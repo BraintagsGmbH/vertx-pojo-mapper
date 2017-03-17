@@ -55,20 +55,15 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
   private IMapper<?> mapper;
 
   /**
-   * Transforms the java value of the given field into a value that is suited for the database, via the configured type
-   * handler(s).<br>
+   * Transforms the java value of the given field into a value that is suited for the database.<br>
    * If the operator is a multi-value operator (e.g IN or NOT_IN), the value must be an instance of {@link Iterable}.
    * The result will then also be a List of the transformed values.
    *
-   * @param field
-   *          the java field of the condition
    * @param operator
    *          the operator of the condition
    * @param value
    *          the value that will be transformed, must not be null
-   * @param handler
-   *          returns the transformed value
-   * @return
+   * @return the transformed value, or a list of transformed values
    */
   private Object transformValue(QueryOperator operator, Object value) {
     if (operator.isMultiValueOperator()) {
@@ -83,15 +78,11 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
   }
 
   /**
-   * Handle the transformation of a single value
+   * Handle the transformation of a single value to a format usable by a datastore
    *
-   * @param field
-   *          the java field of the condition
    * @param value
    *          the value that will be transformed
-   * @param handler
-   *          returns the transformed value
-   * @return
+   * @return the transformed value
    */
   private Object handleSingleValue(Object value) {
     Object transformedValue;
@@ -117,13 +108,9 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
   /**
    * Handle the transformation of multiple values
    *
-   * @param fieldName
-   *          the java field of the condition
    * @param value
    *          the values of the condition, must not be empty
-   * @param handler
-   *          returns a {@link List} with the transformed values
-   * @return
+   * @return a list of transformed values
    */
   private List<Object> handleMultipleValues(Iterable<?> value) {
     int count = Size.size(value);

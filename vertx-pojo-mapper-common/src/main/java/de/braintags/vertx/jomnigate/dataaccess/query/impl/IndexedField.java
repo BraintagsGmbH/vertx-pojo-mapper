@@ -3,7 +3,7 @@ package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 
 /**
- * 
+ * Default implementation of {@link IIndexedField}
  * 
  * @author sschmitt
  * 

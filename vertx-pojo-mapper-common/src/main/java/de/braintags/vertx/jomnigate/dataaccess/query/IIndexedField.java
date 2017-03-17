@@ -4,7 +4,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 /**
- * 
+ * Marks a field as indexed, and thus searchable. Also contains the field and column name to prevent the need to
+ * reference fields by String.
  * 
  * @author sschmitt
  * 
