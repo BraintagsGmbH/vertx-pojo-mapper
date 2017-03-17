@@ -12,8 +12,12 @@
  */
 package de.braintags.vertx.jomnigate.json.mapping.jackson;
 
+import org.apache.commons.lang3.ClassUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.GeoSearchArgument;
+import de.braintags.vertx.jomnigate.exception.QueryParameterException;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
@@ -24,6 +28,8 @@ import de.braintags.vertx.util.exception.PropertyAccessException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 
 /**
  * An implementation of {@link IPropertyMapper} for use with jackson
@@ -46,7 +52,25 @@ public class JacksonPropertyMapper implements IPropertyMapper {
    */
   @Override
   public <T> void convertForStore(T value, IProperty field, Handler<AsyncResult<Object>> handler) {
-    throw new UnsupportedOperationException();
+    try {
+      Object transformedValue;
+      if (ClassUtils.isPrimitiveOrWrapper(value.getClass())) {
+        transformedValue = value;
+      } else if (value instanceof CharSequence) {
+        transformedValue = value.toString();
+      } else if (value instanceof Enum) {
+        transformedValue = ((Enum<?>) value).name();
+      } else if (value instanceof GeoSearchArgument) {
+        transformedValue = new JsonObject(Json.encode(value));
+      } else {
+        // can not use datastore object mapper here because only the JSON datastore has the object mapper
+        transformedValue = Json.encode(value);
+      }
+      handler.handle(Future.succeededFuture(transformedValue));
+    } catch (Exception e) {
+      handler.handle(
+          Future.failedFuture(new QueryParameterException("Unable to transform complex object for value " + value, e)));
+    }
   }
 
   /*
