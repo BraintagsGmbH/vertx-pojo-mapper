@@ -12,14 +12,17 @@
  */
 package de.braintags.vertx.jomnigate.json.mapping.jackson;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
@@ -40,6 +43,38 @@ public class JacksonMapper<T> extends AbstractMapper<T> {
     super(mapperClass, mapperFactory);
     creatorClass = getEntity().polyClass() == Object.class ? getMapperClass() : getEntity().polyClass();
     this.keyGeneratorReference = creatorClass.getSimpleName();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.mapping.impl.AbstractMapper#validate()
+   */
+  @Override
+  protected void validate() {
+    super.validate();
+    JsonTypeInfo ti = (JsonTypeInfo) getAnnotation(JsonTypeInfo.class);
+    boolean polySet = getEntity().polyClass() != Object.class;
+    if (ti != null && !polySet) {
+      throw new MappingException(
+          "If you are setting JsonTypeInfo, you must define Entity.polyClass as well in mapper : "
+              + getMapperClass().getName());
+    }
+    if (polySet && ti == null) {
+      throw new MappingException(
+          "If you are setting Entity.polyClass, you must define JsonTypeInfo as well in mapper : "
+              + getMapperClass().getName());
+    }
+
+  }
+
+  @Override
+  public final Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
+    Annotation ann = super.getAnnotation(annotationClass);
+    if (ann == null) {
+      ann = beanDescription.getClassAnnotations().get(annotationClass);
+    }
+    return ann;
   }
 
   /**

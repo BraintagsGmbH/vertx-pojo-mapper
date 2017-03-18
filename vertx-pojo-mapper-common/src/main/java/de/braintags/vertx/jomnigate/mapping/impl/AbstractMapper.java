@@ -373,7 +373,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#getAnnotation(java.lang.Class)
    */
   @Override
-  public final Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
+  public Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
     return existingClassAnnotations.get(annotationClass);
   }
 

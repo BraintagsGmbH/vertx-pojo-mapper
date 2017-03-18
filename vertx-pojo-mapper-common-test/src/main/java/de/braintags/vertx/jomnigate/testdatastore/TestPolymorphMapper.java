@@ -29,8 +29,11 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
+import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.IPolyMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.PolyMapper;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.PolyMapper_WithoutPolyClass;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.PolyMapper_WithoutType;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.PolySubMapper;
 import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
@@ -71,6 +74,16 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
     pList = findAll(context, query);
     context.assertEquals(2, pList.size(), "expected 2 records");
 
+    query = getDataStore(context).createQuery(PolySubMapper.class);
+    query.setSearchCondition(ISearchCondition.isEqual("subField", "testSub"));
+    pList = findAll(context, query);
+    context.assertEquals(1, pList.size(), "expected 1 records");
+
+    query = getDataStore(context).createQuery(PolyMapper.class);
+    query.setSearchCondition(ISearchCondition.isEqual("mainField", "testMain1"));
+    pList = findAll(context, query);
+    context.assertEquals(1, pList.size(), "expected 1 records");
+
   }
 
   @Test
@@ -107,8 +120,12 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
    */
   @Test
   public void testCheckUndefinedPolyClass(TestContext context) {
-    clearTable(context, "PolyMapper");
-    throw new UnsupportedOperationException();
+    try {
+      IQuery<PolyMapper_WithoutPolyClass> query = getDataStore(context).createQuery(PolyMapper_WithoutPolyClass.class);
+      context.fail("expected MappingException here");
+    } catch (MappingException e) {
+      // expected result
+    }
 
   }
 
@@ -121,9 +138,12 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
    */
   @Test
   public void testCheckUndefined_JsonTypeInfo(TestContext context) {
-    clearTable(context, "PolyMapper");
-    throw new UnsupportedOperationException();
-
+    try {
+      IQuery<PolyMapper> query = getDataStore(context).createQuery(PolyMapper_WithoutType.class);
+      context.fail("expected MappingException here");
+    } catch (MappingException e) {
+      // expected result
+    }
   }
 
   @Test
