@@ -44,6 +44,14 @@ public @interface Entity {
   String name() default UNDEFINED_NAME;
 
   /**
+   * If the Entity shall be part of a polymorphic mapping, this parameter specifies the interface or common super class
+   * of the entity, which shall be used as common class.
+   * 
+   * @return Object.class as default, defined interface or class, if it shall be used
+   */
+  Class<?> polyClass() default Object.class;
+
+  /**
    * Define some specific options, which can be interpreted by the implementation of the IDataStore
    * 
    * @return

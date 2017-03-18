@@ -26,9 +26,10 @@ import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
 import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator.SerializationReference;
 import de.braintags.vertx.jomnigate.json.jackson.deserializer.referenced.ReferencedPostHandler;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
+import de.braintags.vertx.jomnigate.json.mapping.jackson.JacksonMapper;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.mapping.impl.AbstractStoreObject;
@@ -176,7 +177,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
     List<ReferencedPostHandler> valueList = new ArrayList<>();
     InjectableValues iv = new InjectableValues.Std().addValue(REFERENCED_LIST, valueList);
     ObjectReader reader = mapper.reader(iv);
-    T instance = reader.forType(getMapper().getMapperClass()).readValue(getContainer().encode());
+    T instance = reader.forType(((JacksonMapper<T>) getMapper()).getCreatorClass()).readValue(getContainer().encode());
     if (!valueList.isEmpty()) {
       prehandleReferenced(handler, instance, valueList);
     } else {

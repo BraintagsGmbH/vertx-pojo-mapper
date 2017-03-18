@@ -16,11 +16,15 @@ package de.braintags.vertx.jomnigate.testdatastore;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
@@ -40,6 +44,7 @@ import io.vertx.ext.unit.TestContext;
  * @author sschmitt
  * 
  */
+@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 public class TestPolymorphMapper extends DatastoreBaseTest {
   private static Logger logger = LoggerFactory.getLogger(TestPolymorphMapper.class);
 
@@ -49,20 +54,81 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
 
     PolyMapper polyMapper = new PolyMapper();
     polyMapper.setMainField("testMain1");
-
-    testMapper(polyMapper, null, context);
+    Object polyMapperId = saveRecord(context, polyMapper).writeResult.iterator().next().getId();
 
     PolySubMapper polySubMapper = new PolySubMapper();
     polySubMapper.setMainField("testMain2");
     polySubMapper.setSubField("testSub");
+    Object polySubMapperId = saveRecord(context, polySubMapper).writeResult.iterator().next().getId();
 
-    testMapper(polySubMapper, polyMapper, context);
+    // query must give 2 records in PolyMapper
+    IQuery<PolyMapper> query = getDataStore(context).createQuery(PolyMapper.class);
+    List pList = findAll(context, query);
+    context.assertEquals(2, pList.size(), "expected 2 records");
+
+    // query must give 2 records in PolyMapper either
+    query = getDataStore(context).createQuery(PolySubMapper.class);
+    pList = findAll(context, query);
+    context.assertEquals(2, pList.size(), "expected 2 records");
+
+  }
+
+  @Test
+  public void testPolymorphismSaveMixedList(TestContext context) {
+    clearTable(context, "PolyMapper");
+    List recs = new ArrayList<>();
+    PolyMapper polyMapper = new PolyMapper();
+    polyMapper.setMainField("testMain1");
+    recs.add(polyMapper);
+
+    PolySubMapper polySubMapper = new PolySubMapper();
+    polySubMapper.setMainField("testMain2");
+    polySubMapper.setSubField("testSub");
+    recs.add(polySubMapper);
+    saveRecords(context, recs);
+
+    // query must give 2 records in PolyMapper
+    IQuery<PolyMapper> query = getDataStore(context).createQuery(PolyMapper.class);
+    List pList = findAll(context, query);
+    context.assertEquals(2, pList.size(), "expected 2 records");
+
+    // query must give 2 records in PolyMapper either
+    query = getDataStore(context).createQuery(PolySubMapper.class);
+    pList = findAll(context, query);
+    context.assertEquals(2, pList.size(), "expected 2 records");
+  }
+
+  /**
+   * If the annotation JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property =
+   * "@class")
+   * is set, then {@link Entity#polyClass()} must exist either
+   * 
+   * @param context
+   */
+  @Test
+  public void testCheckUndefinedPolyClass(TestContext context) {
+    clearTable(context, "PolyMapper");
+    throw new UnsupportedOperationException();
+
+  }
+
+  /**
+   * If the annotation {@link Entity#polyClass()}, then the annotation JsonTypeInfo(use = JsonTypeInfo.Id.CLASS,
+   * include = JsonTypeInfo.As.PROPERTY, property = "@class")
+   * must exist either
+   * 
+   * @param context
+   */
+  @Test
+  public void testCheckUndefined_JsonTypeInfo(TestContext context) {
+    clearTable(context, "PolyMapper");
+    throw new UnsupportedOperationException();
+
   }
 
   @Test
   public void testDeserialization(TestContext context) throws JsonProcessingException {
     clearTable(context, "PolyMapper");
-
     PolyMapper polyMapper = new PolyMapper();
     polyMapper.setMainField("testMain1");
 

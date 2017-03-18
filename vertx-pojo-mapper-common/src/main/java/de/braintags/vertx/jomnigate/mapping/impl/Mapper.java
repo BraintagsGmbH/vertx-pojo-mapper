@@ -42,6 +42,7 @@ import de.braintags.vertx.util.exception.ClassAccessException;
 
 public class Mapper<T> extends AbstractMapper<T> {
   private IObjectFactory objectFactory;
+  private String keyGeneratorReference;
 
   /**
    * Creates a new definition for the given mapper class
@@ -70,6 +71,8 @@ public class Mapper<T> extends AbstractMapper<T> {
   @Override
   protected void init() {
     super.init();
+    this.keyGeneratorReference = getEntity().polyClass() == Object.class ? getMapperClass().getSimpleName()
+        : getEntity().polyClass().getSimpleName();
     computeObjectFactory();
   }
 
@@ -174,5 +177,15 @@ public class Mapper<T> extends AbstractMapper<T> {
   public boolean handleReferencedRecursive() {
     return this.getMapperFactory().getDataStore().getProperties().getBoolean(IDataStore.HANDLE_REFERENCED_RECURSIVE,
         false);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.mapping.IMapper#getKeyGeneratorReference()
+   */
+  @Override
+  public String getKeyGeneratorReference() {
+    return keyGeneratorReference;
   }
 }

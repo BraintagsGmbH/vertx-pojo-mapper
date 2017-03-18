@@ -22,7 +22,7 @@ import de.braintags.vertx.jomnigate.annotation.field.Id;
  * @author sschmitt
  * 
  */
-@Entity
+@Entity(name = "PolyMapper", polyClass = IPolyMapper.class)
 public class PolyMapper implements IPolyMapper {
   @Id
   private String id;

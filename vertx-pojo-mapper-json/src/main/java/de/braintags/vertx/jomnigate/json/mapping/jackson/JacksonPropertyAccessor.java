@@ -13,6 +13,7 @@
 package de.braintags.vertx.jomnigate.json.mapping.jackson;
 
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
+import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
 
@@ -23,15 +24,17 @@ import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
  * 
  */
 public class JacksonPropertyAccessor implements IPropertyAccessor {
-  private AnnotatedMember member;
+  private AnnotatedMember getter;
+  private AnnotatedMember setter;
   private String name;
 
   /**
    * 
    */
-  public JacksonPropertyAccessor(AnnotatedMember member) {
-    this.member = member;
-    this.name = member.getName();
+  public JacksonPropertyAccessor(BeanPropertyDefinition definition) {
+    this.getter = definition.getAccessor();
+    this.setter = definition.getMutator();
+    this.name = definition.getName();
   }
 
   /*
@@ -51,7 +54,7 @@ public class JacksonPropertyAccessor implements IPropertyAccessor {
    */
   @Override
   public Object readData(Object record) {
-    return member.getValue(record);
+    return getter.getValue(record);
   }
 
   /*
@@ -61,7 +64,7 @@ public class JacksonPropertyAccessor implements IPropertyAccessor {
    */
   @Override
   public void writeData(Object record, Object data) {
-    member.setValue(record, data);
+    setter.setValue(record, data);
   }
 
 }
