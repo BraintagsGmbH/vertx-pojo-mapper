@@ -103,7 +103,7 @@ public abstract class DatastoreBaseTest {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
     ErrorObject err = new ErrorObject<>(null);
-    IWrite<Object> write = (IWrite<Object>) getDataStore(context).createWrite(records.get(0).getClass());
+    IWrite<Object> write = getDataStore(context).createWrite(records.get(0).getClass());
     for (Object record : records) {
       write.add(record);
     }
@@ -427,7 +427,7 @@ public abstract class DatastoreBaseTest {
       return;
     }
     if (expectedResult == 0) {
-      context.assertFalse(qr.iterator().hasNext());
+      context.assertFalse(qr.iterator().hasNext(), "Expected empty selection");
     } else {
       IteratorAsync<?> itr = qr.iterator();
       context.assertTrue(itr.hasNext(), "No record in selection");

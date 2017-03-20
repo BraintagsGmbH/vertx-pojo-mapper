@@ -21,7 +21,6 @@ import org.junit.Test;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
-import de.braintags.vertx.jomnigate.testdatastore.mapper.Person;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.EnumRecord;
 import io.vertx.core.logging.Logger;
@@ -39,14 +38,8 @@ public class TestQuery extends DatastoreBaseTest {
   private static boolean dropTable = false;
 
   @Test
-  public void testQueryInSubObject(TestContext context) {
-    Person person = new Person();
-
-    createDemoRecords(context);
-
-    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setSearchCondition(ISearchCondition.isEqual(SimpleMapper.NAME_NOT_EXOST, "Dublette"));
-    find(context, query, 2);
+  public void testDeepQuery(TestContext context) {
+    throw new UnsupportedOperationException("Search for content of Person.address.street = myStreet");
   }
 
   @Test
