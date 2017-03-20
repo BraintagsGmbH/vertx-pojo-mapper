@@ -13,6 +13,9 @@
 
 package de.braintags.vertx.jomnigate.testdatastore.mapper;
 
+import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
+
 /**
  * Extension of the {@link PolyMapper} that should be saved in the same collection as the {@link PolyMapper}, but with
  * additional class information
@@ -21,6 +24,7 @@ package de.braintags.vertx.jomnigate.testdatastore.mapper;
  * 
  */
 public class PolySubMapper extends PolyMapper {
+  public static final IIndexedField SUBFIELD = new IndexedField("subField");
 
   private String subField;
 

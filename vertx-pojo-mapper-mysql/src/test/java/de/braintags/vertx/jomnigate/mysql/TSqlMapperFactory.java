@@ -45,10 +45,10 @@ import de.braintags.vertx.jomnigate.json.typehandler.handler.ObjectTypeHandler;
 import de.braintags.vertx.jomnigate.json.typehandler.handler.StringTypeHandler;
 import de.braintags.vertx.jomnigate.mapper.Animal;
 import de.braintags.vertx.jomnigate.mapper.Person;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapper;
 import de.braintags.vertx.jomnigate.mapping.impl.DefaultPropertyMapper;
 import de.braintags.vertx.jomnigate.mapping.impl.ParametrizedMappedField;
@@ -253,7 +253,7 @@ public class TSqlMapperFactory {
     if (ann == null)
       Assert.fail("Annotation Id must not be null");
 
-    IProperty field = mapperDef.getIdField();
+    IProperty field = mapperDef.getIdField().getField();
     assertNotNull(field);
     IProperty field2 = mapperDef.getField(field.getName());
     Assert.assertSame(field, field2);

@@ -20,11 +20,16 @@ import de.braintags.vertx.jomnigate.annotation.IndexType;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
+import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
 
 @Entity(options = { @EntityOption(key = "ENGINE", value = "MyISAM") })
 @Indexes(@Index(name = "testindex", fields = { @IndexField(fieldName = "position", type = IndexType.GEO2DSPHERE) }))
 public class GeoMapper {
+
+  public static final IIndexedField POSITION = new IndexedField("position");
+
   @Id
   public String id;
 

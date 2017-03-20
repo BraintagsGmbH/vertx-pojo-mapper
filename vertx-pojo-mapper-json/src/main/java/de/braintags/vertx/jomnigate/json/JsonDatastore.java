@@ -12,11 +12,13 @@
  */
 package de.braintags.vertx.jomnigate.json;
 
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.impl.AbstractDataStore;
@@ -59,10 +61,12 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
     jacksonPrettyMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 
     jacksonMapper.registerModule(new JacksonModuleJomnigate(this));
+    jacksonMapper.registerModule(new ParameterNamesModule(Mode.DEFAULT));
     jacksonMapper.registerModule(new JodaModule());
     jacksonMapper.registerModule(new GuavaModule());
 
     jacksonPrettyMapper.registerModule(new JacksonModuleJomnigate(this));
+    jacksonPrettyMapper.registerModule(new ParameterNamesModule(Mode.DEFAULT));
     jacksonPrettyMapper.registerModule(new JodaModule());
     jacksonPrettyMapper.registerModule(new GuavaModule());
 

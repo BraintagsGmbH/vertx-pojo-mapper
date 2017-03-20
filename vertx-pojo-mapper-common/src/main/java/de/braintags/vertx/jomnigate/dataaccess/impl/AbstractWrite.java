@@ -117,10 +117,8 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    */
   protected void setIdValue(Object id, IStoreObject<T, ?> storeObject, Handler<AsyncResult<Void>> resultHandler) {
     try {
-      IProperty idField = getMapper().getIdField();
+      IProperty idField = getMapper().getIdField().getField();
       // storeObject.put(idField, id.toString());
-      Class mapperClass = getMapper().getMapperClass();
-      Object instance = storeObject.getEntity();
       IPropertyAccessor acc = idField.getPropertyAccessor();
       acc.writeData(storeObject.getEntity(), id.toString());
       // idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);

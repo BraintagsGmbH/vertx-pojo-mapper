@@ -100,7 +100,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    */
   private Future saveStoreObject(SqlStoreObject<T> storeObject) {
     Future<IWriteEntry> f = Future.future();
-    Object currentId = storeObject.get(getMapper().getIdField());
+    Object currentId = storeObject.get(getMapper().getIdField().getField());
     if (currentId == null || (currentId instanceof Number && ((Number) currentId).intValue() == 0)) {
       handleInsert(storeObject, f.completer());
     } else {
@@ -145,7 +145,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   }
 
   private void finishUpdate(SqlStoreObject<T> storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {
-    Object id = getMapper().getIdField().getPropertyAccessor().readData(storeObject.getEntity());
+    Object id = getMapper().getIdField().getField().getPropertyAccessor().readData(storeObject.getEntity());
     LOGGER.debug("updated record with id " + id);
     try {
       executePostSave(storeObject.getEntity(), lcr -> {
@@ -254,7 +254,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   @SuppressWarnings({ "unchecked", "rawtypes" })
   private void finishInsert(SqlStoreObject storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {
     try {
-      Object id = storeObject.get(getMapper().getIdField());
+      Object id = storeObject.get(getMapper().getIdField().getField());
       Objects.requireNonNull(id, "Undefined ID when storing record");
       LOGGER.debug("==>>>> inserted record " + storeObject.getMapper().getTableInfo().getName() + " with id " + id);
       executePostSave((T) storeObject.getEntity(), lcr -> {
@@ -282,7 +282,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    */
   @Override
   protected void setIdValue(Object id, IStoreObject<T, ?> storeObject, Handler<AsyncResult<Void>> resultHandler) {
-    IProperty idField = getMapper().getIdField();
+    IProperty idField = getMapper().getIdField().getField();
     idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
   }
 

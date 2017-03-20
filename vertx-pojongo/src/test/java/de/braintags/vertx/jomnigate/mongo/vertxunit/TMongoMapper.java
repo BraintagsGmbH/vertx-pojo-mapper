@@ -23,8 +23,8 @@ import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.EncoderSettings;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
 import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
@@ -95,7 +95,7 @@ public class TMongoMapper extends DatastoreBaseTest {
     if (ann == null)
       context.fail("Annotation Id must not be null");
 
-    IProperty field = mapper.getIdField();
+    IProperty field = mapper.getIdField().getField();
     context.assertNotNull(field);
     context.assertTrue(field == idField);
 

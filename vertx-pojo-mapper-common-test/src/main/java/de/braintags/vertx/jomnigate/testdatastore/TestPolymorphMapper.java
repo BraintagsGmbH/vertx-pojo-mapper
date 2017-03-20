@@ -75,12 +75,12 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
     context.assertEquals(2, pList.size(), "expected 2 records");
 
     query = getDataStore(context).createQuery(PolySubMapper.class);
-    query.setSearchCondition(ISearchCondition.isEqual("subField", "testSub"));
+    query.setSearchCondition(ISearchCondition.isEqual(PolySubMapper.SUBFIELD, "testSub"));
     pList = findAll(context, query);
     context.assertEquals(1, pList.size(), "expected 1 records");
 
     query = getDataStore(context).createQuery(PolyMapper.class);
-    query.setSearchCondition(ISearchCondition.isEqual("mainField", "testMain1"));
+    query.setSearchCondition(ISearchCondition.isEqual(PolyMapper.MAINFIELD, "testMain1"));
     pList = findAll(context, query);
     context.assertEquals(1, pList.size(), "expected 1 records");
 
@@ -177,7 +177,7 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
           "Records should be in the same collection and thus should not have the same ID");
 
     IQuery<PolyMapper> query = getDataStore(context).createQuery(PolyMapper.class);
-    query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField().getName(), polyMapper.getId()));
+    query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField(), polyMapper.getId()));
     resultContainer = find(context, query, 1);
     Async async = context.async();
     resultContainer.queryResult.iterator().next(context.asyncAssertSuccess(loadedPolyMapper -> {

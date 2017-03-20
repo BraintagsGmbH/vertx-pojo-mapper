@@ -24,8 +24,8 @@ import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
 import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
 import de.braintags.vertx.jomnigate.mapper.Person;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
 import de.braintags.vertx.jomnigate.mysql.mapping.datastore.colhandler.StringColumnHandler;
@@ -75,7 +75,7 @@ public class TestMapper extends DatastoreBaseTest {
     if (ann == null)
       Assert.fail("Annotation Id must not be null");
 
-    IProperty field = mapper.getIdField();
+    IProperty field = mapper.getIdField().getField();
     context.assertNotNull(field);
     Assert.assertSame(field, idField);
 

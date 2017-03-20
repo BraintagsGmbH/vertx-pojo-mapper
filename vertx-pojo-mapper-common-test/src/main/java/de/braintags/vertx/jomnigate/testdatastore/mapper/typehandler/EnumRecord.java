@@ -15,6 +15,8 @@ package de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
 
 /**
@@ -25,6 +27,8 @@ import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
  */
 @Entity
 public class EnumRecord extends BaseRecord {
+  public static final IIndexedField ENUM_ENUM = new IndexedField("enumEnum");
+
   @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
   public Enum<WriteAction> enumEnum = WriteAction.INSERT;
 

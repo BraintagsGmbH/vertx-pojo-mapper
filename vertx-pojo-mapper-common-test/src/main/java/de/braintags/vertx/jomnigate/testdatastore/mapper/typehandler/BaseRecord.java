@@ -27,6 +27,8 @@ import org.junit.Assert;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
+import de.braintags.vertx.jomnigate.dataaccess.query.IdField;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedIdField;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import de.braintags.vertx.util.ObjectUtil;
@@ -39,6 +41,9 @@ import de.braintags.vertx.util.ObjectUtil;
  */
 @Entity
 public class BaseRecord {
+
+  public static final IdField ID = new IndexedIdField("id");
+
   private static final String DIFFERENT_KEY_CLASS = "Classes of keys are different in Map: %s / %s";
   private static final String DIFFERENT_VALUE_CLASS = "Classes of values are different in Map: %s / %s";
 

@@ -36,7 +36,7 @@ public class TestQueryInterator extends DatastoreBaseTest {
     Async async = context.async();
 
     IQuery<MiniMapper> query = getDataStore(context).createQuery(MiniMapper.class);
-    query.setSearchCondition(ISearchCondition.isEqual("name", "test"));
+    query.setSearchCondition(ISearchCondition.isEqual(MiniMapper.NAME, "test"));
     query.execute(result -> {
       if (result.succeeded()) {
         result.result().iterator().next(fut.completer());

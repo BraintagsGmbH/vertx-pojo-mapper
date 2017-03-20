@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.Set;
 
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
@@ -163,7 +163,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
         resultHandler.handle(Future.failedFuture(keyResult.cause()));
       } else {
         Object genKey = keyResult.result().getKey();
-        IProperty idField = getMapper().getIdField();
+        IProperty idField = getMapper().getIdField().getField();
         idField.getTypeHandler().intoStore(genKey, idField, thResult -> {
           if (thResult.failed()) {
             resultHandler.handle(Future.failedFuture(thResult.cause()));
@@ -185,7 +185,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    */
   public SqlSequence generateSqlUpdateStatement() {
     ITableInfo tInfo = getMapper().getTableInfo();
-    IProperty idField = getMapper().getIdField();
+    IProperty idField = getMapper().getIdField().getField();
     Object id = get(idField);
 
     SqlSequence sequence = new SqlSequence(tInfo.getName(), idField.getColumnInfo(), id);

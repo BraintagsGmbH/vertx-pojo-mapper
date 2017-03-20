@@ -15,6 +15,7 @@ package de.braintags.vertx.jomnigate.testdatastore.mapper;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 
 /**
  * Mapper to test polymorphism, together with {@link PolySubMapper}
@@ -24,6 +25,8 @@ import de.braintags.vertx.jomnigate.annotation.field.Id;
  */
 @Entity(name = "PolyMapper", polyClass = IPolyMapper.class)
 public class PolyMapper implements IPolyMapper {
+  public static final IndexedField MAINFIELD = new IndexedField("mainField");
+
   @Id
   private String id;
   private String mainField;

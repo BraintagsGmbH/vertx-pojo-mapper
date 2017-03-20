@@ -23,10 +23,12 @@ import java.lang.reflect.Modifier;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.ObjectFactory;
+import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
+import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.util.ClassUtil;
 import de.braintags.vertx.util.exception.ClassAccessException;
 
@@ -149,6 +151,34 @@ public class Mapper<T> extends AbstractMapper<T> {
         addMappedField(accessor.getName(), createMappedField(field, accessor));
       }
     }
+  }
+
+  /**
+   * Adds a mapped field into the list of properties
+   * 
+   * @param name
+   * @param mf
+   */
+  protected void addMappedField(String name, MappedField mf) {
+    if (mf.hasAnnotation(Id.class)) {
+      if (getIdField() != null)
+        throw new MappingException("duplicate Id field definition found for mapper " + getMapperClass());
+      setIdField(createIdField(mf));
+    }
+    if (!mf.isIgnore()) {
+      this.getMappedProperties().put(name, mf);
+    }
+  }
+
+  /**
+   * Create the id field for this mapper
+   * 
+   * @param mappedField
+   *          the field with the {@link Id} annotation
+   * @return an id field
+   */
+  protected IMappedIdField createIdField(MappedField mappedField) {
+    return new MappedIdFieldImpl(mappedField);
   }
 
   /**

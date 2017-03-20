@@ -13,6 +13,7 @@
 package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldValueResolver;
+import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 import de.braintags.vertx.jomnigate.dataaccess.query.IVariableFieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryOperator;
 import io.vertx.codegen.annotations.Nullable;
@@ -37,7 +38,7 @@ public class VariableFieldCondition extends FieldCondition implements IVariableF
    * @param value
    *          the value of this condition, must contain a variable
    */
-  public VariableFieldCondition(String field, QueryOperator logic, @Nullable Object value) {
+  public VariableFieldCondition(IIndexedField field, QueryOperator logic, @Nullable Object value) {
     super(field, logic, value);
   }
 

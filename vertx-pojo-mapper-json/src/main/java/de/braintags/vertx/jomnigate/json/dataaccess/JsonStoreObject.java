@@ -111,7 +111,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    */
   private void storeJson(String js, Handler<AsyncResult<Void>> handler) {
     container = new JsonObject(js);
-    IProperty idField = getMapper().getIdField();
+    IProperty idField = getMapper().getIdField().getField();
     container.remove(idField.getName()); // do not write the java fieldname of id, but the column
     Object javaValue = idField.getPropertyAccessor().readData(getEntity());
     put(idField, javaValue == null ? null : String.valueOf(javaValue));
@@ -119,7 +119,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
     if (isNewInstance() && getMapper().getKeyGenerator() != null) {
       getNextId(handler);
     } else if (isNewInstance()) {
-      getContainer().remove(getMapper().getIdField().getColumnInfo().getName());
+      getContainer().remove(getMapper().getIdField().getField().getColumnInfo().getName());
       handler.handle(Future.succeededFuture());
     } else {
       handler.handle(Future.succeededFuture());
@@ -157,7 +157,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
   @Override
   public void initToEntity(Handler<AsyncResult<Void>> handler) {
     try {
-      IProperty idField = getMapper().getIdField();
+      IProperty idField = getMapper().getIdField().getField();
       String id = (String) getContainer().remove(idField.getColumnInfo().getName());
       getContainer().put(idField.getName(), id);
       doMapping(res -> {
@@ -276,7 +276,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
         handler.handle(Future.failedFuture(keyResult.cause()));
       } else {
         generatedId = keyResult.result().getKey();
-        IProperty field = getMapper().getIdField();
+        IProperty field = getMapper().getIdField().getField();
         this.put(field, String.valueOf(generatedId));
         setNewInstance(true);
         handler.handle(Future.succeededFuture());

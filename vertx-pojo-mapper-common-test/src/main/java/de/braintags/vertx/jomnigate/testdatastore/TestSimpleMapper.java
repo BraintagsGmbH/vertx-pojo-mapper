@@ -45,7 +45,6 @@ public class TestSimpleMapper extends DatastoreBaseTest {
     IWriteEntry we = resultContainer.writeResult.iterator().next();
     context.assertEquals(WriteAction.INSERT, we.getAction());
     context.assertNotNull(we.getStoreObject());
-    context.assertNotNull(we.getStoreObject());
 
     context.assertNotNull(sm.id);
     context.assertTrue(sm.id.hashCode() != 0, "ID wasn't set by insert statement");
@@ -53,7 +52,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
 
     // SimpleQuery for all records
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField().getName(), sm.id));
+    query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField(), sm.id));
     resultContainer = find(context, query, 1);
   }
 
@@ -95,7 +94,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
         context.assertTrue(sm.equals(result.result()));
 
         // search inside name field
-        query.setSearchCondition(ISearchCondition.isEqual("name", "testNameModified"));
+        query.setSearchCondition(ISearchCondition.isEqual(SimpleMapper.NAME, "testNameModified"));
         try {
           ResultContainer resultContainer2 = find(context, query, 1);
           resultContainer2.queryResult.iterator().next(res2 -> {

@@ -92,7 +92,7 @@ public interface IMapper<T> {
    * 
    * @return the id field
    */
-  public IProperty getIdField();
+  public IMappedIdField getIdField();
 
   /**
    * Get the methods of the mapper which are annotated by the given lifecycle annotation like {@link BeforeLoad},

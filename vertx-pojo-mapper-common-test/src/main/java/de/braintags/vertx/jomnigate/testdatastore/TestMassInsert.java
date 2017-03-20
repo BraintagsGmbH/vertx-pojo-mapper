@@ -49,7 +49,7 @@ public class TestMassInsert extends DatastoreBaseTest {
       LOGGER.warn("size of writeresult is incorrect - checking records in datastore");
       // check wether records weren't written or "only" IWriteResult is incomplete
       IQuery<MiniNumberMapper> query = getDataStore(context).createQuery(MiniNumberMapper.class);
-      query.setSearchCondition(ISearchCondition.isEqual("name", "looper"));
+      query.setSearchCondition(ISearchCondition.isEqual(MiniNumberMapper.NAME, "looper"));
       find(context, query, LOOP);
       context.assertEquals(LOOP, resultContainer.writeResult.size());
       context.fail("The write result hasn't got the right content, the records in the datastore are correct");

@@ -16,9 +16,14 @@ import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
+import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 
 @Entity
 public class DemoMapper {
+
+  public static final IIndexedField NAME = new IndexedField("name");
+
   @Id
   public String id;
   private String name;

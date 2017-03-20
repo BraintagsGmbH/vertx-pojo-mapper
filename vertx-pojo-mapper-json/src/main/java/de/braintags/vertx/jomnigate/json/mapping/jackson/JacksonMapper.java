@@ -22,10 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
+import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.impl.AbstractMapper;
 
 /**
@@ -99,6 +102,27 @@ public class JacksonMapper<T> extends AbstractMapper<T> {
     this.beanDescription = mapper.getSerializationConfig().introspect(type);
     List<BeanPropertyDefinition> propertyList = beanDescription.findProperties();
     propertyList.forEach(def -> addMappedField(def.getFullName().getSimpleName(), new JacksonProperty(this, def)));
+  }
+
+  /**
+   * Adds a mapped field into the list of properties
+   * 
+   * @param name
+   * @param mf
+   */
+  protected void addMappedField(String name, IProperty mf) {
+    if (mf.hasAnnotation(Id.class)) {
+      if (getIdField() != null)
+        throw new MappingException("duplicate Id field definition found for mapper " + getMapperClass());
+      setIdField(createIdProperty(mf));
+    }
+    if (!mf.isIgnore()) {
+      this.getMappedProperties().put(name, mf);
+    }
+  }
+
+  protected IMappedIdField createIdProperty(IProperty property) {
+    return new MappedJacksonIdProperty(property);
   }
 
   /**

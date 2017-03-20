@@ -24,7 +24,6 @@ import java.util.Set;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
-import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad;
@@ -38,6 +37,7 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
+import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
@@ -77,7 +77,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   private Class<T> mapperClass;
   private IMapperFactory mapperFactory;
   private IKeyGenerator keyGenerator;
-  private IProperty idField;
+  private IMappedIdField idField;
   private Entity entity;
   private Indexes indexes;
   private ITableInfo tableInfo;
@@ -197,23 +197,6 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
           addLifecycleAnnotationMethod(ann, method);
         }
       }
-    }
-  }
-
-  /**
-   * Adds a mapped field into the list of properties
-   * 
-   * @param name
-   * @param mf
-   */
-  protected void addMappedField(String name, IProperty mf) {
-    if (mf.hasAnnotation(Id.class)) {
-      if (getIdField() != null)
-        throw new MappingException("duplicate Id field definition found for mapper " + getMapperClass());
-      setIdField(mf);
-    }
-    if (!mf.isIgnore()) {
-      this.mappedProperties.put(name, mf);
     }
   }
 
@@ -383,11 +366,11 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   }
 
   @Override
-  public IProperty getIdField() {
+  public final IMappedIdField getIdField() {
     return idField;
   }
 
-  protected void setIdField(IProperty idField) {
+  protected void setIdField(IMappedIdField idField) {
     this.idField = idField;
   }
 

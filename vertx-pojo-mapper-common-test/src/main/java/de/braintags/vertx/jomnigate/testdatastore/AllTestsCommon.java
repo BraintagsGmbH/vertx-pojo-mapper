@@ -28,7 +28,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.TestQueryInterator;
  */
 @RunWith(Suite.class)
 @SuiteClasses({ TestBaseTest.class, TestMapping.class, TestSimpleMapper.class, TestStoreObject.class,
-    TestQueryHelper.class, TestIndex.class, TestRoundtrip.class, TestSimpleMapperQuery.class, TestOnlyIdMapper.class,
+    TestQueryHelper.class, TestIndex.class, TestRoundtrip.class, TestQuery.class, TestOnlyIdMapper.class,
     TestTrigger.class, TestMassInsert.class, TestKeyGenerator.class, TestGeoSearch.class, TestEncoder.class,
     TestEmbeddedEntity.class, TestListExtrems.class, TestReferenced.class, TestFieldConditionCache.class,
     TestQueryInterator.class, DataTypesTestSuite.class, TestClearDatastore.class })

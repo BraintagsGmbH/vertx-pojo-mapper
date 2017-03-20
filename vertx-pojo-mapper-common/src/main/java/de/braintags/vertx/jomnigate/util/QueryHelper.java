@@ -53,7 +53,7 @@ public class QueryHelper {
   public static final <T> void findRecordById(IDataStore datastore, Class<T> mapperClass, String id,
       Handler<AsyncResult<T>> handler) {
     IQuery<T> query = datastore.createQuery(mapperClass);
-    query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField().getName(), id));
+    query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField(), id));
     executeToFirstRecord(query, handler);
   }
 

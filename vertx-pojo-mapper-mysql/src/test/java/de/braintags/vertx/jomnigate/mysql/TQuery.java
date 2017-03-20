@@ -36,8 +36,8 @@ public class TQuery {
   @Test
   public void test() {
     IQuery<Person> query = dataStore.createQuery(Person.class);
-    query.setSearchCondition(ISearchCondition.and(ISearchCondition.isEqual("name", "peter"),
-        ISearchCondition.in("secName", "eins", "zwei"), ISearchCondition.isEqual("weight", 15)));
+    query.setSearchCondition(ISearchCondition.and(ISearchCondition.isEqual(Person.NAME, "peter"),
+        ISearchCondition.in(Person.SEC_NAME, "eins", "zwei"), ISearchCondition.isEqual(Person.WEIGHT, 15)));
     logger.info("--- start Rambler");
 
     final IQuery<Person> exQuery = query;

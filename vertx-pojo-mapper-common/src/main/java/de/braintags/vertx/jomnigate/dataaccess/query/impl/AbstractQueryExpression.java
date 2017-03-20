@@ -13,14 +13,16 @@
 package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.lang3.ClassUtils;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldValueResolver;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer;
 import de.braintags.vertx.jomnigate.dataaccess.query.IVariableFieldCondition;
+import de.braintags.vertx.jomnigate.dataaccess.query.IdField;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryOperator;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryLogicException;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryOperatorException;
@@ -34,6 +36,9 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.EncodeException;
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 
 /**
  * Abstract implementation of {@link IQueryExpression}
@@ -51,85 +56,75 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
   private IMapper<?> mapper;
 
   /**
-   * Transforms the java value of the given field into a value that is suited for the database, via the configured type
-   * handler(s).<br>
+   * Transforms the java value of the given field into a value that is suited for the database.<br>
    * If the operator is a multi-value operator (e.g IN or NOT_IN), the value must be an instance of {@link Iterable}.
    * The result will then also be a List of the transformed values.
    *
-   * @param field
-   *          the java field of the condition
    * @param operator
    *          the operator of the condition
    * @param value
    *          the value that will be transformed, must not be null
-   * @param handler
-   *          returns the transformed value
+   * @return the transformed value, or a list of transformed values
    */
-  private void transformValue(IProperty field, QueryOperator operator, Object value,
-      Handler<AsyncResult<Object>> handler) {
+  private Object transformValue(QueryOperator operator, Object value) {
     if (operator.isMultiValueOperator()) {
       if (value instanceof Iterable) {
-        handleMultipleValues(field, (Iterable<?>) value, handler);
+        return handleMultipleValues((Iterable<?>) value);
       } else {
-        handler.handle(Future.failedFuture(
-            new QueryParameterException("Multivalued argument but not an instance of Iterable:" + value)));
+        throw new QueryParameterException("Multivalued argument but not an instance of Iterable:" + value);
       }
     } else {
-      handleSingleValue(field, value, handler);
+      return handleSingleValue(value);
     }
   }
 
   /**
-   * Handle the transformation of a single value
+   * Handle the transformation of a single value to a format usable by a datastore
    *
-   * @param field
-   *          the java field of the condition
    * @param value
    *          the value that will be transformed
-   * @param handler
-   *          returns the transformed value
+   * @return the transformed value
    */
-  private void handleSingleValue(IProperty field, Object value, Handler<AsyncResult<Object>> handler) {
-    field.getPropertyMapper().convertForStore(value, field, handler);
+  private Object handleSingleValue(Object value) {
+    Object transformedValue;
+    if (ClassUtils.isPrimitiveOrWrapper(value.getClass())) {
+      transformedValue = value;
+    } else if (value instanceof CharSequence) {
+      transformedValue = value.toString();
+    } else if (value instanceof Enum) {
+      transformedValue = ((Enum<?>) value).name();
+    } else if (value instanceof GeoSearchArgument) {
+      transformedValue = new JsonObject(Json.encode(value));
+    } else {
+      try {
+        // can not use datastore object mapper here because only the JSON datastore has the object mapper
+        transformedValue = Json.encode(value);
+      } catch (EncodeException e) {
+        throw new QueryParameterException("Unable to transform complex object for value " + value, e);
+      }
+    }
+    return transformedValue;
   }
 
   /**
    * Handle the transformation of multiple values
    *
-   * @param fieldName
-   *          the java field of the condition
    * @param value
    *          the values of the condition, must not be empty
-   * @param handler
-   *          returns a {@link List} with the transformed values
+   * @return a list of transformed values
    */
-  private void handleMultipleValues(IProperty field, Iterable<?> value, Handler<AsyncResult<Object>> handler) {
+  private List<Object> handleMultipleValues(Iterable<?> value) {
     int count = Size.size(value);
     if (count == 0) {
-      String message = String.format("Multivalued argument, but no values defined for search in field %s.%s",
-          getMapper().getMapperClass().getName(), field);
-      handler.handle(Future.failedFuture(new QueryParameterException(message)));
-      return;
+      throw new QueryParameterException("Multivalued argument, but no values defined");
     }
 
-    Iterator<?> it = value.iterator();
-    @SuppressWarnings("rawtypes")
-    List<Future> futures = new ArrayList<>();
-    while (it.hasNext()) {
-      Future<Object> future = Future.future();
-      futures.add(future);
-      Object singleValue = it.next();
-      handleSingleValue(field, singleValue, future.completer());
+    List<Object> results = new ArrayList<>();
+    for (Object object : value) {
+      Object transformedValue = handleSingleValue(object);
+      results.add(transformedValue);
     }
-
-    CompositeFuture.all(futures).setHandler(result -> {
-      if (result.failed()) {
-        handler.handle(Future.failedFuture(result.cause()));
-      } else {
-        List<Object> results = result.result().list();
-        handler.handle(Future.succeededFuture(results));
-      }
-    });
+    return results;
   }
 
   /*
@@ -214,8 +209,12 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    */
   protected void parseFieldCondition(IFieldCondition fieldCondition, IFieldValueResolver resolver,
       Handler<AsyncResult<T>> handler) {
-    IProperty field = getMapper().getField(fieldCondition.getField());
-    String columnName = field.getColumnInfo().getName();
+    String columnName;
+    if (fieldCondition.getField() instanceof IdField) {
+      columnName = getMapper().getIdField().getColumnName();
+    } else {
+      columnName = fieldCondition.getField().getColumnName();
+    }
     Object fieldValue = fieldCondition.getValue();
     if (fieldValue != null) {
       if (fieldCondition instanceof IVariableFieldCondition) {
@@ -226,18 +225,13 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
           return;
         }
       }
-      transformValue(field, fieldCondition.getOperator(), fieldValue, result -> {
-        if (result.failed()) {
-          handler.handle(Future.failedFuture(result.cause()));
-        } else {
-          try {
-            T fieldConditionResult = buildFieldConditionResult(fieldCondition, columnName, result.result());
-            handler.handle(Future.succeededFuture(fieldConditionResult));
-          } catch (UnknownQueryOperatorException e) {
-            handler.handle(Future.failedFuture(e));
-          }
-        }
-      });
+      try {
+        Object transformedValue = transformValue(fieldCondition.getOperator(), fieldValue);
+        T fieldConditionResult = buildFieldConditionResult(fieldCondition, columnName, transformedValue);
+        handler.handle(Future.succeededFuture(fieldConditionResult));
+      } catch (UnknownQueryOperatorException | QueryParameterException e) {
+        handler.handle(Future.failedFuture(e));
+      }
     } else {
       handleNullConditionValue(fieldCondition, columnName, handler);
     }

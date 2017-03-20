@@ -14,8 +14,8 @@ package de.braintags.vertx.jomnigate.mysql.typehandler;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.json.typehandler.handler.ObjectTypeHandlerEmbedded;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mysql.dataaccess.SqlStoreObject;
 import de.braintags.vertx.jomnigate.mysql.dataaccess.SqlStoreObjectFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
@@ -48,7 +48,8 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object dbValue, IProperty field, Class<?> cls, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void fromStore(Object dbValue, IProperty field, Class<?> cls,
+      Handler<AsyncResult<ITypeHandlerResult>> handler) {
     try {
       JsonObject jsonObject = dbValue == null ? null : new JsonObject((String) dbValue);
       super.fromStore(jsonObject, field, cls, handler);
@@ -82,7 +83,7 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
 
   @SuppressWarnings("rawtypes")
   private void checkId(IDataStore store, Object embeddedObject, IMapper mapper, Handler<AsyncResult<Void>> handler) {
-    IProperty field = mapper.getIdField();
+    IProperty field = mapper.getIdField().getField();
     Object id = field.getPropertyAccessor().readData(embeddedObject);
     if (id != null) {
       handler.handle(Future.succeededFuture());
