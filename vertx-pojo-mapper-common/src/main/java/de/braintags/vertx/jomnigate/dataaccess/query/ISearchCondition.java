@@ -24,16 +24,33 @@ import de.braintags.vertx.jomnigate.dataaccess.query.impl.QueryOr;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.VariableFieldCondition;
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
 import de.braintags.vertx.jomnigate.datatypes.geojson.Position;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
 
 /**
  * The parts that make up the search condition of the query<br>
  * <br>
+ * There are two possibilities to define an ISearchCondition:
+ * either you are using IIndexedField as field specifyer or you are using a field name of the mapper. Typically
+ * {@link IIndexedField} is defined as static final variable of a mapper and references to a certain field name of the
+ * mapper. If at one time the field name changes for instance, you are sure that your defined queries are still working,
+ * cause the content of the defined variable will be changed wither.<br/>
+ * By using a String expression as field specifyer, you are more flexibled, but this version is more unsecure as well.
+ * 
+ * 
  * Copyright: Copyright (c) 20.12.2016 <br>
  * Company: Braintags GmbH <br>
  *
  * @author sschmitt
  */
+@FunctionalInterface
 public interface ISearchCondition {
+
+  /**
+   * Method validates the query arguments like field existence, to avoid wrong results
+   * 
+   * @param mapper
+   */
+  <T> void validate(IMapper<T> mapper);
 
   /**
    *
@@ -47,6 +64,36 @@ public interface ISearchCondition {
    */
   static IFieldCondition isEqual(IIndexedField field, Object value) {
     return createFieldCondition(field, QueryOperator.EQUALS, value);
+  }
+
+  /**
+   *
+   * Create a query condition for the {@link QueryOperator#EQUALS} operator with an unindexed field
+   *
+   * @param fieldName
+   *          the name of the field
+   * @param value
+   *          the value that the record must be equal to
+   * @return
+   */
+  static IFieldCondition isEqual(String fieldName, Object value) {
+    return createFieldCondition(fieldName, QueryOperator.EQUALS, value);
+  }
+
+  /**
+   *
+   * Create a query condition for any given operator
+   *
+   * @param fieldName
+   *          the name of the field for the comparison
+   * @param operator
+   *          any query operator
+   * @param value
+   *          the value that the record must be equal to
+   * @return
+   */
+  static IFieldCondition condition(String fieldName, QueryOperator operator, Object value) {
+    return createFieldCondition(fieldName, operator, value);
   }
 
   /**
@@ -69,6 +116,20 @@ public interface ISearchCondition {
    *
    * Create a query condition for the {@link QueryOperator#NOT_EQUALS} operator
    *
+   * @param fieldName
+   *          the field name for the comparison
+   * @param value
+   *          the value that the record must not be equal to
+   * @return
+   */
+  static IFieldCondition notEqual(String fieldName, Object value) {
+    return createFieldCondition(fieldName, QueryOperator.NOT_EQUALS, value);
+  }
+
+  /**
+   *
+   * Create a query condition for the {@link QueryOperator#NOT_EQUALS} operator
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -77,6 +138,19 @@ public interface ISearchCondition {
    */
   static IFieldCondition notEqual(IIndexedField field, Object value) {
     return createFieldCondition(field, QueryOperator.NOT_EQUALS, value);
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#LARGER} operator
+   *
+   * @param fieldName
+   *          the field name for the comparison
+   * @param value
+   *          the value that the record must be larger than
+   * @return
+   */
+  static IFieldCondition larger(String fieldName, Object value) {
+    return createFieldCondition(fieldName, QueryOperator.LARGER, value);
   }
 
   /**
@@ -95,6 +169,19 @@ public interface ISearchCondition {
   /**
    * Create a query condition for the {@link QueryOperator#LARGER_EQUAL} operator
    *
+   * @param fieldName
+   *          the field name for the comparison
+   * @param value
+   *          the value that the record must be larger or equal to
+   * @return
+   */
+  static IFieldCondition largerOrEqual(String fieldName, Object value) {
+    return createFieldCondition(fieldName, QueryOperator.LARGER_EQUAL, value);
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#LARGER_EQUAL} operator
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -103,6 +190,19 @@ public interface ISearchCondition {
    */
   static IFieldCondition largerOrEqual(IIndexedField field, Object value) {
     return createFieldCondition(field, QueryOperator.LARGER_EQUAL, value);
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#SMALLER} operator
+   *
+   * @param fieldName
+   *          the field name for the comparison
+   * @param value
+   *          the value that the record must be smaller than
+   * @return
+   */
+  static IFieldCondition smaller(String fieldName, Object value) {
+    return createFieldCondition(fieldName, QueryOperator.SMALLER, value);
   }
 
   /**
@@ -121,6 +221,19 @@ public interface ISearchCondition {
   /**
    * Create a query condition for the {@link QueryOperator#SMALLER_EQUAL} operator
    *
+   * @param fieldName
+   *          the field name for the comparison
+   * @param value
+   *          the value that the record must be smaller or equal to
+   * @return
+   */
+  static IFieldCondition smallerOrEqual(String fieldName, Object value) {
+    return createFieldCondition(fieldName, QueryOperator.SMALLER_EQUAL, value);
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#SMALLER_EQUAL} operator
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -129,6 +242,19 @@ public interface ISearchCondition {
    */
   static IFieldCondition smallerOrEqual(IIndexedField field, Object value) {
     return createFieldCondition(field, QueryOperator.SMALLER_EQUAL, value);
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#IN} operator
+   *
+   * @param fieldName
+   *          the field name for the comparison
+   * @param values
+   *          the values for the comparison
+   * @return
+   */
+  static IFieldCondition in(String fieldName, Object... values) {
+    return in(fieldName, Arrays.asList(values));
   }
 
   /**
@@ -148,6 +274,20 @@ public interface ISearchCondition {
    *
    * Create a query condition for the {@link QueryOperator#IN} operator
    *
+   * @param fieldName
+   *          the name of the field for the comparison
+   * @param values
+   *          the values for the comparison
+   * @return
+   */
+  static IFieldCondition in(String fieldName, Collection<?> values) {
+    return createFieldCondition(fieldName, QueryOperator.IN, values);
+  }
+
+  /**
+   *
+   * Create a query condition for the {@link QueryOperator#IN} operator
+   *
    * @param field
    *          the field for the comparison
    * @param values
@@ -156,6 +296,19 @@ public interface ISearchCondition {
    */
   static IFieldCondition in(IIndexedField field, Collection<?> values) {
     return createFieldCondition(field, QueryOperator.IN, values);
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#NOT_IN} operator
+   *
+   * @param fieldName
+   *          the field name for the comparison
+   * @param values
+   *          the values for the comparison
+   * @return
+   */
+  static IFieldCondition notIn(String fieldName, Object... values) {
+    return notIn(fieldName, Arrays.asList(values));
   }
 
   /**
@@ -174,6 +327,19 @@ public interface ISearchCondition {
   /**
    * Create a query condition for the {@link QueryOperator#NOT_IN} operator
    *
+   * @param fieldName
+   *          the field for the comparison
+   * @param values
+   *          the values for the comparison
+   * @return
+   */
+  static IFieldCondition notIn(String fieldName, Collection<?> values) {
+    return createFieldCondition(fieldName, QueryOperator.NOT_IN, values);
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#NOT_IN} operator
+   *
    * @param field
    *          the field for the comparison
    * @param values
@@ -182,6 +348,19 @@ public interface ISearchCondition {
    */
   static IFieldCondition notIn(IIndexedField field, Collection<?> values) {
     return createFieldCondition(field, QueryOperator.NOT_IN, values);
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#STARTS} operator
+   *
+   * @param fieldName
+   *          the field name for the comparison
+   * @param value
+   *          the value that the record must start with
+   * @return
+   */
+  static IFieldCondition startsWith(String fieldName, Object value) {
+    return createFieldCondition(fieldName, QueryOperator.STARTS, value);
   }
 
   /**
@@ -200,6 +379,19 @@ public interface ISearchCondition {
   /**
    * Create a query condition for the {@link QueryOperator#ENDS} operator
    *
+   * @param fieldName
+   *          the name of the field for the comparison
+   * @param value
+   *          the value that the record must end with
+   * @return
+   */
+  static IFieldCondition endsWith(String fieldName, Object value) {
+    return createFieldCondition(fieldName, QueryOperator.ENDS, value);
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#ENDS} operator
+   *
    * @param field
    *          the field for the comparison
    * @param value
@@ -208,6 +400,19 @@ public interface ISearchCondition {
    */
   static IFieldCondition endsWith(IIndexedField field, Object value) {
     return createFieldCondition(field, QueryOperator.ENDS, value);
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#CONTAINS} operator
+   *
+   * @param fieldName
+   *          the name of the field for the comparison
+   * @param value
+   *          the value that must be contained
+   * @return
+   */
+  static IFieldCondition contains(String fieldName, Object value) {
+    return createFieldCondition(fieldName, QueryOperator.CONTAINS, value);
   }
 
   /**
@@ -226,6 +431,24 @@ public interface ISearchCondition {
   /**
    * Create a query condition for the {@link QueryOperator#NEAR} operator
    *
+   * @param fieldName
+   *          the field name for the comparison
+   * @param x
+   *          the x geo coordinate
+   * @param y
+   *          the y geo coordinate
+   * @param maxDistance
+   *          the maximum distance to the given point
+   * @return
+   */
+  static IFieldCondition near(String fieldName, double x, double y, int maxDistance) {
+    return createFieldCondition(fieldName, QueryOperator.NEAR,
+        new GeoSearchArgument(new GeoPoint(new Position(x, y, new double[0])), maxDistance));
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#NEAR} operator
+   *
    * @param field
    *          the field for the comparison
    * @param x
@@ -239,6 +462,22 @@ public interface ISearchCondition {
   static IFieldCondition near(IIndexedField field, double x, double y, int maxDistance) {
     return createFieldCondition(field, QueryOperator.NEAR,
         new GeoSearchArgument(new GeoPoint(new Position(x, y, new double[0])), maxDistance));
+  }
+
+  /**
+   * Create a new field condition object with the given values. Checks if the value is a variable. If yes, creates a
+   * {@link VariableFieldCondition} to replace the variable with its actual value during execution.
+   *
+   * @param field
+   *          the field of the condition
+   * @param operator
+   *          the logic operator for the condition
+   * @param value
+   *          the value of the condition
+   * @return a new field condition object
+   */
+  static IFieldCondition createFieldCondition(String fieldName, QueryOperator operator, Object value) {
+    return createFieldCondition(IIndexedField.create(fieldName), operator, value);
   }
 
   /**

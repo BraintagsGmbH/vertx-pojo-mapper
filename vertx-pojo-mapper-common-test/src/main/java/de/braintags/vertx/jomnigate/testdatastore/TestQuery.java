@@ -23,6 +23,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
+import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.DeepRecord;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.EnumRecord;
@@ -78,6 +79,36 @@ public class TestQuery extends DatastoreBaseTest {
     query.setSearchCondition(ISearchCondition.or(ISearchCondition.isEqual(SimpleMapper.SECOND_PROPERTY, "erste"),
         ISearchCondition.isEqual(SimpleMapper.SECOND_PROPERTY, "zweite")));
     find(context, query, 2);
+  }
+
+  @Test
+  public void testIs_String(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    query.setSearchCondition(ISearchCondition.isEqual("intValue", 10));
+    ResultContainer resultContainer = find(context, query, 1);
+    logger.info(resultContainer.queryResult.getOriginalQuery().toString());
+  }
+
+  @Test
+  public void testIs_UnknownField(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    try {
+      query.setSearchCondition(ISearchCondition.isEqual("XXXXXXX", "Dublette"));
+      context.fail("expected NoSuchFieldException");
+    } catch (NoSuchFieldException e) {
+      // expected result
+    }
+  }
+
+  @Test
+  public void testIs(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    query.setSearchCondition(ISearchCondition.isEqual(SimpleMapper.NAME, "Dublette"));
+    ResultContainer resultContainer = find(context, query, 1);
+    logger.info(resultContainer.queryResult.getOriginalQuery().toString());
   }
 
   @Test

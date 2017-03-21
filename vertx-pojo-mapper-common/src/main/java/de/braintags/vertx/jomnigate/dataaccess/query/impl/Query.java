@@ -259,6 +259,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public void setSearchCondition(ISearchCondition searchCondition) {
+    searchCondition.validate(getMapper());
     this.searchCondition = searchCondition;
   }
 

@@ -20,6 +20,9 @@ import org.apache.commons.lang3.StringUtils;
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryOperator;
+import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import io.vertx.codegen.annotations.Nullable;
 
 /**
@@ -111,4 +114,22 @@ public class FieldCondition implements IFieldCondition {
         + (value instanceof Iterable<?> ? "(" + StringUtils.join((Iterable<?>) value, ",") + ")" : value);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition#validate(de.braintags.vertx.jomnigate.mapping.
+   * IMapper)
+   */
+  @Override
+  public <T> void validate(IMapper<T> mapper) {
+    String fieldName = field.getFieldName();
+    int dot = fieldName.indexOf('.');
+    if (dot > 0) { // for now we are checking the base field only
+      fieldName = fieldName.substring(0, dot);
+    }
+    IProperty p = mapper.getField(fieldName);
+    if (p == null) {
+      throw new NoSuchFieldException(mapper, fieldName);
+    }
+  }
 }
