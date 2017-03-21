@@ -26,11 +26,34 @@ import de.braintags.vertx.jomnigate.annotation.Entity;
 @Entity
 public class CollectionRecord extends BaseRecord {
   public Collection<String> collection = new ArrayList<>();
+  private Collection<String> collection2 = null;
 
   public CollectionRecord() {
     collection.add("Eins");
     collection.add("Zwei");
     collection.add("Drei");
+
+  }
+
+  /**
+   * @return the collection2
+   */
+  public Collection<String> getCollection2() {
+    if (collection2 == null) {
+      collection2 = new ArrayList();
+      collection2.add("Eins");
+      collection2.add("Zwei");
+      collection2.add("Drei");
+    }
+    return collection2;
+  }
+
+  /**
+   * @param collection2
+   *          the collection2 to set
+   */
+  public void setCollection2(Collection<String> collection2) {
+    this.collection2 = collection2;
   }
 
 }

@@ -109,7 +109,7 @@ public class JacksonPropertyMapper implements IPropertyMapper {
     try {
       IPropertyAccessor pAcc = field.getPropertyAccessor();
       Object javaValue = pAcc.readData(entity);
-      String converted = objectMapper.writeValueAsString(javaValue);
+      String converted = String.valueOf(javaValue);
       handler.handle(Future.succeededFuture(converted));
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));

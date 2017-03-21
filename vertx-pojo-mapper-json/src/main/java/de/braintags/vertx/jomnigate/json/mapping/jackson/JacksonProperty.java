@@ -53,7 +53,7 @@ public class JacksonProperty extends AbstractProperty {
     isSingleValue = !isMap() && !isCollection() && !isArray();
     propertyAccessor = new JacksonPropertyAccessor(beanDefinition);
     propertyMapper = new JacksonPropertyMapper((JsonDatastore) getMapper().getMapperFactory().getDataStore());
-    // computeAnnotations();
+    computeEncoder();
     // propertyMapper = computePropertyMapper();
     // computeType();
     // computeMultivalued();

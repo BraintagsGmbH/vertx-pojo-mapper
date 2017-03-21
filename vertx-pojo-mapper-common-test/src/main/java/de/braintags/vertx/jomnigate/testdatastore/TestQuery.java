@@ -13,6 +13,7 @@
 
 package de.braintags.vertx.jomnigate.testdatastore;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,7 +21,9 @@ import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.DeepRecord;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.EnumRecord;
 import io.vertx.core.logging.Logger;
@@ -39,7 +42,28 @@ public class TestQuery extends DatastoreBaseTest {
 
   @Test
   public void testDeepQuery(TestContext context) {
-    throw new UnsupportedOperationException("Search for content of Person.address.street = myStreet");
+    super.clearTable(context, DeepRecord.class.getSimpleName());
+    List<DeepRecord> childList = new ArrayList<>();
+    for (int i = 0; i < 5; i++) {
+      childList.add(new DeepRecord("Record " + i));
+    }
+    saveRecords(context, childList);
+
+    IQuery<DeepRecord> query0 = getDataStore(context).createQuery(DeepRecord.class);
+    IndexedField recordField = new IndexedField("name");
+    query0.setSearchCondition(ISearchCondition.isEqual(recordField, "Record 1"));
+    find(context, query0, 1);
+
+    IQuery<DeepRecord> query = getDataStore(context).createQuery(DeepRecord.class);
+    IndexedField deepChildField = new IndexedField("child.name");
+    query.setSearchCondition(ISearchCondition.isEqual(deepChildField, "child Record 1"));
+    find(context, query, 1);
+
+    IQuery<DeepRecord> query2 = getDataStore(context).createQuery(DeepRecord.class);
+    IndexedField deeperChildField = new IndexedField("child.deeperChild.name");
+    query.setSearchCondition(ISearchCondition.isEqual(deeperChildField, "deeper child Record 1"));
+    find(context, query, 1);
+
   }
 
   @Test

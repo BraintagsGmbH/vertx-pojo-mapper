@@ -200,13 +200,12 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
                 tempClient.dropCollection(collection, future.completer());
                 futures.add(future);
               }
-              CompositeFuture.all(futures).setHandler(clearResult -> {
+              CompositeFuture.join(futures).setHandler(clearResult -> {
                 if (clearResult.failed()) {
-                  handler.handle(Future.failedFuture(clearResult.cause()));
-                } else {
-                  this.mongoClient = tempClient;
-                  handler.handle(Future.succeededFuture());
+                  LOGGER.warn("clear database failed ( partially )", new InitException(clearResult.cause()));
                 }
+                this.mongoClient = tempClient;
+                handler.handle(Future.succeededFuture());
               });
             } else {
               this.mongoClient = tempClient;

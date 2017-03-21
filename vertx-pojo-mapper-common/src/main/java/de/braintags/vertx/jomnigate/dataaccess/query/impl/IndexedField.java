@@ -36,4 +36,9 @@ public class IndexedField implements IIndexedField {
   public String getColumnName() {
     return columnName;
   }
+
+  @Override
+  public String toString() {
+    return fieldName;
+  }
 }
