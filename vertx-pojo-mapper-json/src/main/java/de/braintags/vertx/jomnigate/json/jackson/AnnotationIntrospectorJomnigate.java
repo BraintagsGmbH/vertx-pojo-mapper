@@ -21,12 +21,10 @@ import com.fasterxml.jackson.module.jaxb.PackageVersion;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
-import de.braintags.vertx.jomnigate.annotation.field.Encoder;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.json.jackson.deserializer.geo.GeoPointDeserializer;
-import de.braintags.vertx.jomnigate.json.jackson.serializer.EncoderSerializer;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.geo.GeoPointSerializer;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.referenced.ReferencedArraySerializer;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.referenced.ReferencedCollectionSerializer;
@@ -74,8 +72,6 @@ public class AnnotationIntrospectorJomnigate extends NopAnnotationIntrospector i
   public Object findSerializer(Annotated am) {
     if (am.hasAnnotation(Referenced.class)) {
       return findReferencedSerializer(am);
-    } else if (am.hasAnnotation(Encoder.class)) {
-      return new EncoderSerializer(datastore, am);
     } else if (am.getType() != null && am.getType().isTypeOrSubTypeOf(GeoPoint.class)) {
       return new GeoPointSerializer(datastore);
     }

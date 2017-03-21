@@ -38,7 +38,7 @@ import io.vertx.core.json.JsonObject;
  * @author Michael Remme
  * 
  * @param <S>
- *          the type of the {@link IStoreObjectFactory}
+ *          the type of the {@link IStoreObjectFactory} like Json, String etc.
  * @param <U>
  *          the format used by the underlaing {@link IDataStoreSynchronizer}
  *

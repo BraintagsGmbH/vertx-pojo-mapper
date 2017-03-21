@@ -13,11 +13,15 @@
 package de.braintags.vertx.jomnigate.json.jackson.serializer;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
+import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.Encoder;
@@ -35,19 +39,18 @@ public class EncoderSerializer extends AbstractDataStoreSerializer {
    */
   private static final long serialVersionUID = 1L;
   private IEncoder encoder;
-  private AnnotatedMember annotated;
+  private AnnotatedMember setter;
 
-  /**
-   * @param datastore
-   */
-  public EncoderSerializer(IDataStore datastore, Annotated am) {
+  public EncoderSerializer(IDataStore datastore, BeanDescription beanDesc, PropertyName propertyName) {
     super(datastore);
-    if (am instanceof AnnotatedMember) {
-      annotated = (AnnotatedMember) am;
-    } else {
-      throw new UnsupportedOperationException("Need an instance of AnnotatedMember");
+    List<BeanPropertyDefinition> propertyList = beanDesc.findProperties();
+    for (BeanPropertyDefinition def : propertyList) {
+      if (def.getFullName().equals(propertyName)) {
+        setter = def.getMutator();
+        String encoder = def.getAccessor().getAnnotation(Encoder.class).name();
+        computeEncoder(encoder, def.getAccessor().getType(), propertyName.getSimpleName());
+      }
     }
-    computeEncoder(am);
   }
 
   /*
@@ -61,23 +64,22 @@ public class EncoderSerializer extends AbstractDataStoreSerializer {
     String encoded = encoder.encode((CharSequence) value);
     Object current = gen.getCurrentValue();
     gen.writeString(encoded);
-    // annotated.getType().
-
-    annotated.setValue(current, encoded);
+    setter.setValue(current, encoded);
   }
 
-  private void computeEncoder(Annotated am) {
-    String encoderName = am.getAnnotation(Encoder.class).name();
+  private void computeEncoder(String encoderName, JavaType type, String fieldName) {
     IEncoder enc = getDatastore().getEncoder(encoderName);
     if (enc == null) {
-      throw new UnsupportedOperationException("The encoder with name " + encoderName
-          + " does not exist. You need to add it into the datastore. Field: " + getFullName(am));
+      throw new UnsupportedOperationException(
+          "The encoder with name " + encoderName + " does not exist. You need to add it into the datastore. Field: "
+              + type.getRawClass().getName() + "." + fieldName);
     }
-    if (am.getType().isTypeOrSubTypeOf(CharSequence.class)) {
+    if (type.isTypeOrSubTypeOf(CharSequence.class)) {
       this.encoder = enc;
     } else {
       throw new UnsupportedOperationException(
-          "Annotation Encoded can only be used for fields instance of CharSequence. Field: " + getFullName(am));
+          "Annotation Encoded can only be used for fields instance of CharSequence. Field: "
+              + type.getRawClass().getName() + "." + fieldName);
     }
   }
 

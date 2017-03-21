@@ -78,6 +78,8 @@ public class JacksonModuleJomnigate extends SimpleModule {
     }
 
     context.addBeanDeserializerModifier(new ReferencedBeanDeserializerModifyer(datastore));
+    context.addBeanSerializerModifier(new JOmnigateBeanSerializerModifyer(datastore));
+
   }
 
   /*
