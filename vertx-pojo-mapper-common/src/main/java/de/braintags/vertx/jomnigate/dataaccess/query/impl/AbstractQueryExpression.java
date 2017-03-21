@@ -30,7 +30,6 @@ import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownSearchCond
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.VariableSyntaxException;
 import de.braintags.vertx.jomnigate.exception.QueryParameterException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.util.Size;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -98,7 +97,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
     } else {
       try {
         // can not use datastore object mapper here because only the JSON datastore has the object mapper
-        transformedValue = Json.encode(value);
+        transformedValue = Json.mapper.valueToTree(value).textValue();
       } catch (EncodeException e) {
         throw new QueryParameterException("Unable to transform complex object for value " + value, e);
       }
