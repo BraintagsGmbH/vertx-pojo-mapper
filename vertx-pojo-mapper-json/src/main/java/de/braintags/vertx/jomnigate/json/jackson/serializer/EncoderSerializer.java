@@ -61,6 +61,8 @@ public class EncoderSerializer extends AbstractDataStoreSerializer {
     String encoded = encoder.encode((CharSequence) value);
     Object current = gen.getCurrentValue();
     gen.writeString(encoded);
+    // annotated.getType().
+
     annotated.setValue(current, encoded);
   }
 

@@ -51,6 +51,7 @@ import de.braintags.vertx.jomnigate.testdatastore.mapper.Animal;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapper_BeanMethodWithoutField;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.Person;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.PrivateIdMapper;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.TestContext;
 
@@ -73,6 +74,11 @@ public class TestMapping extends DatastoreBaseTest {
   @Before
   public void setUpBeforeClass(TestContext context) throws Exception {
     mapperDef = getDataStore(context).getMapperFactory().getMapper(Person.class);
+  }
+
+  @Test
+  public void testPrivateIdField(TestContext context) {
+    IMapper<PrivateIdMapper> mapper = getDataStore(context).getMapperFactory().getMapper(PrivateIdMapper.class);
   }
 
   @Test
