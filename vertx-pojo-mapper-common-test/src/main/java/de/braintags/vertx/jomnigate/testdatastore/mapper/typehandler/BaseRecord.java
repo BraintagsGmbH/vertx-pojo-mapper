@@ -15,10 +15,12 @@ package de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.sql.Time;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -241,6 +243,20 @@ public class BaseRecord {
   private boolean compareArray(Object value, Object compareValue, String fieldName) {
     if (!compareValue.getClass().isArray())
       throw new MappingException("Contents are not equal: " + fieldName);
+    int l1 = Array.getLength(value);
+    int l2 = Array.getLength(compareValue);
+    if (l1 != l2) {
+      throw new MappingException("different lenght in arrays: " + l1 + " / " + l2);
+    }
+    // first clear wether all elements are existing, equal the order
+    List checkList = Arrays.asList((Object[]) compareValue);
+    for (int i = 0; i < Array.getLength(value); i++) {
+      Object element = Array.get(value, i);
+      if (!checkList.contains(element)) {
+        throw new MappingException(String.format("Element %s not in compare Array: %s ", element, compareValue));
+      }
+    }
+
     for (int i = 0; i < Array.getLength(value); i++) {
       if (!ObjectUtil.isEqual(Array.get(value, i), Array.get(compareValue, i))) {
         throw new MappingException(String.format("Contents are not equal in field %s: %s / %s ", fieldName,

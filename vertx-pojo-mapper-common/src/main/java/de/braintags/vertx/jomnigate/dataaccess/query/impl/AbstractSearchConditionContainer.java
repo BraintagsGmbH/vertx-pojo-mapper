@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
 import io.vertx.codegen.annotations.Nullable;
 
 /**
@@ -64,5 +65,16 @@ public abstract class AbstractSearchConditionContainer implements ISearchConditi
     result.append(StringUtils.join(getConditions(), " && "));
     result.append("]");
     return result.toString();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition#validate(de.braintags.vertx.jomnigate.mapping.
+   * IMapper)
+   */
+  @Override
+  public <T> void validate(IMapper<T> mapper) {
+    getConditions().forEach(c -> c.validate(mapper));
   }
 }
