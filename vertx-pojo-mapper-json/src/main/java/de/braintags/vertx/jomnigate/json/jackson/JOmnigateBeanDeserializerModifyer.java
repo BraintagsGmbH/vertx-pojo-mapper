@@ -36,12 +36,12 @@ import de.braintags.vertx.jomnigate.json.jackson.deserializer.referenced.Referen
  * @author Michael Remme
  * 
  */
-public class ReferencedBeanDeserializerModifyer extends BeanDeserializerModifier {
+public class JOmnigateBeanDeserializerModifyer extends BeanDeserializerModifier {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
-      .getLogger(ReferencedBeanDeserializerModifyer.class);
+      .getLogger(JOmnigateBeanDeserializerModifyer.class);
   private IDataStore datastore;
 
-  public ReferencedBeanDeserializerModifyer(IDataStore datastore) {
+  public JOmnigateBeanDeserializerModifyer(IDataStore datastore) {
     this.datastore = datastore;
   }
 

@@ -16,27 +16,27 @@ import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 
 /**
- * Mapper to test {@link Embedded} annotation
+ * Mapper to test {@link Embedded} annotation. This mapper should fail, cause embedded instance is no Entity
  *
  * @author Michael Remme
  * 
  */
 
 @Entity
-public class EmbeddedMapper_Single extends BaseRecord {
+public class EmbeddedMapper_Single_Failure extends BaseRecord {
 
   @Embedded
-  public SimpleMapperEmbedded simpleMapper;
+  public Boolean simpleMapper;
 
   /**
    * 
    */
-  public EmbeddedMapper_Single() {
+  public EmbeddedMapper_Single_Failure() {
   }
 
   @Override
   public boolean equals(Object o) {
-    EmbeddedMapper_Single om = (EmbeddedMapper_Single) o;
+    EmbeddedMapper_Single_Failure om = (EmbeddedMapper_Single_Failure) o;
     boolean equal = om.id.equals(id);
     boolean equal2 = (om.simpleMapper == null && simpleMapper == null)
         || (om.simpleMapper != null && simpleMapper != null && om.simpleMapper.equals(simpleMapper));

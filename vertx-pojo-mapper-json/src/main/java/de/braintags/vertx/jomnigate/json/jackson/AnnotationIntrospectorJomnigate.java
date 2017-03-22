@@ -41,6 +41,8 @@ public class AnnotationIntrospectorJomnigate extends NopAnnotationIntrospector i
    * Comment for <code>serialVersionUID</code>
    */
   private static final long serialVersionUID = 1L;
+  private static final String EMBEDDED_STRING = "embedded";
+  private static final String REFERENCED_STRING = "referenced";
 
   private IDataStore datastore;
 
@@ -97,19 +99,19 @@ public class AnnotationIntrospectorJomnigate extends NopAnnotationIntrospector i
   private Object findReferencedSerializer(Annotated am) {
     JavaType jt = am.getType();
     if (jt.isArrayType()) {
-      checkEntity(am, am.getType().getContentType().getRawClass());
+      checkEntity(am.getType().getContentType().getRawClass(), REFERENCED_STRING);
       return new ReferencedArraySerializer(datastore);
     } else if (jt.isCollectionLikeType()) {
-      checkEntity(am, am.getType().getContentType().getRawClass());
+      checkEntity(am.getType().getContentType().getRawClass(), REFERENCED_STRING);
       return new ReferencedCollectionSerializer(datastore);
     } else if (jt.isMapLikeType()) {
-      checkEntity(am, am.getType().getContentType().getRawClass());
+      checkEntity(am.getType().getContentType().getRawClass(), REFERENCED_STRING);
       // this is done by using the default serializer with a separate content serializer in findContentSerializer
       return null;
     } else if (jt.isEnumType()) {
       throw new UnsupportedOperationException("referenced Enum is not supported");
     } else {
-      checkEntity(am, am.getType().getRawClass());
+      checkEntity(am.getType().getRawClass(), REFERENCED_STRING);
       return new ReferencedObjectSerializer(datastore);
     }
   }
@@ -129,9 +131,16 @@ public class AnnotationIntrospectorJomnigate extends NopAnnotationIntrospector i
     return super.findDeserializer(am);
   }
 
-  private void checkEntity(Annotated am, Class<?> mapperClass) {
+  /**
+   * Checks wether the mapper class is a defined {@link Entity}
+   * 
+   * @param am
+   * @param mapperClass
+   * @param annotation
+   */
+  public static void checkEntity(Class<?> mapperClass, String annotation) {
     if (mapperClass.getAnnotation(Entity.class) == null) {
-      throw new MappingException("referenced entities must be annotated as Entity: " + am);
+      throw new MappingException(annotation + " entities must be annotated as Entity: " + mapperClass.getName());
     }
   }
 

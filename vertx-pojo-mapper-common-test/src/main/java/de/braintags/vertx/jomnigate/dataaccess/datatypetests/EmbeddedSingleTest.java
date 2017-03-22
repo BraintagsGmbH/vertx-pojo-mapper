@@ -17,9 +17,13 @@ import java.util.List;
 import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.exception.MappingException;
+import de.braintags.vertx.jomnigate.testdatastore.ResultContainer;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.EmbeddedMapper_Single;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.EmbeddedMapper_Single_Failure;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.SimpleMapperEmbedded;
+import de.braintags.vertx.util.ExceptionUtil;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -29,12 +33,6 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
-
-  /**
-   * 
-   */
-  public EmbeddedSingleTest() {
-  }
 
   @Override
   @Test
@@ -50,6 +48,34 @@ public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
     context.assertNull(loaded.simpleMapper);
   }
 
+  @Test
+  public void testWrongEmbedded(TestContext context) {
+    try {
+      ResultContainer r = saveRecord(context, new EmbeddedMapper_Single_Failure());
+      context.fail("this mapper should cause an error");
+    } catch (AssertionError e) {
+      String s = e.toString();
+      if (s.contains("MappingException")) {
+        // expected
+      } else {
+        throw ExceptionUtil.createRuntimeException(e);
+      }
+    }
+
+  }
+
+  @Test
+  public void testNoKeyGenerator(TestContext context) {
+    try {
+      IQuery<EmbeddedMapper_Single_Failure> query = getDataStore(context)
+          .createQuery(EmbeddedMapper_Single_Failure.class);
+    } catch (MappingException e) {
+      // expected
+    }
+    context.fail("test if no keygenerator is defined or not existing");
+
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -60,5 +86,20 @@ public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
     EmbeddedMapper_Single mapper = new EmbeddedMapper_Single();
     mapper.simpleMapper = new SimpleMapperEmbedded("testname", "secnd prop");
     return mapper;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.dataaccess.datatypetests.AbstractDatatypeTest#validateAfterSave(io.vertx.ext.unit.
+   * TestContext, java.lang.Object, de.braintags.vertx.jomnigate.testdatastore.ResultContainer)
+   */
+  @Override
+  protected void validateAfterSave(TestContext context, Object record, ResultContainer resultContainer) {
+    super.validateAfterSave(context, record, resultContainer);
+    EmbeddedMapper_Single loaded = (EmbeddedMapper_Single) record;
+    context.assertNotNull(loaded.simpleMapper.id);
+
   }
 }

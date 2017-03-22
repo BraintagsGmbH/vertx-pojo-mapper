@@ -33,10 +33,6 @@ import io.vertx.core.Future;
 public class ReferencedObjectSerializer extends AbstractDataStoreSerializer<Object> {
 
   /**
-   * Comment for <code>REFERENCE_ID</code>
-   */
-  public static final String REFERENCE_ID = "referenceId";
-  /**
    * Comment for <code>serialVersionUID</code>
    */
   private static final long serialVersionUID = 1L;
