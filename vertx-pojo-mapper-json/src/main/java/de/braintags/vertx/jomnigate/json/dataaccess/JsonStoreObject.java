@@ -24,8 +24,8 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
-import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator.SerializationReference;
 import de.braintags.vertx.jomnigate.json.jackson.deserializer.referenced.ReferencedPostHandler;
+import de.braintags.vertx.jomnigate.json.jackson.serializer.ISerializationReference;
 import de.braintags.vertx.jomnigate.json.mapping.jackson.JacksonMapper;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
@@ -138,8 +138,8 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
         } else {
           String newSource = generatedSource;
           try {
-            for (SerializationReference ref : jgen.getReferenceList()) {
-              newSource = newSource.replace(ref.getReference(), ref.getResolvedReference());
+            for (ISerializationReference ref : jgen.getReferenceList()) {
+              newSource = ref.resolveReference(getMapper().getMapperFactory().getDataStore(), newSource);
             }
             handler.handle(Future.succeededFuture(newSource));
           } catch (Exception e) {
