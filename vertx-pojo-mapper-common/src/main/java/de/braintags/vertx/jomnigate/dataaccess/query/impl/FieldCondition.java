@@ -131,5 +131,8 @@ public class FieldCondition implements IFieldCondition {
     if (p == null) {
       throw new NoSuchFieldException(mapper, fieldName);
     }
+    if (p.isIdField()) {
+      field = new IndexedIdField(p.getName(), p.getColumnInfo().getName());
+    }
   }
 }

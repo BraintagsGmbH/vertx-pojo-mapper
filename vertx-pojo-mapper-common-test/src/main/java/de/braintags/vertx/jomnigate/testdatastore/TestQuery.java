@@ -103,6 +103,18 @@ public class TestQuery extends DatastoreBaseTest {
   }
 
   @Test
+  public void testIs_Id(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    SimpleMapper sm = (SimpleMapper) findFirst(context, query);
+    query = getDataStore(context).createQuery(SimpleMapper.class);
+    query.setSearchCondition(ISearchCondition.isEqual("id", sm.id));
+
+    ResultContainer resultContainer = find(context, query, 1);
+    logger.info(resultContainer.queryResult.getOriginalQuery().toString());
+  }
+
+  @Test
   public void testIs(TestContext context) {
     createDemoRecords(context);
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);

@@ -468,7 +468,7 @@ public interface ISearchCondition {
    * Create a new field condition object with the given values. Checks if the value is a variable. If yes, creates a
    * {@link VariableFieldCondition} to replace the variable with its actual value during execution.
    *
-   * @param field
+   * @param fieldName
    *          the field of the condition
    * @param operator
    *          the logic operator for the condition
