@@ -263,21 +263,34 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
    *          the port where to start the instance
    */
   private static void startMongoExe(boolean startMongoLocal, int localPort) {
+    try {
+      internalStartMongoExe(startMongoLocal, localPort);
+    } catch (IOException e) {
+      // retry once
+      LOGGER.error("Error starting local mongo, retrying..");
+      try {
+        internalStartMongoExe(startMongoLocal, localPort);
+        LOGGER.warn("Local mongo started on second try");
+      } catch (IOException e1) {
+        throw new RuntimeException(e1);
+      }
+    }
+  }
+
+  private static void internalStartMongoExe(boolean startMongoLocal, int localPort) throws IOException {
     if (exe == null && startMongoLocal) {
       LOGGER.info("STARTING LOCAL MONGO");
-      try {
-        IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
-            .net(new Net(localPort, Network.localhostIsIPv6())).build();
-        Logger logger = (Logger) new SLF4JLogDelegateFactory()
-            .createDelegate(MongoDataStoreInit.class.getCanonicalName()).unwrap();
+      IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
+          .net(new Net(localPort, Network.localhostIsIPv6())).build();
+      Logger logger = (Logger) new SLF4JLogDelegateFactory().createDelegate(MongoDataStoreInit.class.getCanonicalName())
+          .unwrap();
 
-        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaultsWithLogger(Command.MongoD, logger).build();
+      IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaultsWithLogger(Command.MongoD, logger).build();
 
-        exe = MongodStarter.getInstance(runtimeConfig).prepare(config);
-        exe.start();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+      MongodExecutable temp = MongodStarter.getInstance(runtimeConfig).prepare(config);
+      temp.start();
+      // ensure client was successfully started before assigning to global field
+      exe = temp;
     }
   }
 
