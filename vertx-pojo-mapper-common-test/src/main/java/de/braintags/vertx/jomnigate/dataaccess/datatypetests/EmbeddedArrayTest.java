@@ -17,8 +17,10 @@ import java.util.List;
 import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.testdatastore.ResultContainer;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.EmbeddedMapper_Array;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.SimpleMapperEmbedded;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -28,6 +30,8 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class EmbeddedArrayTest extends AbstractDatatypeTest {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(EmbeddedArrayTest.class);
 
   public EmbeddedArrayTest() {
     super("simpleMapper");
@@ -55,6 +59,30 @@ public class EmbeddedArrayTest extends AbstractDatatypeTest {
   public BaseRecord createInstance(TestContext context) {
     BaseRecord mapper = new EmbeddedMapper_Array();
     return mapper;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.dataaccess.datatypetests.AbstractDatatypeTest#validateAfterSave(io.vertx.ext.unit.
+   * TestContext, java.lang.Object, de.braintags.vertx.jomnigate.testdatastore.ResultContainer)
+   */
+  @Override
+  protected void validateAfterSave(TestContext context, Object record, ResultContainer resultContainer) {
+    super.validateAfterSave(context, record, resultContainer);
+    EmbeddedMapper_Array loaded = (EmbeddedMapper_Array) record;
+    context.assertNotNull(loaded.simpleMapper[0].id);
+    updateRecord(context, loaded);
+  }
+
+  private void updateRecord(TestContext context, EmbeddedMapper_Array loaded) {
+    SimpleMapperEmbedded[] content = new SimpleMapperEmbedded[loaded.simpleMapper.length + 1];
+    System.arraycopy(loaded.simpleMapper, 0, content, 0, loaded.simpleMapper.length);
+    loaded.simpleMapper = content;
+    loaded.simpleMapper[loaded.simpleMapper.length - 1] = new SimpleMapperEmbedded("the last stand", "jojo");
+    LOGGER.info("Updating record now");
+    saveRecord(context, loaded);
   }
 
 }

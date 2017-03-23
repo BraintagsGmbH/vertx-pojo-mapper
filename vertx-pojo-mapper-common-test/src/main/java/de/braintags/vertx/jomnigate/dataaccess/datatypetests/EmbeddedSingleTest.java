@@ -17,9 +17,9 @@ import java.util.List;
 import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
-import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.testdatastore.ResultContainer;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.EmbeddedMapper_NoKeyGenerator;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.EmbeddedMapper_Single;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.EmbeddedMapper_Single_Failure;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.SimpleMapperEmbedded;
@@ -67,13 +67,16 @@ public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
   @Test
   public void testNoKeyGenerator(TestContext context) {
     try {
-      IQuery<EmbeddedMapper_Single_Failure> query = getDataStore(context)
-          .createQuery(EmbeddedMapper_Single_Failure.class);
-    } catch (MappingException e) {
-      // expected
+      ResultContainer r = saveRecord(context, new EmbeddedMapper_NoKeyGenerator());
+      context.fail("this mapper should cause an error");
+    } catch (AssertionError e) {
+      String s = e.toString();
+      if (s.contains("MappingException") && s.contains("needs a defined KeyGenerator")) {
+        // expected
+      } else {
+        throw ExceptionUtil.createRuntimeException(e);
+      }
     }
-    context.fail("test if no keygenerator is defined or not existing");
-
   }
 
   /*
@@ -100,6 +103,8 @@ public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
     super.validateAfterSave(context, record, resultContainer);
     EmbeddedMapper_Single loaded = (EmbeddedMapper_Single) record;
     context.assertNotNull(loaded.simpleMapper.id);
-
+    // update the record
+    loaded.simpleMapper.name = "modified";
+    saveRecord(context, loaded);
   }
 }
