@@ -18,6 +18,8 @@ import com.fasterxml.jackson.module.jaxb.PackageVersion;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
+import de.braintags.vertx.jomnigate.json.jackson.deserializer.JOmnigateBeanDeserializerModifyer;
+import de.braintags.vertx.jomnigate.json.jackson.serializer.JOmnigateBeanSerializerModifyer;
 
 /**
  * Extension module to react to certain datatypes like {@link GeoPoint} and annotations like {@link Referenced}

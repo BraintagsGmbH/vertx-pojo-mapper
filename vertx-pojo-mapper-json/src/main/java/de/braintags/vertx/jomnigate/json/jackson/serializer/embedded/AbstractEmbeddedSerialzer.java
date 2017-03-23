@@ -35,7 +35,20 @@ public abstract class AbstractEmbeddedSerialzer<T> extends AbstractDataStoreSeri
   private IMapper<?> mapper;
 
   /**
+   * 
    * @param datastore
+   * @param annotated
+   */
+  public AbstractEmbeddedSerialzer(IDataStore datastore, Class mapperClass) {
+    super(datastore);
+    this.mapper = initMapper(datastore, mapperClass);
+  }
+
+  /**
+   * 
+   * @param datastore
+   * @param beanDesc
+   * @param beanProperty
    */
   public AbstractEmbeddedSerialzer(IDataStore datastore, BeanDescription beanDesc, BeanPropertyWriter beanProperty) {
     super(datastore);
@@ -48,13 +61,28 @@ public abstract class AbstractEmbeddedSerialzer<T> extends AbstractDataStoreSeri
    * @param datastore
    * @param beanProperty
    */
-  protected IMapper initMapper(IDataStore datastore, BeanPropertyWriter beanProperty) {
-    IMapper<?> mapper = datastore.getMapperFactory().getMapper(beanProperty.getType().getRawClass());
-    if (mapper.getKeyGenerator() == null) {
+  protected IMapper initMapper(IDataStore datastore, Class mapperClass) {
+    IMapper<?> m = datastore.getMapperFactory().getMapper(mapperClass);
+    if (m.getKeyGenerator() == null) {
       throw new MappingException(
-          "Mapper " + mapper.getMapperClass().getName() + " is used as embedded and needs a defined KeyGenerator");
+          "Mapper " + m.getMapperClass().getName() + " is used as embedded and needs a defined KeyGenerator");
     }
-    return mapper;
+    return m;
+  }
+
+  /**
+   * Init the IMapper instance from the value class
+   * 
+   * @param datastore
+   * @param beanProperty
+   */
+  protected IMapper initMapper(IDataStore datastore, BeanPropertyWriter beanProperty) {
+    IMapper<?> m = datastore.getMapperFactory().getMapper(beanProperty.getType().getRawClass());
+    if (m.getKeyGenerator() == null) {
+      throw new MappingException(
+          "Mapper " + m.getMapperClass().getName() + " is used as embedded and needs a defined KeyGenerator");
+    }
+    return m;
   }
 
   protected final boolean isNewRecord(IMapper mapper, Object entity) {

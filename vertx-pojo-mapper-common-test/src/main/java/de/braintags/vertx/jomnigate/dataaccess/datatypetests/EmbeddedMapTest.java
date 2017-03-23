@@ -17,8 +17,10 @@ import java.util.List;
 import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.testdatastore.ResultContainer;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.EmbeddedMapper_Map;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.SimpleMapperEmbedded;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -60,6 +62,22 @@ public class EmbeddedMapTest extends AbstractDatatypeTest {
   @Override
   protected String getTestFieldName() {
     return "simpleMapper";
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.dataaccess.datatypetests.AbstractDatatypeTest#validateAfterSave(io.vertx.ext.unit.
+   * TestContext, java.lang.Object, de.braintags.vertx.jomnigate.testdatastore.ResultContainer)
+   */
+  @Override
+  protected void validateAfterSave(TestContext context, Object record, ResultContainer resultContainer) {
+    super.validateAfterSave(context, record, resultContainer);
+    EmbeddedMapper_Map loaded = (EmbeddedMapper_Map) record;
+    context.assertNotNull(loaded.simpleMapper.get(0).id);
+    loaded.simpleMapper.put(10, new SimpleMapperEmbedded("updated", "updated value"));
+    saveRecord(context, loaded);
   }
 
 }
