@@ -27,6 +27,7 @@ import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Encoder;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.EncoderSerializer;
+import de.braintags.vertx.jomnigate.json.jackson.serializer.embedded.EmbeddedArraySerializer;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.embedded.EmbeddedObjectSerializer;
 
 /**
@@ -77,7 +78,7 @@ public class JOmnigateBeanSerializerModifyer extends BeanSerializerModifier {
     JavaType jt = p.getType();
     if (jt.isArrayType()) {
       AnnotationIntrospectorJomnigate.checkEntity(jt.getContentType().getRawClass(), EMBEDDED_STRING);
-      throw new UnsupportedOperationException();
+      return new EmbeddedArraySerializer(datastore, beanDesc, p);
     } else if (jt.isCollectionLikeType()) {
       AnnotationIntrospectorJomnigate.checkEntity(jt.getContentType().getRawClass(), EMBEDDED_STRING);
       throw new UnsupportedOperationException();

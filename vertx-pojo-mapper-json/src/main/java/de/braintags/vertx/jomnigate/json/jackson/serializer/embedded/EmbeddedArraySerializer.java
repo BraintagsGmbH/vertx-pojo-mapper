@@ -18,28 +18,40 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
+import com.fasterxml.jackson.databind.type.ArrayType;
 
 import de.braintags.vertx.jomnigate.IDataStore;
-import de.braintags.vertx.jomnigate.annotation.field.Embedded;
+import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
 import io.vertx.core.Future;
 
 /**
- * Serializer to handle properties, which are annotated with {@link Embedded}. For new isntance, it generates an ID and
- * adds it into the record before serializing the instance
+ * 
  * 
  * @author Michael Remme
  * 
  */
 @SuppressWarnings("serial")
-public class EmbeddedObjectSerializer extends AbstractEmbeddedSerialzer<Object> {
+public class EmbeddedArraySerializer extends AbstractEmbeddedSerialzer<Object[]> {
 
   /**
    * @param datastore
    */
-  public EmbeddedObjectSerializer(IDataStore datastore, BeanDescription beanDesc, BeanPropertyWriter beanProperty) {
+  public EmbeddedArraySerializer(IDataStore datastore, BeanDescription beanDesc, BeanPropertyWriter beanProperty) {
     super(datastore, beanDesc, beanProperty);
+  }
+
+  @Override
+  protected IMapper initMapper(IDataStore datastore, BeanPropertyWriter beanProperty) {
+    ArrayType t = (ArrayType) beanProperty.getType();
+    IMapper<?> mapper = datastore.getMapperFactory().getMapper(t.getContentType().getRawClass());
+    if (mapper.getKeyGenerator() == null) {
+      throw new MappingException(
+          "Mapper " + mapper.getMapperClass().getName() + " is used as embedded and needs a defined KeyGenerator");
+    }
+    return mapper;
   }
 
   /*
@@ -49,7 +61,19 @@ public class EmbeddedObjectSerializer extends AbstractEmbeddedSerialzer<Object> 
    * com.fasterxml.jackson.core.JsonGenerator, com.fasterxml.jackson.databind.SerializerProvider)
    */
   @Override
-  public void serialize(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+  public void serialize(Object[] value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+    if (value == null) {
+      gen.writeNull();
+    } else {
+      gen.writeStartArray();
+      for (Object ob : value) {
+        serializeEntity(ob, gen, provider);
+      }
+      gen.writeEndArray();
+    }
+  }
+
+  public void serializeEntity(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
     if (value != null) {
       if (isNewRecord(getMapper(), value)) {
         JOmnigateGenerator jgen = (JOmnigateGenerator) gen;
@@ -57,10 +81,10 @@ public class EmbeddedObjectSerializer extends AbstractEmbeddedSerialzer<Object> 
         String refId = jgen.addEntry(future);
         gen.writeString(refId.toString());
       } else {
-        ((JsonDatastore) getDatastore()).getJacksonMapper().writerFor(Object.class).writeValue(gen, value);
+        ((JsonDatastore) getDatastore()).getJacksonMapper().writeValue(gen, value);
       }
     } else {
-      ((JsonDatastore) getDatastore()).getJacksonMapper().writerFor(Object.class).writeValue(gen, value);
+      ((JsonDatastore) getDatastore()).getJacksonMapper().writeValue(gen, value);
     }
   }
 
