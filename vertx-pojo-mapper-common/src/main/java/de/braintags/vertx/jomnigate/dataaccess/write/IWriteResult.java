@@ -23,13 +23,14 @@ import de.braintags.vertx.jomnigate.mapping.IStoreObject;
  * @author Michael Remme
  *
  */
-public interface IWriteResult {
+public interface IWriteResult extends Iterable<IWriteEntry> {
 
   /**
    * The resulting list of {@link IWriteEntry}
    * 
    * @return
    */
+  @Override
   Iterator<IWriteEntry> iterator();
 
   /**
