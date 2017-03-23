@@ -10,13 +10,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.vertx.jomnigate.json.jackson;
+package de.braintags.vertx.jomnigate.json.jackson.serializer;
 
 import java.util.Iterator;
 
 import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
@@ -24,11 +22,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerBuilder;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
 import de.braintags.vertx.jomnigate.IDataStore;
-import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Encoder;
-import de.braintags.vertx.jomnigate.json.jackson.serializer.EncoderSerializer;
-import de.braintags.vertx.jomnigate.json.jackson.serializer.embedded.EmbeddedArraySerializer;
-import de.braintags.vertx.jomnigate.json.jackson.serializer.embedded.EmbeddedObjectSerializer;
 
 /**
  * 
@@ -63,35 +57,9 @@ public class JOmnigateBeanSerializerModifyer extends BeanSerializerModifier {
       if (p.getAnnotation(Encoder.class) != null) {
         PropertyName pname = p.getFullName();
         p.assignSerializer(new EncoderSerializer(datastore, beanDesc, pname));
-      } else if (p.getAnnotation(Embedded.class) != null) {
-        p.assignSerializer(findEmbeddedSerializer(beanDesc, p));
       }
     }
     return super.updateBuilder(config, beanDesc, builder);
-  }
-
-  /**
-   * @param am
-   * @return
-   */
-  private JsonSerializer findEmbeddedSerializer(BeanDescription beanDesc, BeanPropertyWriter p) {
-    JavaType jt = p.getType();
-    if (jt.isArrayType()) {
-      AnnotationIntrospectorJomnigate.checkEntity(jt.getContentType().getRawClass(), EMBEDDED_STRING);
-      return new EmbeddedArraySerializer(datastore, beanDesc, p);
-    } else if (jt.isCollectionLikeType()) {
-      AnnotationIntrospectorJomnigate.checkEntity(jt.getContentType().getRawClass(), EMBEDDED_STRING);
-      throw new UnsupportedOperationException();
-    } else if (jt.isMapLikeType()) {
-      AnnotationIntrospectorJomnigate.checkEntity(jt.getContentType().getRawClass(), EMBEDDED_STRING);
-      // this is done by using the default serializer with a separate content serializer in findContentSerializer
-      return null;
-    } else if (jt.isEnumType()) {
-      throw new UnsupportedOperationException("referenced Enum is not supported");
-    } else {
-      AnnotationIntrospectorJomnigate.checkEntity(jt.getRawClass(), EMBEDDED_STRING);
-      return new EmbeddedObjectSerializer(datastore, beanDesc, p);
-    }
   }
 
 }

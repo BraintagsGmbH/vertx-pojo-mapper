@@ -17,8 +17,10 @@ import java.util.List;
 import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.testdatastore.ResultContainer;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.EmbeddedListMapper;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.StringTestMapper;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -31,6 +33,15 @@ public class EmbeddedListTest extends AbstractDatatypeTest {
 
   public EmbeddedListTest() {
     super("stringTestList");
+  }
+
+  @Override
+  protected void validateAfterSave(TestContext context, Object record, ResultContainer resultContainer) {
+    super.validateAfterSave(context, record, resultContainer);
+    EmbeddedListMapper loaded = (EmbeddedListMapper) record;
+    context.assertNotNull(loaded.stringTestList.iterator().next().id);
+    loaded.stringTestList.add(new StringTestMapper(20));
+    saveRecord(context, loaded);
   }
 
   @Test

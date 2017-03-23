@@ -15,16 +15,19 @@ package de.braintags.vertx.jomnigate.json.jackson;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.Versioned;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.NopAnnotationIntrospector;
 import com.fasterxml.jackson.module.jaxb.PackageVersion;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.json.jackson.deserializer.geo.GeoPointDeserializer;
+import de.braintags.vertx.jomnigate.json.jackson.serializer.embedded.EmbeddedObjectSerializer;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.geo.GeoPointSerializer;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.referenced.ReferencedArraySerializer;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.referenced.ReferencedCollectionSerializer;
@@ -44,12 +47,12 @@ public class AnnotationIntrospectorJomnigate extends NopAnnotationIntrospector i
   private static final String EMBEDDED_STRING = "embedded";
   private static final String REFERENCED_STRING = "referenced";
 
-  private IDataStore datastore;
+  private IDataStore<?, ?> datastore;
 
   /**
    * 
    */
-  public AnnotationIntrospectorJomnigate(IDataStore datastore) {
+  public AnnotationIntrospectorJomnigate(IDataStore<?, ?> datastore) {
     this.datastore = datastore;
   }
 
@@ -74,6 +77,8 @@ public class AnnotationIntrospectorJomnigate extends NopAnnotationIntrospector i
   public Object findSerializer(Annotated am) {
     if (am.hasAnnotation(Referenced.class)) {
       return findReferencedSerializer(am);
+    } else if (am.hasAnnotation(Embedded.class)) {
+      return findEmbeddedSerializer(am);
     } else if (am.getType() != null && am.getType().isTypeOrSubTypeOf(GeoPoint.class)) {
       return new GeoPointSerializer(datastore);
     }
@@ -81,15 +86,45 @@ public class AnnotationIntrospectorJomnigate extends NopAnnotationIntrospector i
   }
 
   /**
+   * @param am
+   * @return
+   */
+  private JsonSerializer<?> findEmbeddedSerializer(Annotated am) {
+    JavaType jt = am.getType();
+    if (jt.isArrayType() || jt.isCollectionLikeType() || jt.isMapLikeType() || jt.isEnumType()) {
+      return null;
+    } else {
+      AnnotationIntrospectorJomnigate.checkEntity(jt.getRawClass(), EMBEDDED_STRING);
+      return new EmbeddedObjectSerializer(datastore, am.getRawType());
+    }
+  }
+
+  /**
    * We are defining serializer of Maps, which are annotated as {@link Referenced}
    */
   @Override
   public Object findContentSerializer(Annotated am) {
-    if (am.getType().isMapLikeType() && am.hasAnnotation(Referenced.class)) {
-      // values of a map, which is annotated Referenced
+    JavaType jt = am.getType();
+    if (am.hasAnnotation(Referenced.class) && am.getType().isMapLikeType()) {
       return new ReferencedObjectSerializer(datastore);
+    } else if (am.hasAnnotation(Embedded.class)) {
+      return getEmbeddedContentSerializer(am, jt);
     }
     return super.findContentSerializer(am);
+  }
+
+  /**
+   * @param am
+   * @param jt
+   * @return
+   */
+  private JsonSerializer<?> getEmbeddedContentSerializer(Annotated am, JavaType jt) {
+    if (am.getType().isMapLikeType() || am.getType().isArrayType() || am.getType().isCollectionLikeType()) {
+      AnnotationIntrospectorJomnigate.checkEntity(jt.getContentType().getRawClass(), EMBEDDED_STRING);
+      return new EmbeddedObjectSerializer(datastore, jt.getContentType().getRawClass());
+    } else {
+      throw new UnsupportedOperationException("Content type as Embedded is not supported: " + am.getType());
+    }
   }
 
   /**

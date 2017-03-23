@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.vertx.jomnigate.json.jackson;
+package de.braintags.vertx.jomnigate.json.jackson.deserializer;
 
 import java.util.Iterator;
 

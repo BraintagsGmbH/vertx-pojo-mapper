@@ -37,6 +37,17 @@ public class EmbeddedObjectSerializer extends AbstractEmbeddedSerialzer<Object> 
 
   /**
    * @param datastore
+   * @param annotated
+   */
+  public EmbeddedObjectSerializer(IDataStore datastore, Class mapperClass) {
+    super(datastore, mapperClass);
+  }
+
+  /**
+   * 
+   * @param datastore
+   * @param beanDesc
+   * @param beanProperty
    */
   public EmbeddedObjectSerializer(IDataStore datastore, BeanDescription beanDesc, BeanPropertyWriter beanProperty) {
     super(datastore, beanDesc, beanProperty);

@@ -38,20 +38,20 @@ public class EmbeddedArraySerializer extends AbstractEmbeddedSerialzer<Object[]>
 
   /**
    * @param datastore
+   * @param annotated
+   */
+  public EmbeddedArraySerializer(IDataStore datastore, Class mapperClass) {
+    super(datastore, mapperClass);
+  }
+
+  /**
+   * 
+   * @param datastore
+   * @param beanDesc
+   * @param beanProperty
    */
   public EmbeddedArraySerializer(IDataStore datastore, BeanDescription beanDesc, BeanPropertyWriter beanProperty) {
     super(datastore, beanDesc, beanProperty);
-  }
-
-  @Override
-  protected IMapper initMapper(IDataStore datastore, BeanPropertyWriter beanProperty) {
-    ArrayType t = (ArrayType) beanProperty.getType();
-    IMapper<?> mapper = datastore.getMapperFactory().getMapper(t.getContentType().getRawClass());
-    if (mapper.getKeyGenerator() == null) {
-      throw new MappingException(
-          "Mapper " + mapper.getMapperClass().getName() + " is used as embedded and needs a defined KeyGenerator");
-    }
-    return mapper;
   }
 
   /*
@@ -86,6 +86,17 @@ public class EmbeddedArraySerializer extends AbstractEmbeddedSerialzer<Object[]>
     } else {
       ((JsonDatastore) getDatastore()).getJacksonMapper().writeValue(gen, value);
     }
+  }
+
+  @Override
+  protected IMapper initMapper(IDataStore datastore, BeanPropertyWriter beanProperty) {
+    ArrayType t = (ArrayType) beanProperty.getType();
+    IMapper<?> mapper = datastore.getMapperFactory().getMapper(t.getContentType().getRawClass());
+    if (mapper.getKeyGenerator() == null) {
+      throw new MappingException(
+          "Mapper " + mapper.getMapperClass().getName() + " is used as embedded and needs a defined KeyGenerator");
+    }
+    return mapper;
   }
 
 }
