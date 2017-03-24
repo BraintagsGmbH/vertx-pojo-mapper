@@ -16,16 +16,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
+import de.braintags.vertx.jomnigate.json.jackson.JOmnigateFactory;
 import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
 import de.braintags.vertx.jomnigate.json.jackson.deserializer.referenced.ReferencedPostHandler;
-import de.braintags.vertx.jomnigate.json.jackson.serializer.ISerializationReference;
 import de.braintags.vertx.jomnigate.json.mapping.jackson.JacksonMapper;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
@@ -87,12 +86,12 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
   @Override
   public void initFromEntity(Handler<AsyncResult<Void>> handler) {
     try {
-      ObjectMapper mapper = ((JsonDatastore) getMapper().getMapperFactory().getDataStore()).getJacksonMapper();
-      SegmentedStringWriter sw = new SegmentedStringWriter(mapper.getFactory()._getBufferRecycler());
-      JOmnigateGenerator jgen = (JOmnigateGenerator) mapper.getFactory().createGenerator(sw);
+      JsonDatastore datastore = (JsonDatastore) getMapper().getMapperFactory().getDataStore();
+      ObjectMapper mapper = datastore.getJacksonMapper();
+      JOmnigateGenerator jgen = JOmnigateFactory.createGenerator(datastore);
       mapper.writer().writeValue(jgen, getEntity());
-      String js = sw.getAndClear();
-      replaceReferenced(jgen, js, res -> {
+      String js = jgen.getWriter().getAndClear();
+      jgen.resolveReferences(datastore, js, res -> {
         if (res.failed()) {
           handler.handle(Future.failedFuture(res.cause()));
         } else {
@@ -124,31 +123,6 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
     } else {
       handler.handle(Future.succeededFuture());
     }
-  }
-
-  private void replaceReferenced(JOmnigateGenerator jgen, String generatedSource,
-      Handler<AsyncResult<String>> handler) {
-    if (jgen.getReferenceList().isEmpty()) {
-      handler.handle(Future.succeededFuture(generatedSource));
-    } else {
-      CompositeFuture cf = jgen.createComposite();
-      cf.setHandler(res -> {
-        if (res.failed()) {
-          handler.handle(Future.failedFuture(res.cause()));
-        } else {
-          String newSource = generatedSource;
-          try {
-            for (ISerializationReference ref : jgen.getReferenceList()) {
-              newSource = ref.resolveReference(getMapper().getMapperFactory().getDataStore(), newSource);
-            }
-            handler.handle(Future.succeededFuture(newSource));
-          } catch (Exception e) {
-            handler.handle(Future.failedFuture(e));
-          }
-        }
-      });
-    }
-
   }
 
   /**

@@ -68,6 +68,16 @@ public class SerializationReference_WriteResult implements ISerializationReferen
     return reference;
   }
 
+  @Override
+  public Future<String> resolveReference(IDataStore<?, ?> datastore, String source) {
+    try {
+      String result = source.replace(getReference(), getResolvedReference(datastore));
+      return Future.succeededFuture(result);
+    } catch (Exception e) {
+      return Future.failedFuture(e);
+    }
+  }
+
   private String getResolvedReference(IDataStore<?, ?> datastore) {
     if (asArrayMembers) {
       Buffer buffer = Buffer.buffer();
@@ -89,15 +99,8 @@ public class SerializationReference_WriteResult implements ISerializationReferen
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.vertx.jomnigate.json.jackson.serializer.ISerializationReference#resolveReference(de.braintags.vertx.
-   * jomnigate.IDataStore, java.lang.String)
-   */
   @Override
-  public String resolveReference(IDataStore<?, ?> datastore, String source) {
-    return source.replace(getReference(), getResolvedReference(datastore));
+  public String toString() {
+    return getReference();
   }
 }

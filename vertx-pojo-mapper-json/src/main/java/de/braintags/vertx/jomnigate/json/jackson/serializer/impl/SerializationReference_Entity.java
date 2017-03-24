@@ -12,11 +12,16 @@
  */
 package de.braintags.vertx.jomnigate.json.jackson.serializer.impl;
 
+import com.fasterxml.jackson.core.JsonFactory;
+
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
+import de.braintags.vertx.jomnigate.json.jackson.JOmnigateFactory;
+import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.ISerializationReference;
-import de.braintags.vertx.util.ExceptionUtil;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * SerializationReference stores information about references, which are written during serialization. It is used to
@@ -29,19 +34,18 @@ import io.vertx.core.Future;
 public class SerializationReference_Entity implements ISerializationReference {
   private Future<Object> future;
   private String reference;
-  private boolean asArrayMembers;
+  private JOmnigateGenerator generator;
 
   /**
    * @param future
    * @param reference
-   * @param asArrayMembers
-   *          if true, then the write entries are expected to be written as array; otherwise only the first member is
-   *          written
+   * @param generator
+   *          the JOmnigateGenerator is needed for further serialization of referenced entity
    */
-  public SerializationReference_Entity(Future<Object> future, String reference) {
+  public SerializationReference_Entity(Future<Object> future, String reference, JOmnigateGenerator generator) {
     this.future = future;
     this.reference = reference;
-    this.asArrayMembers = asArrayMembers;
+    this.generator = generator;
   }
 
   /**
@@ -65,14 +69,6 @@ public class SerializationReference_Entity implements ISerializationReference {
     return reference;
   }
 
-  private String getResolvedReference(IDataStore<?, ?> datastore) {
-    try {
-      return ((JsonDatastore) datastore).getJacksonMapper().writeValueAsString(future.result());
-    } catch (Exception e) {
-      throw ExceptionUtil.createRuntimeException(e);
-    }
-  }
-
   /*
    * (non-Javadoc)
    * 
@@ -81,9 +77,33 @@ public class SerializationReference_Entity implements ISerializationReference {
    * jomnigate.IDataStore, java.lang.String)
    */
   @Override
-  public String resolveReference(IDataStore<?, ?> datastore, String source) {
-    String result = getResolvedReference(datastore);
-    String re = source.replace("\"" + getReference() + "\"", result);
-    return re;
+  public Future<String> resolveReference(IDataStore<?, ?> datastore, String source) {
+    Future<String> f = Future.future();
+    getResolvedReference(datastore, res -> {
+      if (res.failed()) {
+        f.fail(res.cause());
+      } else {
+        f.complete(res.result());
+      }
+    });
+    return f;
+  }
+
+  private void getResolvedReference(IDataStore<?, ?> datastore, Handler<AsyncResult<String>> handler) {
+    try {
+      JsonFactory f = ((JsonDatastore) datastore).getJacksonMapper().getFactory();
+      JOmnigateGenerator gen = JOmnigateFactory.createGenerator((JsonDatastore) datastore);
+      // gen.setParentJomnigateGenerator(generator);
+      ((JsonDatastore) datastore).getJacksonMapper().writer().writeValue(gen, future.result());
+      String result = gen.getWriter().toString();
+      gen.resolveReferences(datastore, result, handler);
+    } catch (Exception e) {
+      handler.handle(Future.failedFuture(e));
+    }
+  }
+
+  @Override
+  public String toString() {
+    return getReference();
   }
 }

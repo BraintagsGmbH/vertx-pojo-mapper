@@ -18,10 +18,13 @@ import java.io.Writer;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.io.IOContext;
+import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
+import de.braintags.vertx.jomnigate.json.JsonDatastore;
+import de.braintags.vertx.util.ExceptionUtil;
 
 /**
  * An extension of {@link JsonFactory} to allow ReferencedSerializers to store Future, which are executed to serialize
@@ -31,6 +34,7 @@ import de.braintags.vertx.jomnigate.annotation.field.Referenced;
  * 
  */
 public class JOmnigateFactory extends MappingJsonFactory {
+  private JsonDatastore datastore;
 
   /**
    * Comment for <code>serialVersionUID</code>
@@ -38,24 +42,12 @@ public class JOmnigateFactory extends MappingJsonFactory {
   private static final long serialVersionUID = 1L;
 
   /**
-   * 
-   */
-  public JOmnigateFactory() {
-  }
-
-  /**
-   * @param mapper
-   */
-  public JOmnigateFactory(ObjectMapper mapper) {
-    super(mapper);
-  }
-
-  /**
    * @param src
    * @param mapper
    */
-  public JOmnigateFactory(JsonFactory src, ObjectMapper mapper) {
+  public JOmnigateFactory(JsonDatastore datastore, JsonFactory src, ObjectMapper mapper) {
     super(src, mapper);
+    this.datastore = datastore;
   }
 
   /*
@@ -66,7 +58,23 @@ public class JOmnigateFactory extends MappingJsonFactory {
    */
   @Override
   protected JsonGenerator _createGenerator(Writer out, IOContext ctxt) throws IOException {
-    return new JOmnigateGenerator(super._createGenerator(out, ctxt));
+    return new JOmnigateGenerator(datastore, super._createGenerator(out, ctxt), (SegmentedStringWriter) out);
   }
 
+  /**
+   * Create a new instance of JOmnigateGenerator
+   * 
+   * @param datastore
+   *          the datastore to be used
+   * @return
+   */
+  public static final JOmnigateGenerator createGenerator(JsonDatastore datastore) {
+    try {
+      ObjectMapper mapper = datastore.getJacksonMapper();
+      SegmentedStringWriter sw = new SegmentedStringWriter(mapper.getFactory()._getBufferRecycler());
+      return (JOmnigateGenerator) mapper.getFactory().createGenerator(sw);
+    } catch (Exception e) {
+      throw ExceptionUtil.createRuntimeException(e);
+    }
+  }
 }

@@ -40,8 +40,16 @@ public class EmbeddedListTest extends AbstractDatatypeTest {
     super.validateAfterSave(context, record, resultContainer);
     EmbeddedListMapper loaded = (EmbeddedListMapper) record;
     context.assertNotNull(loaded.stringTestList.iterator().next().id);
+    context.assertNotNull(loaded.stringTestList.iterator().next().booleanMapperList.iterator().next().id);
+
     loaded.stringTestList.add(new StringTestMapper(20));
     saveRecord(context, loaded);
+  }
+
+  @Test
+  public void simpleSave(TestContext context) {
+    clearTable(context, EmbeddedListMapper.class.getSimpleName());
+    saveRecord(context, createInstance(context));
   }
 
   @Test

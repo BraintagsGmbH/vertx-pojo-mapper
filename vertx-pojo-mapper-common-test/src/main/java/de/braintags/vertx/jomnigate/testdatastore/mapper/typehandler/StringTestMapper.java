@@ -12,7 +12,11 @@
  */
 package de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 
 /**
  * Testing tpyehandler for Strings
@@ -25,12 +29,16 @@ public class StringTestMapper extends BaseRecord {
   public int counter;
   public String stringField = "myString";
 
+  @Embedded
+  public Collection<BooleanMapper> booleanMapperList = new ArrayList<>();
+
   public StringTestMapper() {
   }
 
   public StringTestMapper(int counter) {
     this.counter = counter;
     stringField += " " + counter;
+    booleanMapperList.add(new BooleanMapper());
   }
 
   /*
