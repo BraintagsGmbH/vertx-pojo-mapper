@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.vertx.jomnigate.json.jackson;
+package de.braintags.vertx.jomnigate.json.jackson.serializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +21,11 @@ import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
 
 import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
-import de.braintags.vertx.jomnigate.json.jackson.serializer.ISerializationReference;
+import de.braintags.vertx.util.ResultObject;
 import edu.emory.mathcs.backport.java.util.Collections;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -32,7 +33,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 /**
- * Special Generator which is enabled to track objects, which are annotated as {@link Referenced}.
+ * Special Generator which is enabled to track objects, which are annotated as {@link Referenced} or {@link Embedded}.
  * The Generator is used during Serialization to collect referenced records and to fill the gap between synchrone
  * execution of jackson and async execution of datastore
  * 
@@ -40,6 +41,9 @@ import io.vertx.core.Handler;
  *
  */
 public class JOmnigateGenerator extends JsonGeneratorDelegate {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(JOmnigateGenerator.class);
+
   private static final String REFERENCE_IDENTIFYER = "$REFERENCE_IDENTIFYER$%s$";
   private AtomicInteger counter = new AtomicInteger();
   private List<ISerializationReference> referencedList = new ArrayList<>();
@@ -50,34 +54,10 @@ public class JOmnigateGenerator extends JsonGeneratorDelegate {
   /**
    * @param d
    */
-  JOmnigateGenerator(JsonDatastore datastore, JsonGenerator d, SegmentedStringWriter writer) {
+  public JOmnigateGenerator(JsonDatastore datastore, JsonGenerator d, SegmentedStringWriter writer) {
     super(d);
     this.writer = writer;
-  }
-
-  public void getResult(Handler<AsyncResult<String>> handler) {
-    String js = jgen.getWriter().getAndClear();
-    jgen.resolveReferences(datastore, js, res -> {
-      if (res.failed()) {
-        handler.handle(Future.failedFuture(res.cause()));
-      } else {
-        storeJson(res.result(), handler);
-      }
-    });
-
-  }
-
-  private SegmentedStringWriter getWriter() {
-    return writer;
-  }
-
-  /**
-   * Set the parent {@link JOmnigateGenerator} to share the counter
-   * 
-   * @param parent
-   */
-  public void setParentJomnigateGenerator(JOmnigateGenerator parent) {
-    parentGenerator = parent;
+    this.datastore = datastore;
   }
 
   /**
@@ -127,7 +107,7 @@ public class JOmnigateGenerator extends JsonGeneratorDelegate {
    * 
    * @return
    */
-  public CompositeFuture createComposite() {
+  private CompositeFuture createComposite() {
     List<Future> fl = new ArrayList();
     referencedList.stream().forEach(e -> fl.add(e.getFuture()));
     return CompositeFuture.all(fl);
@@ -143,13 +123,12 @@ public class JOmnigateGenerator extends JsonGeneratorDelegate {
   }
 
   /**
-   * if the generator contains reference information, they are replaced against their real value
+   * Get the result of serialization. This includes resolvement of referenced or embedded elements
    * 
-   * @param datastore
-   * @param generatedSource
    * @param handler
    */
-  public void resolveReferences(IDataStore datastore, String generatedSource, Handler<AsyncResult<String>> handler) {
+  public void getResult(Handler<AsyncResult<String>> handler) {
+    String generatedSource = getWriter().getAndClear();
     if (getReferenceList().isEmpty()) {
       handler.handle(Future.succeededFuture(generatedSource));
     } else {
@@ -169,24 +148,27 @@ public class JOmnigateGenerator extends JsonGeneratorDelegate {
    * @param generatedSource
    * @param handler
    */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private void referenceLoop(IDataStore datastore, String generatedSource, Handler<AsyncResult<String>> handler) {
-    String newSource = generatedSource;
     try {
+      ResultObject<String> ro = new ResultObject<>(null);
+      ro.setResult(generatedSource);
       List<Future> fl = new ArrayList<>();
       List<ISerializationReference> list = getReferenceList();
       for (ISerializationReference ref : list) {
-        fl.add(ref.resolveReference(datastore, newSource));
+        fl.add(ref.resolveReference(datastore, ro));
       }
       CompositeFuture cf = CompositeFuture.all(fl);
       cf.setHandler(result -> {
         if (result.failed()) {
           handler.handle(Future.failedFuture(result.cause()));
         } else {
-          String modSource = cf.size() == 0 ? newSource : cf.resultAt(cf.size() - 1);
+          String modSource = ro.getResult();
           validateResult(handler, modSource);
         }
       });
     } catch (Exception e) {
+      LOGGER.error("", e);
       handler.handle(Future.failedFuture(e));
     }
   }
@@ -202,6 +184,10 @@ public class JOmnigateGenerator extends JsonGeneratorDelegate {
     } else {
       handler.handle(Future.succeededFuture(newSource));
     }
+  }
+
+  private SegmentedStringWriter getWriter() {
+    return writer;
   }
 
 }

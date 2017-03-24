@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.type.ArrayType;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
-import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
+import de.braintags.vertx.jomnigate.json.jackson.serializer.JOmnigateGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import io.vertx.core.Future;
 

@@ -14,9 +14,9 @@ package de.braintags.vertx.jomnigate.json.jackson.serializer;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
-import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.impl.SerializationReference_Entity;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.impl.SerializationReference_WriteResult;
+import de.braintags.vertx.util.ResultObject;
 import io.vertx.core.Future;
 
 /**
@@ -26,8 +26,10 @@ import io.vertx.core.Future;
  * 
  * 
  * @author Michael Remme
+ * @param <T>
+ *          the type of the Future, which contains the value to be handled
  */
-public interface ISerializationReference {
+public interface ISerializationReference<T> {
 
   public static ISerializationReference createSerializationReference(Future<Object> future, String reference,
       JOmnigateGenerator generator) {
@@ -44,7 +46,7 @@ public interface ISerializationReference {
    * 
    * @return
    */
-  Future<?> getFuture();
+  Future<T> getFuture();
 
   /**
    * Get the reference, which was placed inside the generated json and which will be replaced by the real id from out
@@ -58,11 +60,11 @@ public interface ISerializationReference {
    * Method replaces the reference, which was written by a previous serializer, against the result object
    * 
    * @param datastore
-   * @param source
-   *          the reference to be replaced
-   * @param handler
-   *          the handler, which will receive the result
+   * @param ro
+   *          the ResultObject, which contains the String to be modified and where the modified content will be stored
+   *          again
+   * @return
    */
-  Future<String> resolveReference(IDataStore<?, ?> datastore, String source);
+  Future<Void> resolveReference(IDataStore<?, ?> datastore, ResultObject<String> ro);
 
 }

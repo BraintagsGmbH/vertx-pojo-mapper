@@ -23,8 +23,8 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.json.jackson.JOmnigateFactory;
-import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
 import de.braintags.vertx.jomnigate.json.jackson.deserializer.referenced.ReferencedPostHandler;
+import de.braintags.vertx.jomnigate.json.jackson.serializer.JOmnigateGenerator;
 import de.braintags.vertx.jomnigate.json.mapping.jackson.JacksonMapper;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
@@ -90,8 +90,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
       ObjectMapper mapper = datastore.getJacksonMapper();
       JOmnigateGenerator jgen = JOmnigateFactory.createGenerator(datastore);
       mapper.writer().writeValue(jgen, getEntity());
-      String js = jgen.getWriter().getAndClear();
-      jgen.resolveReferences(datastore, js, res -> {
+      jgen.getResult(res -> {
         if (res.failed()) {
           handler.handle(Future.failedFuture(res.cause()));
         } else {
@@ -109,19 +108,25 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * @param handler
    */
   private void storeJson(String js, Handler<AsyncResult<Void>> handler) {
-    container = new JsonObject(js);
-    IProperty idField = getMapper().getIdField().getField();
-    container.remove(idField.getName()); // do not write the java fieldname of id, but the column
-    Object javaValue = idField.getPropertyAccessor().readData(getEntity());
-    put(idField, javaValue == null ? null : String.valueOf(javaValue));
+    try {
+      LOGGER.debug("Storing json: " + js);
+      container = new JsonObject(js);
+      IProperty idField = getMapper().getIdField().getField();
+      container.remove(idField.getName()); // do not write the java fieldname of id, but the column
+      Object javaValue = idField.getPropertyAccessor().readData(getEntity());
+      put(idField, javaValue == null ? null : String.valueOf(javaValue));
 
-    if (isNewInstance() && getMapper().getKeyGenerator() != null) {
-      getNextId(handler);
-    } else if (isNewInstance()) {
-      getContainer().remove(getMapper().getIdField().getField().getColumnInfo().getName());
-      handler.handle(Future.succeededFuture());
-    } else {
-      handler.handle(Future.succeededFuture());
+      if (isNewInstance() && getMapper().getKeyGenerator() != null) {
+        getNextId(handler);
+      } else if (isNewInstance()) {
+        getContainer().remove(getMapper().getIdField().getField().getColumnInfo().getName());
+        handler.handle(Future.succeededFuture());
+      } else {
+        handler.handle(Future.succeededFuture());
+      }
+    } catch (Exception e) {
+      LOGGER.error("", e);
+      handler.handle(Future.failedFuture(e));
     }
   }
 

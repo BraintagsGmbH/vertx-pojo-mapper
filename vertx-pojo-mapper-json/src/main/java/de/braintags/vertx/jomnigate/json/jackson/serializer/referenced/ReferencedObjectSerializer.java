@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
-import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.AbstractDataStoreSerializer;
+import de.braintags.vertx.jomnigate.json.jackson.serializer.JOmnigateGenerator;
 import io.vertx.core.Future;
 
 /**

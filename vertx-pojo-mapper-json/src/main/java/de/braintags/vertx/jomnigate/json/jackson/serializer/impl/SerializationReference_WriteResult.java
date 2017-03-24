@@ -17,7 +17,7 @@ import java.util.Iterator;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
-import de.braintags.vertx.jomnigate.json.jackson.serializer.ISerializationReference;
+import de.braintags.vertx.util.ResultObject;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 
@@ -29,9 +29,7 @@ import io.vertx.core.buffer.Buffer;
  * @author Michael Remme
  *
  */
-public class SerializationReference_WriteResult implements ISerializationReference {
-  private Future<IWriteResult> future;
-  private String reference;
+public class SerializationReference_WriteResult extends AbstractSerializerReference<IWriteResult> {
   private boolean asArrayMembers;
 
   /**
@@ -42,37 +40,24 @@ public class SerializationReference_WriteResult implements ISerializationReferen
    *          written
    */
   public SerializationReference_WriteResult(Future<IWriteResult> future, String reference, boolean asArrayMembers) {
-    this.future = future;
-    this.reference = reference;
+    super(reference, future);
     this.asArrayMembers = asArrayMembers;
   }
 
-  /**
-   * Get the future, which was the result of storage of a referenced field content
+  /*
+   * (non-Javadoc)
    * 
-   * @return the future
+   * @see
+   * de.braintags.vertx.jomnigate.json.jackson.serializer.ISerializationReference#resolveReference(de.braintags.vertx.
+   * jomnigate.IDataStore, de.braintags.vertx.util.ResultObject)
    */
   @Override
-  public Future<IWriteResult> getFuture() {
-    return future;
-  }
-
-  /**
-   * Get the reference, which was placed inside the generated json and which will be replaced by the real id from out
-   * of the Future
-   * 
-   * @return the reference
-   */
-  @Override
-  public String getReference() {
-    return reference;
-  }
-
-  @Override
-  public Future<String> resolveReference(IDataStore<?, ?> datastore, String source) {
+  public final Future<Void> resolveReference(IDataStore<?, ?> datastore, ResultObject<String> ro) {
     try {
-      String result = source.replace(getReference(), getResolvedReference(datastore));
-      return Future.succeededFuture(result);
+      String resolved = getResolvedReference(datastore);
+      String result = ro.getResult().replace(getReference(), resolved);
+      ro.setResult(result);
+      return Future.succeededFuture();
     } catch (Exception e) {
       return Future.failedFuture(e);
     }
@@ -81,7 +66,7 @@ public class SerializationReference_WriteResult implements ISerializationReferen
   private String getResolvedReference(IDataStore<?, ?> datastore) {
     if (asArrayMembers) {
       Buffer buffer = Buffer.buffer();
-      Iterator<IWriteEntry> it = future.result().iterator();
+      Iterator<IWriteEntry> it = getFuture().result().iterator();
       while (it.hasNext()) {
         // write a sequence like 23", "24", "25 -> cause the value to be replaced is stored within quotation marks
         // like "$REFERENCE_IDENTIFYER$555$
@@ -92,15 +77,10 @@ public class SerializationReference_WriteResult implements ISerializationReferen
       }
       return buffer.toString();
     } else {
-      if (future.result().size() != 1) {
+      if (getFuture().result().size() != 1) {
         throw new IllegalArgumentException("Expected ONE instance for single object");
       }
-      return future.result().iterator().next().getId().toString();
+      return getFuture().result().iterator().next().getId().toString();
     }
-  }
-
-  @Override
-  public String toString() {
-    return getReference();
   }
 }
