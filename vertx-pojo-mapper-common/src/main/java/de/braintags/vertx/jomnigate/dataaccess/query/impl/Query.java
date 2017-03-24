@@ -37,7 +37,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
 
   private ISearchCondition searchCondition;
   private boolean returnCompleteCount = false;
-  private SortDefinition<T> sortDefs = new SortDefinition<>();
+  private final SortDefinition<T> sortDefs = new SortDefinition<>();
   private Object nativeCommand;
 
   /**
@@ -259,7 +259,9 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    */
   @Override
   public void setSearchCondition(ISearchCondition searchCondition) {
-    searchCondition.validate(getMapper());
+    if (searchCondition != null) {
+      searchCondition.validate(getMapper());
+    }
     this.searchCondition = searchCondition;
   }
 
