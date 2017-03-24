@@ -41,7 +41,7 @@ import io.vertx.core.json.JsonObject;
  *          the format used by the underlaing {@link IDataStoreSynchronizer}
  */
 public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonObject> {
-  private ObjectMapper jacksonMapper;
+  private final ObjectMapper jacksonMapper;
   private ObjectMapper jacksonPrettyMapper = new ObjectMapper();
 
   /**
@@ -52,8 +52,10 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
     super(vertx, properties);
     JOmnigateFactory jf = new JOmnigateFactory(Json.mapper.getFactory(), Json.mapper);
     jacksonMapper = new ObjectMapper(jf);
+    jacksonMapper.setFilterProvider(Json.mapper.getSerializationConfig().getFilterProvider());
     jf = new JOmnigateFactory(Json.prettyMapper.getFactory(), Json.prettyMapper);
     jacksonPrettyMapper = new ObjectMapper(jf);
+    jacksonPrettyMapper.setFilterProvider(Json.prettyMapper.getSerializationConfig().getFilterProvider());
 
     // Non-standard JSON but we allow C style comments in our JSON
     jacksonMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
