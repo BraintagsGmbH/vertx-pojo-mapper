@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
-import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
+import de.braintags.vertx.jomnigate.json.jackson.serializer.JOmnigateGenerator;
 import io.vertx.core.Future;
 
 /**

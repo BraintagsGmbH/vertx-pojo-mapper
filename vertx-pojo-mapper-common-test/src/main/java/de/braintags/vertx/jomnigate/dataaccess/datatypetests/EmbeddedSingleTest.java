@@ -34,6 +34,14 @@ import io.vertx.ext.unit.TestContext;
  */
 public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
 
+  //
+
+  @Test
+  public void simpleSave(TestContext context) {
+    clearTable(context, SimpleMapperEmbedded.class.getSimpleName());
+    saveRecord(context, new SimpleMapperEmbedded("first value", "secondValue"));
+  }
+
   @Override
   @Test
   public void extreme(TestContext context) {
@@ -61,7 +69,6 @@ public class EmbeddedSingleTest extends EmbeddedSingleTest_Null {
         throw ExceptionUtil.createRuntimeException(e);
       }
     }
-
   }
 
   @Test

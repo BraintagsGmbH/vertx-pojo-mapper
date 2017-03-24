@@ -56,10 +56,10 @@ public class JacksonModuleJomnigate extends SimpleModule {
    * Priority to use when registering annotation introspector: default
    * value is {@link Priority#PRIMARY}.
    */
-  protected Priority _priority = Priority.PRIMARY;
-  private IDataStore datastore;
+  protected Priority priority = Priority.PRIMARY;
+  private IDataStore<?, ?> datastore;
 
-  public JacksonModuleJomnigate(IDataStore datastore) {
+  public JacksonModuleJomnigate(IDataStore<?, ?> datastore) {
     super(PackageVersion.VERSION);
     if (datastore == null) {
       throw new NullPointerException("need an instance of IDataStore");
@@ -70,13 +70,15 @@ public class JacksonModuleJomnigate extends SimpleModule {
   @Override
   public void setupModule(SetupContext context) {
     AnnotationIntrospectorJomnigate intr = new AnnotationIntrospectorJomnigate(datastore);
-    switch (_priority) {
+    switch (priority) {
     case PRIMARY:
       context.insertAnnotationIntrospector(intr);
       break;
     case SECONDARY:
       context.appendAnnotationIntrospector(intr);
       break;
+    default:
+      throw new UnsupportedOperationException("only PRIMARY and SECONDARY supported");
     }
 
     context.addBeanDeserializerModifier(new JOmnigateBeanDeserializerModifyer(datastore));
@@ -99,12 +101,12 @@ public class JacksonModuleJomnigate extends SimpleModule {
    * afterwards will not have any effect on previous registrations.
    */
   public JacksonModuleJomnigate setPriority(Priority p) {
-    _priority = p;
+    priority = p;
     return this;
   }
 
   public Priority getPriority() {
-    return _priority;
+    return priority;
   }
 
 }

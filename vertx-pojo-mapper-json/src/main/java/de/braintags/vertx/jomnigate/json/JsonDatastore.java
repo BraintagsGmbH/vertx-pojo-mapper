@@ -42,7 +42,7 @@ import io.vertx.core.json.JsonObject;
  */
 public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonObject> {
   private final ObjectMapper jacksonMapper;
-  private ObjectMapper jacksonPrettyMapper = new ObjectMapper();
+  private final ObjectMapper jacksonPrettyMapper;
 
   /**
    * @param vertx
@@ -50,10 +50,10 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
    */
   public JsonDatastore(Vertx vertx, JsonObject properties) {
     super(vertx, properties);
-    JOmnigateFactory jf = new JOmnigateFactory(Json.mapper.getFactory(), Json.mapper);
+    JOmnigateFactory jf = new JOmnigateFactory(this, Json.mapper.getFactory(), Json.mapper);
     jacksonMapper = new ObjectMapper(jf);
     jacksonMapper.setFilterProvider(Json.mapper.getSerializationConfig().getFilterProvider());
-    jf = new JOmnigateFactory(Json.prettyMapper.getFactory(), Json.prettyMapper);
+    jf = new JOmnigateFactory(this, Json.prettyMapper.getFactory(), Json.prettyMapper);
     jacksonPrettyMapper = new ObjectMapper(jf);
     jacksonPrettyMapper.setFilterProvider(Json.prettyMapper.getSerializationConfig().getFilterProvider());
 
@@ -71,7 +71,6 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
     jacksonPrettyMapper.registerModule(new ParameterNamesModule(Mode.DEFAULT));
     jacksonPrettyMapper.registerModule(new JodaModule());
     jacksonPrettyMapper.registerModule(new GuavaModule());
-
   }
 
   /**

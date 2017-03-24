@@ -12,13 +12,11 @@
  */
 package de.braintags.vertx.jomnigate.json.jackson.serializer.impl;
 
-import com.fasterxml.jackson.core.JsonFactory;
-
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.json.jackson.JOmnigateFactory;
-import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
-import de.braintags.vertx.jomnigate.json.jackson.serializer.ISerializationReference;
+import de.braintags.vertx.jomnigate.json.jackson.serializer.JOmnigateGenerator;
+import de.braintags.vertx.util.ResultObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -31,9 +29,10 @@ import io.vertx.core.Handler;
  * @author Michael Remme
  *
  */
-public class SerializationReference_Entity implements ISerializationReference {
-  private Future<Object> future;
-  private String reference;
+public class SerializationReference_Entity extends AbstractSerializerReference<Object> {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(SerializationReference_Entity.class);
+
   private JOmnigateGenerator generator;
 
   /**
@@ -43,30 +42,8 @@ public class SerializationReference_Entity implements ISerializationReference {
    *          the JOmnigateGenerator is needed for further serialization of referenced entity
    */
   public SerializationReference_Entity(Future<Object> future, String reference, JOmnigateGenerator generator) {
-    this.future = future;
-    this.reference = reference;
+    super(reference, future);
     this.generator = generator;
-  }
-
-  /**
-   * Get the future, which was the result of storage of a referenced field content
-   * 
-   * @return the future
-   */
-  @Override
-  public Future<Object> getFuture() {
-    return future;
-  }
-
-  /**
-   * Get the reference, which was placed inside the generated json and which will be replaced by the real id from out
-   * of the Future
-   * 
-   * @return the reference
-   */
-  @Override
-  public String getReference() {
-    return reference;
   }
 
   /*
@@ -77,33 +54,30 @@ public class SerializationReference_Entity implements ISerializationReference {
    * jomnigate.IDataStore, java.lang.String)
    */
   @Override
-  public Future<String> resolveReference(IDataStore<?, ?> datastore, String source) {
-    Future<String> f = Future.future();
+  public Future<Void> resolveReference(IDataStore<?, ?> datastore, ResultObject<String> ro) {
+    Future<Void> f = Future.future();
     getResolvedReference(datastore, res -> {
       if (res.failed()) {
         f.fail(res.cause());
       } else {
-        f.complete(res.result());
+        String result = ro.getResult().replace("\"" + getReference() + "\"", res.result());
+        ro.setResult(result);
+        f.complete();
       }
     });
     return f;
   }
 
-  private void getResolvedReference(IDataStore<?, ?> datastore, Handler<AsyncResult<String>> handler) {
+  protected void getResolvedReference(IDataStore<?, ?> datastore, Handler<AsyncResult<String>> handler) {
     try {
-      JsonFactory f = ((JsonDatastore) datastore).getJacksonMapper().getFactory();
       JOmnigateGenerator gen = JOmnigateFactory.createGenerator((JsonDatastore) datastore);
-      // gen.setParentJomnigateGenerator(generator);
-      ((JsonDatastore) datastore).getJacksonMapper().writer().writeValue(gen, future.result());
-      String result = gen.getWriter().toString();
-      gen.resolveReferences(datastore, result, handler);
+      Object result = getFuture().result();
+      ((JsonDatastore) datastore).getJacksonMapper().writer().writeValue(gen, result);
+      gen.getResult(handler);
     } catch (Exception e) {
+      LOGGER.error("", e);
       handler.handle(Future.failedFuture(e));
     }
   }
 
-  @Override
-  public String toString() {
-    return getReference();
-  }
 }

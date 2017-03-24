@@ -34,7 +34,8 @@ import de.braintags.vertx.jomnigate.json.jackson.serializer.referenced.Reference
 import de.braintags.vertx.jomnigate.json.jackson.serializer.referenced.ReferencedObjectSerializer;
 
 /**
- * 
+ * Used to initialize serializers and deserializers for the special need of jomnigate ( Referenced / Embedded for
+ * instance )
  * 
  * @author Michael Remme
  * 

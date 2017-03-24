@@ -22,13 +22,15 @@ import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
+import de.braintags.vertx.jomnigate.json.jackson.serializer.JOmnigateGenerator;
 import de.braintags.vertx.util.ExceptionUtil;
 
 /**
- * An extension of {@link JsonFactory} to allow ReferencedSerializers to store Future, which are executed to serialize
- * fields, which are annotated as {@link Referenced}
+ * An extension of {@link JsonFactory} to allow ReferencedSerializers and Embedded Serializers to store Future, which
+ * are executed to serialize fields, which are annotated as {@link Referenced} or {@link Embedded}
  * 
  * @author Michael Remme
  * 
