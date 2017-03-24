@@ -13,6 +13,7 @@
 package de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 
 /**
  * A simple mapper with some beans properties
@@ -25,6 +26,9 @@ import de.braintags.vertx.jomnigate.annotation.Entity;
 public class SimpleMapperEmbedded extends BaseRecord {
   public String name;
   private String secondProperty;
+
+  @Embedded
+  public BooleanMapper booleanMapper = new BooleanMapper();
 
   /**
    * 

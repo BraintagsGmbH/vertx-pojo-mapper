@@ -29,6 +29,7 @@ public class EmbeddedListMapper extends BaseRecord {
 
   @Embedded
   public Collection<StringTestMapper> stringTestList = new ArrayList<>();
+
   @Embedded
   public Collection<DateMapper> dateTestList = new ArrayList<>();
 

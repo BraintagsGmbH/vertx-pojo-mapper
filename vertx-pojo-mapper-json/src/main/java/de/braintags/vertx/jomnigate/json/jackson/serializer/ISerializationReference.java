@@ -14,6 +14,7 @@ package de.braintags.vertx.jomnigate.json.jackson.serializer;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
+import de.braintags.vertx.jomnigate.json.jackson.JOmnigateGenerator;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.impl.SerializationReference_Entity;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.impl.SerializationReference_WriteResult;
 import io.vertx.core.Future;
@@ -28,8 +29,9 @@ import io.vertx.core.Future;
  */
 public interface ISerializationReference {
 
-  public static ISerializationReference createSerializationReference(Future<Object> future, String reference) {
-    return new SerializationReference_Entity(future, reference);
+  public static ISerializationReference createSerializationReference(Future<Object> future, String reference,
+      JOmnigateGenerator generator) {
+    return new SerializationReference_Entity(future, reference, generator);
   }
 
   public static ISerializationReference createSerializationReference(Future<IWriteResult> future, String reference,
@@ -55,9 +57,12 @@ public interface ISerializationReference {
   /**
    * Method replaces the reference, which was written by a previous serializer, against the result object
    * 
+   * @param datastore
    * @param source
-   * @return
+   *          the reference to be replaced
+   * @param handler
+   *          the handler, which will receive the result
    */
-  String resolveReference(IDataStore<?, ?> datastore, String source);
+  Future<String> resolveReference(IDataStore<?, ?> datastore, String source);
 
 }

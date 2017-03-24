@@ -17,13 +17,19 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
 
+import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
+import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.json.jackson.serializer.ISerializationReference;
+import edu.emory.mathcs.backport.java.util.Collections;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 /**
  * Special Generator which is enabled to track objects, which are annotated as {@link Referenced}.
@@ -37,12 +43,41 @@ public class JOmnigateGenerator extends JsonGeneratorDelegate {
   private static final String REFERENCE_IDENTIFYER = "$REFERENCE_IDENTIFYER$%s$";
   private AtomicInteger counter = new AtomicInteger();
   private List<ISerializationReference> referencedList = new ArrayList<>();
+  private JOmnigateGenerator parentGenerator;
+  private SegmentedStringWriter writer;
+  private JsonDatastore datastore;
 
   /**
    * @param d
    */
-  JOmnigateGenerator(JsonGenerator d) {
+  JOmnigateGenerator(JsonDatastore datastore, JsonGenerator d, SegmentedStringWriter writer) {
     super(d);
+    this.writer = writer;
+  }
+
+  public void getResult(Handler<AsyncResult<String>> handler) {
+    String js = jgen.getWriter().getAndClear();
+    jgen.resolveReferences(datastore, js, res -> {
+      if (res.failed()) {
+        handler.handle(Future.failedFuture(res.cause()));
+      } else {
+        storeJson(res.result(), handler);
+      }
+    });
+
+  }
+
+  private SegmentedStringWriter getWriter() {
+    return writer;
+  }
+
+  /**
+   * Set the parent {@link JOmnigateGenerator} to share the counter
+   * 
+   * @param parent
+   */
+  public void setParentJomnigateGenerator(JOmnigateGenerator parent) {
+    parentGenerator = parent;
   }
 
   /**
@@ -54,9 +89,13 @@ public class JOmnigateGenerator extends JsonGeneratorDelegate {
    * @return
    */
   public String addEntry(Future<IWriteResult> future, boolean asArrayMembers) {
-    String identifyer = String.format(REFERENCE_IDENTIFYER, String.valueOf(counter.incrementAndGet()));
-    referencedList.add(ISerializationReference.createSerializationReference(future, identifyer, asArrayMembers));
-    return identifyer;
+    if (parentGenerator != null) {
+      return parentGenerator.addEntry(future, asArrayMembers);
+    } else {
+      String identifyer = String.format(REFERENCE_IDENTIFYER, String.valueOf(counter.incrementAndGet()));
+      addEntry(ISerializationReference.createSerializationReference(future, identifyer, asArrayMembers));
+      return identifyer;
+    }
   }
 
   /**
@@ -68,9 +107,19 @@ public class JOmnigateGenerator extends JsonGeneratorDelegate {
    * @return
    */
   public String addEntry(Future<Object> future) {
-    String identifyer = String.format(REFERENCE_IDENTIFYER, String.valueOf(counter.incrementAndGet()));
-    referencedList.add(ISerializationReference.createSerializationReference(future, identifyer));
-    return identifyer;
+    if (parentGenerator != null) {
+      return parentGenerator.addEntry(future);
+    } else {
+      String identifyer = String.format(REFERENCE_IDENTIFYER, String.valueOf(counter.incrementAndGet()));
+      addEntry(ISerializationReference.createSerializationReference(future, identifyer, this));
+      return identifyer;
+    }
+  }
+
+  private void addEntry(ISerializationReference ref) {
+    List<ISerializationReference> list = referencedList == null ? new ArrayList() : new ArrayList(referencedList);
+    list.add(ref);
+    referencedList = list;
   }
 
   /**
@@ -90,6 +139,69 @@ public class JOmnigateGenerator extends JsonGeneratorDelegate {
    * @return the referencedFutureList
    */
   public List<ISerializationReference> getReferenceList() {
-    return referencedList;
+    return Collections.unmodifiableList(referencedList);
   }
+
+  /**
+   * if the generator contains reference information, they are replaced against their real value
+   * 
+   * @param datastore
+   * @param generatedSource
+   * @param handler
+   */
+  public void resolveReferences(IDataStore datastore, String generatedSource, Handler<AsyncResult<String>> handler) {
+    if (getReferenceList().isEmpty()) {
+      handler.handle(Future.succeededFuture(generatedSource));
+    } else {
+      CompositeFuture cf = createComposite();
+      cf.setHandler(res -> {
+        if (res.failed()) {
+          handler.handle(Future.failedFuture(res.cause()));
+        } else {
+          referenceLoop(datastore, generatedSource, handler);
+        }
+      });
+    }
+  }
+
+  /**
+   * @param jgen
+   * @param generatedSource
+   * @param handler
+   */
+  private void referenceLoop(IDataStore datastore, String generatedSource, Handler<AsyncResult<String>> handler) {
+    String newSource = generatedSource;
+    try {
+      List<Future> fl = new ArrayList<>();
+      List<ISerializationReference> list = getReferenceList();
+      for (ISerializationReference ref : list) {
+        fl.add(ref.resolveReference(datastore, newSource));
+      }
+      CompositeFuture cf = CompositeFuture.all(fl);
+      cf.setHandler(result -> {
+        if (result.failed()) {
+          handler.handle(Future.failedFuture(result.cause()));
+        } else {
+          String modSource = cf.size() == 0 ? newSource : cf.resultAt(cf.size() - 1);
+          validateResult(handler, modSource);
+        }
+      });
+    } catch (Exception e) {
+      handler.handle(Future.failedFuture(e));
+    }
+  }
+
+  /**
+   * @param handler
+   * @param newSource
+   */
+  private void validateResult(Handler<AsyncResult<String>> handler, String newSource) {
+    if (newSource.contains("$REFERENCE_IDENTIFYER")) {
+      handler.handle(
+          Future.failedFuture(new IllegalArgumentException("references not completely resolved: " + newSource)));
+    } else {
+      handler.handle(Future.succeededFuture(newSource));
+    }
+  }
+
 }
