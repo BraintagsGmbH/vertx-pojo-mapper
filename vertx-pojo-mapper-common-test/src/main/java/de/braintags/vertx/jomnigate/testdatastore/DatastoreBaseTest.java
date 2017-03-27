@@ -468,26 +468,15 @@ public abstract class DatastoreBaseTest {
       Async async = context.async();
       ErrorObject<Void> err = new ErrorObject<>(null);
       IQuery q = EXTERNAL_DATASTORE.createQuery(mapperClass);
-      find(context, q, -1).queryResult.toArray(result -> {
-        if (result.failed()) {
-          err.setThrowable(result.cause());
+      IDelete delete = EXTERNAL_DATASTORE.createDelete(mapperClass);
+      delete.setQuery(q);
+      delete.delete(delResult -> {
+        AsyncResult<IDeleteResult> dr = (AsyncResult<IDeleteResult>) delResult;
+        if (dr.failed()) {
+          err.setThrowable(dr.cause());
           async.complete();
         } else {
-          if (result.result().length > 0) {
-            IDelete delete = EXTERNAL_DATASTORE.createDelete(mapperClass);
-            delete.add(result.result());
-            delete.delete(delResult -> {
-              AsyncResult<IDeleteResult> dr = (AsyncResult<IDeleteResult>) delResult;
-              if (dr.failed()) {
-                err.setThrowable(dr.cause());
-                async.complete();
-              } else {
-                async.complete();
-              }
-            });
-          } else {
-            async.complete();
-          }
+          async.complete();
         }
       });
       async.await();
