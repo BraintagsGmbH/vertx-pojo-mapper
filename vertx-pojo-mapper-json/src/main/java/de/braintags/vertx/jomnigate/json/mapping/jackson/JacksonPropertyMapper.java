@@ -90,7 +90,8 @@ public class JacksonPropertyMapper implements IPropertyMapper {
         javaValue = field.getEncoder().encode((CharSequence) javaValue);
         pAcc.writeData(entity, javaValue);
       }
-      String converted = objectMapper.writeValueAsString(javaValue);
+      String converted = javaValue != null && javaValue instanceof CharSequence ? String.valueOf(javaValue)
+          : objectMapper.writeValueAsString(javaValue);
       storeObject.put(field, converted);
       handler.handle(Future.succeededFuture());
     } catch (Exception e) {
