@@ -13,6 +13,7 @@
 package de.braintags.vertx.jomnigate.json.jackson.serializer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,7 +27,6 @@ import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.util.ResultObject;
-import edu.emory.mathcs.backport.java.util.Collections;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
