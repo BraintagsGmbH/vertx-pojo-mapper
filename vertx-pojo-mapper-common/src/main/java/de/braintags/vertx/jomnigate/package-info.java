@@ -298,6 +298,11 @@
  * {@link examples.mapper.PersonRef}
  * ----
  * 
+ * 
+ * ==== The observer system
+ * {@link de.braintags.vertx.jomnigate.observer}
+ * 
+ * 
  * ==== Lifecycle methods
  * 
  * In vertx-pojo-mapper are existing a series of lifecycle annotations, by which you can modify the content

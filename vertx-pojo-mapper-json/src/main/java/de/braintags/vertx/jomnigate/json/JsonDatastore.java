@@ -22,6 +22,7 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.impl.AbstractDataStore;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.json.jackson.JOmnigateFactory;
 import de.braintags.vertx.jomnigate.json.jackson.JacksonModuleJomnigate;
 import de.braintags.vertx.jomnigate.mapping.IDataStoreSynchronizer;
@@ -48,8 +49,8 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
    * @param vertx
    * @param properties
    */
-  public JsonDatastore(Vertx vertx, JsonObject properties) {
-    super(vertx, properties);
+  public JsonDatastore(Vertx vertx, JsonObject properties, DataStoreSettings settings) {
+    super(vertx, properties, settings);
     JOmnigateFactory jf = new JOmnigateFactory(this, Json.mapper.getFactory(), Json.mapper);
     jacksonMapper = new ObjectMapper(jf);
     jacksonMapper.setFilterProvider(Json.mapper.getSerializationConfig().getFilterProvider());

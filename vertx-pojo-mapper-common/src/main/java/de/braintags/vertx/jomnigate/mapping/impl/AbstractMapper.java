@@ -32,15 +32,18 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
 import de.braintags.vertx.jomnigate.exception.MappingException;
+import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
+import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
-import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
+import de.braintags.vertx.jomnigate.observer.IObserver;
+import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.util.ClassUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -83,6 +86,8 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   private ITableInfo tableInfo;
   private boolean syncNeeded = true;
   private boolean hasReferencedFields = false;
+  private List<ObserverSettings<?>> observerList = new ArrayList();
+  private Map<ObserverEventType, List<IObserver>> eventObserverCache = new HashMap<>();
 
   /**
    * Class annotations which were found inside the current definition
@@ -113,7 +118,17 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     computeKeyGenerator();
     generateTableInfo();
     checkReferencedFields();
+    computeObserver();
     validate();
+  }
+
+  /**
+   * Computes the list of all observers, which can be executed for the current mapper class.
+   */
+  private void computeObserver() {
+    List<ObserverSettings<?>> osl = getMapperFactory().getDataStore().getSettings().getObserverSettings();
+    osl.stream().filter(os -> os.isApplyableFor(this))
+        .sorted((os1, os2) -> Integer.compare(os1.getPriority(), os2.getPriority())).forEach(c -> observerList.add(c));
   }
 
   /**
@@ -443,4 +458,24 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     return mappedProperties;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.mapping.IMapper#getObserver(de.braintags.vertx.jomnigate.observer.ObserverEventType)
+   */
+  @Override
+  public List<IObserver> getObserver(ObserverEventType event) {
+    if (!eventObserverCache.containsKey(event)) {
+      List<IObserver> ol = new ArrayList<>();
+      observerList.stream().filter(os -> os.isApplyableFor(event)).forEach(os -> {
+        try {
+          ol.add(os.getObserverClass().newInstance());
+        } catch (Exception e) {
+          throw new MappingException(e);
+        }
+      });
+    }
+    return eventObserverCache.get(event);
+  }
 }

@@ -148,7 +148,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
           LOGGER.error("could not start mongo client", initResult.cause());
           handler.handle(Future.failedFuture(new InitException(initResult.cause())));
         } else {
-          mongoDataStore = new MongoDataStore(vertx, mongoClient, getConfig());
+          mongoDataStore = new MongoDataStore(vertx, mongoClient, getConfig(), settings);
           handler.handle(Future.succeededFuture(mongoDataStore));
         }
       });
@@ -267,7 +267,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
       internalStartMongoExe(startMongoLocal, localPort);
     } catch (IOException e) {
       // retry once
-      LOGGER.error("Error starting local mongo, retrying..");
+      LOGGER.error("Error starting local mongo, retrying..", e);
       try {
         internalStartMongoExe(startMongoLocal, localPort);
         LOGGER.warn("Local mongo started on second try");

@@ -21,6 +21,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.Query;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.vertx.jomnigate.json.typehandler.JsonTypeHandlerFactory;
 import de.braintags.vertx.jomnigate.mapping.IDataStoreSynchronizer;
@@ -52,11 +53,12 @@ public class DummyDataStore implements IDataStore<String, String> {
   String database;
   private JsonObject properties;
   private ITriggerContextFactory triggerContextFactory;
+  private DataStoreSettings settings;
 
   public DummyDataStore() {
   }
 
-  public DummyDataStore(ITypeHandlerFactory tf, IPropertyMapperFactory pf) {
+  public DummyDataStore(ITypeHandlerFactory tf, IPropertyMapperFactory pf, DataStoreSettings settings) {
     this.mf = new MapperFactory(this, tf, pf);
   }
 
@@ -305,6 +307,16 @@ public class DummyDataStore implements IDataStore<String, String> {
   @Override
   public IStoreObjectFactory<String> getStoreObjectFactory() {
     return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.IDataStore#getSettings()
+   */
+  @Override
+  public DataStoreSettings getSettings() {
+    return settings;
   }
 
 }

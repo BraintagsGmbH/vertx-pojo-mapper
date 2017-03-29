@@ -33,6 +33,7 @@ public class DataStoreSettings {
   private String databaseName;
   private List<EncoderSettings> encoders = new ArrayList<>();
   private boolean clearDatabaseOnInit = false;
+  private List<ObserverSettings<?>> observerSettings = new ArrayList<>();
 
   /**
    * Standard constructor needed for saving as local file
@@ -162,5 +163,22 @@ public class DataStoreSettings {
    */
   public void setClearDatabaseOnInit(boolean clearDatabaseOnInit) {
     this.clearDatabaseOnInit = clearDatabaseOnInit;
+  }
+
+  /**
+   * The instance, where global
+   * 
+   * @return the observerSettings
+   */
+  public List<ObserverSettings<?>> getObserverSettings() {
+    return observerSettings;
+  }
+
+  /**
+   * @param observerSettings
+   *          the observerSettings to set
+   */
+  private void setObserverSettings(List<ObserverSettings<?>> observerSettings) {
+    this.observerSettings = observerSettings;
   }
 }

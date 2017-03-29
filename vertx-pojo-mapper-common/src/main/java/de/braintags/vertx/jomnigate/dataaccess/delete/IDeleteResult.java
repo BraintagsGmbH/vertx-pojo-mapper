@@ -14,6 +14,7 @@
 package de.braintags.vertx.jomnigate.dataaccess.delete;
 
 import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.dataaccess.IAccessResult;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 
 /**
@@ -22,7 +23,7 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
  * @author Michael Remme
  * 
  */
-public interface IDeleteResult {
+public interface IDeleteResult extends IAccessResult {
 
   /**
    * Get the {@link IDataStore} by which the current instance was created

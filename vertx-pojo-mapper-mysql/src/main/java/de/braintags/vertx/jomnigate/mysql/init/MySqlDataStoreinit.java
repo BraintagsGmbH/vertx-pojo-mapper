@@ -82,7 +82,7 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
         });
       } else {
         this.mySQLClient = createMySqlClient();
-        datastore = new MySqlDataStore(vertx, mySQLClient, getConfig());
+        datastore = new MySqlDataStore(vertx, mySQLClient, getConfig(), settings);
         handler.handle(Future.succeededFuture(datastore));
       }
     } catch (Exception e) {
@@ -113,7 +113,7 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
           } else {
             // reinitialize the client because we dropped the database the temporary client used
             this.mySQLClient = createMySqlClient();
-            datastore = new MySqlDataStore(vertx, tempClient, getConfig());
+            datastore = new MySqlDataStore(vertx, tempClient, getConfig(), settings);
             handler.handle(Future.succeededFuture(datastore));
           }
         });

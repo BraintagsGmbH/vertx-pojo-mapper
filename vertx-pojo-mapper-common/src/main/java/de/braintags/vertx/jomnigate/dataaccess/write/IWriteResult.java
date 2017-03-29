@@ -14,6 +14,7 @@ package de.braintags.vertx.jomnigate.dataaccess.write;
 
 import java.util.Iterator;
 
+import de.braintags.vertx.jomnigate.dataaccess.IAccessResult;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 
 /**
@@ -23,7 +24,7 @@ import de.braintags.vertx.jomnigate.mapping.IStoreObject;
  * @author Michael Remme
  *
  */
-public interface IWriteResult extends Iterable<IWriteEntry> {
+public interface IWriteResult extends Iterable<IWriteEntry>, IAccessResult {
 
   /**
    * The resulting list of {@link IWriteEntry}
@@ -43,7 +44,7 @@ public interface IWriteResult extends Iterable<IWriteEntry> {
    * @param action
    *          the {@link WriteAction} used
    */
-  void addEntry(IStoreObject< ? , ? > sto, Object id, WriteAction action);
+  void addEntry(IStoreObject<?, ?> sto, Object id, WriteAction action);
 
   /**
    * Get the number of {@link IWriteEntry}

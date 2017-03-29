@@ -18,6 +18,7 @@ import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.impl.AbstractDataStore;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.vertx.jomnigate.mysql.dataaccess.SqlDelete;
@@ -58,8 +59,8 @@ public class MySqlDataStore extends AbstractDataStore<Object, String> {
    * @param database
    *          the name of the database used
    */
-  public MySqlDataStore(Vertx vertx, AsyncSQLClient sqlClient, JsonObject properties) {
-    super(vertx, properties);
+  public MySqlDataStore(Vertx vertx, AsyncSQLClient sqlClient, JsonObject properties, DataStoreSettings settings) {
+    super(vertx, properties, settings);
     this.sqlClient = sqlClient;
     metaData = new MySqlMetaData(this);
     setMapperFactory(new SqlMapperFactory(this, new SqlTypeHandlerFactory(), new SqlPropertyMapperFactory()));

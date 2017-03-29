@@ -19,6 +19,7 @@ import java.util.Map;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
 import de.braintags.vertx.jomnigate.exception.UnsupportedKeyGenerator;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.mapping.IDataStoreSynchronizer;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
@@ -55,6 +56,7 @@ public abstract class AbstractDataStore<S, U> implements IDataStore<S, U> {
   private ITriggerContextFactory triggerContextFactory = new TriggerContextFactory();
   private Map<String, IEncoder> encoderMap = new HashMap<>();
   private int defaultQueryLimit;
+  private DataStoreSettings settings;
 
   /**
    * Create a new instance. The possible properties are defined by its concete implementation
@@ -64,11 +66,12 @@ public abstract class AbstractDataStore<S, U> implements IDataStore<S, U> {
    * @param properties
    *          the properties by which the new instance is created
    */
-  public AbstractDataStore(Vertx vertx, JsonObject properties) {
+  public AbstractDataStore(Vertx vertx, JsonObject properties, DataStoreSettings settings) {
     this.vertx = vertx;
     this.properties = properties;
     initSupportedKeyGenerators();
     defaultQueryLimit = properties.getInteger(DEFAULT_QUERY_LIMIT, 500);
+    this.settings = settings;
   }
 
   /**
@@ -230,6 +233,14 @@ public abstract class AbstractDataStore<S, U> implements IDataStore<S, U> {
   @Override
   public int getDefaultQueryLimit() {
     return defaultQueryLimit;
+  }
+
+  /**
+   * @return the settings
+   */
+  @Override
+  public DataStoreSettings getSettings() {
+    return settings;
   }
 
 }
