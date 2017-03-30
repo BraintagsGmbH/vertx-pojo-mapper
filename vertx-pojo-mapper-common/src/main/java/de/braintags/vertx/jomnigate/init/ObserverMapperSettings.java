@@ -12,12 +12,14 @@
  */
 package de.braintags.vertx.jomnigate.init;
 
+import java.lang.annotation.Annotation;
+
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 
 /**
  * The part of {@link ObserverSettings} which defines, on which {@link IMapper} the ObserverSettings shall be executed.
- * The property classDefinition contains the definition. Examples for such a definition are:
+ * The property classDefinition and annotation contain the definition. Examples for a class definition are:
  * <UL>
  * <LI>my.mapper.class<br/>
  * the parent ObserverSettings will be applied for a mapper with the class my.mapper.class
@@ -33,6 +35,7 @@ public class ObserverMapperSettings {
   private String classDefinition;
   private boolean instOf = false;
   private Class<?> mapperClass;
+  private Class<? extends Annotation> annotation;
 
   @SuppressWarnings("unused")
   private ObserverMapperSettings() {
@@ -47,6 +50,16 @@ public class ObserverMapperSettings {
    */
   public ObserverMapperSettings(String classDefinition) {
     setClassDefinition(classDefinition);
+  }
+
+  /**
+   * Constructor for a new instance, which shall be executed on mapper classes, which are annotated with the given
+   * annotation
+   * 
+   * @param annotation
+   */
+  public ObserverMapperSettings(Class<? extends Annotation> annotation) {
+    setAnnotation(annotation);
   }
 
   private void init() {
@@ -84,17 +97,44 @@ public class ObserverMapperSettings {
   }
 
   /**
+   * If an observer shall be executed for mapper classes, which are annotated with a certain Annotation, the annotation
+   * must be defined here
+   * 
+   * @return the annotation
+   */
+  public Class<? extends Annotation> getAnnotation() {
+    return annotation;
+  }
+
+  /**
+   * If an observer shall be executed for mapper classes, which are annotated with a certain Annotation, the annotation
+   * must be defined here
+   * 
+   * @param annotation
+   *          the annotation to set
+   */
+  public void setAnnotation(Class<? extends Annotation> annotation) {
+    this.annotation = annotation;
+  }
+
+  /**
    * This method checks, whether the current definition is applyable to the given instance of IMapper.
    * 
    * @param mapper
    * @return true, if appliable
    */
   boolean isApplyableFor(IMapper<?> mapper) {
+    boolean applyable = false;
     if (instOf) {
-      return mapperClass.isAssignableFrom(mapper.getMapperClass());
+      applyable = mapperClass.isAssignableFrom(mapper.getMapperClass());
     } else {
-      return mapperClass == mapper.getMapperClass();
+      applyable = mapperClass == mapper.getMapperClass();
     }
+    if (annotation != null) {
+      applyable = mapper.getAnnotation(annotation) != null;
+    }
+
+    return applyable;
   }
 
 }

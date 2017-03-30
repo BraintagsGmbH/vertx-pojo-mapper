@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.ObserverMapperSettings;
@@ -24,6 +26,7 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.Person;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.PolyMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.TriggerMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
@@ -43,6 +46,28 @@ import io.vertx.ext.unit.TestContext;
 public class TestObserverMapping extends DatastoreBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TestObserverMapping.class);
+
+  /**
+   * Defines an observer, which should be executed for any event on mappers, which are annotated with
+   * {@link JsonTypeInfo}
+   * 
+   * @param context
+   */
+  @Test
+  public void testGlobalObserver_Annotated(TestContext context) {
+    DataStoreSettings settings = reset(context);
+
+    ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
+    os.getMapperSettings().add(new ObserverMapperSettings(JsonTypeInfo.class));
+    settings.getObserverSettings().add(os);
+
+    IMapper<PolyMapper> mapper = getDataStore(context).getMapperFactory().getMapper(PolyMapper.class);
+    checkObserver_AllEvents(context, mapper, 1);
+
+    IMapper<SimpleMapper> mapper2 = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
+    checkObserver_AllEvents(context, mapper2, 0);
+
+  }
 
   /**
    * Defines an observer, which should be executed for any event instanceof BaseRecord. TriggerMapper should not be
