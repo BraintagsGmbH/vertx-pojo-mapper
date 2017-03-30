@@ -451,17 +451,18 @@ public interface ISearchCondition {
    *
    * @param field
    *          the field for the comparison
-   * @param x
-   *          the x geo coordinate
-   * @param y
-   *          the y geo coordinate
+   * @param longitude
+   *          the longitude coordinate
+   * @param latitude
+   *          the latitude coordinate
    * @param maxDistance
-   *          the maximum distance to the given point
+   *          the maximum distance in meters to the given point
    * @return
    */
-  static IFieldCondition near(IIndexedField field, double x, double y, int maxDistance) {
+  static IFieldCondition near(IIndexedField field, double longitude, double latitude, int maxDistance) {
+    // don't change order of longitude/latitude, or else mongo doesn't work anymore
     return createFieldCondition(field, QueryOperator.NEAR,
-        new GeoSearchArgument(new GeoPoint(new Position(x, y, new double[0])), maxDistance));
+        new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0])), maxDistance));
   }
 
   /**

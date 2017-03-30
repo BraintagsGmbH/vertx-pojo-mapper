@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import de.braintags.vertx.util.assertion.Assert;
 
 /**
@@ -27,6 +29,7 @@ import de.braintags.vertx.util.assertion.Assert;
  * 
  */
 public class Position {
+
   private final List<Double> values;
 
   /**
@@ -86,6 +89,7 @@ public class Position {
    * 
    * @return the values of the position
    */
+  @JsonValue
   public List<Double> getValues() {
     return values;
   }
