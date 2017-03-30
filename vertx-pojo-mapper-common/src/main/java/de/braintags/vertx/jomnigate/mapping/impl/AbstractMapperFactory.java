@@ -27,13 +27,18 @@ import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
  */
 public abstract class AbstractMapperFactory implements IMapperFactory {
   private IDataStore<?, ?> datastore;
-  private final Map<String, IMapper> mappedClasses = new HashMap<>();
+  private Map<String, IMapper<?>> mappedClasses = new HashMap<>();
 
   /**
    * @param dataStore
    */
   public AbstractMapperFactory(IDataStore<?, ?> dataStore) {
     this.datastore = dataStore;
+  }
+
+  @Override
+  public void reset() {
+    mappedClasses = new HashMap<>();
   }
 
   /*
@@ -46,19 +51,20 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
     return datastore;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public final <T> IMapper<T> getMapper(Class<T> mapperClass) {
     String className = mapperClass.getName();
     if (mappedClasses.containsKey(className)) {
-      @SuppressWarnings("unchecked")
-      IMapper<T> cachedEntry = mappedClasses.get(className);
-      return cachedEntry;
+      return (IMapper<T>) mappedClasses.get(className);
     }
     if (!mapperClass.isAnnotationPresent(Entity.class))
       throw new UnsupportedOperationException(String
           .format("The class %s is no mappable entity. Add the annotation Entity to the class", mapperClass.getName()));
     IMapper<T> mapper = createMapper(mapperClass);
-    mappedClasses.put(className, mapper);
+    Map<String, IMapper<?>> tmpMap = new HashMap<>(mappedClasses);
+    tmpMap.put(className, mapper);
+    mappedClasses = tmpMap;
     return mapper;
   }
 

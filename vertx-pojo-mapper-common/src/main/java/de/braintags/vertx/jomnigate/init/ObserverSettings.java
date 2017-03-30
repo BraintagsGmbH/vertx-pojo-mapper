@@ -17,7 +17,6 @@ import java.util.List;
 
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
-import de.braintags.vertx.jomnigate.observer.IObserverEvent;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 
 /**
@@ -28,7 +27,7 @@ import de.braintags.vertx.jomnigate.observer.ObserverEventType;
  */
 public class ObserverSettings<T extends IObserver> {
   private Class<T> observerClass;
-  private List<IObserverEvent> eventList = new ArrayList<>();
+  private List<ObserverEventType> eventTypeList = new ArrayList<>();
   private List<ObserverMapperSettings> mapperSettings = new ArrayList<>();
   private int priority;
 
@@ -65,8 +64,8 @@ public class ObserverSettings<T extends IObserver> {
    * 
    * @return the eventList
    */
-  public List<IObserverEvent> getEventList() {
-    return eventList;
+  public List<ObserverEventType> getEventTypeList() {
+    return eventTypeList;
   }
 
   /**
@@ -76,8 +75,8 @@ public class ObserverSettings<T extends IObserver> {
    *          the eventList to set
    */
   @SuppressWarnings("unused")
-  private void setEventList(List<IObserverEvent> eventList) {
-    this.eventList = eventList;
+  private void setEventTypeList(List<ObserverEventType> eventTypeList) {
+    this.eventTypeList = eventTypeList;
   }
 
   /**
@@ -139,10 +138,10 @@ public class ObserverSettings<T extends IObserver> {
    * @return
    */
   public boolean isApplyableFor(ObserverEventType eventType) {
-    if (getEventList().isEmpty()) {
+    if (getEventTypeList().isEmpty()) {
       return true;
     }
-    return getEventList().stream().filter(event -> event.getEventType().equals(eventType)).findFirst().isPresent();
+    return getEventTypeList().stream().filter(evt -> evt.equals(eventType)).findFirst().isPresent();
   }
 
 }

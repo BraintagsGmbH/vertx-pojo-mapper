@@ -31,6 +31,37 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
 public class ObserverMapperSettings {
   private static final String INSTANCEOF = "instanceof";
   private String classDefinition;
+  private boolean instOf = false;
+  private Class<?> mapperClass;
+
+  @SuppressWarnings("unused")
+  private ObserverMapperSettings() {
+    // only usable for serialization
+  }
+
+  /**
+   * Constructor for a new instance. The class definition can be something like "my.mapper.class" or "instanceof
+   * my.mapper.class"
+   * 
+   * @param classDefinition
+   */
+  public ObserverMapperSettings(String classDefinition) {
+    setClassDefinition(classDefinition);
+  }
+
+  private void init() {
+    String clsName = classDefinition;
+    int index = clsName.indexOf(INSTANCEOF);
+    if (index >= 0) {
+      instOf = true;
+      clsName = clsName.substring(index + INSTANCEOF.length()).trim();
+    }
+    try {
+      mapperClass = Class.forName(clsName);
+    } catch (ClassNotFoundException e) {
+      throw new MappingException(e);
+    }
+  }
 
   /**
    * The class definition which defines for which mapper classes the definition shall be applied
@@ -49,6 +80,7 @@ public class ObserverMapperSettings {
    */
   public void setClassDefinition(String classDefinition) {
     this.classDefinition = classDefinition;
+    init();
   }
 
   /**
@@ -57,23 +89,11 @@ public class ObserverMapperSettings {
    * @param mapper
    * @return true, if appliable
    */
-  boolean isApplyableFor(IMapper mapper) {
-    boolean instOf = false;
-    String clsName = classDefinition;
-    int index = clsName.indexOf(INSTANCEOF);
-    if (index >= 0) {
-      instOf = true;
-      clsName = clsName.substring(index + INSTANCEOF.length()).trim();
-    }
-    try {
-      Class mapperClass = Class.forName(clsName);
-      if (instOf) {
-        return mapper.getMapperClass().isAssignableFrom(mapperClass);
-      } else {
-        return mapperClass == mapper.getMapperClass();
-      }
-    } catch (ClassNotFoundException e) {
-      throw new MappingException(e);
+  boolean isApplyableFor(IMapper<?> mapper) {
+    if (instOf) {
+      return mapperClass.isAssignableFrom(mapper.getMapperClass());
+    } else {
+      return mapperClass == mapper.getMapperClass();
     }
   }
 

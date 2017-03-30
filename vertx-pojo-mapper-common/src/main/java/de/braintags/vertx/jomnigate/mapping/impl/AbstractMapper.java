@@ -128,7 +128,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   private void computeObserver() {
     List<ObserverSettings<?>> osl = getMapperFactory().getDataStore().getSettings().getObserverSettings();
     osl.stream().filter(os -> os.isApplyableFor(this))
-        .sorted((os1, os2) -> Integer.compare(os1.getPriority(), os2.getPriority())).forEach(c -> observerList.add(c));
+        .sorted((os1, os2) -> Integer.compare(os2.getPriority(), os1.getPriority())).forEach(c -> observerList.add(c));
   }
 
   /**
@@ -475,6 +475,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
           throw new MappingException(e);
         }
       });
+      eventObserverCache.put(event, ol);
     }
     return eventObserverCache.get(event);
   }

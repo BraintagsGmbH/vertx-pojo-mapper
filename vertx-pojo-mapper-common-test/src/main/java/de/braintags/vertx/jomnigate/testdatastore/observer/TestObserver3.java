@@ -24,29 +24,24 @@ import io.vertx.core.Handler;
  * @author Michael Remme
  * 
  */
-public class TestObserver_NoDefaultConstructor implements IObserver {
+public class TestObserver3 implements IObserver {
 
-  private TestObserver_NoDefaultConstructor(String name) {
-    // let the unused parameter to provocate exception
+  /**
+   * 
+   */
+  public TestObserver3() {
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.observer.IObserver#handlesEvent(de.braintags.vertx.jomnigate.observer.
-   * ObserverEventType)
+  /* (non-Javadoc)
+   * @see de.braintags.vertx.jomnigate.observer.IObserver#handlesEvent(de.braintags.vertx.jomnigate.observer.ObserverEventType)
    */
   @Override
   public boolean handlesEvent(ObserverEventType event) {
     return false;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.vertx.jomnigate.observer.IObserver#handleEvent(de.braintags.vertx.jomnigate.observer.IObserverEvent,
-   * io.vertx.core.Handler)
+  /* (non-Javadoc)
+   * @see de.braintags.vertx.jomnigate.observer.IObserver#handleEvent(de.braintags.vertx.jomnigate.observer.IObserverEvent, io.vertx.core.Handler)
    */
   @Override
   public void handleEvent(IObserverEvent event, Handler<AsyncResult<Void>> handler) {
