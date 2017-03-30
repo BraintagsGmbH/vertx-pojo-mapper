@@ -128,7 +128,7 @@ public interface IMapper<T> {
    *          the annotation class where we are interested in
    * @return a defined annotation or null
    */
-  Annotation getAnnotation(Class<? extends Annotation> annotationClass);
+  <U extends Annotation> U getAnnotation(Class<U> annotationClass);
 
   /**
    * Get all {@link IProperty} of the current mapper, which are annotated with the specified class

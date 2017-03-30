@@ -25,6 +25,8 @@ import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.ObserverAnnotatedMapper;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.ObserverAnnotatedMapper_TwoEvents;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.Person;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.PolyMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
@@ -34,7 +36,10 @@ import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BooleanMapp
 import de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver;
 import de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver2;
 import de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver3;
+import de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver4;
 import de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver_NoDefaultConstructor;
+import de.braintags.vertx.util.ExceptionUtil;
+import io.vertx.core.json.Json;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -46,6 +51,94 @@ import io.vertx.ext.unit.TestContext;
 public class TestObserverMapping extends DatastoreBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TestObserverMapping.class);
+
+  /**
+   * Defines an observer, which should be executed for any event instanceof BaseRecord. TriggerMapper should not be
+   * handled by this mapper
+   * 
+   * @param context
+   */
+  @Test
+  public void testObserverAndGlobal_Priority(TestContext context) {
+    DataStoreSettings settings = reset(context);
+
+    ObserverSettings<TestObserver4> os = new ObserverSettings<>(TestObserver4.class);
+    os.setPriority(500);
+    settings.getObserverSettings().add(os);
+
+    ObserverSettings<TestObserver2> os2 = new ObserverSettings<>(TestObserver2.class);
+    os2.setPriority(200);
+    settings.getObserverSettings().add(os2);
+
+    ObserverSettings<TestObserver3> os3 = new ObserverSettings<>(TestObserver3.class);
+    os3.setPriority(501);
+    settings.getObserverSettings().add(os3);
+    serializeDeserializeSettings(context, settings);
+
+    IMapper<ObserverAnnotatedMapper> mapper = getDataStore(context).getMapperFactory()
+        .getMapper(ObserverAnnotatedMapper.class);
+    checkObserver_AllEvents(context, mapper, 4);
+
+    List<IObserver> ol = mapper.getObserver(ObserverEventType.AFTER_DELETE);
+    context.assertTrue(ol.get(0).getClass() == TestObserver.class, "wrong sort by priority");
+    context.assertTrue(ol.get(1).getClass() == TestObserver3.class, "wrong sort by priority");
+    context.assertTrue(ol.get(2).getClass() == TestObserver4.class, "wrong sort by priority");
+    context.assertTrue(ol.get(3).getClass() == TestObserver2.class, "wrong sort by priority");
+
+  }
+
+  /**
+   * Checks a mapper, which is annotated for usage of an observer
+   * 
+   * @param context
+   */
+  @Test
+  public void testMapperObserverAndGlobal_TwoEvents(TestContext context) {
+    DataStoreSettings settings = reset(context);
+    ObserverSettings<TestObserver2> os = new ObserverSettings<>(TestObserver2.class);
+    os.getEventTypeList().add(ObserverEventType.AFTER_DELETE);
+    os.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
+    settings.getObserverSettings().add(os);
+    serializeDeserializeSettings(context, settings);
+
+    IMapper<ObserverAnnotatedMapper_TwoEvents> mapper = getDataStore(context).getMapperFactory()
+        .getMapper(ObserverAnnotatedMapper_TwoEvents.class);
+
+    checkObserver(context, mapper, 2, ObserverEventType.AFTER_DELETE);
+    checkObserver(context, mapper, 1, ObserverEventType.BEFORE_DELETE);
+    checkObserver(context, mapper, 1, ObserverEventType.BEFORE_SAVE);
+    checkObserver(context, mapper, 0, ObserverEventType.AFTER_LOAD, ObserverEventType.AFTER_SAVE,
+        ObserverEventType.BEFORE_LOAD);
+  }
+
+  /**
+   * Checks a mapper, which is annotated for usage of an observer only for two events
+   * 
+   * @param context
+   */
+  @Test
+  public void testMapperObserver_TwoEvents(TestContext context) {
+    DataStoreSettings settings = reset(context);
+    IMapper<ObserverAnnotatedMapper_TwoEvents> mapper = getDataStore(context).getMapperFactory()
+        .getMapper(ObserverAnnotatedMapper_TwoEvents.class);
+    checkObserver(context, mapper, 1, ObserverEventType.AFTER_DELETE, ObserverEventType.BEFORE_DELETE);
+    checkObserver(context, mapper, 0, ObserverEventType.AFTER_LOAD, ObserverEventType.AFTER_SAVE,
+        ObserverEventType.BEFORE_LOAD, ObserverEventType.BEFORE_SAVE);
+  }
+
+  /**
+   * Checks a mapper, which is annotated for usage of an observer
+   * 
+   * @param context
+   */
+  @Test
+  public void testMapperObserver_AllEvents(TestContext context) {
+    DataStoreSettings settings = reset(context);
+    IMapper<ObserverAnnotatedMapper> mapper = getDataStore(context).getMapperFactory()
+        .getMapper(ObserverAnnotatedMapper.class);
+    checkObserver_AllEvents(context, mapper, 1);
+
+  }
 
   /**
    * Defines an observer, which should be executed for any event on mappers, which are annotated with
@@ -60,6 +153,7 @@ public class TestObserverMapping extends DatastoreBaseTest {
     ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
     os.getMapperSettings().add(new ObserverMapperSettings(JsonTypeInfo.class));
     settings.getObserverSettings().add(os);
+    serializeDeserializeSettings(context, settings);
 
     IMapper<PolyMapper> mapper = getDataStore(context).getMapperFactory().getMapper(PolyMapper.class);
     checkObserver_AllEvents(context, mapper, 1);
@@ -90,6 +184,7 @@ public class TestObserverMapping extends DatastoreBaseTest {
     ObserverSettings<TestObserver3> os3 = new ObserverSettings<>(TestObserver3.class);
     os3.setPriority(501);
     settings.getObserverSettings().add(os3);
+    serializeDeserializeSettings(context, settings);
 
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
     checkObserver_AllEvents(context, mapper, 3);
@@ -113,6 +208,7 @@ public class TestObserverMapping extends DatastoreBaseTest {
     ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
     os.getMapperSettings().add(new ObserverMapperSettings("instanceof " + BaseRecord.class.getName()));
     settings.getObserverSettings().add(os);
+    serializeDeserializeSettings(context, settings);
 
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
     checkObserver_AllEvents(context, mapper, 1);
@@ -140,6 +236,7 @@ public class TestObserverMapping extends DatastoreBaseTest {
     os.getEventTypeList().add(ObserverEventType.AFTER_SAVE);
     os.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
     settings.getObserverSettings().add(os);
+    serializeDeserializeSettings(context, settings);
 
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
     checkObserver(context, mapper, 1, ObserverEventType.AFTER_SAVE, ObserverEventType.BEFORE_SAVE);
@@ -161,6 +258,7 @@ public class TestObserverMapping extends DatastoreBaseTest {
     ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
     os.getMapperSettings().add(new ObserverMapperSettings(SimpleMapper.class.getName()));
     settings.getObserverSettings().add(os);
+    serializeDeserializeSettings(context, settings);
 
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
     checkObserver_AllEvents(context, mapper, 1);
@@ -180,6 +278,7 @@ public class TestObserverMapping extends DatastoreBaseTest {
     os.getEventTypeList().add(ObserverEventType.AFTER_SAVE);
     os.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
     settings.getObserverSettings().add(os);
+    serializeDeserializeSettings(context, settings);
 
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
     checkObserver(context, mapper, 1, ObserverEventType.AFTER_SAVE, ObserverEventType.BEFORE_SAVE);
@@ -201,6 +300,8 @@ public class TestObserverMapping extends DatastoreBaseTest {
   public void testGlobalObserver_All(TestContext context) {
     DataStoreSettings settings = reset(context);
     settings.getObserverSettings().add(new ObserverSettings<>(TestObserver.class));
+    serializeDeserializeSettings(context, settings);
+
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
     checkObserver_AllEvents(context, mapper, 1);
   }
@@ -214,6 +315,7 @@ public class TestObserverMapping extends DatastoreBaseTest {
   public void testClassNotFound_ObserverClass(TestContext context) {
     DataStoreSettings settings = reset(context);
     settings.getObserverSettings().add(new ObserverSettings<>(TestObserver_NoDefaultConstructor.class));
+    serializeDeserializeSettings(context, settings);
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
     // we are expecting instantiation exception here
     try {
@@ -222,6 +324,19 @@ public class TestObserverMapping extends DatastoreBaseTest {
     } catch (MappingException e) {
       // expected
       context.assertTrue(e.toString().contains("InstantiationException"), "expected InstantiationException");
+    }
+  }
+
+  /**
+   * Checking that serialization by jackson is running
+   */
+  private void serializeDeserializeSettings(TestContext context, DataStoreSettings settings) {
+    try {
+      String src = Json.encodePrettily(settings);
+      DataStoreSettings settings2 = Json.decodeValue(src, DataStoreSettings.class);
+    } catch (Exception e) {
+      LOGGER.error("", e);
+      throw ExceptionUtil.createRuntimeException(e);
     }
   }
 

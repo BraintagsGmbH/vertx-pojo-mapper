@@ -63,16 +63,18 @@ public class ObserverMapperSettings {
   }
 
   private void init() {
-    String clsName = classDefinition;
-    int index = clsName.indexOf(INSTANCEOF);
-    if (index >= 0) {
-      instOf = true;
-      clsName = clsName.substring(index + INSTANCEOF.length()).trim();
-    }
-    try {
-      mapperClass = Class.forName(clsName);
-    } catch (ClassNotFoundException e) {
-      throw new MappingException(e);
+    if (classDefinition != null) {
+      String clsName = classDefinition;
+      int index = clsName.indexOf(INSTANCEOF);
+      if (index >= 0) {
+        instOf = true;
+        clsName = clsName.substring(index + INSTANCEOF.length()).trim();
+      }
+      try {
+        mapperClass = Class.forName(clsName);
+      } catch (ClassNotFoundException e) {
+        throw new MappingException(e);
+      }
     }
   }
 

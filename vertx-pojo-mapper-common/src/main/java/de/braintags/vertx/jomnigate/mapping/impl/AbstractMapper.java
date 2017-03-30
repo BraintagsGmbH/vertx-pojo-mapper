@@ -24,6 +24,7 @@ import java.util.Set;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
+import de.braintags.vertx.jomnigate.annotation.Observer;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad;
@@ -126,9 +127,21 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * Computes the list of all observers, which can be executed for the current mapper class.
    */
   private void computeObserver() {
+    List<ObserverSettings<?>> tmpList = new ArrayList<>();
     List<ObserverSettings<?>> osl = getMapperFactory().getDataStore().getSettings().getObserverSettings();
-    osl.stream().filter(os -> os.isApplyableFor(this))
-        .sorted((os1, os2) -> Integer.compare(os2.getPriority(), os1.getPriority())).forEach(c -> observerList.add(c));
+    osl.stream().filter(os -> os.isApplyableFor(this)).forEach(c -> tmpList.add(c));
+    Observer ob = this.getAnnotation(Observer.class);
+    if (ob != null) {
+      ObserverSettings<?> os = new ObserverSettings<>(ob.observerClass());
+      os.setPriority(ob.priority());
+      ObserverEventType[] tl = ob.eventTypes();
+      for (ObserverEventType t : tl) {
+        os.getEventTypeList().add(t);
+      }
+      tmpList.add(os);
+    }
+    tmpList.sort((os1, os2) -> Integer.compare(os2.getPriority(), os1.getPriority()));
+    observerList = tmpList;
   }
 
   /**
@@ -183,7 +196,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
 
   protected void computeKeyGenerator() {
     if (getMapperFactory().getDataStore() != null) {
-      KeyGenerator gen = (KeyGenerator) getAnnotation(KeyGenerator.class);
+      KeyGenerator gen = getAnnotation(KeyGenerator.class);
       if (gen != null) {
         String name = gen.value();
         keyGenerator = getMapperFactory().getDataStore().getKeyGenerator(name);
@@ -371,8 +384,9 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#getAnnotation(java.lang.Class)
    */
   @Override
-  public Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
-    return existingClassAnnotations.get(annotationClass);
+  public <U extends Annotation> U getAnnotation(Class<U> annotationClass) {
+    U ann = (U) existingClassAnnotations.get(annotationClass);
+    return ann;
   }
 
   @Override

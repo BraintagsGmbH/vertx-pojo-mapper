@@ -56,7 +56,7 @@ public class JacksonMapper<T> extends AbstractMapper<T> {
   @Override
   protected void validate() {
     super.validate();
-    JsonTypeInfo ti = (JsonTypeInfo) getAnnotation(JsonTypeInfo.class);
+    JsonTypeInfo ti = getAnnotation(JsonTypeInfo.class);
     boolean polySet = getEntity().polyClass() != Object.class;
     if (ti != null && !polySet) {
       throw new MappingException(
@@ -72,8 +72,8 @@ public class JacksonMapper<T> extends AbstractMapper<T> {
   }
 
   @Override
-  public final Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
-    Annotation ann = super.getAnnotation(annotationClass);
+  public <U extends Annotation> U getAnnotation(Class<U> annotationClass) {
+    U ann = super.getAnnotation(annotationClass);
     if (ann == null) {
       ann = beanDescription.getClassAnnotations().get(annotationClass);
     }
