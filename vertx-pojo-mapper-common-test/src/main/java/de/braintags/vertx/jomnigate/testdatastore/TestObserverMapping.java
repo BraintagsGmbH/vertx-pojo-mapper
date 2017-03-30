@@ -14,6 +14,7 @@ package de.braintags.vertx.jomnigate.testdatastore;
 
 import java.util.List;
 
+import org.junit.AfterClass;
 import org.junit.Test;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -52,6 +53,13 @@ public class TestObserverMapping extends DatastoreBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TestObserverMapping.class);
 
+  @AfterClass
+  public static void resetAfter(TestContext context) {
+    getDataStore(context).getMapperFactory().reset();
+    DataStoreSettings settings = getDataStore(context).getSettings();
+    settings.getObserverSettings().clear();
+  }
+
   /**
    * Defines an observer, which should be executed for any event instanceof BaseRecord. TriggerMapper should not be
    * handled by this mapper
@@ -79,7 +87,7 @@ public class TestObserverMapping extends DatastoreBaseTest {
         .getMapper(ObserverAnnotatedMapper.class);
     checkObserver_AllEvents(context, mapper, 4);
 
-    List<IObserver> ol = mapper.getObserver(ObserverEventType.AFTER_DELETE);
+    List<IObserver> ol = mapper.getObserverHandler().getObserver(ObserverEventType.AFTER_DELETE);
     context.assertTrue(ol.get(0).getClass() == TestObserver.class, "wrong sort by priority");
     context.assertTrue(ol.get(1).getClass() == TestObserver3.class, "wrong sort by priority");
     context.assertTrue(ol.get(2).getClass() == TestObserver4.class, "wrong sort by priority");
@@ -189,7 +197,7 @@ public class TestObserverMapping extends DatastoreBaseTest {
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
     checkObserver_AllEvents(context, mapper, 3);
 
-    List<IObserver> ol = mapper.getObserver(ObserverEventType.AFTER_DELETE);
+    List<IObserver> ol = mapper.getObserverHandler().getObserver(ObserverEventType.AFTER_DELETE);
     context.assertTrue(ol.get(0).getClass() == TestObserver3.class, "wrong sort by priority");
     context.assertTrue(ol.get(1).getClass() == TestObserver.class, "wrong sort by priority");
     context.assertTrue(ol.get(2).getClass() == TestObserver2.class, "wrong sort by priority");
@@ -319,7 +327,7 @@ public class TestObserverMapping extends DatastoreBaseTest {
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
     // we are expecting instantiation exception here
     try {
-      mapper.getObserver(ObserverEventType.AFTER_DELETE);
+      mapper.getObserverHandler().getObserver(ObserverEventType.AFTER_DELETE);
       context.fail("expected exception here");
     } catch (MappingException e) {
       // expected
@@ -349,7 +357,7 @@ public class TestObserverMapping extends DatastoreBaseTest {
   private void checkObserver(TestContext context, IMapper<?> mapper, int expectedResult,
       ObserverEventType... eventTypes) {
     for (ObserverEventType t : eventTypes) {
-      List<IObserver> rl = mapper.getObserver(t);
+      List<IObserver> rl = mapper.getObserverHandler().getObserver(t);
       context.assertEquals(expectedResult, rl.size(), "Expected number of observers wrong for event " + t);
     }
   }

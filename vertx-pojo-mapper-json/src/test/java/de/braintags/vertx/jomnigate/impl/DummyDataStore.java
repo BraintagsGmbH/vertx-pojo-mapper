@@ -53,7 +53,7 @@ public class DummyDataStore implements IDataStore<String, String> {
   String database;
   private JsonObject properties;
   private ITriggerContextFactory triggerContextFactory;
-  private DataStoreSettings settings;
+  private DataStoreSettings settings = new DataStoreSettings();
 
   public DummyDataStore() {
   }

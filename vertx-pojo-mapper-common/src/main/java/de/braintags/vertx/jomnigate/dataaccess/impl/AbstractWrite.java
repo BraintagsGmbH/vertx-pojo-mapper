@@ -15,6 +15,7 @@ package de.braintags.vertx.jomnigate.dataaccess.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.IDataStore;
@@ -37,6 +38,9 @@ import io.vertx.core.Handler;
  */
 
 public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> implements IWrite<T> {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(AbstractWrite.class);
+
   private List<T> objectsToSave = new ArrayList<>();
 
   /**
@@ -48,16 +52,49 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
   }
 
   @Override
+  public Iterator<T> getSelection() {
+    return objectsToSave.iterator();
+  }
+
+  @Override
   public final void save(Handler<AsyncResult<IWriteResult>> resultHandler) {
     sync(syncResult -> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
       } else {
         try {
-          internalSave(resultHandler);
+          Future<IWriteResult> rf = Future.future();
+          rf.setHandler(resultHandler);
+          preSave().compose(pre -> internalSave()).compose(wr -> postSave(wr, rf), rf);
         } catch (Exception e) {
           resultHandler.handle(Future.failedFuture(e));
         }
+      }
+    });
+  }
+
+  /**
+   * Execution done before instances are stored into the datastore
+   * 
+   * @return
+   */
+  protected Future<Void> preSave() {
+    return getMapper().getObserverHandler().handleBeforeSave(this);
+  }
+
+  /**
+   * Execution done after entities were stored into the datastore
+   * 
+   * @param wr
+   * @param nextFuture
+   */
+  protected void postSave(IWriteResult wr, Future<IWriteResult> nextFuture) {
+    Future<Void> f = getMapper().getObserverHandler().handleAfterSave(this, wr);
+    f.setHandler(res -> {
+      if (f.failed()) {
+        nextFuture.fail(f.cause());
+      } else {
+        nextFuture.complete(wr);
       }
     });
   }
@@ -67,7 +104,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * 
    * @param resultHandler
    */
-  protected abstract void internalSave(Handler<AsyncResult<IWriteResult>> resultHandler);
+  protected abstract Future<IWriteResult> internalSave();
 
   /**
    * Get the objects that shall be saved

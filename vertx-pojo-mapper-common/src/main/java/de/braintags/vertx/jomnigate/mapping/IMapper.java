@@ -27,11 +27,9 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterSave;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
-import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
 import de.braintags.vertx.jomnigate.mapping.impl.DefaultObjectFactory;
-import de.braintags.vertx.jomnigate.observer.IObserver;
-import de.braintags.vertx.jomnigate.observer.ObserverEventType;
+import de.braintags.vertx.jomnigate.observer.IObserverHandler;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -197,11 +195,9 @@ public interface IMapper<T> {
   String getKeyGeneratorReference();
 
   /**
-   * Get all observers, which are registered for the current mapper and the given event. The list should be sorted by
-   * priority of the underlaying {@link ObserverSettings}
+   * Get the instance of {@link IObserverHandler} for the current mapper
    * 
-   * @return a list of all fitting IObserver
+   * @return
    */
-  List<IObserver> getObserver(ObserverEventType event);
-
+  IObserverHandler getObserverHandler();
 }

@@ -12,8 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.observer;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
+import io.vertx.core.Future;
 
 /**
  * IObserver is the instance, which is executed on a given event
@@ -37,6 +36,6 @@ public interface IObserver {
    * @param event
    * @param handler
    */
-  void handleEvent(IObserverEvent event, Handler<AsyncResult<Void>> handler);
+  Future<Void> handleEvent(IObserverEvent event);
 
 }

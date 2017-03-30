@@ -24,7 +24,6 @@ import java.util.Set;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
-import de.braintags.vertx.jomnigate.annotation.Observer;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad;
@@ -33,7 +32,6 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
@@ -43,8 +41,8 @@ import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
-import de.braintags.vertx.jomnigate.observer.IObserver;
-import de.braintags.vertx.jomnigate.observer.ObserverEventType;
+import de.braintags.vertx.jomnigate.observer.IObserverHandler;
+import de.braintags.vertx.jomnigate.observer.impl.DefaultObserverHandler;
 import de.braintags.vertx.util.ClassUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -87,8 +85,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   private ITableInfo tableInfo;
   private boolean syncNeeded = true;
   private boolean hasReferencedFields = false;
-  private List<ObserverSettings<?>> observerList = new ArrayList();
-  private Map<ObserverEventType, List<IObserver>> eventObserverCache = new HashMap<>();
+  private IObserverHandler observerHandler;
 
   /**
    * Class annotations which were found inside the current definition
@@ -119,29 +116,8 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     computeKeyGenerator();
     generateTableInfo();
     checkReferencedFields();
-    computeObserver();
+    observerHandler = new DefaultObserverHandler(this);
     validate();
-  }
-
-  /**
-   * Computes the list of all observers, which can be executed for the current mapper class.
-   */
-  private void computeObserver() {
-    List<ObserverSettings<?>> tmpList = new ArrayList<>();
-    List<ObserverSettings<?>> osl = getMapperFactory().getDataStore().getSettings().getObserverSettings();
-    osl.stream().filter(os -> os.isApplyableFor(this)).forEach(c -> tmpList.add(c));
-    Observer ob = this.getAnnotation(Observer.class);
-    if (ob != null) {
-      ObserverSettings<?> os = new ObserverSettings<>(ob.observerClass());
-      os.setPriority(ob.priority());
-      ObserverEventType[] tl = ob.eventTypes();
-      for (ObserverEventType t : tl) {
-        os.getEventTypeList().add(t);
-      }
-      tmpList.add(os);
-    }
-    tmpList.sort((os1, os2) -> Integer.compare(os2.getPriority(), os1.getPriority()));
-    observerList = tmpList;
   }
 
   /**
@@ -472,25 +448,8 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     return mappedProperties;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.vertx.jomnigate.mapping.IMapper#getObserver(de.braintags.vertx.jomnigate.observer.ObserverEventType)
-   */
   @Override
-  public List<IObserver> getObserver(ObserverEventType event) {
-    if (!eventObserverCache.containsKey(event)) {
-      List<IObserver> ol = new ArrayList<>();
-      observerList.stream().filter(os -> os.isApplyableFor(event)).forEach(os -> {
-        try {
-          ol.add(os.getObserverClass().newInstance());
-        } catch (Exception e) {
-          throw new MappingException(e);
-        }
-      });
-      eventObserverCache.put(event, ol);
-    }
-    return eventObserverCache.get(event);
+  public IObserverHandler getObserverHandler() {
+    return this.observerHandler;
   }
 }

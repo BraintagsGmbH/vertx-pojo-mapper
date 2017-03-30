@@ -37,13 +37,13 @@ public interface IDataAccessObject<T> {
    * 
    * @return the class
    */
-  public Class<T> getMapperClass();
+  Class<T> getMapperClass();
 
   /**
    * Get the underlaying instance of {@link IMapper}
    * 
    * @return the mapper
    */
-  public IMapper<T> getMapper();
+  IMapper<T> getMapper();
 
 }

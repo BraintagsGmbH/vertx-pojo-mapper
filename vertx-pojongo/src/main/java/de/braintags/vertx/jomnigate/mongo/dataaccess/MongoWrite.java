@@ -59,19 +59,21 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   }
 
   @Override
-  public void internalSave(Handler<AsyncResult<IWriteResult>> resultHandler) {
+  public Future<IWriteResult> internalSave() {
+    Future<IWriteResult> f = Future.future();
     if (getObjectsToSave().isEmpty()) {
-      resultHandler.handle(Future.succeededFuture(new MongoWriteResult()));
+      f.complete(new MongoWriteResult());
     } else {
       CompositeFuture cf = saveRecords();
       cf.setHandler(cfr -> {
         if (cfr.failed()) {
-          resultHandler.handle(Future.failedFuture(cfr.cause()));
+          f.fail(cfr.cause());
         } else {
-          resultHandler.handle(Future.succeededFuture(new MongoWriteResult(cf.list())));
+          f.complete(new MongoWriteResult(cf.list()));
         }
       });
     }
+    return f;
   }
 
   @SuppressWarnings("rawtypes")

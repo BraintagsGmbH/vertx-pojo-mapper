@@ -15,6 +15,7 @@ package de.braintags.vertx.jomnigate.dataaccess.delete.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.IDataStore;
@@ -25,8 +26,8 @@ import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
 import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -52,6 +53,11 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    */
   public Delete(Class<T> mapperClass, IDataStore datastore) {
     super(mapperClass, datastore);
+  }
+
+  @Override
+  public Iterator<T> getSelection() {
+    return recordList.iterator();
   }
 
   /*
@@ -171,8 +177,9 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   }
 
   /**
-   * @return the recordList
+   * @deprecated use getSelection() instead
    */
+  @Deprecated
   protected List<T> getRecordList() {
     return recordList;
   }
