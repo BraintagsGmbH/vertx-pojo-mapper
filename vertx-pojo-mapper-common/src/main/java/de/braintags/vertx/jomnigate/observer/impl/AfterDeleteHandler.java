@@ -39,7 +39,8 @@ public class AfterDeleteHandler extends AbstractEventHandler<IDelete<?>, IDelete
    * de.braintags.vertx.jomnigate.observer.IObserverContext)
    */
   @Override
-  protected List<Future> createEntityFutureList(IObserver observer, IDelete<?> queryObject, IObserverContext context) {
+  protected List<Future> createEntityFutureList(IObserver observer, IDelete<?> queryObject, IDeleteResult result,
+      IObserverContext context) {
     List<Future> fl = new ArrayList<>();
 
     fl.add(Future.failedFuture(new UnsupportedOperationException()));

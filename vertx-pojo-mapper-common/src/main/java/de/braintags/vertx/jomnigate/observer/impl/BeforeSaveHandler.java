@@ -40,7 +40,8 @@ public class BeforeSaveHandler extends AbstractEventHandler<IWrite<?>, IWriteRes
    */
   @SuppressWarnings("rawtypes")
   @Override
-  protected List<Future> createEntityFutureList(IObserver observer, IWrite<?> writeObject, IObserverContext context) {
+  protected List<Future> createEntityFutureList(IObserver observer, IWrite<?> writeObject, IWriteResult result,
+      IObserverContext context) {
     List<Future> fl = new ArrayList<>();
     Iterator<?> selection = writeObject.getSelection();
     while (selection.hasNext()) {

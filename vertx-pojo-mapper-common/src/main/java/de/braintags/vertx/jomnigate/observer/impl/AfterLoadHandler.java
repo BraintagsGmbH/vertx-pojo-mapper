@@ -19,7 +19,9 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
+import de.braintags.vertx.jomnigate.observer.IObserverEvent;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
+import de.braintags.vertx.util.IteratorAsync;
 import io.vertx.core.Future;
 
 /**
@@ -39,10 +41,20 @@ public class AfterLoadHandler extends AbstractEventHandler<IQuery<?>, IQueryResu
    * de.braintags.vertx.jomnigate.observer.IObserverContext)
    */
   @Override
-  protected List<Future> createEntityFutureList(IObserver observer, IQuery<?> queryObject, IObserverContext context) {
+  protected List<Future> createEntityFutureList(IObserver observer, IQuery<?> queryObject, IQueryResult<?> result,
+      IObserverContext context) {
     List<Future> fl = new ArrayList<>();
-
-    fl.add(Future.failedFuture(new UnsupportedOperationException()));
+    IteratorAsync<?> selection = result.iterator();
+    while (selection.hasNext()) {
+      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.AFTER_LOAD, selection.next(), null,
+          writeObject);
+      if (observer.handlesEvent(event, context)) {
+        Future tf = observer.handleEvent(event, context);
+        if (tf != null) {
+          fl.add(tf);
+        }
+      }
+    }
     return fl;
   }
 

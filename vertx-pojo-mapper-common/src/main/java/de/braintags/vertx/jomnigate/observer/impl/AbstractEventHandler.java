@@ -86,7 +86,7 @@ public abstract class AbstractEventHandler<T extends IDataAccessObject<?>, U ext
   @SuppressWarnings("rawtypes")
   protected Future<Void> loopEntities(IObserver observer, T accessObject, U result, IObserverContext context) {
     Future<Void> f = Future.future();
-    List<Future> fl = createEntityFutureList(observer, accessObject, context);
+    List<Future> fl = createEntityFutureList(observer, accessObject, result, context);
     if (fl.isEmpty()) {// if all handlers work fire-and-forget or ifnothing was handled
       f.complete();
     } else {
@@ -111,5 +111,6 @@ public abstract class AbstractEventHandler<T extends IDataAccessObject<?>, U ext
    * @return
    */
   @SuppressWarnings("rawtypes")
-  protected abstract List<Future> createEntityFutureList(IObserver observer, T accessObject, IObserverContext context);
+  protected abstract List<Future> createEntityFutureList(IObserver observer, T accessObject, U result,
+      IObserverContext context);
 }

@@ -19,6 +19,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
+import de.braintags.vertx.jomnigate.observer.IObserverEvent;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import io.vertx.core.Future;
 
@@ -30,19 +31,33 @@ import io.vertx.core.Future;
  */
 public class BeforeLoadHandler extends AbstractEventHandler<IQuery<?>, IQueryResult<?>> {
 
+  @SuppressWarnings("rawtypes")
+  @Override
+  protected List<Future> createEntityFutureList(IObserver observer, IQuery<?> queryObject, IQueryResult<?> result,
+      IObserverContext context) {
+    List<Future> fl = new ArrayList<>();
+    fl.add(Future.failedFuture(
+        new UnsupportedOperationException("we should not land here, cause there are no entities before load")));
+    return fl;
+  }
+
   /*
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.vertx.jomnigate.observer.impl.AbstractEventHandler#createEntityFutureList(de.braintags.vertx.jomnigate
-   * .observer.IObserver, de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject,
-   * de.braintags.vertx.jomnigate.observer.IObserverContext)
+   * de.braintags.vertx.jomnigate.observer.impl.AbstractEventHandler#loopEntities(de.braintags.vertx.jomnigate.observer.
+   * IObserver, de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject,
+   * de.braintags.vertx.jomnigate.dataaccess.IAccessResult, de.braintags.vertx.jomnigate.observer.IObserverContext)
    */
   @Override
-  protected List<Future> createEntityFutureList(IObserver observer, IQuery<?> queryObject, IObserverContext context) {
-    List<Future> fl = new ArrayList<>();
-    fl.add(Future.failedFuture(new UnsupportedOperationException()));
-    return fl;
+  protected Future<Void> loopEntities(IObserver observer, IQuery<?> accessObject, IQueryResult<?> result,
+      IObserverContext context) {
+    IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_LOAD, null, null, accessObject);
+    if (observer.handlesEvent(event, context)) {
+      return observer.handleEvent(event, context);
+    } else {
+      return Future.succeededFuture();
+    }
   }
 
 }

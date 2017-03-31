@@ -167,7 +167,7 @@ public class DefaultObserverHandler implements IObserverHandler {
       IObserverContext context) {
     List<IObserver> ol = getObserver(ObserverEventType.AFTER_LOAD);
     Future<Void> f = Future.future();
-    if (ol.isEmpty()) {
+    if (ol.isEmpty() || queryResult.isEmpty()) {
       f.complete();
     } else {
       f = getAfterLoadHandler().handle(queryObject, queryResult, context, ol);
@@ -207,7 +207,7 @@ public class DefaultObserverHandler implements IObserverHandler {
       IObserverContext context) {
     List<IObserver> ol = getObserver(ObserverEventType.AFTER_DELETE);
     Future<Void> f = Future.future();
-    if (ol.isEmpty()) {
+    if (ol.isEmpty() || deleteResult.getDeletedInstances() == 0) {
       f.complete();
     } else {
       f = getAfterDeleteHandler().handle(deleteObject, deleteResult, context, ol);
