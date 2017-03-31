@@ -14,7 +14,6 @@ package de.braintags.vertx.jomnigate.observer.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -26,10 +25,8 @@ import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
-import de.braintags.vertx.jomnigate.observer.IObserverEvent;
 import de.braintags.vertx.jomnigate.observer.IObserverHandler;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 
 /**
@@ -42,6 +39,8 @@ public class DefaultObserverHandler implements IObserverHandler {
   private List<ObserverSettings<?>> observerList = new ArrayList<>();
   private Map<ObserverEventType, List<IObserver>> eventObserverCache = new HashMap<>();
   private IMapper<?> mapper;
+  private BeforeSaveHandler beforeSaveHandler = new BeforeSaveHandler();
+  private AfterSaveHandler afterSaveHandler = new AfterSaveHandler();
 
   /**
    * Create a new instance, where usable observers are examined
@@ -99,69 +98,13 @@ public class DefaultObserverHandler implements IObserverHandler {
    */
   @Override
   public Future<Void> handleBeforeSave(IWrite<?> writeObject, IObserverContext context) {
-    Future<Void> f = Future.future();
     List<IObserver> ol = getObserver(ObserverEventType.BEFORE_SAVE);
+    Future<Void> f = Future.future();
     if (ol.isEmpty() || writeObject.size() <= 0) {
       f.complete();
     } else {
-      CompositeFuture cf = loopBeforeSaveObserver(ol, writeObject, context);
-      cf.setHandler(cfr -> {
-        if (cfr.failed()) {
-          f.fail(cfr.cause());
-        } else {
-          f.complete();
-        }
-      });
+      f = getBeforeSaveHandler().handle(writeObject, null, context, ol);
     }
-    return f;
-  }
-
-  /**
-   * for each defined observer, process the entities of the write object
-   * 
-   * @param ol
-   * @param writeObject
-   * @return
-   */
-  @SuppressWarnings("rawtypes")
-  private CompositeFuture loopBeforeSaveObserver(List<IObserver> ol, IWrite<?> writeObject, IObserverContext context) {
-    List<Future> fl = new ArrayList<>();
-    for (IObserver observer : ol) {
-      fl.add(loopBeforSaveEntities(observer, writeObject, context));
-    }
-    return CompositeFuture.all(fl);
-  }
-
-  /**
-   * Execute the current observer on each entity of the write object
-   * 
-   * @param observer
-   * @param writeObject
-   * @return
-   */
-  @SuppressWarnings("rawtypes")
-  private Future<Void> loopBeforSaveEntities(IObserver observer, IWrite<?> writeObject, IObserverContext context) {
-    Future<Void> f = Future.future();
-    List<Future> fl = new ArrayList<>();
-    Iterator<?> selection = writeObject.getSelection();
-    while (selection.hasNext()) {
-      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_SAVE, selection.next(), null,
-          writeObject);
-      if (observer.handlesEvent(event, context)) {
-        Future tf = observer.handleEvent(event, context);
-        if (tf != null) {
-          fl.add(tf);
-        }
-      }
-    }
-    CompositeFuture cf = CompositeFuture.all(fl);
-    cf.setHandler(res -> {
-      if (res.failed()) {
-        f.fail(res.cause());
-      } else {
-        f.complete();
-      }
-    });
     return f;
   }
 
@@ -174,13 +117,27 @@ public class DefaultObserverHandler implements IObserverHandler {
    */
   @Override
   public Future<Void> handleAfterSave(IWrite<?> writeObject, IWriteResult writeResult, IObserverContext context) {
-    Future<Void> f = Future.future();
     List<IObserver> ol = getObserver(ObserverEventType.AFTER_SAVE);
+    Future<Void> f = Future.future();
     if (ol.isEmpty() || writeObject.size() <= 0) {
       f.complete();
     } else {
-      f.fail(new UnsupportedOperationException());
+      f = getAfterSaveHandler().handle(writeObject, null, context, ol);
     }
     return f;
+  }
+
+  /**
+   * @return the beforeSaveHandler
+   */
+  protected BeforeSaveHandler getBeforeSaveHandler() {
+    return beforeSaveHandler;
+  }
+
+  /**
+   * @return the afterSaveHandler
+   */
+  protected AfterSaveHandler getAfterSaveHandler() {
+    return afterSaveHandler;
   }
 }

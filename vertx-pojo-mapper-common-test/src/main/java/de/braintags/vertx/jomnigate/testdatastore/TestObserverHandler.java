@@ -17,11 +17,14 @@ import java.util.List;
 
 import org.junit.Test;
 
+import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
+import de.braintags.vertx.jomnigate.testdatastore.observer.BeforeDeleteObserver;
+import de.braintags.vertx.jomnigate.testdatastore.observer.BeforeLoadObserver;
 import de.braintags.vertx.jomnigate.testdatastore.observer.SimpleMapperObserver;
 import io.vertx.ext.unit.TestContext;
 
@@ -41,6 +44,123 @@ public class TestObserverHandler extends AbstractObserverTest {
    * @param context
    */
   @Test
+  public void test_AfterDelete_SingleRecord(TestContext context) {
+    SimpleMapperObserver.executed = false;
+    DataStoreSettings settings = getDataStore(context).getSettings();
+    ObserverSettings<SimpleMapperObserver> os = new ObserverSettings<>(SimpleMapperObserver.class);
+    os.getEventTypeList().add(ObserverEventType.AFTER_DELETE);
+    settings.getObserverSettings().add(os);
+    SimpleMapper sm = new SimpleMapper("testname", "nix");
+    sm.intValue = -1;
+    saveRecord(context, sm);
+    context.assertFalse(SimpleMapperObserver.executed, "Observer should not execute here");
+    context.assertEquals(-1, sm.intValue, "Expected NO Observer here");
+
+    SimpleMapper tmp = findRecordByID(context, SimpleMapper.class, sm.id);
+    context.assertNotNull(tmp, "instance not found");
+
+    IDelete<SimpleMapper> del = getDataStore(context).createDelete(SimpleMapper.class);
+    del.add(tmp);
+    delete(context, del, null, 1);
+
+    context.assertTrue(SimpleMapperObserver.executed, "Observer wasn't executed");
+    context.assertEquals(1, tmp.intValue, "Observer did not set number correct");
+  }
+
+  /**
+   * The value of the field intValue must be set to 1 through the observer
+   * 
+   * @param context
+   */
+  @SuppressWarnings({ "unused", "unchecked" })
+  @Test
+  public void test_BeforeLoad_DeleteRecord(TestContext context) {
+    BeforeLoadObserver.executed = false;
+    DataStoreSettings settings = getDataStore(context).getSettings();
+    ObserverSettings<BeforeDeleteObserver> os = new ObserverSettings<>(BeforeDeleteObserver.class);
+    os.getEventTypeList().add(ObserverEventType.BEFORE_DELETE);
+    settings.getObserverSettings().add(os);
+
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    IDelete<SimpleMapper> del = getDataStore(context).createDelete(SimpleMapper.class);
+    del.setQuery(query);
+
+    delete(context, del, null, -1);
+    context.assertTrue(BeforeDeleteObserver.executed, "Observer wasn't executed");
+  }
+
+  /**
+   * The value of the field intValue must be set to 1 through the observer
+   * 
+   * @param context
+   */
+  @Test
+  public void test_AfterLoad_SingleRecord(TestContext context) {
+    SimpleMapperObserver.executed = false;
+    DataStoreSettings settings = getDataStore(context).getSettings();
+    ObserverSettings<SimpleMapperObserver> os = new ObserverSettings<>(SimpleMapperObserver.class);
+    os.getEventTypeList().add(ObserverEventType.AFTER_LOAD);
+    settings.getObserverSettings().add(os);
+    SimpleMapper sm = new SimpleMapper("testname", "nix");
+    sm.intValue = -1;
+    saveRecord(context, sm);
+    context.assertFalse(SimpleMapperObserver.executed, "Observer should not execute here");
+    context.assertEquals(-1, sm.intValue, "Expected NO Observer here");
+
+    SimpleMapper tmp = findRecordByID(context, SimpleMapper.class, sm.id);
+    context.assertTrue(SimpleMapperObserver.executed, "Observer wasn't executed");
+    context.assertNotNull(tmp, "instance not found");
+    context.assertEquals(1, tmp.intValue, "Observer did not set number correct");
+  }
+
+  /**
+   * The value of the field intValue must be set to 1 through the observer
+   * 
+   * @param context
+   */
+  @SuppressWarnings({ "unused", "unchecked" })
+  @Test
+  public void test_BeforeLoad_SingleRecord(TestContext context) {
+    BeforeLoadObserver.executed = false;
+    DataStoreSettings settings = getDataStore(context).getSettings();
+    ObserverSettings<BeforeLoadObserver> os = new ObserverSettings<>(BeforeLoadObserver.class);
+    os.getEventTypeList().add(ObserverEventType.BEFORE_LOAD);
+    settings.getObserverSettings().add(os);
+
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    List<SimpleMapper> sr = findAll(context, query);
+    context.assertTrue(BeforeLoadObserver.executed, "Observer wasn't executed");
+  }
+
+  /**
+   * The value of the field intValue must be set to 1 through the observer
+   * 
+   * @param context
+   */
+  @Test
+  public void test_AfterSave_SingleRecord(TestContext context) {
+    SimpleMapperObserver.executed = false;
+    DataStoreSettings settings = getDataStore(context).getSettings();
+    ObserverSettings<SimpleMapperObserver> os = new ObserverSettings<>(SimpleMapperObserver.class);
+    os.getEventTypeList().add(ObserverEventType.AFTER_SAVE);
+    settings.getObserverSettings().add(os);
+    SimpleMapper sm = new SimpleMapper("testname", "nix");
+    sm.intValue = -1;
+    saveRecord(context, sm);
+    context.assertTrue(SimpleMapperObserver.executed, "Observer wasn't executed");
+    context.assertEquals(1, sm.intValue, "Observer did not set number correct");
+
+    SimpleMapper tmp = findRecordByID(context, SimpleMapper.class, sm.id);
+    context.assertNotNull(tmp, "instance not found");
+    context.assertEquals(-1, tmp.intValue, "handler afterSave should not save value");
+  }
+
+  /**
+   * The value of the field intValue must be set to 1 through the observer
+   * 
+   * @param context
+   */
+  @Test
   public void test_BeforeSave_SingleRecord(TestContext context) {
     SimpleMapperObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
@@ -50,10 +170,10 @@ public class TestObserverHandler extends AbstractObserverTest {
     SimpleMapper sm = new SimpleMapper("testname", "nix");
     sm.intValue = -1;
     saveRecord(context, sm);
-    SimpleMapper tmp = findRecordByID(context, SimpleMapper.class, sm.id);
     context.assertTrue(SimpleMapperObserver.executed, "Observer wasn't executed");
+    SimpleMapper tmp = findRecordByID(context, SimpleMapper.class, sm.id);
     context.assertNotNull(tmp, "instance not found");
-    context.assertEquals(1, sm.intValue, "Observer did not set number correct");
+    context.assertEquals(1, tmp.intValue, "Observer did not set number correct");
   }
 
   /**

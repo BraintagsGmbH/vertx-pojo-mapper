@@ -14,6 +14,13 @@ package de.braintags.vertx.jomnigate.observer;
 
 import de.braintags.vertx.jomnigate.dataaccess.IAccessResult;
 import de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject;
+import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
+import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
+import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
+import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.impl.DefaultObserverEvent;
 
 /**
@@ -50,14 +57,14 @@ public interface IObserverEvent {
    * Get the source object, which shall be handled. The content differs depending to the event type, which is processed:
    * 
    * <UL>
-   * <LI>{@link ObserverEventType#BEFORE_MAPPING}
-   * <LI>{@link ObserverEventType#AFTER_MAPPING}
-   * <LI>{@link ObserverEventType#BEFORE_SAVE}
-   * <LI>{@link ObserverEventType#AFTER_SAVE}
-   * <LI>{@link ObserverEventType#BEFORE_LOAD}
-   * <LI>{@link ObserverEventType#AFTER_LOAD}
-   * <LI>{@link ObserverEventType#BEFORE_DELETE}
-   * <LI>{@link ObserverEventType#AFTER_DELETE}
+   * <LI>{@link ObserverEventType#BEFORE_MAPPING} the class to be mapped
+   * <LI>{@link ObserverEventType#AFTER_MAPPING} the {@link IMapper} which was created
+   * <LI>{@link ObserverEventType#BEFORE_SAVE} the instance to be saved
+   * <LI>{@link ObserverEventType#AFTER_SAVE} the instance, which was saved
+   * <LI>{@link ObserverEventType#BEFORE_LOAD} null
+   * <LI>{@link ObserverEventType#AFTER_LOAD} the instance, which was loaded
+   * <LI>{@link ObserverEventType#BEFORE_DELETE} the instance, which shall be deleted
+   * <LI>{@link ObserverEventType#AFTER_DELETE} the instance, which was deleted
    * </UL>
    * 
    * @return
@@ -69,14 +76,14 @@ public interface IObserverEvent {
    * which is processed:
    * 
    * <UL>
-   * <LI>{@link ObserverEventType#BEFORE_MAPPING}
-   * <LI>{@link ObserverEventType#AFTER_MAPPING}
-   * <LI>{@link ObserverEventType#BEFORE_SAVE}
-   * <LI>{@link ObserverEventType#AFTER_SAVE}
-   * <LI>{@link ObserverEventType#BEFORE_LOAD}
-   * <LI>{@link ObserverEventType#AFTER_LOAD}
-   * <LI>{@link ObserverEventType#BEFORE_DELETE}
-   * <LI>{@link ObserverEventType#AFTER_DELETE}
+   * <LI>{@link ObserverEventType#BEFORE_MAPPING} null
+   * <LI>{@link ObserverEventType#AFTER_MAPPING} null
+   * <LI>{@link ObserverEventType#BEFORE_SAVE} {@link IWriteResult}
+   * <LI>{@link ObserverEventType#AFTER_SAVE} {@link IWriteResult}
+   * <LI>{@link ObserverEventType#BEFORE_LOAD} {@link IQueryResult}
+   * <LI>{@link ObserverEventType#AFTER_LOAD} {@link IQueryResult}
+   * <LI>{@link ObserverEventType#BEFORE_DELETE} {@link IDeleteResult}
+   * <LI>{@link ObserverEventType#AFTER_DELETE} {@link IDeleteResult}
    * </UL>
    * 
    * @return
@@ -87,14 +94,14 @@ public interface IObserverEvent {
    * Get the data access object which is combined to the current event
    * 
    * <UL>
-   * <LI>{@link ObserverEventType#BEFORE_MAPPING}
-   * <LI>{@link ObserverEventType#AFTER_MAPPING}
-   * <LI>{@link ObserverEventType#BEFORE_SAVE}
-   * <LI>{@link ObserverEventType#AFTER_SAVE}
-   * <LI>{@link ObserverEventType#BEFORE_LOAD}
-   * <LI>{@link ObserverEventType#AFTER_LOAD}
-   * <LI>{@link ObserverEventType#BEFORE_DELETE}
-   * <LI>{@link ObserverEventType#AFTER_DELETE}
+   * <LI>{@link ObserverEventType#BEFORE_MAPPING} null
+   * <LI>{@link ObserverEventType#AFTER_MAPPING} null
+   * <LI>{@link ObserverEventType#BEFORE_SAVE} {@link IWrite}
+   * <LI>{@link ObserverEventType#AFTER_SAVE} {@link IWrite}
+   * <LI>{@link ObserverEventType#BEFORE_LOAD} {@link IQuery}
+   * <LI>{@link ObserverEventType#AFTER_LOAD} {@link IQuery}
+   * <LI>{@link ObserverEventType#BEFORE_DELETE} {@link IDelete}
+   * <LI>{@link ObserverEventType#AFTER_DELETE} {@link IDelete}
    * </UL>
    * 
    * @return
