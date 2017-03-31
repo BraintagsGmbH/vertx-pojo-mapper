@@ -25,7 +25,8 @@ import de.braintags.vertx.jomnigate.observer.impl.DefaultObserverEvent;
 public interface IObserverEvent {
 
   /**
-   * Create an instance of {@link IObserverEvent}
+   * Create an instance of {@link IObserverEvent}. The content of the event depends on the {@link ObserverEventType},
+   * which is processed. See the method descriptions for further information.
    * 
    * @param eventType
    * @param entity
@@ -39,21 +40,44 @@ public interface IObserverEvent {
   }
 
   /**
-   * Get the event type which is executed
+   * Get the event type which is executed.
    * 
    * @return
    */
   ObserverEventType getEventType();
 
   /**
-   * Get the entity, which was executed. In case of {@link ObserverEventType#BEFORE_LOAD} this can be null
+   * Get the source object, which shall be handled. The content differs depending to the event type, which is processed:
+   * 
+   * <UL>
+   * <LI>{@link ObserverEventType#BEFORE_MAPPING}
+   * <LI>{@link ObserverEventType#AFTER_MAPPING}
+   * <LI>{@link ObserverEventType#BEFORE_SAVE}
+   * <LI>{@link ObserverEventType#AFTER_SAVE}
+   * <LI>{@link ObserverEventType#BEFORE_LOAD}
+   * <LI>{@link ObserverEventType#AFTER_LOAD}
+   * <LI>{@link ObserverEventType#BEFORE_DELETE}
+   * <LI>{@link ObserverEventType#AFTER_DELETE}
+   * </UL>
    * 
    * @return
    */
-  Object getEntity();
+  Object getSource();
 
   /**
-   * Get the instance of {@link IAccessResult} for the current event. This depends on the executed event.
+   * Get the instance of {@link IAccessResult} for the current event. The content differs depending to the event type,
+   * which is processed:
+   * 
+   * <UL>
+   * <LI>{@link ObserverEventType#BEFORE_MAPPING}
+   * <LI>{@link ObserverEventType#AFTER_MAPPING}
+   * <LI>{@link ObserverEventType#BEFORE_SAVE}
+   * <LI>{@link ObserverEventType#AFTER_SAVE}
+   * <LI>{@link ObserverEventType#BEFORE_LOAD}
+   * <LI>{@link ObserverEventType#AFTER_LOAD}
+   * <LI>{@link ObserverEventType#BEFORE_DELETE}
+   * <LI>{@link ObserverEventType#AFTER_DELETE}
+   * </UL>
    * 
    * @return
    */
@@ -61,6 +85,17 @@ public interface IObserverEvent {
 
   /**
    * Get the data access object which is combined to the current event
+   * 
+   * <UL>
+   * <LI>{@link ObserverEventType#BEFORE_MAPPING}
+   * <LI>{@link ObserverEventType#AFTER_MAPPING}
+   * <LI>{@link ObserverEventType#BEFORE_SAVE}
+   * <LI>{@link ObserverEventType#AFTER_SAVE}
+   * <LI>{@link ObserverEventType#BEFORE_LOAD}
+   * <LI>{@link ObserverEventType#AFTER_LOAD}
+   * <LI>{@link ObserverEventType#BEFORE_DELETE}
+   * <LI>{@link ObserverEventType#AFTER_DELETE}
+   * </UL>
    * 
    * @return
    */

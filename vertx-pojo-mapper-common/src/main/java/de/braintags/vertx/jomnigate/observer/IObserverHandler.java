@@ -17,11 +17,13 @@ import java.util.List;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.init.ObserverSettings;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.observer.impl.DefaultObserverHandler;
 import io.vertx.core.Future;
 
 /**
  * IObserverHandler is the member of an IMapper which keeps the information about registered {@link IObserver} and
- * executes the observer handling
+ * executes the observers, which are registered for an event for the parent mapper
  * 
  * @author Michael Remme
  * 
@@ -29,12 +31,23 @@ import io.vertx.core.Future;
 public interface IObserverHandler {
 
   /**
+   * Create a new instance of {@link IObserverHandler}
+   * 
+   * @param mapper
+   *          the mapper to be used
+   * @return
+   */
+  public static IObserverHandler createInstance(IMapper<?> mapper) {
+    return new DefaultObserverHandler(mapper);
+  }
+
+  /**
    * Performs the event {@link ObserverEventType#BEFORE_SAVE} to the records in the {@link IWrite}
    * 
    * @param writeObject
    * @return
    */
-  Future<Void> handleBeforeSave(IWrite<?> writeObject);
+  Future<Void> handleBeforeSave(IWrite<?> writeObject, IObserverContext context);
 
   /**
    * Performs the event {@link ObserverEventType#AFTER_SAVE} to the records in the {@link IWrite}
@@ -42,7 +55,7 @@ public interface IObserverHandler {
    * @param writeObject
    * @return
    */
-  Future<Void> handleAfterSave(IWrite<?> writeObject, IWriteResult writeResult);
+  Future<Void> handleAfterSave(IWrite<?> writeObject, IWriteResult writeResult, IObserverContext context);
 
   /**
    * Get all observers, which are registered for the current mapper and the given event. The list should be sorted by

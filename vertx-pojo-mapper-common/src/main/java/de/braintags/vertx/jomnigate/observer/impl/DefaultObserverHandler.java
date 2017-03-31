@@ -25,6 +25,7 @@ import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
+import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
 import de.braintags.vertx.jomnigate.observer.IObserverHandler;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
@@ -32,7 +33,7 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 
 /**
- * 
+ * Default implementation for {@link IObserverHandler}
  * 
  * @author Michael Remme
  * 
@@ -43,7 +44,9 @@ public class DefaultObserverHandler implements IObserverHandler {
   private IMapper<?> mapper;
 
   /**
+   * Create a new instance, where usable observers are examined
    * 
+   * @param mapper
    */
   public DefaultObserverHandler(IMapper<?> mapper) {
     this.mapper = mapper;
@@ -56,7 +59,7 @@ public class DefaultObserverHandler implements IObserverHandler {
   private void computeObserver() {
     List<ObserverSettings<?>> tmpList = new ArrayList<>();
     List<ObserverSettings<?>> osl = mapper.getMapperFactory().getDataStore().getSettings().getObserverSettings();
-    osl.stream().filter(os -> os.isApplyableFor(mapper)).forEach(c -> tmpList.add(c));
+    osl.stream().filter(os -> os.isApplyableFor(mapper)).forEach(tmpList::add);
     Observer ob = mapper.getAnnotation(Observer.class);
     if (ob != null) {
       ObserverSettings<?> os = new ObserverSettings<>(ob.observerClass());
@@ -87,16 +90,6 @@ public class DefaultObserverHandler implements IObserverHandler {
     return eventObserverCache.get(event);
   }
 
-  /**
-   * This method executes the event on all {@link IObserver} which are registered for
-   * 
-   * @param event
-   * @param handler
-   */
-  Future<Void> handleEvent(IObserverEvent event) {
-    return Future.failedFuture(new UnsupportedOperationException());
-  }
-
   /*
    * (non-Javadoc)
    * 
@@ -105,13 +98,13 @@ public class DefaultObserverHandler implements IObserverHandler {
    * write.IWrite)
    */
   @Override
-  public Future<Void> handleBeforeSave(IWrite<?> writeObject) {
+  public Future<Void> handleBeforeSave(IWrite<?> writeObject, IObserverContext context) {
     Future<Void> f = Future.future();
     List<IObserver> ol = getObserver(ObserverEventType.BEFORE_SAVE);
     if (ol.isEmpty() || writeObject.size() <= 0) {
       f.complete();
     } else {
-      CompositeFuture cf = loopBeforeSave(ol, writeObject);
+      CompositeFuture cf = loopBeforeSaveObserver(ol, writeObject, context);
       cf.setHandler(cfr -> {
         if (cfr.failed()) {
           f.fail(cfr.cause());
@@ -123,25 +116,44 @@ public class DefaultObserverHandler implements IObserverHandler {
     return f;
   }
 
+  /**
+   * for each defined observer, process the entities of the write object
+   * 
+   * @param ol
+   * @param writeObject
+   * @return
+   */
   @SuppressWarnings("rawtypes")
-  private CompositeFuture loopBeforeSave(List<IObserver> ol, IWrite<?> writeObject) {
+  private CompositeFuture loopBeforeSaveObserver(List<IObserver> ol, IWrite<?> writeObject, IObserverContext context) {
     List<Future> fl = new ArrayList<>();
     for (IObserver observer : ol) {
-      fl.add(handleBeforSave_Observer(observer, writeObject));
+      fl.add(loopBeforSaveEntities(observer, writeObject, context));
     }
     return CompositeFuture.all(fl);
   }
 
+  /**
+   * Execute the current observer on each entity of the write object
+   * 
+   * @param observer
+   * @param writeObject
+   * @return
+   */
   @SuppressWarnings("rawtypes")
-  private Future<Void> handleBeforSave_Observer(IObserver observer, IWrite<?> writeObject) {
+  private Future<Void> loopBeforSaveEntities(IObserver observer, IWrite<?> writeObject, IObserverContext context) {
     Future<Void> f = Future.future();
     List<Future> fl = new ArrayList<>();
     Iterator<?> selection = writeObject.getSelection();
     while (selection.hasNext()) {
-      fl.add(observer
-          .handleEvent(IObserverEvent.createEvent(ObserverEventType.BEFORE_SAVE, selection.next(), null, writeObject)));
+      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_SAVE, selection.next(), null,
+          writeObject);
+      if (observer.handlesEvent(event, context)) {
+        Future tf = observer.handleEvent(event, context);
+        if (tf != null) {
+          fl.add(tf);
+        }
+      }
     }
-
     CompositeFuture cf = CompositeFuture.all(fl);
     cf.setHandler(res -> {
       if (res.failed()) {
@@ -161,13 +173,13 @@ public class DefaultObserverHandler implements IObserverHandler {
    * write.IWrite, de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult)
    */
   @Override
-  public Future<Void> handleAfterSave(IWrite<?> writeObject, IWriteResult writeResult) {
+  public Future<Void> handleAfterSave(IWrite<?> writeObject, IWriteResult writeResult, IObserverContext context) {
     Future<Void> f = Future.future();
     List<IObserver> ol = getObserver(ObserverEventType.AFTER_SAVE);
     if (ol.isEmpty() || writeObject.size() <= 0) {
       f.complete();
     } else {
-      f.fail("unimplemented");
+      f.fail(new UnsupportedOperationException());
     }
     return f;
   }

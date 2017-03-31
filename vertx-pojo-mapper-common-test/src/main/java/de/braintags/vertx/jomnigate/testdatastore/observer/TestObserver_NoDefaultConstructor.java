@@ -13,8 +13,8 @@
 package de.braintags.vertx.jomnigate.testdatastore.observer;
 
 import de.braintags.vertx.jomnigate.observer.IObserver;
+import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
-import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import io.vertx.core.Future;
 
 /**
@@ -29,20 +29,14 @@ public class TestObserver_NoDefaultConstructor implements IObserver {
     // let the unused parameter to provocate exception
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.observer.IObserver#handlesEvent(de.braintags.vertx.jomnigate.observer.
-   * ObserverEventType)
-   */
   @Override
-  public boolean handlesEvent(ObserverEventType event) {
-    return false;
+  public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
+    return Future.succeededFuture();
   }
 
   @Override
-  public Future<Void> handleEvent(IObserverEvent event) {
-    return Future.succeededFuture();
+  public boolean handlesEvent(IObserverEvent event, IObserverContext context) {
+    return false;
   }
 
 }

@@ -60,7 +60,7 @@ public class DefaultObserverEvent implements IObserverEvent {
    * @see de.braintags.vertx.jomnigate.observer.IObserverEvent#getEntity()
    */
   @Override
-  public Object getEntity() {
+  public Object getSource() {
     return entity;
   }
 

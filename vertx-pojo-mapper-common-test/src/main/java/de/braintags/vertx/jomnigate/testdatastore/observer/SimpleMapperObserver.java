@@ -15,6 +15,8 @@ package de.braintags.vertx.jomnigate.testdatastore.observer;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
+import de.braintags.vertx.jomnigate.observer.ObserverEventType;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
 import io.vertx.core.Future;
 
 /**
@@ -23,16 +25,30 @@ import io.vertx.core.Future;
  * @author Michael Remme
  * 
  */
-public class TestObserver4 implements IObserver {
+public class SimpleMapperObserver implements IObserver {
+  public static boolean executed = false;
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.observer.IObserver#handleEvent(de.braintags.vertx.jomnigate.observer.IObserverEvent)
+   */
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
-    return Future.succeededFuture();
+    if (event.getEventType().equals(ObserverEventType.BEFORE_SAVE)) {
+      ((SimpleMapper) event.getSource()).intValue = context.get("counter", 1);
+      context.put("counter", ((SimpleMapper) event.getSource()).intValue + 1);
+      executed = true;
+      return Future.succeededFuture();
+    } else {
+      return null;
+    }
   }
 
   @Override
   public boolean handlesEvent(IObserverEvent event, IObserverContext context) {
-    return false;
+    return event.getEventType().equals(ObserverEventType.BEFORE_SAVE) && event.getSource() instanceof SimpleMapper;
   }
 
 }

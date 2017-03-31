@@ -25,6 +25,7 @@ import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
+import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -65,7 +66,8 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
         try {
           Future<IWriteResult> rf = Future.future();
           rf.setHandler(resultHandler);
-          preSave().compose(pre -> internalSave()).compose(wr -> postSave(wr, rf), rf);
+          IObserverContext context = IObserverContext.createInstance();
+          preSave(context).compose(pre -> internalSave()).compose(wr -> postSave(wr, context, rf), rf);
         } catch (Exception e) {
           resultHandler.handle(Future.failedFuture(e));
         }
@@ -78,8 +80,8 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * 
    * @return
    */
-  protected Future<Void> preSave() {
-    return getMapper().getObserverHandler().handleBeforeSave(this);
+  protected Future<Void> preSave(IObserverContext context) {
+    return getMapper().getObserverHandler().handleBeforeSave(this, context);
   }
 
   /**
@@ -88,8 +90,8 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * @param wr
    * @param nextFuture
    */
-  protected void postSave(IWriteResult wr, Future<IWriteResult> nextFuture) {
-    Future<Void> f = getMapper().getObserverHandler().handleAfterSave(this, wr);
+  protected void postSave(IWriteResult wr, IObserverContext context, Future<IWriteResult> nextFuture) {
+    Future<Void> f = getMapper().getObserverHandler().handleAfterSave(this, wr, context);
     f.setHandler(res -> {
       if (f.failed()) {
         nextFuture.fail(f.cause());

@@ -21,6 +21,14 @@ package de.braintags.vertx.jomnigate.observer;
 public enum ObserverEventType {
 
   /**
+   * Event type which is executed directly before the mapping of a mapper class is executed
+   */
+  BEFORE_MAPPING,
+  /**
+   * Event type which is executed directly after the mapping of a mapper class was executed
+   */
+  AFTER_MAPPING,
+  /**
    * Event type which is executed directly after an instance was deleted from the datastore
    */
   AFTER_DELETE,

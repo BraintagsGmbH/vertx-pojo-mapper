@@ -42,7 +42,6 @@ import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
 import de.braintags.vertx.jomnigate.observer.IObserverHandler;
-import de.braintags.vertx.jomnigate.observer.impl.DefaultObserverHandler;
 import de.braintags.vertx.util.ClassUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -116,7 +115,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     computeKeyGenerator();
     generateTableInfo();
     checkReferencedFields();
-    observerHandler = new DefaultObserverHandler(this);
+    observerHandler = IObserverHandler.createInstance(this);
     validate();
   }
 
