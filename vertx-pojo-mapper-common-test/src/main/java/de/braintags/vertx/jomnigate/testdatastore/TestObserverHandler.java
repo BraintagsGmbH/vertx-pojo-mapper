@@ -38,6 +38,16 @@ public class TestObserverHandler extends AbstractObserverTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TestObserverHandler.class);
 
+  @Test
+  public void test_AfterMapping_SingleRecord(TestContext context) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Test
+  public void test_BeforeMapping_SingleRecord(TestContext context) {
+    throw new UnsupportedOperationException();
+  }
+
   /**
    * The value of the field intValue must be set to 1 through the observer
    * 
@@ -74,7 +84,7 @@ public class TestObserverHandler extends AbstractObserverTest {
    */
   @SuppressWarnings({ "unused", "unchecked" })
   @Test
-  public void test_BeforeLoad_DeleteRecord(TestContext context) {
+  public void test_BeforeDelete_SingleRecord(TestContext context) {
     BeforeLoadObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverSettings<BeforeDeleteObserver> os = new ObserverSettings<>(BeforeDeleteObserver.class);

@@ -20,6 +20,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQueryCountResult;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISortDefinition;
+import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -72,15 +73,60 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
       } else {
-        buildQueryExpression(resolver, result -> {
-          if (result.failed()) {
-            resultHandler.handle(Future.failedFuture(result.cause()));
-          } else {
-            IQueryExpression queryExpression = result.result();
-            queryExpression.setLimit(limit, offset);
-            internalExecute(queryExpression, resultHandler);
-          }
-        });
+        try {
+          Future<IQueryResult<T>> rf = Future.future();
+          rf.setHandler(resultHandler);
+          IObserverContext context = IObserverContext.createInstance();
+          preQuery(context).compose(pre -> executeQuery(resolver, limit, offset))
+              .compose(wr -> postQuery(wr, context, rf), rf);
+        } catch (Exception e) {
+          resultHandler.handle(Future.failedFuture(e));
+        }
+
+        // Future<IQueryResult<T>> f = executeQuery(resolver, limit, offset);
+        // f.setHandler(resultHandler);
+      }
+    });
+  }
+
+  private final Future<IQueryResult<T>> executeQuery(IFieldValueResolver resolver, int limit, int offset) {
+    Future<IQueryResult<T>> f = Future.future();
+    buildQueryExpression(resolver, result -> {
+      if (result.failed()) {
+        f.fail(result.cause());
+      } else {
+        IQueryExpression queryExpression = result.result();
+        queryExpression.setLimit(limit, offset);
+        internalExecute(queryExpression, f);
+      }
+    });
+    return f;
+  }
+
+  /**
+   * Execution done before instances are stored into the datastore
+   * 
+   * @param context
+   * @return
+   */
+  protected Future<Void> preQuery(IObserverContext context) {
+    return getMapper().getObserverHandler().handleBeforeLoad(this, context);
+  }
+
+  /**
+   * Execution done after entities were stored into the datastore
+   * 
+   * @param qr
+   * @param context
+   * @param nextFuture
+   */
+  protected void postQuery(IQueryResult<T> qr, IObserverContext context, Future<IQueryResult<T>> nextFuture) {
+    Future<Void> f = getMapper().getObserverHandler().handleAfterLoad(this, qr, context);
+    f.setHandler(res -> {
+      if (f.failed()) {
+        nextFuture.fail(f.cause());
+      } else {
+        nextFuture.complete(qr);
       }
     });
   }

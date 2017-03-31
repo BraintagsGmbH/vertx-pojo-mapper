@@ -18,6 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 import de.braintags.vertx.jomnigate.annotation.Observer;
+import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
+import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.exception.MappingException;
@@ -41,6 +45,10 @@ public class DefaultObserverHandler implements IObserverHandler {
   private IMapper<?> mapper;
   private BeforeSaveHandler beforeSaveHandler = new BeforeSaveHandler();
   private AfterSaveHandler afterSaveHandler = new AfterSaveHandler();
+  private AfterLoadHandler afterLoadHandler = new AfterLoadHandler();
+  private BeforeLoadHandler beforeLoadHandler = new BeforeLoadHandler();
+  private AfterDeleteHandler afterDeleteHandler = new AfterDeleteHandler();
+  private BeforeDeleteHandler beforeDeleteHandler = new BeforeDeleteHandler();
 
   /**
    * Create a new instance, where usable observers are examined
@@ -97,7 +105,7 @@ public class DefaultObserverHandler implements IObserverHandler {
    * write.IWrite)
    */
   @Override
-  public Future<Void> handleBeforeSave(IWrite<?> writeObject, IObserverContext context) {
+  public <T> Future<Void> handleBeforeSave(IWrite<T> writeObject, IObserverContext context) {
     List<IObserver> ol = getObserver(ObserverEventType.BEFORE_SAVE);
     Future<Void> f = Future.future();
     if (ol.isEmpty() || writeObject.size() <= 0) {
@@ -116,13 +124,93 @@ public class DefaultObserverHandler implements IObserverHandler {
    * write.IWrite, de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult)
    */
   @Override
-  public Future<Void> handleAfterSave(IWrite<?> writeObject, IWriteResult writeResult, IObserverContext context) {
+  public <T> Future<Void> handleAfterSave(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context) {
     List<IObserver> ol = getObserver(ObserverEventType.AFTER_SAVE);
     Future<Void> f = Future.future();
     if (ol.isEmpty() || writeObject.size() <= 0) {
       f.complete();
     } else {
-      f = getAfterSaveHandler().handle(writeObject, null, context, ol);
+      f = getAfterSaveHandler().handle(writeObject, writeResult, context, ol);
+    }
+    return f;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.observer.IObserverHandler#handleBeforeLoad(de.braintags.vertx.jomnigate.dataaccess.
+   * query.IQuery, de.braintags.vertx.jomnigate.observer.IObserverContext)
+   */
+  @Override
+  public <T> Future<Void> handleBeforeLoad(IQuery<T> queryObject, IObserverContext context) {
+    List<IObserver> ol = getObserver(ObserverEventType.BEFORE_LOAD);
+    Future<Void> f = Future.future();
+    if (ol.isEmpty()) {
+      f.complete();
+    } else {
+      f = getBeforeLoadHandler().handle(queryObject, null, context, ol);
+    }
+    return f;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.observer.IObserverHandler#handleAfterLoad(de.braintags.vertx.jomnigate.dataaccess.
+   * query.IQuery, de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult,
+   * de.braintags.vertx.jomnigate.observer.IObserverContext)
+   */
+  @Override
+  public <T> Future<Void> handleAfterLoad(IQuery<T> queryObject, IQueryResult<T> queryResult,
+      IObserverContext context) {
+    List<IObserver> ol = getObserver(ObserverEventType.AFTER_LOAD);
+    Future<Void> f = Future.future();
+    if (ol.isEmpty()) {
+      f.complete();
+    } else {
+      f = getAfterLoadHandler().handle(queryObject, queryResult, context, ol);
+    }
+    return f;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.observer.IObserverHandler#handleBeforeDelete(de.braintags.vertx.jomnigate.dataaccess.
+   * delete.IDelete, de.braintags.vertx.jomnigate.observer.IObserverContext)
+   */
+  @Override
+  public <T> Future<Void> handleBeforeDelete(IDelete<T> deleteObject, IObserverContext context) {
+    List<IObserver> ol = getObserver(ObserverEventType.BEFORE_DELETE);
+    Future<Void> f = Future.future();
+    if (ol.isEmpty()) {
+      f.complete();
+    } else {
+      f = getBeforeDeleteHandler().handle(deleteObject, null, context, ol);
+    }
+    return f;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.observer.IObserverHandler#handleAfterDelete(de.braintags.vertx.jomnigate.dataaccess.
+   * delete.IDelete, de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult,
+   * de.braintags.vertx.jomnigate.observer.IObserverContext)
+   */
+  @Override
+  public <T> Future<Void> handleAfterDelete(IDelete<T> deleteObject, IDeleteResult deleteResult,
+      IObserverContext context) {
+    List<IObserver> ol = getObserver(ObserverEventType.AFTER_DELETE);
+    Future<Void> f = Future.future();
+    if (ol.isEmpty()) {
+      f.complete();
+    } else {
+      f = getAfterDeleteHandler().handle(deleteObject, deleteResult, context, ol);
     }
     return f;
   }
@@ -139,5 +227,33 @@ public class DefaultObserverHandler implements IObserverHandler {
    */
   protected AfterSaveHandler getAfterSaveHandler() {
     return afterSaveHandler;
+  }
+
+  /**
+   * @return the afterLoadHandler
+   */
+  protected AfterLoadHandler getAfterLoadHandler() {
+    return afterLoadHandler;
+  }
+
+  /**
+   * @return the beforeLoadHandler
+   */
+  protected BeforeLoadHandler getBeforeLoadHandler() {
+    return beforeLoadHandler;
+  }
+
+  /**
+   * @return the afterDeleteHandler
+   */
+  protected AfterDeleteHandler getAfterDeleteHandler() {
+    return afterDeleteHandler;
+  }
+
+  /**
+   * @return the beforeDeleteHandler
+   */
+  protected BeforeDeleteHandler getBeforeDeleteHandler() {
+    return beforeDeleteHandler;
   }
 }

@@ -14,6 +14,10 @@ package de.braintags.vertx.jomnigate.observer;
 
 import java.util.List;
 
+import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
+import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.init.ObserverSettings;
@@ -42,27 +46,69 @@ public interface IObserverHandler {
   }
 
   /**
+   * Get all observers, which are registered for the current mapper and the given event. The list should be sorted by
+   * priority of the underlaying {@link ObserverSettings}
+   * 
+   * @param event
+   * @return a list of all fitting IObserver
+   */
+  List<IObserver> getObserver(ObserverEventType event);
+
+  /**
    * Performs the event {@link ObserverEventType#BEFORE_SAVE} to the records in the {@link IWrite}
    * 
    * @param writeObject
+   * @param context
    * @return
    */
-  Future<Void> handleBeforeSave(IWrite<?> writeObject, IObserverContext context);
+  <T> Future<Void> handleBeforeSave(IWrite<T> writeObject, IObserverContext context);
 
   /**
    * Performs the event {@link ObserverEventType#AFTER_SAVE} to the records in the {@link IWrite}
    * 
    * @param writeObject
+   * @param writeResult
+   * @param context
    * @return
    */
-  Future<Void> handleAfterSave(IWrite<?> writeObject, IWriteResult writeResult, IObserverContext context);
+  <T> Future<Void> handleAfterSave(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context);
 
   /**
-   * Get all observers, which are registered for the current mapper and the given event. The list should be sorted by
-   * priority of the underlaying {@link ObserverSettings}
+   * Performs the event {@link ObserverEventType#BEFORE_LOAD} to the records in the {@link IWrite}
    * 
-   * @return a list of all fitting IObserver
+   * @param queryObject
+   * @param context
+   * @return
    */
-  List<IObserver> getObserver(ObserverEventType event);
+  <T> Future<Void> handleBeforeLoad(IQuery<T> queryObject, IObserverContext context);
+
+  /**
+   * Performs the event {@link ObserverEventType#AFTER_LOAD} to the records in the {@link IQuery}
+   * 
+   * @param queryObject
+   * @param queryResult
+   * @param context
+   * @return
+   */
+  <T> Future<Void> handleAfterLoad(IQuery<T> queryObject, IQueryResult<T> queryResult, IObserverContext context);
+
+  /**
+   * Performs the event {@link ObserverEventType#BEFORE_DELETE} to the records in the {@link IDelete}
+   * 
+   * @param deleteObject
+   * @param context
+   * @return
+   */
+  <T> Future<Void> handleBeforeDelete(IDelete<T> deleteObject, IObserverContext context);
+
+  /**
+   * Performs the event {@link ObserverEventType#AFTER_DELETE} to the records in the {@link IDelete}
+   * 
+   * @param deleteObject
+   * @param deleteResult
+   * @param context
+   * @return
+   */
+  <T> Future<Void> handleAfterDelete(IDelete<T> deleteObject, IDeleteResult deleteResult, IObserverContext context);
 
 }

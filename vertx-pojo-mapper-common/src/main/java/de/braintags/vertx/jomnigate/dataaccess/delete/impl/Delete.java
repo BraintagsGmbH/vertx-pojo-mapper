@@ -28,6 +28,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
+import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -69,7 +70,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   public final void delete(Handler<AsyncResult<IDeleteResult>> resultHandler) {
     if (getQuery() != null) {
       deleteQuery(query, resultHandler);
-    } else if (!getRecordList().isEmpty()) {
+    } else if (getSelection().hasNext()) {
       deleteRecords(resultHandler);
     } else
       throw new ParameterRequiredException("Nor query nor records defined to be deleted");
@@ -102,19 +103,54 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
       } else {
-        doDeleteRecords(resultHandler);
+        try {
+          Future<IDeleteResult> rf = Future.future();
+          rf.setHandler(resultHandler);
+          IObserverContext context = IObserverContext.createInstance();
+          preDelete(context).compose(pre -> doDeleteRecords()).compose(dr -> postDelete(dr, context, rf), rf);
+        } catch (Exception e) {
+          resultHandler.handle(Future.failedFuture(e));
+        }
       }
     });
   }
 
-  private void doDeleteRecords(Handler<AsyncResult<IDeleteResult>> resultHandler) {
+  private Future<IDeleteResult> doDeleteRecords() {
+    Future<IDeleteResult> f = Future.future();
     IMappedIdField idField = getMapper().getIdField();
     CompositeFuture cf = CompositeFuture.all(getRecordIds(idField.getField()));
     cf.setHandler(res -> {
       if (res.failed()) {
-        resultHandler.handle(Future.failedFuture(res.cause()));
+        f.fail(res.cause());
       } else {
-        deleteRecordsById(idField, cf.list(), resultHandler);
+        deleteRecordsById(idField, cf.list(), f);
+      }
+    });
+    return f;
+  }
+
+  /**
+   * Execution done before instances are deleted from the datastore
+   * 
+   * @return
+   */
+  protected Future<Void> preDelete(IObserverContext context) {
+    return getMapper().getObserverHandler().handleBeforeDelete(this, context);
+  }
+
+  /**
+   * Execution done after entities were deleted from the datastore
+   * 
+   * @param wr
+   * @param nextFuture
+   */
+  protected void postDelete(IDeleteResult dr, IObserverContext context, Future<IDeleteResult> nextFuture) {
+    Future<Void> f = getMapper().getObserverHandler().handleAfterDelete(this, dr, context);
+    f.setHandler(res -> {
+      if (f.failed()) {
+        nextFuture.fail(f.cause());
+      } else {
+        nextFuture.complete(dr);
       }
     });
   }

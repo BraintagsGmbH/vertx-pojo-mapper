@@ -111,5 +111,5 @@ public abstract class AbstractEventHandler<T extends IDataAccessObject<?>, U ext
    * @return
    */
   @SuppressWarnings("rawtypes")
-  protected abstract List<Future> createEntityFutureList(IObserver observer, T writeObject, IObserverContext context);
+  protected abstract List<Future> createEntityFutureList(IObserver observer, T accessObject, IObserverContext context);
 }
