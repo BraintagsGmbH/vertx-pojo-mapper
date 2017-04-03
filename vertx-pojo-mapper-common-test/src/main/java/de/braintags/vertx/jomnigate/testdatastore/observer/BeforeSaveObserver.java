@@ -12,10 +12,13 @@
  */
 package de.braintags.vertx.jomnigate.testdatastore.observer;
 
-import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
+import java.util.Iterator;
+
+import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
 import io.vertx.core.Future;
 
 /**
@@ -24,7 +27,7 @@ import io.vertx.core.Future;
  * @author Michael Remme
  * 
  */
-public class BeforeDeleteObserver implements IObserver {
+public class BeforeSaveObserver implements IObserver {
   public static boolean executed = false;
 
   /*
@@ -35,8 +38,16 @@ public class BeforeDeleteObserver implements IObserver {
    */
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
-    IDelete<?> delete = (IDelete<?>) event.getAccessObject();
-    BeforeDeleteObserver.executed = true;
+    IWrite<?> write = (IWrite<?>) event.getAccessObject();
+    executed = true;
+    Iterator<?> it = write.getSelection();
+    while (it.hasNext()) {
+      SimpleMapper sm = (SimpleMapper) it.next();
+      sm.intValue = context.get("counter", 1);
+      context.put("counter", sm.intValue + 1);
+      executed = true;
+    }
+
     return Future.succeededFuture();
   }
 

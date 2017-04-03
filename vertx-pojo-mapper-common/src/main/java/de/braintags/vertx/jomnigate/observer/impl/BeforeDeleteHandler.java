@@ -13,12 +13,14 @@
 package de.braintags.vertx.jomnigate.observer.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
+import de.braintags.vertx.jomnigate.observer.IObserverEvent;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import io.vertx.core.Future;
 
@@ -39,10 +41,20 @@ public class BeforeDeleteHandler extends AbstractEventHandler<IDelete<?>, IDelet
    * de.braintags.vertx.jomnigate.observer.IObserverContext)
    */
   @Override
-  protected List<Future> createEntityFutureList(IObserver observer, IDelete<?> queryObject, IDeleteResult result,
+  protected List<Future> createEntityFutureList(IObserver observer, IDelete<?> deleteObject, IDeleteResult result,
       IObserverContext context) {
     List<Future> fl = new ArrayList<>();
-    fl.add(Future.failedFuture(new UnsupportedOperationException()));
+    Iterator<?> selection = deleteObject.getSelection();
+    while (selection.hasNext()) {
+      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_DELETE, selection.next(), null,
+          deleteObject);
+      if (observer.handlesEvent(event, context)) {
+        Future tf = observer.handleEvent(event, context);
+        if (tf != null) {
+          fl.add(tf);
+        }
+      }
+    }
     return fl;
   }
 

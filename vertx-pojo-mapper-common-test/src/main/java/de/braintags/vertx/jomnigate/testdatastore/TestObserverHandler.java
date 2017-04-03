@@ -25,6 +25,7 @@ import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
 import de.braintags.vertx.jomnigate.testdatastore.observer.BeforeDeleteObserver;
 import de.braintags.vertx.jomnigate.testdatastore.observer.BeforeLoadObserver;
+import de.braintags.vertx.jomnigate.testdatastore.observer.BeforeSaveObserver;
 import de.braintags.vertx.jomnigate.testdatastore.observer.SimpleMapperObserver;
 import io.vertx.ext.unit.TestContext;
 
@@ -60,12 +61,12 @@ public class TestObserverHandler extends AbstractObserverTest {
     ObserverSettings<SimpleMapperObserver> os = new ObserverSettings<>(SimpleMapperObserver.class);
     os.getEventTypeList().add(ObserverEventType.AFTER_DELETE);
     settings.getObserverSettings().add(os);
+
     SimpleMapper sm = new SimpleMapper("testname", "nix");
     sm.intValue = -1;
     saveRecord(context, sm);
     context.assertFalse(SimpleMapperObserver.executed, "Observer should not execute here");
     context.assertEquals(-1, sm.intValue, "Expected NO Observer here");
-
     SimpleMapper tmp = findRecordByID(context, SimpleMapper.class, sm.id);
     context.assertNotNull(tmp, "instance not found");
 
@@ -91,11 +92,18 @@ public class TestObserverHandler extends AbstractObserverTest {
     os.getEventTypeList().add(ObserverEventType.BEFORE_DELETE);
     settings.getObserverSettings().add(os);
 
-    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    IDelete<SimpleMapper> del = getDataStore(context).createDelete(SimpleMapper.class);
-    del.setQuery(query);
+    SimpleMapper sm = new SimpleMapper("testname", "nix");
+    sm.intValue = -1;
+    saveRecord(context, sm);
+    context.assertFalse(BeforeDeleteObserver.executed, "Observer should not execute here");
+    context.assertEquals(-1, sm.intValue, "Expected NO Observer here");
 
-    delete(context, del, null, -1);
+    SimpleMapper tmp = findRecordByID(context, SimpleMapper.class, sm.id);
+    context.assertNotNull(tmp, "instance not found");
+
+    IDelete<SimpleMapper> del = getDataStore(context).createDelete(SimpleMapper.class);
+    del.add(tmp);
+    delete(context, del, null, 1);
     context.assertTrue(BeforeDeleteObserver.executed, "Observer wasn't executed");
   }
 
@@ -172,15 +180,15 @@ public class TestObserverHandler extends AbstractObserverTest {
    */
   @Test
   public void test_BeforeSave_SingleRecord(TestContext context) {
-    SimpleMapperObserver.executed = false;
+    BeforeSaveObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
-    ObserverSettings<SimpleMapperObserver> os = new ObserverSettings<>(SimpleMapperObserver.class);
+    ObserverSettings<BeforeSaveObserver> os = new ObserverSettings<>(BeforeSaveObserver.class);
     os.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
     settings.getObserverSettings().add(os);
     SimpleMapper sm = new SimpleMapper("testname", "nix");
     sm.intValue = -1;
     saveRecord(context, sm);
-    context.assertTrue(SimpleMapperObserver.executed, "Observer wasn't executed");
+    context.assertTrue(BeforeSaveObserver.executed, "Observer wasn't executed");
     SimpleMapper tmp = findRecordByID(context, SimpleMapper.class, sm.id);
     context.assertNotNull(tmp, "instance not found");
     context.assertEquals(1, tmp.intValue, "Observer did not set number correct");
@@ -194,9 +202,9 @@ public class TestObserverHandler extends AbstractObserverTest {
   @Test
   public void test_BeforeSave_Selection(TestContext context) {
     clearTable(context, SimpleMapper.class);
-    SimpleMapperObserver.executed = false;
+    BeforeSaveObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
-    ObserverSettings<SimpleMapperObserver> os = new ObserverSettings<>(SimpleMapperObserver.class);
+    ObserverSettings<BeforeSaveObserver> os = new ObserverSettings<>(BeforeSaveObserver.class);
     os.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
     settings.getObserverSettings().add(os);
     List<SimpleMapper> selection = new ArrayList<>();
@@ -206,7 +214,7 @@ public class TestObserverHandler extends AbstractObserverTest {
       selection.add(sm);
     }
     ResultContainer rc = saveRecords(context, selection);
-    context.assertTrue(SimpleMapperObserver.executed, "Observer wasn't executed");
+    context.assertTrue(BeforeSaveObserver.executed, "Observer wasn't executed");
 
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
     List<SimpleMapper> sr = findAll(context, query);
