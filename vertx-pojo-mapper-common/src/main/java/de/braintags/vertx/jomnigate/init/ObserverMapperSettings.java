@@ -126,14 +126,24 @@ public class ObserverMapperSettings {
    * @return true, if appliable
    */
   boolean isApplyableFor(IMapper<?> mapper) {
+    return isApplyableFor(mapper.getMapperClass());
+  }
+
+  /**
+   * This method checks, whether the current definition is applyable to the given instance of IMapper.
+   * 
+   * @param mapper
+   * @return true, if appliable
+   */
+  boolean isApplyableFor(Class<?> mapperClass) {
     boolean applyable = false;
     if (instOf) {
-      applyable = mapperClass.isAssignableFrom(mapper.getMapperClass());
+      applyable = this.mapperClass.isAssignableFrom(mapperClass);
     } else {
-      applyable = mapperClass == mapper.getMapperClass();
+      applyable = this.mapperClass == mapperClass;
     }
-    if (annotation != null) {
-      applyable = mapper.getAnnotation(annotation) != null;
+    if (this.annotation != null) {
+      applyable = mapperClass.getAnnotation(this.annotation) != null;
     }
 
     return applyable;

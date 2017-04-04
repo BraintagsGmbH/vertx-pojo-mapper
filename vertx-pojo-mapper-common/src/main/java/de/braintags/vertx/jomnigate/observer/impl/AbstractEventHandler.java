@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.dataaccess.IAccessResult;
-import de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
@@ -32,7 +31,7 @@ import io.vertx.core.Future;
  * @param <U>
  *          the type of the IAccessResult
  */
-public abstract class AbstractEventHandler<T extends IDataAccessObject<?>, U extends IAccessResult> {
+public abstract class AbstractEventHandler<T, U extends IAccessResult> {
 
   /**
    * Handles the event {@link ObserverEventType#BEFORE_SAVE }

@@ -120,6 +120,20 @@ public class ObserverSettings<T extends IObserver> {
    * Checks wether the current settings are applyable to the given IMapper. The definition is applyable, if no mapper
    * settings are defined or if mapper settings are defined and one is fitting
    * 
+   * @param mapperClass
+   * @return
+   */
+  public boolean isApplyableFor(Class<?> mapperClass) {
+    if (getMapperSettings().isEmpty()) {
+      return true;
+    }
+    return getMapperSettings().stream().filter(s -> s.isApplyableFor(mapperClass)).findFirst().isPresent();
+  }
+
+  /**
+   * Checks wether the current settings are applyable to the given IMapper. The definition is applyable, if no mapper
+   * settings are defined or if mapper settings are defined and one is fitting
+   * 
    * @param mapper
    * @return
    */

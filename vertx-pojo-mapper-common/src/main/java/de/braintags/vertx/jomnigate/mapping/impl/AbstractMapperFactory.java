@@ -14,11 +14,16 @@ package de.braintags.vertx.jomnigate.mapping.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
+import de.braintags.vertx.jomnigate.observer.IObserverContext;
+import de.braintags.vertx.util.ResultObject;
+import de.braintags.vertx.util.exception.InitException;
+import io.vertx.core.Future;
 
 /**
  * An abstract implementation of IMapperFactory
@@ -61,11 +66,64 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
     if (!mapperClass.isAnnotationPresent(Entity.class))
       throw new UnsupportedOperationException(String
           .format("The class %s is no mappable entity. Add the annotation Entity to the class", mapperClass.getName()));
-    IMapper<T> mapper = createMapper(mapperClass);
+
+    IMapper<T> mapper = createMapperBlocking(mapperClass);
     Map<String, IMapper<?>> tmpMap = new HashMap<>(mappedClasses);
     tmpMap.put(className, mapper);
     mappedClasses = tmpMap;
     return mapper;
+  }
+
+  private final <T> IMapper<T> createMapperBlocking(Class<T> mapperClass) {
+    IObserverContext context = IObserverContext.createInstance();
+    preMapping(mapperClass, context);
+    IMapper<T> mapper = createMapper(mapperClass);
+    postMapping(mapper, context);
+    return mapper;
+  }
+
+  private void preMapping(Class<?> mapperClass, IObserverContext context) {
+    CountDownLatch latch = new CountDownLatch(1);
+    getDataStore().getVertx().executeBlocking(future -> {
+      getDataStore().getSettings().getObserverSettings();
+    }, false, res -> {
+
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      throw new InitException("Init of mapping not possible", e);
+    }
+  }
+
+  private void postMapping(IMapper<?> mapper, IObserverContext context) {
+    CountDownLatch latch = new CountDownLatch(1);
+    ResultObject<Void> ro = new ResultObject<>(null);
+    getDataStore().getVertx().<Void> executeBlocking(future -> {
+      Future<Void> mf = mapper.getObserverHandler().handleAfterMapping(mapper, context);
+      if (mf.failed()) {
+        future.fail(mf.cause());
+      } else {
+        future.complete();
+      }
+    }, false, res -> {
+      if (res.failed()) {
+        ro.setThrowable(res.cause());
+      } else {
+        // its void
+      }
+      latch.countDown();
+    });
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      throw new InitException("Init of mapping not possible", e);
+    }
+    if (ro.isError()) {
+      throw new InitException(ro.getThrowable());
+    }
   }
 
   @Override

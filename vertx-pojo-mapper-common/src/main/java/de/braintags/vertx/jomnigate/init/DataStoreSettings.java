@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Properties;
 
 import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.util.security.crypt.IEncoder;
 
 /**
@@ -172,6 +173,19 @@ public class DataStoreSettings {
    */
   public List<ObserverSettings<?>> getObserverSettings() {
     return observerSettings;
+  }
+
+  /**
+   * Get all {@link ObserverSettings} which are fitting the given mapper
+   * 
+   * @param mapper
+   * @return
+   */
+  public List<ObserverSettings<?>> getObserverSettings(IMapper<?> mapper) {
+    List<ObserverSettings<?>> tmpList = new ArrayList<>();
+    List<ObserverSettings<?>> osl = getObserverSettings();
+    osl.stream().filter(os -> os.isApplyableFor(mapper)).forEach(tmpList::add);
+    return tmpList;
   }
 
   /**

@@ -93,6 +93,15 @@ public interface IObserverHandler {
   <T> Future<Void> handleAfterLoad(IQuery<T> queryObject, IQueryResult<T> queryResult, IObserverContext context);
 
   /**
+   * Performs the event {@link ObserverEventType#AFTER_MAPPING} for the given mapper
+   * 
+   * @param mapper
+   * @param context
+   * @return
+   */
+  <T> Future<Void> handleAfterMapping(IMapper<T> mapper, IObserverContext context);
+
+  /**
    * Performs the event {@link ObserverEventType#BEFORE_DELETE} to the records in the {@link IDelete}
    * 
    * @param deleteObject

@@ -64,9 +64,8 @@ public class DefaultObserverHandler implements IObserverHandler {
    * Computes the list of all observers, which can be executed for the current mapper class.
    */
   private void computeObserver() {
-    List<ObserverSettings<?>> tmpList = new ArrayList<>();
-    List<ObserverSettings<?>> osl = mapper.getMapperFactory().getDataStore().getSettings().getObserverSettings();
-    osl.stream().filter(os -> os.isApplyableFor(mapper)).forEach(tmpList::add);
+    List<ObserverSettings<?>> tmpList = mapper.getMapperFactory().getDataStore().getSettings()
+        .getObserverSettings(mapper);
     Observer ob = mapper.getAnnotation(Observer.class);
     if (ob != null) {
       ObserverSettings<?> os = new ObserverSettings<>(ob.observerClass());
