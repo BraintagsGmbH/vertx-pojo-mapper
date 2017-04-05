@@ -3,7 +3,7 @@ package de.braintags.vertx.jomnigate.json.jackson;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
- * THis module only applies to JsonDatastores
+ * This module only applies to JsonDatastores
  * 
  * @author mpluecker
  *
