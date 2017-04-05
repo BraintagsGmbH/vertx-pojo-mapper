@@ -51,6 +51,7 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
    */
   public JsonDatastore(Vertx vertx, JsonObject properties) {
     super(vertx, properties);
+    // Do not change factory type, it is used by the @link{JomnigateJsonModule} to detect jOmnigate environment
     JOmnigateFactory jf = new JOmnigateFactory(this, Json.mapper.getFactory(), Json.mapper);
     jacksonMapper = new ObjectMapper(jf);
     jf = new JOmnigateFactory(this, Json.prettyMapper.getFactory(), Json.prettyMapper);
