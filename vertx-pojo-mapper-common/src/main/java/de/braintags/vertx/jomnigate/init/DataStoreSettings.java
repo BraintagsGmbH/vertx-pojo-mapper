@@ -18,6 +18,7 @@ import java.util.Properties;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.util.security.crypt.IEncoder;
 
 /**
@@ -167,12 +168,27 @@ public class DataStoreSettings {
   }
 
   /**
-   * The instance, where global
+   * Get all defined {@link ObserverSettings}
    * 
    * @return the observerSettings
    */
   public List<ObserverSettings<?>> getObserverSettings() {
     return observerSettings;
+  }
+
+  /**
+   * Get all {@link ObserverSettings} which are fitting the given mapper class for the event
+   * {@link ObserverEventType#BEFORE_MAPPING}
+   * 
+   * @param mapperClass
+   * @return
+   */
+  public List<ObserverSettings<?>> getObserverSettings(Class<?> mapperClass) {
+    List<ObserverSettings<?>> tmpList = new ArrayList<>();
+    List<ObserverSettings<?>> osl = getObserverSettings();
+    osl.stream().filter(os -> os.isApplyableFor(mapperClass) && os.isApplyableFor(ObserverEventType.BEFORE_MAPPING))
+        .forEach(tmpList::add);
+    return tmpList;
   }
 
   /**

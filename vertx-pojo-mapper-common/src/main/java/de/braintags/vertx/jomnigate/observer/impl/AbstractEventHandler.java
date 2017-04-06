@@ -18,7 +18,6 @@ import java.util.List;
 import de.braintags.vertx.jomnigate.dataaccess.IAccessResult;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
-import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 
@@ -34,7 +33,7 @@ import io.vertx.core.Future;
 public abstract class AbstractEventHandler<T, U extends IAccessResult> {
 
   /**
-   * Handles the event {@link ObserverEventType#BEFORE_SAVE }
+   * Handles the event
    * 
    * @param accessObject
    * @param result

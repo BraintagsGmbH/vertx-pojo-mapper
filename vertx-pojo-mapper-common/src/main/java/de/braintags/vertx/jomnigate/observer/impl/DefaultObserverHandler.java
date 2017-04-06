@@ -49,6 +49,7 @@ public class DefaultObserverHandler implements IObserverHandler {
   private BeforeLoadHandler beforeLoadHandler = new BeforeLoadHandler();
   private AfterDeleteHandler afterDeleteHandler = new AfterDeleteHandler();
   private BeforeDeleteHandler beforeDeleteHandler = new BeforeDeleteHandler();
+  private AfterMappingHandler afterMappingHandler = new AfterMappingHandler();
 
   /**
    * Create a new instance, where usable observers are examined
@@ -214,6 +215,25 @@ public class DefaultObserverHandler implements IObserverHandler {
     return f;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.observer.IObserverHandler#handleAfterMapping(de.braintags.vertx.jomnigate.mapping.
+   * IMapper, de.braintags.vertx.jomnigate.observer.IObserverContext)
+   */
+  @Override
+  public <T> Future<Void> handleAfterMapping(IMapper<T> mapper, IObserverContext context) {
+    List<IObserver> ol = getObserver(ObserverEventType.AFTER_MAPPING);
+    Future<Void> f = Future.future();
+    if (ol.isEmpty()) {
+      f.complete();
+    } else {
+      f = getAfterMappingHandler().handle(mapper, context, ol);
+    }
+    return f;
+  }
+
   /**
    * @return the beforeSaveHandler
    */
@@ -255,4 +275,12 @@ public class DefaultObserverHandler implements IObserverHandler {
   protected BeforeDeleteHandler getBeforeDeleteHandler() {
     return beforeDeleteHandler;
   }
+
+  /**
+   * @return the afterMappingHandler
+   */
+  protected AfterMappingHandler getAfterMappingHandler() {
+    return afterMappingHandler;
+  }
+
 }

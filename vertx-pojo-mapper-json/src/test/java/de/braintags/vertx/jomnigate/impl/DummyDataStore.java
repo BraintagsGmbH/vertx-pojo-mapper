@@ -54,11 +54,14 @@ public class DummyDataStore implements IDataStore<String, String> {
   private JsonObject properties;
   private ITriggerContextFactory triggerContextFactory;
   private DataStoreSettings settings = new DataStoreSettings();
+  private Vertx vertx;
 
   public DummyDataStore() {
+    this.vertx = Vertx.vertx();
   }
 
   public DummyDataStore(ITypeHandlerFactory tf, IPropertyMapperFactory pf, DataStoreSettings settings) {
+    this();
     this.mf = new MapperFactory(this, tf, pf);
   }
 
@@ -243,7 +246,7 @@ public class DummyDataStore implements IDataStore<String, String> {
    */
   @Override
   public Vertx getVertx() {
-    return null;
+    return vertx;
   }
 
   /*

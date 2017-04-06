@@ -15,7 +15,6 @@ package de.braintags.vertx.jomnigate.observer.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
@@ -24,12 +23,12 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 
 /**
- * A handler which handles the event After_Mapping
+ * A handler which handles the event Before_Mapping
  * 
  * @author Michael Remme
  * 
  */
-public class AfterMappingHandler {
+public class BeforeMappingHandler {
 
   /**
    * Handles the event
@@ -39,9 +38,9 @@ public class AfterMappingHandler {
    * @param ol
    * @return
    */
-  public Future<Void> handle(IMapper<?> mapper, IObserverContext context, List<IObserver> ol) {
+  public Future<Void> handle(Class<?> mapperClass, IObserverContext context, List<IObserver> ol) {
     Future<Void> f = Future.future();
-    CompositeFuture cf = loopObserver(ol, mapper, context);
+    CompositeFuture cf = loopObserver(ol, mapperClass, context);
     cf.setHandler(cfr -> {
       if (cfr.failed()) {
         f.fail(cfr.cause());
@@ -61,10 +60,10 @@ public class AfterMappingHandler {
    * @return
    */
   @SuppressWarnings("rawtypes")
-  protected CompositeFuture loopObserver(List<IObserver> ol, IMapper<?> mapper, IObserverContext context) {
+  protected CompositeFuture loopObserver(List<IObserver> ol, Class<?> mapperClass, IObserverContext context) {
     List<Future> fl = new ArrayList<>();
     for (IObserver observer : ol) {
-      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.AFTER_MAPPING, mapper, null, null);
+      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.AFTER_MAPPING, mapperClass, null, null);
       if (observer.handlesEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
         if (tf != null) {
