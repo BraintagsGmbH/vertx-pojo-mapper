@@ -18,7 +18,6 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.ObserverMapperSettings;
 import de.braintags.vertx.jomnigate.init.ObserverSettings;
@@ -301,13 +300,14 @@ public class TestObserverMapping extends AbstractObserverTest {
   public void testClassNotFound_ObserverClass(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
     settings.getObserverSettings().add(new ObserverSettings<>(TestObserver_NoDefaultConstructor.class));
-    IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
-    // we are expecting instantiation exception here
     try {
+      IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
+      // we are expecting instantiation exception here
       mapper.getObserverHandler().getObserver(ObserverEventType.AFTER_DELETE);
       context.fail("expected exception here");
-    } catch (MappingException e) {
+    } catch (Exception e) {
       // expected
+      LOGGER.info(e);
       context.assertTrue(e.toString().contains("InstantiationException"), "expected InstantiationException");
     }
   }

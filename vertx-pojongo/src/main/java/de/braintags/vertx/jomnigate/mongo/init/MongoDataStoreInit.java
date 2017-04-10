@@ -284,9 +284,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
           .net(new Net(localPort, Network.localhostIsIPv6())).build();
       Logger logger = (Logger) new SLF4JLogDelegateFactory().createDelegate(MongoDataStoreInit.class.getCanonicalName())
           .unwrap();
-
       IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaultsWithLogger(Command.MongoD, logger).build();
-
       MongodExecutable temp = MongodStarter.getInstance(runtimeConfig).prepare(config);
       temp.start();
       // ensure client was successfully started before assigning to global field

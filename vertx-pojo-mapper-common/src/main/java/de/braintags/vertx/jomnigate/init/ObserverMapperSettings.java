@@ -126,7 +126,11 @@ public class ObserverMapperSettings {
    * @return true, if appliable
    */
   boolean isApplyableFor(IMapper<?> mapper) {
-    return isApplyableFor(mapper.getMapperClass());
+    boolean applyable = isApplyableFor(mapper.getMapperClass());
+    if (annotation != null) {
+      applyable = mapper.getAnnotation(annotation) != null;
+    }
+    return applyable;
   }
 
   /**

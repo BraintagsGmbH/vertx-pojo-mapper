@@ -21,10 +21,13 @@ import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.ObserverSettings;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
+import de.braintags.vertx.jomnigate.testdatastore.observer.AfterMappingObserver;
 import de.braintags.vertx.jomnigate.testdatastore.observer.BeforeDeleteObserver;
 import de.braintags.vertx.jomnigate.testdatastore.observer.BeforeLoadObserver;
+import de.braintags.vertx.jomnigate.testdatastore.observer.BeforeMappingObserver;
 import de.braintags.vertx.jomnigate.testdatastore.observer.BeforeSaveObserver;
 import de.braintags.vertx.jomnigate.testdatastore.observer.SimpleMapperObserver;
 import io.vertx.ext.unit.TestContext;
@@ -41,12 +44,30 @@ public class TestObserverHandler extends AbstractObserverTest {
 
   @Test
   public void test_AfterMapping_SingleRecord(TestContext context) {
-    throw new UnsupportedOperationException();
+    AfterMappingObserver.executed = false;
+    DataStoreSettings settings = getDataStore(context).getSettings();
+    ObserverSettings<AfterMappingObserver> os = new ObserverSettings<>(AfterMappingObserver.class);
+    os.getEventTypeList().add(ObserverEventType.AFTER_MAPPING);
+    settings.getObserverSettings().add(os);
+
+    SimpleMapper sm = new SimpleMapper("testname", "nix");
+    sm.intValue = -1;
+    IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
+    context.assertTrue(AfterMappingObserver.executed, "Observer wasn't executed");
   }
 
   @Test
   public void test_BeforeMapping_SingleRecord(TestContext context) {
-    throw new UnsupportedOperationException();
+    BeforeMappingObserver.executed = false;
+    DataStoreSettings settings = getDataStore(context).getSettings();
+    ObserverSettings<BeforeMappingObserver> os = new ObserverSettings<>(BeforeMappingObserver.class);
+    os.getEventTypeList().add(ObserverEventType.BEFORE_MAPPING);
+    settings.getObserverSettings().add(os);
+
+    SimpleMapper sm = new SimpleMapper("testname", "nix");
+    sm.intValue = -1;
+    IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
+    context.assertTrue(BeforeMappingObserver.executed, "Observer wasn't executed");
   }
 
   /**

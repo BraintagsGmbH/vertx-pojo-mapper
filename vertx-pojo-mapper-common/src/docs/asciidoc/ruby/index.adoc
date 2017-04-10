@@ -121,6 +121,9 @@ Creating a mapper is very simple:
 @Source(translate = false)
 @Entity
 public class MiniMapper {
+
+  public static final IIndexedField NAME = new IndexedField("name");
+
   @Id
   public String id;
   public String name;
@@ -203,7 +206,7 @@ To search inside the connected datastore, we are creating first an instance of
 [source,java]
 ----
 IQuery<DemoMapper> query = dataStore.createQuery(DemoMapper.class);
-query.setSearchCondition(ISearchCondition.isEqual("name", "my mini mapper"));
+query.setSearchCondition(ISearchCondition.isEqual(DemoMapper.NAME, "my mini mapper"));
 query.execute(rResult -> {
   if (rResult.failed()) {
     logger.error(rResult.cause());
@@ -266,7 +269,7 @@ arguments which were used to perform the delete action
 [source,java]
 ----
 IQuery<DemoMapper> query = dataStore.createQuery(DemoMapper.class);
-query.setSearchCondition(ISearchCondition.isEqual("name", "test"));
+query.setSearchCondition(ISearchCondition.isEqual(DemoMapper.NAME, "test"));
 IDelete<DemoMapper> delete = dataStore.createDelete(DemoMapper.class);
 delete.setQuery(query);
 delete.delete(deleteResult -> {
@@ -455,6 +458,11 @@ public class PersonRef {
 }
 ----
 
+
+==== The observer system
+TODO documentation of obsserver system
+
+
 ==== Lifecycle methods
 
 In vertx-pojo-mapper are existing a series of lifecycle annotations, by which you can modify the content
@@ -483,7 +491,7 @@ public class LifecycleMapper {
     name = "just after load";
     IDataStore ds = triggerContext.getMapper().getMapperFactory().getDataStore();
     IQuery<MiniMapper> q = ds.createQuery(MiniMapper.class);
-    q.setSearchCondition(ISearchCondition.isEqual("name", "test"));
+    q.setSearchCondition(ISearchCondition.isEqual(MiniMapper.NAME, "test"));
     q.execute(qr -> {
       if (qr.failed()) {
         triggerContext.fail(qr.cause());
@@ -541,7 +549,7 @@ The trigger methods can be empty, or get the parameter
 name = "just after load";
 IDataStore ds = triggerContext.getMapper().getMapperFactory().getDataStore();
 IQuery<MiniMapper> q = ds.createQuery(MiniMapper.class);
-q.setSearchCondition(ISearchCondition.isEqual("name", "test"));
+q.setSearchCondition(ISearchCondition.isEqual(MiniMapper.NAME, "test"));
 q.execute(qr -> {
   if (qr.failed()) {
     triggerContext.fail(qr.cause());
@@ -690,7 +698,7 @@ The result of the mapping process is an `link:unavailable[IMapper]`, which is cr
 and stored inside the `link:unavailable[IMapperFactory]` implementation, which fits the
 needs of the underlaying datastore or database. The IMapper contains general information about the mapped class and
 the generated, respectively connected table in the datastore. Additionally it contains per property of the mapper an
-instance of `link:unavailable[IField]`, where the field and its behaviour regarding the
+instance of `link:unavailable[IProperty]`, where the field and its behaviour regarding the
 mapping are desribed. Additionally per field the information about the connected column inside the datastore are kept
 inside an instance of `link:unavailable[IColumnInfo]`
 
@@ -712,7 +720,7 @@ This is the job of an `link:unavailable[ITypeHandler]`. During the mapping of
 a mapper property the suitable ITypeHandler is detected by requesting the
 `link:unavailable[ITypeHandlerFactory]` of the underlaying
 `link:unavailable[IDataStore]`. The found ITypeHandler is stored inside the appropriate
-`link:unavailable[IField]` and from there used, when a value is read from or shall be
+`link:unavailable[IProperty]` and from there used, when a value is read from or shall be
 written into the datastore.
 Michael Remme
 
@@ -761,6 +769,12 @@ By default the `link:unavailable[IObjectFactory]` is defined inside each
 `link:unavailable[IMapper]` by using a default implementation. If you need another
 implementation you are able to set it by adding this annotation to the mapper class and reference the class of the
 `link:unavailable[IObjectFactory]` you want to use.
+
+
+===== `link:unavailable[@Observer]`
+The annotation Observer is used to define an `link:unavailable[IObserver]`, which shall be
+executed for a certain mapper. The annotation extends the possible globale definition of
+`link:unavailable#get_observer_settings-instance_method[getObserverSettings]`
 
 ===== `link:unavailable[@AfterLoad]`
 

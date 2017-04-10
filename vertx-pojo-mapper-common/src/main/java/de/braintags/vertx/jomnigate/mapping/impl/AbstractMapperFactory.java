@@ -39,6 +39,9 @@ import io.vertx.core.Future;
  * @author Michael Remme
  */
 public abstract class AbstractMapperFactory implements IMapperFactory {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(AbstractMapperFactory.class);
+
   private IDataStore<?, ?> datastore;
   private Map<String, IMapper<?>> mappedClasses = new HashMap<>();
   private BeforeMappingHandler beforeMappingHandler = new BeforeMappingHandler();
@@ -85,8 +88,11 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
 
   private final <T> IMapper<T> createMapperBlocking(Class<T> mapperClass) {
     IObserverContext context = IObserverContext.createInstance();
+    LOGGER.debug("pre mapping for " + mapperClass.getName());
     preMapping(mapperClass, context);
+    LOGGER.debug("createMapper for " + mapperClass.getName());
     IMapper<T> mapper = createMapper(mapperClass);
+    LOGGER.debug("post mapping for " + mapperClass.getName());
     postMapping(mapper, context);
     return mapper;
   }
@@ -94,21 +100,45 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
   private void preMapping(Class<?> mapperClass, IObserverContext context) {
     CountDownLatch latch = new CountDownLatch(1);
     ResultObject<Void> ro = new ResultObject<>(null);
-    getDataStore().getVertx().executeBlocking(future -> {
-      Future<Void> f = handleBeforeMapping(mapperClass, context);
-      if (f.failed()) {
-        future.fail(f.cause());
-      } else {
-        future.complete();
+
+    // using only vertx.executeBlocking will potentially block with MongoDatastore
+    // thus - during init - we are using Runnable
+    Runnable runnable = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          LOGGER.debug("start handle before mapping");
+          Future<Void> f = handleBeforeMapping(mapperClass, context);
+          LOGGER.debug("stop handle before mapping");
+          if (f.failed()) {
+            ro.setThrowable(f.cause());
+          } else {
+            // no result to be set;
+          }
+        } catch (Exception e) {
+          ro.setThrowable(e);
+        }
+        latch.countDown();
       }
-    }, false, res -> {
-      if (res.failed()) {
-        ro.setThrowable(res.cause());
-      } else {
-        // its void
-      }
-      latch.countDown();
-    });
+    };
+    Thread thr = new Thread(runnable);
+    thr.start();
+
+    // getDataStore().getVertx().executeBlocking(future -> {
+    // Future<Void> f = handleBeforeMapping(mapperClass, context);
+    // if (f.failed()) {
+    // future.fail(f.cause());
+    // } else {
+    // future.complete();
+    // }
+    // }, false, res -> {
+    // if (res.failed()) {
+    // ro.setThrowable(res.cause());
+    // } else {
+    // // its void
+    // }
+    // latch.countDown();
+    // });
 
     try {
       latch.await();
@@ -162,21 +192,45 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
   private void postMapping(IMapper<?> mapper, IObserverContext context) {
     CountDownLatch latch = new CountDownLatch(1);
     ResultObject<Void> ro = new ResultObject<>(null);
-    getDataStore().getVertx().<Void> executeBlocking(future -> {
-      Future<Void> mf = mapper.getObserverHandler().handleAfterMapping(mapper, context);
-      if (mf.failed()) {
-        future.fail(mf.cause());
-      } else {
-        future.complete();
+
+    // using only vertx.executeBlocking will potentially block with MongoDatastore
+    // thus - during init - we are using Runnable
+    Runnable runnable = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          LOGGER.debug("start handle after mapping");
+          Future<Void> f = mapper.getObserverHandler().handleAfterMapping(mapper, context);
+          LOGGER.debug("stop handle after mapping");
+          if (f.failed()) {
+            ro.setThrowable(f.cause());
+          } else {
+            // no result to be set;
+          }
+        } catch (Exception e) {
+          ro.setThrowable(e);
+        }
+        latch.countDown();
       }
-    }, false, res -> {
-      if (res.failed()) {
-        ro.setThrowable(res.cause());
-      } else {
-        // its void
-      }
-      latch.countDown();
-    });
+    };
+    Thread thr = new Thread(runnable);
+    thr.start();
+
+    // getDataStore().getVertx().<Void> executeBlocking(future -> {
+    // Future<Void> mf = mapper.getObserverHandler().handleAfterMapping(mapper, context);
+    // if (mf.failed()) {
+    // future.fail(mf.cause());
+    // } else {
+    // future.complete();
+    // }
+    // }, false, res -> {
+    // if (res.failed()) {
+    // ro.setThrowable(res.cause());
+    // } else {
+    // // its void
+    // }
+    // latch.countDown();
+    // });
 
     try {
       latch.await();
