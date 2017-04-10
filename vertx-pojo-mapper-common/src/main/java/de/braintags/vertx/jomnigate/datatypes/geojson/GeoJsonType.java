@@ -12,6 +12,8 @@
  */
 package de.braintags.vertx.jomnigate.datatypes.geojson;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * An enumeration which describes the existing types from GeoJSON
  * 
@@ -23,44 +25,37 @@ public enum GeoJsonType {
   /**
    * A GeometryCollection
    */
-  GEOMETRY_COLLECTION(
-      "GeometryCollection"),
+  GEOMETRY_COLLECTION("GeometryCollection"),
 
   /**
    * A LineString
    */
-  LINE_STRING(
-      "LineString"),
+  LINE_STRING("LineString"),
 
   /**
    * A MultiLineString
    */
-  MULTI_LINE_STRING(
-      "MultiLineString"),
+  MULTI_LINE_STRING("MultiLineString"),
 
   /**
    * A MultiPoint
    */
-  MULTI_POINT(
-      "MultiPoint"),
+  MULTI_POINT("MultiPoint"),
 
   /**
    * A MultiPolygon
    */
-  MULTI_POLYGON(
-      "MultiPolygon"),
+  MULTI_POLYGON("MultiPolygon"),
 
   /**
    * A Point
    */
-  POINT(
-      "Point"),
+  POINT("Point"),
 
   /**
    * A Polygon
    */
-  POLYGON(
-      "Polygon");
+  POLYGON("Polygon");
 
   private final String typeName;
 
@@ -73,6 +68,7 @@ public enum GeoJsonType {
    *
    * @return the GeoJSON-defined type name
    */
+  @JsonValue
   public String getTypeName() {
     return typeName;
   }

@@ -27,6 +27,7 @@ import de.braintags.vertx.jomnigate.json.jackson.JOmnigateFactory;
 import de.braintags.vertx.jomnigate.json.jackson.JacksonModuleJomnigate;
 import de.braintags.vertx.jomnigate.mapping.IDataStoreSynchronizer;
 import de.braintags.vertx.jomnigate.mapping.IStoreObjectFactory;
+import de.braintags.vertx.util.json.JsonConfig;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
@@ -51,12 +52,11 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
    */
   public JsonDatastore(Vertx vertx, JsonObject properties, DataStoreSettings settings) {
     super(vertx, properties, settings);
+    // Do not change factory type, it is used by the @link{JomnigateJsonModule} to detect jOmnigate environment
     JOmnigateFactory jf = new JOmnigateFactory(this, Json.mapper.getFactory(), Json.mapper);
     jacksonMapper = new ObjectMapper(jf);
-    jacksonMapper.setFilterProvider(Json.mapper.getSerializationConfig().getFilterProvider());
     jf = new JOmnigateFactory(this, Json.prettyMapper.getFactory(), Json.prettyMapper);
     jacksonPrettyMapper = new ObjectMapper(jf);
-    jacksonPrettyMapper.setFilterProvider(Json.prettyMapper.getSerializationConfig().getFilterProvider());
 
     // Non-standard JSON but we allow C style comments in our JSON
     jacksonMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
@@ -72,6 +72,9 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
     jacksonPrettyMapper.registerModule(new ParameterNamesModule(Mode.DEFAULT));
     jacksonPrettyMapper.registerModule(new JodaModule());
     jacksonPrettyMapper.registerModule(new GuavaModule());
+
+    JsonConfig.configureObjectMapper(jacksonMapper);
+    JsonConfig.configureObjectMapper(jacksonPrettyMapper);
   }
 
   /**
