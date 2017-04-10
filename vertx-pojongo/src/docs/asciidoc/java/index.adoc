@@ -19,7 +19,7 @@ Please take the possible properties, which can be set from
 `link:../../apidocs/de/braintags/vertx/jomnigate/mongo/init/MongoDataStoreInit.html[MongoDataStoreInit]`
 
 === Information about JsonDatastore
-
+index.adoc
 
 
 The rest of the usage is the same than described in the documentation of

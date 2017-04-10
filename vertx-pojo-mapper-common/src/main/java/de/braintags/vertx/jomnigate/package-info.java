@@ -234,6 +234,10 @@
  * 
  * ----
  * 
+ * === The observer system
+ * {@link de.braintags.vertx.jomnigate.observer}
+ * 
+ * 
  * === Complexer mapper definitions
  * 
  * The example above was very simple and straightforward, just to explain the basics of vertx-pojo-mapper. But of course
@@ -297,10 +301,6 @@
  * ----
  * {@link examples.mapper.PersonRef}
  * ----
- * 
- * 
- * ==== The observer system
- * {@link de.braintags.vertx.jomnigate.observer}
  * 
  * 
  * ==== Lifecycle methods

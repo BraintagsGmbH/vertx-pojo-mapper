@@ -57,6 +57,7 @@ public abstract class AbstractObserverTest extends DatastoreBaseTest {
   private void serializeDeserializeSettings(TestContext context, DataStoreSettings settings) {
     try {
       String src = Json.encodePrettily(settings);
+      LOGGER.debug(src);
       DataStoreSettings settings2 = Json.decodeValue(src, DataStoreSettings.class);
     } catch (Exception e) {
       LOGGER.error("", e);

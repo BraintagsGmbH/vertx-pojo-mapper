@@ -29,7 +29,7 @@
  * {@link de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit}
  * 
  * === Information about JsonDatastore
- * {@link de.braintags.vertx.jomnigate.json.jackson}
+ * {@link de.braintags.vertx.jomnigate.json}
  * 
  * 
  * The rest of the usage is the same than described in the documentation of
