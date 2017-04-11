@@ -17,6 +17,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISortDefinition;
@@ -136,20 +139,21 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    */
   @Override
   protected SqlWhereFragment buildFieldConditionResult(IFieldCondition fieldCondition, String columnName,
-      Object parsedValue) throws UnknownQueryOperatorException {
+      JsonNode value) throws UnknownQueryOperatorException {
     QueryOperator operator = fieldCondition.getOperator();
+    JsonNode parsedValue;
     switch (operator) {
     case CONTAINS:
-      parsedValue = "%" + parsedValue + "%";
+      parsedValue = new TextNode("%" + value.textValue() + "%");
       break;
     case STARTS:
-      parsedValue = parsedValue + "%";
+      parsedValue = new TextNode(value.textValue() + "%");
       break;
     case ENDS:
-      parsedValue = "%" + parsedValue;
+      parsedValue = new TextNode("%" + value.textValue());
       break;
     default:
-      // noop
+      parsedValue = value;
       break;
     }
     String parsedOperator = translateOperator(operator);

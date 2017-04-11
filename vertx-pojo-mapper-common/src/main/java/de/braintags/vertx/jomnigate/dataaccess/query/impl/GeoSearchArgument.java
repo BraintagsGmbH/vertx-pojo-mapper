@@ -12,6 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoJsonObject;
@@ -24,7 +25,11 @@ import de.braintags.vertx.jomnigate.datatypes.geojson.GeoJsonObject;
  */
 
 @JsonSerialize(using = GeoSearchArgumentSerializer.class)
+@JsonDeserialize(using = GeoSearchArgumentDeserializer.class)
 public class GeoSearchArgument {
+
+  public static final String COORDINATES = "coordinates";
+
   private final GeoJsonObject geoJson;
   private int distance = -1;
 

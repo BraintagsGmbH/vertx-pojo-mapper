@@ -15,7 +15,9 @@ package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
@@ -24,6 +26,7 @@ import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
 import io.vertx.codegen.annotations.Nullable;
+import io.vertx.core.json.Json;
 
 /**
  * Simple implementation of {@link IFieldCondition}<br>
@@ -38,7 +41,7 @@ public class FieldCondition implements IFieldCondition {
 
   private IIndexedField field;
   private QueryOperator operator;
-  private Object value;
+  private JsonNode value;
 
   private Map<Class<? extends IQueryExpression>, Object> cacheMap = new HashMap<>(1);
 
@@ -52,10 +55,15 @@ public class FieldCondition implements IFieldCondition {
    * @param value
    *          the value of this condition, can be null
    */
+  @JsonCreator
   public FieldCondition(IIndexedField field, QueryOperator logic, @Nullable Object value) {
     this.field = field;
     this.operator = logic;
-    this.value = value;
+    this.value = transformObject(value);
+  }
+
+  public static JsonNode transformObject(@Nullable Object object) {
+    return Json.mapper.convertValue(object, JsonNode.class);
   }
 
   /*
@@ -65,6 +73,7 @@ public class FieldCondition implements IFieldCondition {
    * java.lang.Object)
    */
   @Override
+  @JsonIgnore
   public void setIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass, Object result) {
     cacheMap.put(queryExpressionClass, result);
   }
@@ -75,6 +84,7 @@ public class FieldCondition implements IFieldCondition {
    * @see de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition#getIntermediateResult(java.lang.Class)
    */
   @Override
+  @JsonIgnore
   public Object getIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass) {
     return cacheMap.get(queryExpressionClass);
   }
@@ -99,7 +109,7 @@ public class FieldCondition implements IFieldCondition {
    * @return the value of this condition, can be null
    */
   @Override
-  public Object getValue() {
+  public JsonNode getValue() {
     return value;
   }
 
@@ -110,8 +120,7 @@ public class FieldCondition implements IFieldCondition {
    */
   @Override
   public String toString() {
-    return field + " " + operator + " "
-        + (value instanceof Iterable<?> ? "(" + StringUtils.join((Iterable<?>) value, ",") + ")" : value);
+    return field + " " + operator + " " + String.valueOf(value);
   }
 
   /*
@@ -131,8 +140,39 @@ public class FieldCondition implements IFieldCondition {
     if (p == null) {
       throw new NoSuchFieldException(mapper, fieldName);
     }
-    if (p.isIdField()) {
-      field = new IndexedIdField(p.getName(), p.getColumnInfo().getName());
-    }
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((field == null) ? 0 : field.hashCode());
+    result = prime * result + ((operator == null) ? 0 : operator.hashCode());
+    result = prime * result + ((value == null) ? 0 : value.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    FieldCondition other = (FieldCondition) obj;
+    if (field == null) {
+      if (other.field != null)
+        return false;
+    } else if (!field.equals(other.field))
+      return false;
+    if (operator != other.operator)
+      return false;
+    if (value == null) {
+      if (other.value != null)
+        return false;
+    } else if (!value.equals(other.value))
+      return false;
+    return true;
   }
 }

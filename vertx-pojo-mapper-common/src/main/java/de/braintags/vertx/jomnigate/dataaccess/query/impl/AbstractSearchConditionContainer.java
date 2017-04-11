@@ -14,9 +14,10 @@ package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer;
@@ -31,7 +32,7 @@ import io.vertx.codegen.annotations.Nullable;
  */
 public abstract class AbstractSearchConditionContainer implements ISearchConditionContainer {
 
-  private List<ISearchCondition> conditions = new ArrayList<>();
+  private ConditionList conditions = new ConditionList();
 
   /**
    * Initializes the container with zero or more sub conditions
@@ -49,7 +50,8 @@ public abstract class AbstractSearchConditionContainer implements ISearchConditi
    * @see de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer#getConditions()
    */
   @Override
-  public List<ISearchCondition> getConditions() {
+  @JsonValue
+  public ConditionList getConditions() {
     return conditions;
   }
 
@@ -76,5 +78,37 @@ public abstract class AbstractSearchConditionContainer implements ISearchConditi
   @Override
   public <T> void validate(IMapper<T> mapper) {
     getConditions().forEach(c -> c.validate(mapper));
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((conditions == null) ? 0 : conditions.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    AbstractSearchConditionContainer other = (AbstractSearchConditionContainer) obj;
+    if (conditions == null) {
+      if (other.conditions != null)
+        return false;
+    } else if (!conditions.equals(other.conditions))
+      return false;
+    return true;
+  }
+
+  /**
+   * Wrapper around the search condition list to prevent type erasure when serializing with jackson
+   */
+  public static class ConditionList extends ArrayList<ISearchCondition> {
+    private static final long serialVersionUID = 1L;
   }
 }

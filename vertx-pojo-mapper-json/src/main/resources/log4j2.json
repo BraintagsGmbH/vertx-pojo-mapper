@@ -1,0 +1,78 @@
+{
+    "configuration": {
+        "status": "warn",
+        "name": "LogProperties",
+        "appenders": {
+            "Console": {
+                "name": "STDOUT",
+                "PatternLayout": {
+                    "pattern": "%d{ISO8601} %-5p [%t] [%c{1}] %m (%F:%L)%n"
+                }
+            }
+        },
+        "loggers": {
+            "logger": [{
+                    "name": "org.mongodb",
+                    "level": "warn",
+                    "additivity": "false",
+                    "AppenderRef": {
+                        "ref": "STDOUT"
+                    }
+                },
+                {
+                    "name": "org.thymeleaf",
+                    "level": "warn",
+                    "additivity": "false",
+                    "AppenderRef": {
+                        "ref": "STDOUT"
+                    }
+                },
+                {
+                    "name": "io.netty",
+                    "level": "warn",
+                    "additivity": "false",
+                    "AppenderRef": {
+                        "ref": "STDOUT"
+                    }
+                },
+                {
+                    "name": "de.braintags.vertx.BtVertxTestBase",
+                    "level": "warn",
+                    "additivity": "false",
+                    "AppenderRef": {
+                        "ref": "STDOUT"
+                    }
+                },
+                {
+                    "name": "io.vertx.ext.web.handler.impl.SessionHandlerImpl",
+                    "level": "warn",
+                    "additivity": "false",
+                    "AppenderRef": {
+                        "ref": "STDOUT"
+                    }
+                }, {
+                    "name": "de.braintags.vertx.jomnigate",
+                    "level": "debug",
+                    "additivity": "false",
+                    "AppenderRef": {
+                        "ref": "STDOUT"
+                    }
+                }, 
+                {
+                    "name": "io.vertx.ext.auth.jwt.JWT",
+                    "level": "warn",
+                    "additivity": "false",
+                    "AppenderRef": {
+                        "ref": "STDOUT"
+                    }
+                }
+            ],
+            "root": {
+                "level": "info",
+                "AppenderRef": {
+                    "ref": "STDOUT"
+                }
+            }
+        }
+    }
+}

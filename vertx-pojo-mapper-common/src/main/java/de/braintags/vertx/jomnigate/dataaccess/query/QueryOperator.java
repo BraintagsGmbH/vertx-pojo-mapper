@@ -14,7 +14,12 @@ package de.braintags.vertx.jomnigate.dataaccess.query;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 /**
  * Defines the operators for a query
@@ -22,7 +27,6 @@ import java.util.Map;
  * @author Michael Remme
  *
  */
-
 public enum QueryOperator {
 
   EQUALS(false, "="),
@@ -64,9 +68,12 @@ public enum QueryOperator {
     EnumSet.allOf(QueryOperator.class).forEach(operator -> {
       if (operator.synonyms != null) {
         for (String synonym : operator.synonyms) {
-          translationMap.put(synonym, operator);
+          translationMap.put(synonym.toLowerCase(Locale.US), operator);
         }
       }
+      translationMap.put(operator.name().toLowerCase(), operator);
+      if (operator.name().contains("_"))
+        translationMap.put(operator.name().replaceAll("_", "").toLowerCase(), operator);
     });
   }
 
@@ -84,8 +91,9 @@ public enum QueryOperator {
    *          the text value to translate
    * @return
    */
+  @JsonCreator
   public static QueryOperator translate(String value) {
-    return translationMap.get(value);
+    return translationMap.get(StringUtils.lowerCase(value, Locale.US));
   }
 
 }

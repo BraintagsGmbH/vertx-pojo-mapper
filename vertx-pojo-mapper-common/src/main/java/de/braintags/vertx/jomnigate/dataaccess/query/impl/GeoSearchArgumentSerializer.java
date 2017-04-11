@@ -17,8 +17,6 @@ import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
 public class GeoSearchArgumentSerializer extends StdSerializer<GeoSearchArgument> {
   private static final long serialVersionUID = 1L;
 
-  private static final String COORDINATES = "coordinates";
-
   protected GeoSearchArgumentSerializer() {
     super(GeoSearchArgument.class);
   }
@@ -39,7 +37,7 @@ public class GeoSearchArgumentSerializer extends StdSerializer<GeoSearchArgument
     gen.writeStartObject();
     gen.writeFieldName("type");
     gen.writeString(geoPoint.getType().getTypeName());
-    gen.writeFieldName(COORDINATES);
+    gen.writeFieldName(GeoSearchArgument.COORDINATES);
 
     gen.writeStartArray(geoPoint.getCoordinates().getValues().size());
     for (Double coordinate : geoPoint.getCoordinates().getValues()) {
