@@ -29,7 +29,7 @@ public interface IObserver {
    * @param context
    * @return true, if event shall be handled, false otherwise
    */
-  boolean handlesEvent(IObserverEvent event, IObserverContext context);
+  boolean canHandleEvent(IObserverEvent event, IObserverContext context);
 
   /**
    * Called to execute the given event. The content of the IObserverEvent depends on the event type, which is handled.

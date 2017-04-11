@@ -38,7 +38,7 @@ public class GeoPoint extends GeoJsonObject {
    *          the non-null coordinate of the point
    */
   public GeoPoint(final Position coordinate) {
-    this.coordinate = notNull("coordinates", coordinate);
+    setCoordinates(notNull("coordinates", coordinate));
     validateCoordinates(coordinate);
   }
 
@@ -74,20 +74,10 @@ public class GeoPoint extends GeoJsonObject {
 
   @Override
   public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
     if (!super.equals(o)) {
       return false;
     }
-
-    GeoPoint point = (GeoPoint) o;
-
-    if (!coordinate.equals(point.coordinate)) {
+    if (!coordinate.equals(((GeoPoint) o).coordinate)) {
       return false;
     }
 

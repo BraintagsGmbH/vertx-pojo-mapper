@@ -42,7 +42,7 @@ public class AfterMappingObserver implements IObserver {
   }
 
   @Override
-  public boolean handlesEvent(IObserverEvent event, IObserverContext context) {
+  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
     return event.getEventType().equals(ObserverEventType.AFTER_MAPPING);
   }
 

@@ -32,6 +32,9 @@ import io.vertx.core.Future;
  */
 public class BeforeDeleteHandler extends AbstractEventHandler<IDelete<?>, IDeleteResult> {
 
+  public BeforeDeleteHandler() {
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -48,7 +51,7 @@ public class BeforeDeleteHandler extends AbstractEventHandler<IDelete<?>, IDelet
     while (selection.hasNext()) {
       IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_DELETE, selection.next(), null,
           deleteObject, deleteObject.getDataStore());
-      if (observer.handlesEvent(event, context)) {
+      if (observer.canHandleEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
         if (tf != null) {
           fl.add(tf);

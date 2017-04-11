@@ -52,7 +52,7 @@ public class AfterLoadHandler extends AbstractEventHandler<IQuery<?>, IQueryResu
         for (Object o : selection) {
           IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.AFTER_LOAD, o, result, queryObject,
               queryObject.getDataStore());
-          if (observer.handlesEvent(event, context)) {
+          if (observer.canHandleEvent(event, context)) {
             Future tf = observer.handleEvent(event, context);
             if (tf != null) {
               fl.add(tf);

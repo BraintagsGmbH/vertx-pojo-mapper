@@ -49,7 +49,7 @@ public class AfterDeleteHandler extends AbstractEventHandler<IDelete<?>, IDelete
     while (selection.hasNext()) {
       IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.AFTER_DELETE, selection.next(), null,
           deleteObject, deleteObject.getDataStore());
-      if (observer.handlesEvent(event, context)) {
+      if (observer.canHandleEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
         if (tf != null) {
           fl.add(tf);

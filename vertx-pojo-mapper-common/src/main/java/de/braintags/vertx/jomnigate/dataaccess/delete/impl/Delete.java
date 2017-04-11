@@ -70,7 +70,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   public final void delete(Handler<AsyncResult<IDeleteResult>> resultHandler) {
     if (getQuery() != null) {
       deleteQuery(query, resultHandler);
-    } else if (getSelection().hasNext()) {
+    } else if (!recordList.isEmpty()) {
       deleteRecords(resultHandler);
     } else
       throw new ParameterRequiredException("Nor query nor records defined to be deleted");
@@ -147,8 +147,8 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   protected void postDelete(IDeleteResult dr, IObserverContext context, Future<IDeleteResult> nextFuture) {
     Future<Void> f = getMapper().getObserverHandler().handleAfterDelete(this, dr, context);
     f.setHandler(res -> {
-      if (f.failed()) {
-        nextFuture.fail(f.cause());
+      if (res.failed()) {
+        nextFuture.fail(res.cause());
       } else {
         nextFuture.complete(dr);
       }

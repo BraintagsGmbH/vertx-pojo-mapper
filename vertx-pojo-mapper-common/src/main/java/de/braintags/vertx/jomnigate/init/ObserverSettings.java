@@ -127,7 +127,7 @@ public class ObserverSettings<T extends IObserver> {
     if (getMapperSettings().isEmpty()) {
       return true;
     }
-    return getMapperSettings().stream().filter(s -> s.isApplyableFor(mapperClass)).findFirst().isPresent();
+    return getMapperSettings().stream().filter(s -> s.isApplicableFor(mapperClass)).findFirst().isPresent();
   }
 
   /**
@@ -141,7 +141,7 @@ public class ObserverSettings<T extends IObserver> {
     if (getMapperSettings().isEmpty()) {
       return true;
     }
-    return getMapperSettings().stream().filter(s -> s.isApplyableFor(mapper)).findFirst().isPresent();
+    return getMapperSettings().stream().filter(s -> s.isApplicableFor(mapper)).findFirst().isPresent();
   }
 
   /**

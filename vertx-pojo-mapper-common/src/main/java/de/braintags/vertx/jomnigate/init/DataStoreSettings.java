@@ -15,6 +15,7 @@ package de.braintags.vertx.jomnigate.init;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
@@ -198,9 +199,9 @@ public class DataStoreSettings {
    * @return
    */
   public List<ObserverSettings<?>> getObserverSettings(IMapper<?> mapper) {
-    List<ObserverSettings<?>> tmpList = new ArrayList<>();
     List<ObserverSettings<?>> osl = getObserverSettings();
-    osl.stream().filter(os -> os.isApplyableFor(mapper)).forEach(tmpList::add);
+    List<ObserverSettings<?>> tmpList = osl.stream().filter(os -> os.isApplyableFor(mapper))
+        .collect(Collectors.toList());
     return tmpList;
   }
 

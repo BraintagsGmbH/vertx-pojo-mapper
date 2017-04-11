@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Set;
 
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -46,6 +46,8 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
   public AbstractStoreObject(IMapper<T> mapper, T entity, F container) {
     if (mapper == null)
       throw new NullPointerException("Mapper must not be null");
+    if (entity == null)
+      throw new NullPointerException("Entity must not be null");
     this.mapper = mapper;
     this.entity = entity;
     this.container = container;
@@ -54,6 +56,8 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
   public AbstractStoreObject(F container, IMapper<T> mapper) {
     if (mapper == null)
       throw new NullPointerException("Mapper must not be null");
+    if (container == null)
+      throw new NullPointerException("Container must not be null");
     this.mapper = mapper;
     this.container = container;
   }

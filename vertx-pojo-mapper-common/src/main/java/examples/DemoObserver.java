@@ -21,7 +21,7 @@ import io.vertx.core.Future;
 public class DemoObserver implements IObserver {
 
   @Override
-  public boolean handlesEvent(IObserverEvent event, IObserverContext context) { // <1>
+  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) { // <1>
     return true;
   }
 

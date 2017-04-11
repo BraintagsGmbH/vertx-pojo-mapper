@@ -38,7 +38,7 @@ public class TestObserver implements IObserver {
   }
 
   @Override
-  public boolean handlesEvent(IObserverEvent event, IObserverContext context) {
+  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
     return false;
   }
 

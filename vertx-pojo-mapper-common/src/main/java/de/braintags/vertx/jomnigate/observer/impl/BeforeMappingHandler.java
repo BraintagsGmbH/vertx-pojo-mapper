@@ -68,7 +68,7 @@ public class BeforeMappingHandler {
     for (IObserver observer : ol) {
       IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.AFTER_MAPPING, mapperClass, null, null,
           datastore);
-      if (observer.handlesEvent(event, context)) {
+      if (observer.canHandleEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
         if (tf != null) {
           fl.add(tf);

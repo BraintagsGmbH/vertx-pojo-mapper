@@ -54,7 +54,7 @@ public class BeforeLoadHandler extends AbstractEventHandler<IQuery<?>, IQueryRes
       IObserverContext context) {
     IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_LOAD, null, null, accessObject,
         accessObject.getDataStore());
-    if (observer.handlesEvent(event, context)) {
+    if (observer.canHandleEvent(event, context)) {
       return observer.handleEvent(event, context);
     } else {
       return Future.succeededFuture();
