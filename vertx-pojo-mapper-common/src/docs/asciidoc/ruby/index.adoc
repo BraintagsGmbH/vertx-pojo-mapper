@@ -324,12 +324,12 @@ IQuery<MiniMapper> query = datastore.createQuery(MiniMapper.class);
 String qs = "select * from MiniMapper where name LIKE \"native%\"";
 query.setNativeCommand(qs);
 query.execute(qr -> {
-if (qr.succeeded()) {
-IteratorAsync<MiniMapper> it = qr.result().iterator();
-while (it.hasNext()) {
-...
-}
-}
+  if (qr.succeeded()) {
+    IteratorAsync<MiniMapper> it = qr.result().iterator();
+    while (it.hasNext()) {
+      ...
+    }
+  }
 });
 
 ----
@@ -358,6 +358,51 @@ instance to be handled and an ObserverContext, which is created at the beginning
 observer normally returns a Future, where the caller is waiting for. If it returs null, then the observer is executed
 as fire-and-forget.
 
+==== Creating and registering an Observer
+To create an observer you willsimply implement the interface `link:unavailable[IObserver]`
+with your observer class. There are two methods to be implemented:
+
+[source, java]
+----
+public class DemoObserver implements IObserver {
+
+  @Override
+  public boolean handlesEvent(IObserverEvent event, IObserverContext context) { // <1>
+    return true;
+  }
+
+  @Override
+  public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) { // <2>
+    ((SimpleMapper) event.getSource()).number = context.get("counter", 1);
+    context.put("counter", ((SimpleMapper) event.getSource()).number + 1);
+    System.out.println("counter raised");
+    return Future.succeededFuture();
+  }
+
+}
+----
+
+<1> The first is the method `handlesEvent` which returns true, if the observer shall handle the given event and false
+otherwise. In most cases the definition, which observer will handle which event will be done by configuration or by
+annotation, thus this method will return simply `true`. But there might exist use cases, where the oberver itself has
+to decide this based on the current data of a concrete event.
+
+<2> The second method is `handleEvent`, which will handle a concrete event. This method must return a `Future` if the
+caller shall wait for the execution. If the method returns NULL, the event handling is executed as fire-and-forget.
+
+Both methods receive two arguments. One is the IObserverEvent, which contains all existing data which are needed to
+process the event. The content of the IObserverEvent differs depending on the event type and will be described below.
+The other argument is the `link:unavailable[IObserverContext]`, which is created in the
+beginning of an action like saving object(s) and is delivered to any observer, which participates on this action, so
+that participating obervers are able to share some data.
+
+Registration of observers is done either by adding some information into the section `observerSettings` of the
+DataStoreSettings or by adding the annotation `link:unavailable[@Observer]` to a mapper
+class.
+
+===== Register observer by configuration
+The example configuration below shows some possible configurations, how to register observers for different events
+and situations
 
 [source, json]
 ----
@@ -365,11 +410,8 @@ as fire-and-forget.
 {
   "datastoreInit": "de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit",
   "properties": {
-    "startMongoLocal": "true",
-    "handleReferencedRecursive": "true",
     "localPort": "27017",
     "connection_string": "mongodb://localhost:27017",
-    "shared": "false",
     "defaultKeyGenerator": "DefaultKeyGenerator"
   },
   "databaseName": "UnitTestDatabase",
@@ -382,22 +424,39 @@ as fire-and-forget.
       }
     }
   ],
-  "clearDatabaseOnInit": false,
   "observerSettings": [
     {
-      "observerClass": "de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver",
-      "eventTypeList": [],
-      "mapperSettings": [],
-      "priority": 500
+      "observerClass": "examples.DemoObserver", //<1>
+      "eventTypeList": ["BEFORE_SAVE"],
+      "mapperSettings": [
+        "classDefinition" : "examples.mapper.SimpleMapper"
+      ],
+      "priority": 5
     },
     {
-      "observerClass": "de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver2",
-      "eventTypeList": [],
+      "observerClass": "my.observer.TestObserver", // <2>
+      "eventTypeList": ["AFTER_DELETE", "BEFORE_SAVE" ],
       "mapperSettings": [],
       "priority": 200
     },
     {
-      "observerClass": "de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver3",
+      "observerClass": "my.observer.TestObserver", // <3>
+      "eventTypeList": [],
+      "mapperSettings": [
+        "classDefinition" : "examples.mapper.SimpleMapper"
+      ],
+      "priority": 500
+    },
+    {
+      "observerClass": "my.observer.TestObserver", // <4>
+      "eventTypeList": [],
+      "mapperSettings": [
+        "annotation" : "com.fasterxml.jackson.annotation.JsonTypeInfo"
+      ],
+      "priority": 500
+    },
+    {
+      "observerClass": "my.observer.TestObserver", // <5>
       "eventTypeList": [],
       "mapperSettings": [],
       "priority": 501
@@ -405,8 +464,83 @@ as fire-and-forget.
   ]
 }
 
-
 ----
+
+<1> The observer `examples.DemoObserver` is registered to handle the event type BEFORE_SAVE for the mapper
+`examples.mapper.SimpleMapper`. The priority is set to be 5, where higher = more important.
+
+<2> An observer is registered for the events AFTER_DELETE and BEFORE_SAVE. Because no mapper settings are defined,
+this observer will be executed for every mapper class for those events
+
+<3> An observer is registered for every event for the mapper class SimpleMapper
+
+<4> An observer is registered for every event for those mappers, where the class contains the annotation JsonTypeInfo
+
+<5> An observer is registered for any event and mapper
+
+
+===== Register observer by annotation
+The annotation `link:unavailable[@Observer]` can be used to register an observer for a
+certain mapper class. The example below registeres an observer, sets the priority and the event types.
+
+[source, java]
+----
+@Source(translate = false)
+@Entity
+@Observer(observerClass = DemoObserver.class, priority = 400, eventTypes = { ObserverEventType.AFTER_DELETE,
+    ObserverEventType.AFTER_LOAD })
+public class AnnotatedObserver {
+  @Id
+  public String id;
+  private String name;
+  public int number;
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+}
+----
+
+
+==== The events of the observer system
+Existing events are defined by `link:unavailable[ObserverEventType]`
+
+* `link:todo[BEFORE_MAPPING]` +
+This event is called before a class is mapped. The source of the IObserverEvent is the class to be mapped;
+accessResult and accessObject are null
+
+* `link:todo[AFTER_MAPPING]` +
+This event is called after a class is mapped. The source of the IObserverEvent is the generated instance of IMapper;
+accessResult and accessObject are null
+
+* `link:todo[BEFORE_LOAD]` +
+This event is called before execution of an IQuery. The source
+of the IObserverEvent is null; accessResult is null; accessObject is the IQuery
+
+* `link:todo[AFTER_LOAD]` +
+This event is called after execution of an IQuery. The source
+of the IObserverEvent is a loaded instance; accessResult is IQueryResult; accessObject is the IQuery
+
+* `link:todo[BEFORE_SAVE]` +
+This event is called before execution of an IWrite. The source
+of the IObserverEvent is the instance to be saved; accessResult is null; accessObject is the IWrite
+
+* `link:todo[AFTER_SAVE]` +
+This event is called after execution of an IWrite. The source
+of the IObserverEvent is a saved instance; accessResult is IWriteResult; accessObject is the IWrite
+
+* `link:todo[BEFORE_DELETE]` +
+This event is called before execution of an IDelete. The source
+of the IObserverEvent is the instance to be deleted; accessResult is null; accessObject is the IDelete
+
+* `link:todo[AFTER_DELETE]` +
+This event is called after execution of an IDelete. The source
+of the IObserverEvent is a deleted instance; accessResult is IDeleteResult; accessObject is the IDelete
 
 
 === Complexer mapper definitions

@@ -152,10 +152,38 @@
  * Existing events are defined by {@link de.braintags.vertx.jomnigate.observer.ObserverEventType}
  * 
  * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#BEFORE_MAPPING} +
- * This event is called before a class is mapped
+ * This event is called before a class is mapped. The source of the IObserverEvent is the class to be mapped;
+ * accessResult and accessObject are null
+ * 
+ * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#AFTER_MAPPING} +
+ * This event is called after a class is mapped. The source of the IObserverEvent is the generated instance of IMapper;
+ * accessResult and accessObject are null
+ * 
+ * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#BEFORE_LOAD} +
+ * This event is called before execution of an IQuery. The source
+ * of the IObserverEvent is null; accessResult is null; accessObject is the IQuery
+ * 
+ * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#AFTER_LOAD} +
+ * This event is called after execution of an IQuery. The source
+ * of the IObserverEvent is a loaded instance; accessResult is IQueryResult; accessObject is the IQuery
+ * 
+ * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#BEFORE_SAVE} +
+ * This event is called before execution of an IWrite. The source
+ * of the IObserverEvent is the instance to be saved; accessResult is null; accessObject is the IWrite
+ * 
+ * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#AFTER_SAVE} +
+ * This event is called after execution of an IWrite. The source
+ * of the IObserverEvent is a saved instance; accessResult is IWriteResult; accessObject is the IWrite
+ * 
+ * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#BEFORE_DELETE} +
+ * This event is called before execution of an IDelete. The source
+ * of the IObserverEvent is the instance to be deleted; accessResult is null; accessObject is the IDelete
+ * 
+ * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#AFTER_DELETE} +
+ * This event is called after execution of an IDelete. The source
+ * of the IObserverEvent is a deleted instance; accessResult is IDeleteResult; accessObject is the IDelete
  * 
  * 
- * TODO further documentation
  * 
  * 
  */
