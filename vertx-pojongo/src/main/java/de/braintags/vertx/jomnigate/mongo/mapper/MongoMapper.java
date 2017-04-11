@@ -13,11 +13,7 @@
 package de.braintags.vertx.jomnigate.mongo.mapper;
 
 import de.braintags.vertx.jomnigate.json.mapping.jackson.JacksonMapper;
-import de.braintags.vertx.jomnigate.json.mapping.jackson.MappedJacksonIdProperty;
-import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.impl.Mapper;
-import de.braintags.vertx.jomnigate.mongo.mapper.datastore.MongoColumnInfo;
 
 /**
  * An extension of {@link Mapper} for use with Mongo
@@ -35,11 +31,6 @@ public class MongoMapper<T> extends JacksonMapper<T> {
   public MongoMapper(Class<T> mapperClass, MongoMapperFactory mapperFactory) {
     super(mapperClass, mapperFactory);
     checkIdField();
-  }
-
-  @Override
-  protected IMappedIdField createIdProperty(IProperty property) {
-    return new MappedJacksonIdProperty(property, MongoColumnInfo.ID_FIELD_NAME);
   }
 
   /**

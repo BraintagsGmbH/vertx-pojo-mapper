@@ -11,15 +11,9 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 public class IndexedField implements IIndexedField {
 
   private String fieldName;
-  private String columnName;
 
   public IndexedField(String name) {
-    this(name, name);
-  }
-
-  public IndexedField(String fieldName, String columnName) {
-    this.fieldName = fieldName;
-    this.columnName = columnName;
+    this.fieldName = name;
   }
 
   @Override
@@ -27,18 +21,33 @@ public class IndexedField implements IIndexedField {
     return fieldName;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField#getColumnName()
-   */
-  @Override
-  public String getColumnName() {
-    return columnName;
-  }
-
   @Override
   public String toString() {
     return fieldName;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((fieldName == null) ? 0 : fieldName.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    IndexedField other = (IndexedField) obj;
+    if (fieldName == null) {
+      if (other.fieldName != null)
+        return false;
+    } else if (!fieldName.equals(other.fieldName))
+      return false;
+    return true;
   }
 }

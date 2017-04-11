@@ -13,8 +13,4 @@ public class IndexedIdField extends IndexedField implements IdField {
   public IndexedIdField(String name) {
     super(name);
   }
-
-  public IndexedIdField(String fieldName, String columnName) {
-    super(fieldName, columnName);
-  }
 }

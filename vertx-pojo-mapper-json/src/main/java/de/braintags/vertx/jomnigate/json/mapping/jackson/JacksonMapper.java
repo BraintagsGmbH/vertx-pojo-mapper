@@ -30,6 +30,7 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.impl.AbstractMapper;
+import de.braintags.vertx.jomnigate.mapping.impl.MappedIdFieldImpl;
 
 /**
  * An implementation of {@link IMapper} which uses jackson
@@ -122,7 +123,7 @@ public class JacksonMapper<T> extends AbstractMapper<T> {
   }
 
   protected IMappedIdField createIdProperty(IProperty property) {
-    return new MappedJacksonIdProperty(property);
+    return new MappedIdFieldImpl(property);
   }
 
   /**

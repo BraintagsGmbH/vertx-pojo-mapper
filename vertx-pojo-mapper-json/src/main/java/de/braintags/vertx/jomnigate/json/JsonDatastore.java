@@ -15,9 +15,6 @@ package de.braintags.vertx.jomnigate.json;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.impl.AbstractDataStore;
