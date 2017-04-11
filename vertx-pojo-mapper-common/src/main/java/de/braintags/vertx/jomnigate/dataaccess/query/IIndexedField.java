@@ -3,8 +3,6 @@ package de.braintags.vertx.jomnigate.dataaccess.query;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
