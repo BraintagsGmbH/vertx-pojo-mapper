@@ -64,7 +64,8 @@ public class AfterMappingHandler {
   protected CompositeFuture loopObserver(List<IObserver> ol, IMapper<?> mapper, IObserverContext context) {
     List<Future> fl = new ArrayList<>();
     for (IObserver observer : ol) {
-      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.AFTER_MAPPING, mapper, null, null);
+      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.AFTER_MAPPING, mapper, null, null,
+          mapper.getMapperFactory().getDataStore());
       if (observer.handlesEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
         if (tf != null) {

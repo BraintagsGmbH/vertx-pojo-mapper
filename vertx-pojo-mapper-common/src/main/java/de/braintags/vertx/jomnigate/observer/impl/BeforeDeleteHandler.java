@@ -47,7 +47,7 @@ public class BeforeDeleteHandler extends AbstractEventHandler<IDelete<?>, IDelet
     Iterator<?> selection = deleteObject.getSelection();
     while (selection.hasNext()) {
       IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_DELETE, selection.next(), null,
-          deleteObject);
+          deleteObject, deleteObject.getDataStore());
       if (observer.handlesEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
         if (tf != null) {

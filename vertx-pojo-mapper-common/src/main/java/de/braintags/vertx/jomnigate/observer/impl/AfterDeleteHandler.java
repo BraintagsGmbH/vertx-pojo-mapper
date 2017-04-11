@@ -40,6 +40,7 @@ public class AfterDeleteHandler extends AbstractEventHandler<IDelete<?>, IDelete
    * .observer.IObserver, de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject,
    * de.braintags.vertx.jomnigate.observer.IObserverContext)
    */
+  @SuppressWarnings("rawtypes")
   @Override
   protected List<Future> createEntityFutureList(IObserver observer, IDelete<?> deleteObject, IDeleteResult result,
       IObserverContext context) {
@@ -47,7 +48,7 @@ public class AfterDeleteHandler extends AbstractEventHandler<IDelete<?>, IDelete
     Iterator<?> selection = deleteObject.getSelection();
     while (selection.hasNext()) {
       IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.AFTER_DELETE, selection.next(), null,
-          deleteObject);
+          deleteObject, deleteObject.getDataStore());
       if (observer.handlesEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
         if (tf != null) {

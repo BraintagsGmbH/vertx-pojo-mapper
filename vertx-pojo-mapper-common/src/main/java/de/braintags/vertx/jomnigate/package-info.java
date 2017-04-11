@@ -224,12 +224,12 @@
  * String qs = "select * from MiniMapper where name LIKE \"native%\"";
  * query.setNativeCommand(qs);
  * query.execute(qr -> {
- * if (qr.succeeded()) {
- * IteratorAsync<MiniMapper> it = qr.result().iterator();
- * while (it.hasNext()) {
- * ...
- * }
- * }
+ *   if (qr.succeeded()) {
+ *     IteratorAsync<MiniMapper> it = qr.result().iterator();
+ *     while (it.hasNext()) {
+ *       ...
+ *     }
+ *   }
  * });
  * 
  * ----

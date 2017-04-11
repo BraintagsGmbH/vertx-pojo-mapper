@@ -46,7 +46,7 @@ public class AfterSaveHandler extends AbstractEventHandler<IWrite<?>, IWriteResu
     Iterator<?> selection = writeObject.getSelection();
     while (selection.hasNext()) {
       IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.AFTER_SAVE, selection.next(), null,
-          writeObject);
+          writeObject, writeObject.getDataStore());
       if (observer.handlesEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
         if (tf != null) {

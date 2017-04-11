@@ -32,6 +32,36 @@
  * observer normally returns a Future, where the caller is waiting for. If it returs null, then the observer is executed
  * as fire-and-forget.
  * 
+ * ==== Creating and registering an Observer
+ * To create an observer you willsimply implement the interface {@link de.braintags.vertx.jomnigate.observer.IObserver}
+ * with your observer class. There are two methods to be implemented:
+ * 
+ * [source, java]
+ * ----
+ * {@link examples.DemoObserver}
+ * ----
+ * 
+ * <1> The first is the method `handlesEvent` which returns true, if the observer shall handle the given event and false
+ * otherwise. In most cases the definition, which observer will handle which event will be done by configuration or by
+ * annotation, thus this method will return simply `true`. But there might exist use cases, where the oberver itself has
+ * to decide this based on the current data of a concrete event.
+ * 
+ * <2> The second method is `handleEvent`, which will handle a concrete event. This method must return a `Future` if the
+ * caller shall wait for the execution. If the method returns NULL, the event handling is executed as fire-and-forget.
+ * 
+ * Both methods receive two arguments. One is the IObserverEvent, which contains all existing data which are needed to
+ * process the event. The content of the IObserverEvent differs depending on the event type and will be described below.
+ * The other argument is the {@link de.braintags.vertx.jomnigate.observer.IObserverContext}, which is created in the
+ * beginning of an action like saving object(s) and is delivered to any observer, which participates on this action, so
+ * that participating obervers are able to share some data.
+ * 
+ * Registration of observers is done either by adding some information into the section `observerSettings` of the
+ * DataStoreSettings or by adding the annotation {@link de.braintags.vertx.jomnigate.annotation.Observer} to a mapper
+ * class.
+ * 
+ * ===== Register observer by configuration
+ * The example configuration below shows some possible configurations, how to register observers for different events
+ * and situations
  * 
  * [source, json]
  * ----
@@ -55,22 +85,37 @@
  *   ],
  *   "observerSettings": [
  *     {
- *       "observerClass": "de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver",
- *       "eventTypeList": [],
+ *       "observerClass": "examples.DemoObserver", //<1>
+ *       "eventTypeList": ["BEFORE_SAVE"],
  *       "mapperSettings": [
- *         "classDefinition" : "de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper",
- *         "annotation" : "com.fasterxml.jackson.annotation.JsonTypeInfo"
+ *         "classDefinition" : "examples.mapper.SimpleMapper"
  *       ],
- *       "priority": 500
+ *       "priority": 5
  *     },
  *     {
- *       "observerClass": "de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver2",
+ *       "observerClass": "my.observer.TestObserver", // <2>
  *       "eventTypeList": ["AFTER_DELETE", "BEFORE_SAVE" ],
  *       "mapperSettings": [],
  *       "priority": 200
  *     },
  *     {
- *       "observerClass": "de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver3",
+ *       "observerClass": "my.observer.TestObserver", // <3>
+ *       "eventTypeList": [],
+ *       "mapperSettings": [
+ *         "classDefinition" : "examples.mapper.SimpleMapper"
+ *       ],
+ *       "priority": 500
+ *     },
+ *     {
+ *       "observerClass": "my.observer.TestObserver", // <4>
+ *       "eventTypeList": [],
+ *       "mapperSettings": [
+ *         "annotation" : "com.fasterxml.jackson.annotation.JsonTypeInfo"
+ *       ],
+ *       "priority": 500
+ *     },
+ *     {
+ *       "observerClass": "my.observer.TestObserver", // <5>
  *       "eventTypeList": [],
  *       "mapperSettings": [],
  *       "priority": 501
@@ -79,6 +124,36 @@
  * }
  * 
  * ----
+ * 
+ * <1> The observer `examples.DemoObserver` is registered to handle the event type BEFORE_SAVE for the mapper
+ * `examples.mapper.SimpleMapper`. The priority is set to be 5, where higher = more important.
+ * 
+ * <2> An observer is registered for the events AFTER_DELETE and BEFORE_SAVE. Because no mapper settings are defined,
+ * this observer will be executed for every mapper class for those events
+ * 
+ * <3> An observer is registered for every event for the mapper class SimpleMapper
+ * 
+ * <4> An observer is registered for every event for those mappers, where the class contains the annotation JsonTypeInfo
+ * 
+ * <5> An observer is registered for any event and mapper
+ * 
+ * 
+ * ===== Register observer by annotation
+ * The annotation {@link de.braintags.vertx.jomnigate.annotation.Observer} can be used to register an observer for a
+ * certain mapper class. The example below registeres an observer, sets the priority and the event types.
+ * 
+ * [source, java]
+ * ----
+ * {@link examples.mapper.AnnotatedObserver}
+ * ----
+ * 
+ * 
+ * ==== The events of the observer system
+ * Existing events are defined by {@link de.braintags.vertx.jomnigate.observer.ObserverEventType}
+ * 
+ * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#BEFORE_MAPPING} +
+ * This event is called before a class is mapped
+ * 
  * 
  * TODO further documentation
  * 

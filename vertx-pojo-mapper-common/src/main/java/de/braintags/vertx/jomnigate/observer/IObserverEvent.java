@@ -12,6 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.observer;
 
+import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.IAccessResult;
 import de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
@@ -39,11 +40,12 @@ public interface IObserverEvent {
    * @param entity
    * @param accessResult
    * @param accessObject
+   * @param datastore
    * @return
    */
   public static IObserverEvent createEvent(ObserverEventType eventType, Object entity, IAccessResult accessResult,
-      IDataAccessObject<?> accessObject) {
-    return new DefaultObserverEvent(eventType, entity, accessResult, accessObject);
+      IDataAccessObject<?> accessObject, IDataStore<?, ?> datastore) {
+    return new DefaultObserverEvent(eventType, entity, accessResult, accessObject, datastore);
   }
 
   /**
@@ -80,7 +82,7 @@ public interface IObserverEvent {
    * <LI>{@link ObserverEventType#AFTER_MAPPING} null
    * <LI>{@link ObserverEventType#BEFORE_SAVE} {@link IWriteResult}
    * <LI>{@link ObserverEventType#AFTER_SAVE} {@link IWriteResult}
-   * <LI>{@link ObserverEventType#BEFORE_LOAD} {@link IQueryResult}
+   * <LI>{@link ObserverEventType#BEFORE_LOAD} null
    * <LI>{@link ObserverEventType#AFTER_LOAD} {@link IQueryResult}
    * <LI>{@link ObserverEventType#BEFORE_DELETE} {@link IDeleteResult}
    * <LI>{@link ObserverEventType#AFTER_DELETE} {@link IDeleteResult}
@@ -107,4 +109,11 @@ public interface IObserverEvent {
    * @return
    */
   IDataAccessObject<?> getAccessObject();
+
+  /**
+   * The datastore, which can be used by an observer to execute further actions
+   * 
+   * @return
+   */
+  IDataStore<?, ?> getDataStore();
 }

@@ -46,7 +46,7 @@ public class BeforeSaveHandler extends AbstractEventHandler<IWrite<?>, IWriteRes
     Iterator<?> selection = writeObject.getSelection();
     while (selection.hasNext()) {
       IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_SAVE, selection.next(), null,
-          writeObject);
+          writeObject, writeObject.getDataStore());
       if (observer.handlesEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
         if (tf != null) {

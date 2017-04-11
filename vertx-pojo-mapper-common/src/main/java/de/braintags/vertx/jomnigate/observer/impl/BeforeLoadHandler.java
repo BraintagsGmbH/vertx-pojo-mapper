@@ -52,7 +52,8 @@ public class BeforeLoadHandler extends AbstractEventHandler<IQuery<?>, IQueryRes
   @Override
   protected Future<Void> loopEntities(IObserver observer, IQuery<?> accessObject, IQueryResult<?> result,
       IObserverContext context) {
-    IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_LOAD, null, null, accessObject);
+    IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_LOAD, null, null, accessObject,
+        accessObject.getDataStore());
     if (observer.handlesEvent(event, context)) {
       return observer.handleEvent(event, context);
     } else {

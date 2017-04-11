@@ -12,6 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.observer.impl;
 
+import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.IAccessResult;
 import de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
@@ -28,6 +29,7 @@ public class DefaultObserverEvent implements IObserverEvent {
   private final Object entity;
   private final IAccessResult accessResult;
   private final IDataAccessObject<?> accessObject;
+  private IDataStore<?, ?> datastore;
 
   /**
    * 
@@ -35,13 +37,15 @@ public class DefaultObserverEvent implements IObserverEvent {
    * @param entity
    * @param accessResult
    * @param accessObject
+   * @param datastore
    */
   public DefaultObserverEvent(ObserverEventType eventType, Object entity, IAccessResult accessResult,
-      IDataAccessObject<?> accessObject) {
+      IDataAccessObject<?> accessObject, IDataStore<?, ?> datastore) {
     this.eventType = eventType;
     this.entity = entity;
     this.accessResult = accessResult;
     this.accessObject = accessObject;
+    this.datastore = datastore;
   }
 
   /*
@@ -82,6 +86,16 @@ public class DefaultObserverEvent implements IObserverEvent {
   @Override
   public IDataAccessObject<?> getAccessObject() {
     return accessObject;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.observer.IObserverEvent#getDataStore()
+   */
+  @Override
+  public IDataStore<?, ?> getDataStore() {
+    return datastore;
   }
 
 }

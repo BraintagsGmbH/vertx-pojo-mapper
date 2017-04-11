@@ -165,7 +165,7 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
     if (ol.isEmpty()) {
       f.complete();
     } else {
-      f = getBeforeMappingHandler().handle(mapperClass, context, ol);
+      f = getBeforeMappingHandler().handle(mapperClass, context, ol, this.getDataStore());
     }
     return f;
   }
