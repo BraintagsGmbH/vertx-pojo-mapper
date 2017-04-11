@@ -12,7 +12,6 @@
  */
 package de.braintags.vertx.jomnigate.json;
 
-import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -53,25 +52,17 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
   public JsonDatastore(Vertx vertx, JsonObject properties, DataStoreSettings settings) {
     super(vertx, properties, settings);
     // Do not change factory type, it is used by the @link{JomnigateJsonModule} to detect jOmnigate environment
-    JOmnigateFactory jf = new JOmnigateFactory(this, Json.mapper.getFactory(), Json.mapper);
-    jacksonMapper = new ObjectMapper(jf);
-    jf = new JOmnigateFactory(this, Json.prettyMapper.getFactory(), Json.prettyMapper);
-    jacksonPrettyMapper = new ObjectMapper(jf);
-
-    // Non-standard JSON but we allow C style comments in our JSON
+    JOmnigateFactory jOmnigateFactory = new JOmnigateFactory(this, Json.mapper.getFactory(), Json.mapper);
+    jacksonMapper = new ObjectMapper(jOmnigateFactory);
+    jacksonMapper.registerModule(new JacksonModuleJomnigate(this));
     jacksonMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+
+    JOmnigateFactory prettyJOmnigateFactory = new JOmnigateFactory(this, Json.prettyMapper.getFactory(),
+        Json.prettyMapper);
+    jacksonPrettyMapper = new ObjectMapper(prettyJOmnigateFactory);
+    jacksonPrettyMapper.registerModule(new JacksonModuleJomnigate(this));
     jacksonPrettyMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
     jacksonPrettyMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-
-    jacksonMapper.registerModule(new JacksonModuleJomnigate(this));
-    jacksonMapper.registerModule(new ParameterNamesModule(Mode.DEFAULT));
-    jacksonMapper.registerModule(new JodaModule());
-    jacksonMapper.registerModule(new GuavaModule());
-
-    jacksonPrettyMapper.registerModule(new JacksonModuleJomnigate(this));
-    jacksonPrettyMapper.registerModule(new ParameterNamesModule(Mode.DEFAULT));
-    jacksonPrettyMapper.registerModule(new JodaModule());
-    jacksonPrettyMapper.registerModule(new GuavaModule());
 
     JsonConfig.configureObjectMapper(jacksonMapper);
     JsonConfig.configureObjectMapper(jacksonPrettyMapper);
