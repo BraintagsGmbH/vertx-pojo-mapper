@@ -14,4 +14,8 @@ public class InvalidQueryValueException extends RuntimeException {
     super(message);
   }
 
+  public InvalidQueryValueException(Throwable cause) {
+    super(cause);
+  }
+
 }

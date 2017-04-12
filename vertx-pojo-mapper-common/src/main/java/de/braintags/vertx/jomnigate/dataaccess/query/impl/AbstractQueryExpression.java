@@ -145,7 +145,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
       try {
         T fieldConditionResult = buildFieldConditionResult(fieldCondition, columnName, fieldValue);
         handler.handle(Future.succeededFuture(fieldConditionResult));
-      } catch (UnknownQueryOperatorException | QueryParameterException e) {
+      } catch (UnknownQueryOperatorException | QueryParameterException | InvalidQueryValueException e) {
         handler.handle(Future.failedFuture(e));
       }
     } else {
