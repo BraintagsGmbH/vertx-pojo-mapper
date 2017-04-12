@@ -82,9 +82,6 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
         } catch (Exception e) {
           resultHandler.handle(Future.failedFuture(e));
         }
-
-        // Future<IQueryResult<T>> f = executeQuery(resolver, limit, offset);
-        // f.setHandler(resultHandler);
       }
     });
   }

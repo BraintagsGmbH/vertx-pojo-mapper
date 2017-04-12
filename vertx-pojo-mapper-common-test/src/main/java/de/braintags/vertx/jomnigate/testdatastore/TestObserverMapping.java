@@ -196,7 +196,10 @@ public class TestObserverMapping extends AbstractObserverTest {
   public void testGlobalObserver_InstanceOf(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
-    os.getMapperSettings().add(new ObserverMapperSettings("instanceof " + BaseRecord.class.getName()));
+
+    ObserverMapperSettings oms = new ObserverMapperSettings(BaseRecord.class.getName());
+    oms.setInstanceOf(true);
+    os.getMapperSettings().add(oms);
     settings.getObserverSettings().add(os);
 
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);

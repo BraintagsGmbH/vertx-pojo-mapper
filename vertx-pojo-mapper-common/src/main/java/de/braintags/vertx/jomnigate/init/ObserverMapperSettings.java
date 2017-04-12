@@ -31,9 +31,8 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
  * 
  */
 public class ObserverMapperSettings {
-  private static final String INSTANCEOF = "instanceof";
   private String classDefinition;
-  private boolean instOf = false;
+  private boolean instanceOf = false;
   private Class<?> mapperClass;
   private Class<? extends Annotation> annotation;
 
@@ -65,11 +64,6 @@ public class ObserverMapperSettings {
   private void init() {
     if (classDefinition != null) {
       String clsName = classDefinition;
-      int index = clsName.indexOf(INSTANCEOF);
-      if (index >= 0) {
-        instOf = true;
-        clsName = clsName.substring(index + INSTANCEOF.length()).trim();
-      }
       try {
         mapperClass = Class.forName(clsName);
       } catch (ClassNotFoundException e) {
@@ -134,6 +128,25 @@ public class ObserverMapperSettings {
   }
 
   /**
+   * If a class definition is contained, shall the observer hit just that class or instanceof as well?
+   * 
+   * @return the instanceOf
+   */
+  public boolean isInstanceOf() {
+    return instanceOf;
+  }
+
+  /**
+   * If a class definition is contained, shall the observer hit just that class or instanceof as well?
+   * 
+   * @param instanceOf
+   *          the instanceOf to set
+   */
+  public void setInstanceOf(boolean instanceOf) {
+    this.instanceOf = instanceOf;
+  }
+
+  /**
    * This method checks, whether the current definition is applyable for the given class
    * 
    * @param mapperClass
@@ -144,7 +157,7 @@ public class ObserverMapperSettings {
   boolean isApplicableFor(Class<?> checkClass) {
     boolean applyable = mapperClass == null;
     if (!applyable) {
-      if (instOf) {
+      if (isInstanceOf()) {
         applyable = this.mapperClass.isAssignableFrom(checkClass);
       } else {
         applyable = this.mapperClass == checkClass;
