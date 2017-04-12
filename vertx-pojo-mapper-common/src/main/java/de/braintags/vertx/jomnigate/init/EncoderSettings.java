@@ -12,6 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.init;
 
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import de.braintags.vertx.jomnigate.IDataStore;
@@ -26,7 +27,7 @@ import de.braintags.vertx.util.security.crypt.IEncoder;
  * @author Michael Remme
  * 
  */
-public class EncoderSettings {
+public class EncoderSettings implements Cloneable {
   private String name;
   private Class<? extends IEncoder> encoderClass;
   private Properties properties = new Properties();
@@ -101,6 +102,18 @@ public class EncoderSettings {
     } catch (Exception e) {
       throw ExceptionUtil.createRuntimeException(e);
     }
+  }
+
+  @Override
+  public EncoderSettings clone() {
+    EncoderSettings res = new EncoderSettings();
+    res.name = this.name;
+    res.encoderClass = this.encoderClass;
+    res.properties = new Properties();
+    for (Entry<Object, Object> property : properties.entrySet()) {
+      res.properties.put(property.getKey(), property.getValue());
+    }
+    return res;
   }
 
 }

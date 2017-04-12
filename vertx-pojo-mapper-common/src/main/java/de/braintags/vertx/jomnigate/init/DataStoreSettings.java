@@ -30,7 +30,7 @@ import de.braintags.vertx.util.security.crypt.IEncoder;
  * @author mremme
  * 
  */
-public class DataStoreSettings {
+public class DataStoreSettings implements Cloneable {
   private Class<? extends IDataStoreInit> datastoreInit;
   private Properties properties = new Properties();
   private String databaseName;
@@ -53,7 +53,7 @@ public class DataStoreSettings {
    * @param databaseName
    *          the database used
    */
-  public DataStoreSettings(Class<? extends IDataStoreInit> datastoreInit, String databaseName) {
+  public DataStoreSettings(final Class<? extends IDataStoreInit> datastoreInit, final String databaseName) {
     this.datastoreInit = datastoreInit;
     this.databaseName = databaseName;
   }
@@ -75,7 +75,7 @@ public class DataStoreSettings {
    * @param datastoreInit
    *          the datastoreInit to set
    */
-  public final void setDatastoreInit(Class<? extends IDataStoreInit> datastoreInit) {
+  public final void setDatastoreInit(final Class<? extends IDataStoreInit> datastoreInit) {
     this.datastoreInit = datastoreInit;
   }
 
@@ -96,7 +96,7 @@ public class DataStoreSettings {
    * @param properties
    *          the properties to set
    */
-  public final void setProperties(Properties properties) {
+  public final void setProperties(final Properties properties) {
     this.properties = properties;
   }
 
@@ -115,7 +115,7 @@ public class DataStoreSettings {
    * @param databaseName
    *          the databaseName to set
    */
-  public final void setDatabaseName(String databaseName) {
+  public final void setDatabaseName(final String databaseName) {
     this.databaseName = databaseName;
   }
 
@@ -141,7 +141,7 @@ public class DataStoreSettings {
    * @param encoders
    *          the encoders to set
    */
-  public void setEncoders(List<EncoderSettings> encoders) {
+  public void setEncoders(final List<EncoderSettings> encoders) {
     this.encoders = encoders;
   }
 
@@ -164,7 +164,7 @@ public class DataStoreSettings {
    * @param clearDatabaseOnInit
    *          if the database should be cleared on initialization
    */
-  public void setClearDatabaseOnInit(boolean clearDatabaseOnInit) {
+  public void setClearDatabaseOnInit(final boolean clearDatabaseOnInit) {
     this.clearDatabaseOnInit = clearDatabaseOnInit;
   }
 
@@ -184,7 +184,7 @@ public class DataStoreSettings {
    * @param mapperClass
    * @return
    */
-  public List<ObserverSettings<?>> getObserverSettings(Class<?> mapperClass) {
+  public List<ObserverSettings<?>> getObserverSettings(final Class<?> mapperClass) {
     List<ObserverSettings<?>> tmpList = new ArrayList<>();
     List<ObserverSettings<?>> osl = getObserverSettings();
     osl.stream().filter(os -> os.isApplicableFor(mapperClass) && os.isApplicableFor(ObserverEventType.BEFORE_MAPPING))
@@ -198,7 +198,7 @@ public class DataStoreSettings {
    * @param mapper
    * @return
    */
-  public List<ObserverSettings<?>> getObserverSettings(IMapper<?> mapper) {
+  public List<ObserverSettings<?>> getObserverSettings(final IMapper<?> mapper) {
     List<ObserverSettings<?>> osl = getObserverSettings();
     List<ObserverSettings<?>> tmpList = osl.stream().filter(os -> os.isApplicableFor(mapper))
         .collect(Collectors.toList());
@@ -209,7 +209,7 @@ public class DataStoreSettings {
    * @param observerSettings
    *          the observerSettings to set
    */
-  private void setObserverSettings(List<ObserverSettings<?>> observerSettings) {
+  private void setObserverSettings(final List<ObserverSettings<?>> observerSettings) {
     this.observerSettings = observerSettings;
   }
 }
