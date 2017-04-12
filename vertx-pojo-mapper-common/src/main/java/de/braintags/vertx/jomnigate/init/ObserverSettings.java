@@ -117,13 +117,13 @@ public class ObserverSettings<T extends IObserver> {
   }
 
   /**
-   * Checks wether the current settings are applyable to the given IMapper. The definition is applyable, if no mapper
+   * Checks wether the current settings are applicable to the given IMapper. The definition is applicable, if no mapper
    * settings are defined or if mapper settings are defined and one is fitting
    * 
    * @param mapperClass
    * @return
    */
-  public boolean isApplyableFor(Class<?> mapperClass) {
+  public boolean isApplicableFor(Class<?> mapperClass) {
     if (getMapperSettings().isEmpty()) {
       return true;
     }
@@ -131,13 +131,13 @@ public class ObserverSettings<T extends IObserver> {
   }
 
   /**
-   * Checks wether the current settings are applyable to the given IMapper. The definition is applyable, if no mapper
+   * Checks wether the current settings are applicable to the given IMapper. The definition is applicable, if no mapper
    * settings are defined or if mapper settings are defined and one is fitting
    * 
    * @param mapper
    * @return
    */
-  public boolean isApplyableFor(IMapper<?> mapper) {
+  public boolean isApplicableFor(IMapper<?> mapper) {
     if (getMapperSettings().isEmpty()) {
       return true;
     }
@@ -145,13 +145,13 @@ public class ObserverSettings<T extends IObserver> {
   }
 
   /**
-   * Checks wether the current settings are applyable for the given ObserverEventType. The definition is applyable, if
+   * Checks wether the current settings are applicable for the given ObserverEventType. The definition is applicable, if
    * no event type is defined or if at least one event type is defined, which is fitting the given one
    * 
    * @param mapper
    * @return
    */
-  public boolean isApplyableFor(ObserverEventType eventType) {
+  public boolean isApplicableFor(ObserverEventType eventType) {
     if (getEventTypeList().isEmpty()) {
       return true;
     }

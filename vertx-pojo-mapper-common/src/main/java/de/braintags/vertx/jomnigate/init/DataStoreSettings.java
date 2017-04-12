@@ -187,7 +187,7 @@ public class DataStoreSettings {
   public List<ObserverSettings<?>> getObserverSettings(Class<?> mapperClass) {
     List<ObserverSettings<?>> tmpList = new ArrayList<>();
     List<ObserverSettings<?>> osl = getObserverSettings();
-    osl.stream().filter(os -> os.isApplyableFor(mapperClass) && os.isApplyableFor(ObserverEventType.BEFORE_MAPPING))
+    osl.stream().filter(os -> os.isApplicableFor(mapperClass) && os.isApplicableFor(ObserverEventType.BEFORE_MAPPING))
         .forEach(tmpList::add);
     return tmpList;
   }
@@ -200,7 +200,7 @@ public class DataStoreSettings {
    */
   public List<ObserverSettings<?>> getObserverSettings(IMapper<?> mapper) {
     List<ObserverSettings<?>> osl = getObserverSettings();
-    List<ObserverSettings<?>> tmpList = osl.stream().filter(os -> os.isApplyableFor(mapper))
+    List<ObserverSettings<?>> tmpList = osl.stream().filter(os -> os.isApplicableFor(mapper))
         .collect(Collectors.toList());
     return tmpList;
   }

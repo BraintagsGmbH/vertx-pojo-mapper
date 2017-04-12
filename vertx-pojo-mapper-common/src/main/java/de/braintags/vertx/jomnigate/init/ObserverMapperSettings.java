@@ -114,17 +114,17 @@ public class ObserverMapperSettings {
   }
 
   /**
-   * This method checks, whether the current definition is applyable to the given instance of IMapper.
+   * This method checks, whether the current definition is applicable to the given instance of IMapper.
    * 
    * @param mapper
-   * @return true, if appliable
+   * @return true, if applicable
    */
   boolean isApplicableFor(IMapper<?> mapper) {
-    boolean applyable = isApplicableFor(mapper.getMapperClass());
-    if (applyable && annotation != null) {
-      applyable = mapper.getAnnotation(annotation) != null;
+    boolean applicable = isApplicableFor(mapper.getMapperClass());
+    if (applicable && annotation != null) {
+      applicable = mapper.getAnnotation(annotation) != null;
     }
-    return applyable;
+    return applicable;
   }
 
   /**
@@ -147,7 +147,7 @@ public class ObserverMapperSettings {
   }
 
   /**
-   * This method checks, whether the current definition is applyable for the given class
+   * This method checks, whether the current definition is applicable for the given class
    * 
    * @param mapperClass
    *          the class to be checked
@@ -155,15 +155,15 @@ public class ObserverMapperSettings {
    *         if there is no class definition, it will return true
    */
   boolean isApplicableFor(Class<?> checkClass) {
-    boolean applyable = mapperClass == null;
-    if (!applyable) {
+    boolean applicable = mapperClass == null;
+    if (!applicable) {
       if (isInstanceOf()) {
-        applyable = this.mapperClass.isAssignableFrom(checkClass);
+        applicable = this.mapperClass.isAssignableFrom(checkClass);
       } else {
-        applyable = this.mapperClass == checkClass;
+        applicable = this.mapperClass == checkClass;
       }
     }
-    return applyable;
+    return applicable;
   }
 
 }

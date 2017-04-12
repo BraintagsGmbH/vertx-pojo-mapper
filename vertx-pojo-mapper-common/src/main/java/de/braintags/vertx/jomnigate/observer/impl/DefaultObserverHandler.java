@@ -89,7 +89,7 @@ public class DefaultObserverHandler implements IObserverHandler {
   public List<IObserver> getObserver(ObserverEventType event) {
     if (!eventObserverCache.containsKey(event)) {
       List<IObserver> ol = new ArrayList<>();
-      observerList.stream().filter(os -> os.isApplyableFor(event)).forEach(os -> {
+      observerList.stream().filter(os -> os.isApplicableFor(event)).forEach(os -> {
         try {
           ol.add(os.getObserverClass().newInstance());
         } catch (Exception e) {
