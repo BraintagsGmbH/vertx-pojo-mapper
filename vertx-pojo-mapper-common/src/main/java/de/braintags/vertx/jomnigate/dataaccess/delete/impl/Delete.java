@@ -56,8 +56,12 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
     super(mapperClass, datastore);
   }
 
-  @Override
-  public Iterator<T> getSelection() {
+  /**
+   * Get the objects, which were defined to be deleted
+   * 
+   * @return
+   */
+  Iterator<T> getSelection() {
     return recordList.iterator();
   }
 
@@ -74,6 +78,11 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
       deleteRecords(resultHandler);
     } else
       throw new ParameterRequiredException("Nor query nor records defined to be deleted");
+  }
+
+  @Override
+  public int size() {
+    return recordList.size();
   }
 
   /**

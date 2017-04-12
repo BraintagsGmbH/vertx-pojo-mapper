@@ -12,8 +12,6 @@
  */
 package de.braintags.vertx.jomnigate.testdatastore.observer;
 
-import java.util.Iterator;
-
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
@@ -40,13 +38,17 @@ public class BeforeSaveObserver implements IObserver {
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
     IWrite<?> write = (IWrite<?>) event.getAccessObject();
     executed = true;
-    Iterator<?> it = write.getSelection();
-    while (it.hasNext()) {
-      SimpleMapper sm = (SimpleMapper) it.next();
-      sm.intValue = context.get("counter", 1);
-      context.put("counter", sm.intValue + 1);
-      executed = true;
-    }
+    SimpleMapper sm = (SimpleMapper) event.getSource();
+    sm.intValue = context.get("counter", 1);
+    context.put("counter", sm.intValue + 1);
+
+    // Iterator<?> it = write.getSelection();
+    // while (it.hasNext()) {
+    // SimpleMapper sm = (SimpleMapper) it.next();
+    // sm.intValue = context.get("counter", 1);
+    // context.put("counter", sm.intValue + 1);
+    // executed = true;
+    // }
 
     return Future.succeededFuture();
   }

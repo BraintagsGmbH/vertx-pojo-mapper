@@ -17,11 +17,11 @@ import java.util.List;
 
 import com.mongodb.MongoException;
 
-import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.AbstractWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.impl.WriteEntry;
 import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
 import de.braintags.vertx.jomnigate.exception.WriteException;

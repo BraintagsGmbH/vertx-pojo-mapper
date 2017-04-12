@@ -20,10 +20,14 @@ import java.util.Map;
 import de.braintags.vertx.jomnigate.annotation.Observer;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
+import de.braintags.vertx.jomnigate.dataaccess.delete.impl.AfterDeleteHandler;
+import de.braintags.vertx.jomnigate.dataaccess.delete.impl.BeforeDeleteHandler;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.AfterSaveHandler;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.BeforeSaveHandler;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
@@ -207,7 +211,7 @@ public class DefaultObserverHandler implements IObserverHandler {
       IObserverContext context) {
     List<IObserver> ol = getObserver(ObserverEventType.AFTER_DELETE);
     Future<Void> f = Future.future();
-    if (ol.isEmpty() || !deleteObject.getSelection().hasNext()) {
+    if (ol.isEmpty() || deleteObject.size() <= 0) {
       f.complete();
     } else {
       f = getAfterDeleteHandler().handle(deleteObject, deleteResult, context, ol);

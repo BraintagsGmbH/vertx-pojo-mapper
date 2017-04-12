@@ -13,7 +13,6 @@
 package de.braintags.vertx.jomnigate.dataaccess.write;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject;
 import io.vertx.core.AsyncResult;
@@ -28,13 +27,6 @@ import io.vertx.core.Handler;
  */
 
 public interface IWrite<T> extends IDataAccessObject<T> {
-
-  /**
-   * Get the items to be handled
-   * 
-   * @return
-   */
-  Iterator<T> getSelection();
 
   /**
    * Add an entity to be saved

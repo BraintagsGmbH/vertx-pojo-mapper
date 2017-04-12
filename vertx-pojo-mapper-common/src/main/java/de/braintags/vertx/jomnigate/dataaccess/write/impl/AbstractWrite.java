@@ -11,7 +11,7 @@
  * #L%
  */
 
-package de.braintags.vertx.jomnigate.dataaccess.impl;
+package de.braintags.vertx.jomnigate.dataaccess.write.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +20,7 @@ import java.util.List;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterSave;
+import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
@@ -52,8 +53,12 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
     super(mapperClass, datastore);
   }
 
-  @Override
-  public Iterator<T> getSelection() {
+  /**
+   * Get the objects, which were defined to be saved
+   * 
+   * @return
+   */
+  Iterator<T> getSelection() {
     return objectsToSave.iterator();
   }
 

@@ -13,8 +13,6 @@
 
 package de.braintags.vertx.jomnigate.dataaccess.delete;
 
-import java.util.Iterator;
-
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
@@ -30,13 +28,6 @@ import io.vertx.core.Handler;
  */
 
 public interface IDelete<T> extends IDataAccessObject<T> {
-
-  /**
-   * Get the items to be handled
-   * 
-   * @return
-   */
-  Iterator<T> getSelection();
 
   /**
    * Delete instances from the connected {@link IDataStore}
@@ -69,4 +60,12 @@ public interface IDelete<T> extends IDataAccessObject<T> {
    */
   @SuppressWarnings("unchecked")
   public void add(T... records);
+
+  /**
+   * Get the number of records to be deleted
+   * 
+   * @return the count
+   */
+  public int size();
+
 }
