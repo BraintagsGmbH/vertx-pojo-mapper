@@ -13,11 +13,12 @@
 
 package de.braintags.vertx.jomnigate.mysql.dataaccess;
 
-import java.util.Collection;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition;
@@ -25,9 +26,11 @@ import de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISortDefinition;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryLogic;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryOperator;
+import de.braintags.vertx.jomnigate.dataaccess.query.exception.InvalidQueryValueException;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryLogicException;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryOperatorException;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.GeoSearchArgument;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.SortDefinition;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.SortDefinition.SortArgument;
@@ -35,9 +38,11 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mysql.dataaccess.SqlExpression.SqlWhereFragment;
 import de.braintags.vertx.jomnigate.mysql.mapping.SqlMapper;
 import de.braintags.vertx.jomnigate.mysql.typehandler.SqlDistanceSearchFunction;
+import de.braintags.vertx.util.json.JsonConverter;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 
 /**
@@ -159,28 +164,52 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
     String parsedOperator = translateOperator(operator);
 
     SqlWhereFragment fragment = new SqlWhereFragment();
-    if (parsedValue instanceof SqlDistanceSearchFunction) {
-      fragment.whereClause.append(" ").append(((SqlDistanceSearchFunction) parsedValue).getFunctionSequence());
-      fragment.parameters.add(((SqlDistanceSearchFunction) parsedValue).getValue());
+    if (parsedValue.isObject()) {
+      parseGeoSearchArgument(fieldCondition, parsedValue, fragment);
     } else {
       fragment.whereClause.append(columnName).append(" ");
       fragment.whereClause.append(parsedOperator).append(" ");
-      if (parsedValue instanceof Collection<?>) {
-        fragment.whereClause.append("(");
-        Iterator<?> it = ((Collection<?>) parsedValue).iterator();
-        while (it.hasNext()) {
-          fragment.whereClause.append("?");
-          fragment.parameters.add(it.next());
-          if (it.hasNext())
-            fragment.whereClause.append(", ");
-        }
-        fragment.whereClause.append(")");
+      if (parsedValue.isArray()) {
+        parseArrayValue(parsedValue, fragment);
       } else {
         fragment.whereClause.append("?");
-        fragment.parameters.add(parsedValue);
+        try {
+          fragment.parameters.add(JsonConverter.convertValueNode(parsedValue));
+        } catch (IOException e) {
+          throw new InvalidQueryValueException(e);
+        }
       }
     }
     return fragment;
+  }
+
+  private void parseArrayValue(JsonNode parsedValue, SqlWhereFragment fragment) {
+    fragment.whereClause.append("(");
+    Iterator<JsonNode> it = ((ArrayNode) parsedValue).iterator();
+    while (it.hasNext()) {
+      fragment.whereClause.append("?");
+      try {
+        fragment.parameters.add(JsonConverter.convertValueNode(it.next()));
+      } catch (IOException e) {
+        throw new InvalidQueryValueException(e);
+      }
+      if (it.hasNext())
+        fragment.whereClause.append(", ");
+    }
+    fragment.whereClause.append(")");
+  }
+
+  private void parseGeoSearchArgument(IFieldCondition fieldCondition, JsonNode parsedValue, SqlWhereFragment fragment) {
+    GeoSearchArgument geoSearchArgument;
+    try {
+      geoSearchArgument = Json.mapper.convertValue(parsedValue, GeoSearchArgument.class);
+    } catch (Exception e) {
+      throw new InvalidQueryValueException(e);
+    }
+    SqlDistanceSearchFunction sqlDistanceFunction = new SqlDistanceSearchFunction(geoSearchArgument,
+        getMapper().getField(fieldCondition.getField().getFieldName()));
+    fragment.whereClause.append(" ").append(sqlDistanceFunction.getFunctionSequence());
+    fragment.parameters.add(sqlDistanceFunction.getValue());
   }
 
   /**

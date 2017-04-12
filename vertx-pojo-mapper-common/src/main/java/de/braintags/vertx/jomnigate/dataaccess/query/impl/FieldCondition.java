@@ -18,10 +18,12 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryOperator;
+import de.braintags.vertx.jomnigate.dataaccess.query.exception.InvalidQueryValueException;
 import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
@@ -55,15 +57,23 @@ public class FieldCondition implements IFieldCondition {
    * @param value
    *          the value of this condition, can be null
    */
-  @JsonCreator
   public FieldCondition(IIndexedField field, QueryOperator logic, @Nullable Object value) {
     this.field = field;
     this.operator = logic;
     this.value = transformObject(value);
+    validateValue(value);
+  }
+
+  @JsonCreator
+  protected FieldCondition(IIndexedField field, QueryOperator logic, @Nullable JsonNode value) {
+    this.field = field;
+    this.operator = logic;
+    this.value = value;
   }
 
   public static JsonNode transformObject(@Nullable Object object) {
-    return Json.mapper.convertValue(object, JsonNode.class);
+    JsonNode node = Json.mapper.convertValue(object, JsonNode.class);
+    return node;
   }
 
   /*
@@ -139,6 +149,36 @@ public class FieldCondition implements IFieldCondition {
     IProperty p = mapper.getField(fieldName);
     if (p == null) {
       throw new NoSuchFieldException(mapper, fieldName);
+    }
+
+    validateValue(null);
+  }
+
+  private void validateValue(Object originalValue) {
+    if (value != null) {
+      if (value.isObject()) {
+        if (originalValue != null) {
+          if (!(originalValue instanceof GeoSearchArgument)) {
+            throw new InvalidQueryValueException(
+                "Only values that convert into primitive values, or GeoSearchArgument are allowed");
+          }
+        } else {
+          // currently only geo search values are allowed, otherwise the value must convert to a primitive type
+          try {
+            Json.mapper.convertValue(value, GeoSearchArgument.class);
+          } catch (Exception e) {
+            throw new InvalidQueryValueException(
+                "Only values that convert into primitive values, or GeoSearchArgument are allowed");
+          }
+        }
+      } else if (value.isArray()) {
+        ArrayNode arrayNode = (ArrayNode) value;
+        for (JsonNode subNode : arrayNode) {
+          if (subNode.isArray() || subNode.isObject())
+            throw new InvalidQueryValueException(
+                "Only primitive types are allowed inside arrays, not: " + subNode.getNodeType());
+        }
+      }
     }
   }
 
