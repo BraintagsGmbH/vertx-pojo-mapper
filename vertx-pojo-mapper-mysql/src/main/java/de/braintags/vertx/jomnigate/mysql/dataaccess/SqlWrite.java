@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Objects;
 
 import de.braintags.vertx.jomnigate.IDataStore;
-import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.AbstractWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.impl.WriteEntry;
 import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
 import de.braintags.vertx.jomnigate.exception.WriteException;
@@ -61,26 +61,27 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   }
 
   @Override
-  public void internalSave(Handler<AsyncResult<IWriteResult>> resultHandler) {
+  public Future<IWriteResult> internalSave() {
+    Future<IWriteResult> f = Future.future();
     if (getObjectsToSave().isEmpty()) {
-      resultHandler.handle(Future.succeededFuture(new SqlWriteResult()));
+      f.complete(new SqlWriteResult());
     } else {
       getDataStore().getStoreObjectFactory().createStoreObjects(getMapper(), getObjectsToSave(), stoResult -> {
         if (stoResult.failed()) {
-          resultHandler.handle(Future.failedFuture(stoResult.cause()));
+          f.fail(stoResult.cause());
         } else {
           CompositeFuture cf = saveRecords(stoResult.result());
           cf.setHandler(cfr -> {
             if (cfr.failed()) {
-              resultHandler.handle(Future.failedFuture(cfr.cause()));
+              f.fail(cfr.cause());
             } else {
-              resultHandler.handle(Future.succeededFuture(new SqlWriteResult(cf.list())));
+              f.complete(new SqlWriteResult(cf.list()));
             }
           });
         }
       });
-
     }
+    return f;
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })

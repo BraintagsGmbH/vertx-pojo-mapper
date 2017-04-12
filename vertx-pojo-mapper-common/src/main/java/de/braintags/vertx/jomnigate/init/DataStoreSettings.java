@@ -15,8 +15,11 @@ package de.braintags.vertx.jomnigate.init;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.util.security.crypt.IEncoder;
 
 /**
@@ -33,6 +36,7 @@ public class DataStoreSettings {
   private String databaseName;
   private List<EncoderSettings> encoders = new ArrayList<>();
   private boolean clearDatabaseOnInit = false;
+  private List<ObserverSettings<?>> observerSettings = new ArrayList<>();
 
   /**
    * Standard constructor needed for saving as local file
@@ -162,5 +166,50 @@ public class DataStoreSettings {
    */
   public void setClearDatabaseOnInit(boolean clearDatabaseOnInit) {
     this.clearDatabaseOnInit = clearDatabaseOnInit;
+  }
+
+  /**
+   * Get all defined {@link ObserverSettings}
+   * 
+   * @return the observerSettings
+   */
+  public List<ObserverSettings<?>> getObserverSettings() {
+    return observerSettings;
+  }
+
+  /**
+   * Get all {@link ObserverSettings} which are fitting the given mapper class for the event
+   * {@link ObserverEventType#BEFORE_MAPPING}
+   * 
+   * @param mapperClass
+   * @return
+   */
+  public List<ObserverSettings<?>> getObserverSettings(Class<?> mapperClass) {
+    List<ObserverSettings<?>> tmpList = new ArrayList<>();
+    List<ObserverSettings<?>> osl = getObserverSettings();
+    osl.stream().filter(os -> os.isApplicableFor(mapperClass) && os.isApplicableFor(ObserverEventType.BEFORE_MAPPING))
+        .forEach(tmpList::add);
+    return tmpList;
+  }
+
+  /**
+   * Get all {@link ObserverSettings} which are fitting the given mapper
+   * 
+   * @param mapper
+   * @return
+   */
+  public List<ObserverSettings<?>> getObserverSettings(IMapper<?> mapper) {
+    List<ObserverSettings<?>> osl = getObserverSettings();
+    List<ObserverSettings<?>> tmpList = osl.stream().filter(os -> os.isApplicableFor(mapper))
+        .collect(Collectors.toList());
+    return tmpList;
+  }
+
+  /**
+   * @param observerSettings
+   *          the observerSettings to set
+   */
+  private void setObserverSettings(List<ObserverSettings<?>> observerSettings) {
+    this.observerSettings = observerSettings;
   }
 }

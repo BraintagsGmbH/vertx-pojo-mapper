@@ -53,6 +53,11 @@ public interface IMapperFactory {
   IDataStore<?, ?> getDataStore();
 
   /**
+   * Reset all mapping information. Mappings will be recreated with the next request to {@link #getMapper(Class)}
+   */
+  void reset();
+
+  /**
    * Get the propriate {@link ITypeHandlerFactory} for the current implementation
    * 
    * @return the {@link ITypeHandlerFactory}

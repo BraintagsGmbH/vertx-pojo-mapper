@@ -58,6 +58,12 @@
  * implementation you are able to set it by adding this annotation to the mapper class and reference the class of the
  * {@link de.braintags.vertx.jomnigate.mapping.IObjectFactory} you want to use.
  * 
+ * 
+ * ===== {@link de.braintags.vertx.jomnigate.annotation.Observer}
+ * The annotation Observer is used to define an {@link de.braintags.vertx.jomnigate.observer.IObserver}, which shall be
+ * executed for a certain mapper. The annotation extends the possible globale definition of
+ * {@link de.braintags.vertx.jomnigate.init.DataStoreSettings#getObserverSettings()}
+ * 
  * ===== {@link de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad}
  * 
  * All methods, which are annotated by this annotation are executed after an instance was loaded from the

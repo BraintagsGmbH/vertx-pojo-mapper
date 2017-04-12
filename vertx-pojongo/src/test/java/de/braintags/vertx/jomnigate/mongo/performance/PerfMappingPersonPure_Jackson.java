@@ -64,7 +64,7 @@ public class PerfMappingPersonPure_Jackson extends DatastoreBaseTest {
     config.put("db_name", "PojongoTestDatabase");
     AtomicLong allTime = new AtomicLong();
     MongoClient mongoClient = MongoClient.createNonShared(vertx, config);
-    MongoDataStore store = new MongoDataStore(vertx, mongoClient, config);
+    MongoDataStore store = new MongoDataStore(vertx, mongoClient, config, null);
     store.getMapperFactory().getMapper(PersonPure.class);
 
     for (int i = 0; i < loops; i++) {

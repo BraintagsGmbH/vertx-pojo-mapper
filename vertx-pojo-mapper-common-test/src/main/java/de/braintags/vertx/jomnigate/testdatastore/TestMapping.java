@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,6 +52,7 @@ import de.braintags.vertx.jomnigate.testdatastore.mapper.Animal;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapper_BeanMethodWithoutField;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.Person;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.PolyMapper;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.PrivateIdMapper;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.TestContext;
@@ -74,6 +76,13 @@ public class TestMapping extends DatastoreBaseTest {
   @Before
   public void setUpBeforeClass(TestContext context) throws Exception {
     mapperDef = getDataStore(context).getMapperFactory().getMapper(Person.class);
+  }
+
+  @Test
+  public void testClassAnnotation(TestContext context) {
+    JsonTypeInfo ti = PolyMapper.class.getAnnotation(JsonTypeInfo.class);
+    JsonTypeInfo[] til = PolyMapper.class.getAnnotationsByType(JsonTypeInfo.class);
+    context.assertNotNull(til);
   }
 
   @Test

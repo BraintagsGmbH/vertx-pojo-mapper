@@ -148,7 +148,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
           LOGGER.error("could not start mongo client", initResult.cause());
           handler.handle(Future.failedFuture(new InitException(initResult.cause())));
         } else {
-          mongoDataStore = new MongoDataStore(vertx, mongoClient, getConfig());
+          mongoDataStore = new MongoDataStore(vertx, mongoClient, getConfig(), settings);
           handler.handle(Future.succeededFuture(mongoDataStore));
         }
       });
@@ -267,7 +267,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
       internalStartMongoExe(startMongoLocal, localPort);
     } catch (IOException e) {
       // retry once
-      LOGGER.error("Error starting local mongo, retrying..");
+      LOGGER.error("Error starting local mongo, retrying..", e);
       try {
         internalStartMongoExe(startMongoLocal, localPort);
         LOGGER.warn("Local mongo started on second try");
@@ -284,9 +284,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
           .net(new Net(localPort, Network.localhostIsIPv6())).build();
       Logger logger = (Logger) new SLF4JLogDelegateFactory().createDelegate(MongoDataStoreInit.class.getCanonicalName())
           .unwrap();
-
       IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaultsWithLogger(Command.MongoD, logger).build();
-
       MongodExecutable temp = MongodStarter.getInstance(runtimeConfig).prepare(config);
       temp.start();
       // ensure client was successfully started before assigning to global field

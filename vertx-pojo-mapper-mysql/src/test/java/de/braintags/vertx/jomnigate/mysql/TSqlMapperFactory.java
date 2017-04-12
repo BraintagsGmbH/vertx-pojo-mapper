@@ -76,7 +76,8 @@ import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 
 public class TSqlMapperFactory {
   public static final int NUMBER_OF_PROPERTIES = Person.NUMBER_OF_PROPERTIES;
-  public static IDataStore dataStore = new DummyDataStore(new SqlTypeHandlerFactory(), new SqlPropertyMapperFactory());
+  public static IDataStore dataStore = new DummyDataStore(new SqlTypeHandlerFactory(), new SqlPropertyMapperFactory(),
+      null);
   private static IMapper mapperDef = null;
 
   /**

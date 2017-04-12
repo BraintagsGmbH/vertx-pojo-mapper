@@ -209,4 +209,11 @@ public interface IDataStore<S, U> {
    */
   int getDefaultQueryLimit();
 
+  /**
+   * Get the settings, where the observer are defined for instance
+   * 
+   * @return
+   */
+  DataStoreSettings getSettings();
+
 }

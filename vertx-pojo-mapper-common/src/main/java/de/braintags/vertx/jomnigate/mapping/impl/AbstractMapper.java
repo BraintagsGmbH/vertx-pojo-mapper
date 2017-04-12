@@ -33,14 +33,15 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
+import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
-import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
+import de.braintags.vertx.jomnigate.observer.IObserverHandler;
 import de.braintags.vertx.util.ClassUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -83,6 +84,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   private ITableInfo tableInfo;
   private boolean syncNeeded = true;
   private boolean hasReferencedFields = false;
+  private IObserverHandler observerHandler;
 
   /**
    * Class annotations which were found inside the current definition
@@ -113,6 +115,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     computeKeyGenerator();
     generateTableInfo();
     checkReferencedFields();
+    observerHandler = IObserverHandler.createInstance(this);
     validate();
   }
 
@@ -168,7 +171,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
 
   protected void computeKeyGenerator() {
     if (getMapperFactory().getDataStore() != null) {
-      KeyGenerator gen = (KeyGenerator) getAnnotation(KeyGenerator.class);
+      KeyGenerator gen = getAnnotation(KeyGenerator.class);
       if (gen != null) {
         String name = gen.value();
         keyGenerator = getMapperFactory().getDataStore().getKeyGenerator(name);
@@ -356,8 +359,9 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#getAnnotation(java.lang.Class)
    */
   @Override
-  public Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
-    return existingClassAnnotations.get(annotationClass);
+  public <U extends Annotation> U getAnnotation(Class<U> annotationClass) {
+    U ann = (U) existingClassAnnotations.get(annotationClass);
+    return ann;
   }
 
   @Override
@@ -443,4 +447,8 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     return mappedProperties;
   }
 
+  @Override
+  public IObserverHandler getObserverHandler() {
+    return this.observerHandler;
+  }
 }

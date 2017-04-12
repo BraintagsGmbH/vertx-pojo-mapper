@@ -60,4 +60,12 @@ public interface IDelete<T> extends IDataAccessObject<T> {
    */
   @SuppressWarnings("unchecked")
   public void add(T... records);
+
+  /**
+   * Get the number of records to be deleted
+   * 
+   * @return the count
+   */
+  public int size();
+
 }
