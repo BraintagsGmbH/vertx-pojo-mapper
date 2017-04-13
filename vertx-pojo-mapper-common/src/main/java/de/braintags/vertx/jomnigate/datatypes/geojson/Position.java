@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import de.braintags.vertx.util.assertion.Assert;
@@ -38,6 +39,7 @@ public class Position {
    * @param values
    *          the non-null values
    */
+  @JsonCreator
   public Position(final List<Double> values) {
     Objects.requireNonNull(values, "values must not be null");
     Assert.isTrueArgument("value contains only non-null elements", !values.contains(null));
