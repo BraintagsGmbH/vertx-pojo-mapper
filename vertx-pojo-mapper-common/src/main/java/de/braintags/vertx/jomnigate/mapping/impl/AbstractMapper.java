@@ -31,6 +31,7 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterSave;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
+import de.braintags.vertx.jomnigate.datatypes.IMapperVersion;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
@@ -116,16 +117,26 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     generateTableInfo();
     checkReferencedFields();
     observerHandler = IObserverHandler.createInstance(this);
+    internalValidate();
+  }
+
+  /**
+   * Validations, which are not overwritable
+   */
+  private final void internalValidate() {
+    if (idField == null)
+      throw new MappingException("No id-field specified in mapper " + getMapperClass().getName());
+    if (getEntity().version() > 0 && !IMapperVersion.class.isAssignableFrom(getMapperClass())) {
+      throw new MappingException(
+          "Mapper, where the property Entity.version is set must implement the interface IMapperVersion");
+    }
     validate();
   }
 
   /**
    * Validation for required properties etc
    */
-  protected void validate() {
-    if (idField == null)
-      throw new MappingException("No id-field specified in mapper " + getMapperClass().getName());
-  }
+  protected abstract void validate();
 
   /**
    * Compute all fields, which shall be persisted

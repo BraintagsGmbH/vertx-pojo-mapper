@@ -48,14 +48,8 @@ public class JacksonMapper<T> extends AbstractMapper<T> {
     this.keyGeneratorReference = creatorClass.getSimpleName();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.mapping.impl.AbstractMapper#validate()
-   */
   @Override
   protected void validate() {
-    super.validate();
     JsonTypeInfo ti = getAnnotation(JsonTypeInfo.class);
     boolean polySet = getEntity().polyClass() != Object.class;
     if (ti != null && !polySet) {
