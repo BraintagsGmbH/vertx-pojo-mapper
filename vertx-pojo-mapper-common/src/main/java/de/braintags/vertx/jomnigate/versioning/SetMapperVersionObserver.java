@@ -60,6 +60,8 @@ public class SetMapperVersionObserver implements IObserver {
    */
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
+    IMapperVersion vrec = (IMapperVersion) event.getSource();
+
     return Future.failedFuture(new UnsupportedOperationException());
   }
 

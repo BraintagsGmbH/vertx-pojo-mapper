@@ -31,6 +31,7 @@ import de.braintags.vertx.jomnigate.dataaccess.write.impl.BeforeSaveHandler;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverHandler;
@@ -109,7 +110,8 @@ public class DefaultObserverHandler implements IObserverHandler {
    * write.IWrite)
    */
   @Override
-  public <T> Future<Void> handleBeforeSave(IWrite<T> writeObject, IObserverContext context) {
+  public <T> Future<Void> handleBeforeSave(IWrite<T> writeObject, IStoreObject<T, ?> storeObject,
+      IObserverContext context) {
     List<IObserver> ol = getObserver(ObserverEventType.BEFORE_SAVE);
     Future<Void> f = Future.future();
     if (ol.isEmpty() || writeObject.size() <= 0) {

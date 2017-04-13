@@ -72,21 +72,12 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
           Future<IWriteResult> rf = Future.future();
           rf.setHandler(resultHandler);
           IObserverContext context = IObserverContext.createInstance();
-          preSave(context).compose(pre -> internalSave()).compose(wr -> postSave(wr, context, rf), rf);
+          internalSave(context).compose(wr -> postSave(wr, context, rf), rf);
         } catch (Exception e) {
           resultHandler.handle(Future.failedFuture(e));
         }
       }
     });
-  }
-
-  /**
-   * Execution done before instances are stored into the datastore
-   * 
-   * @return
-   */
-  protected Future<Void> preSave(IObserverContext context) {
-    return getMapper().getObserverHandler().handleBeforeSave(this, context);
   }
 
   /**
@@ -111,7 +102,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * 
    * @param resultHandler
    */
-  protected abstract Future<IWriteResult> internalSave();
+  protected abstract Future<IWriteResult> internalSave(IObserverContext context);
 
   /**
    * Get the objects that shall be saved

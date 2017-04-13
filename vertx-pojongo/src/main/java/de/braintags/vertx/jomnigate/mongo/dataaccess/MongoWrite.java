@@ -27,6 +27,7 @@ import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
 import de.braintags.vertx.jomnigate.exception.WriteException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mongo.MongoDataStore;
+import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -59,12 +60,12 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   }
 
   @Override
-  public Future<IWriteResult> internalSave() {
+  public Future<IWriteResult> internalSave(IObserverContext context) {
     Future<IWriteResult> f = Future.future();
     if (getObjectsToSave().isEmpty()) {
       f.complete(new MongoWriteResult());
     } else {
-      CompositeFuture cf = saveRecords();
+      CompositeFuture cf = saveRecords(context);
       cf.setHandler(cfr -> {
         if (cfr.failed()) {
           f.fail(cfr.cause());
@@ -77,16 +78,16 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   }
 
   @SuppressWarnings("rawtypes")
-  private CompositeFuture saveRecords() {
+  private CompositeFuture saveRecords(IObserverContext context) {
     List<Future> fl = new ArrayList<>(getObjectsToSave().size());
     for (T entity : getObjectsToSave()) {
-      fl.add(save(entity));
+      fl.add(save(entity, context));
     }
     return CompositeFuture.all(fl);
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private Future<IWriteEntry> save(T entity) {
+  private Future<IWriteEntry> save(T entity, IObserverContext context) {
     Future<IWriteEntry> f = Future.future();
     getDataStore().getStoreObjectFactory().createStoreObject(getMapper(), entity, result -> {
       if (result.failed()) {
@@ -94,17 +95,29 @@ public class MongoWrite<T> extends AbstractWrite<T> {
         LOG.info("failed", we);
         f.fail(we);
       } else {
-        doSave(entity, (MongoStoreObject) result.result(), sResult -> {
-          if (sResult.failed()) {
-            LOG.info("failed", sResult.cause());
-            f.fail(sResult.cause());
-          } else {
-            f.complete(sResult.result());
-          }
-        });
+        MongoStoreObject<T> sto = (MongoStoreObject) result.result();
+        preSave(sto, context).compose(wr -> doSave(entity, sto, f), f);
+
+        // doSave(entity, sto, sResult -> {
+        // if (sResult.failed()) {
+        // LOG.info("failed", sResult.cause());
+        // f.fail(sResult.cause());
+        // } else {
+        // f.complete(sResult.result());
+        // }
+        // });
       }
     });
     return f;
+  }
+
+  /**
+   * Execution done before instances are stored into the datastore
+   * 
+   * @return
+   */
+  protected Future<Void> preSave(MongoStoreObject<T> storeObject, IObserverContext context) {
+    return getMapper().getObserverHandler().handleBeforeSave(this, storeObject, context);
   }
 
   /**
@@ -113,14 +126,13 @@ public class MongoWrite<T> extends AbstractWrite<T> {
    * @param storeObject
    * @param resultHandler
    */
-  private void doSave(T entity, MongoStoreObject<T> storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {
+  private void doSave(T entity, MongoStoreObject<T> storeObject, Future<IWriteEntry> future) {
     LOG.debug("now saving: " + storeObject.toString());
     if (storeObject.isNewInstance()) {
-      doInsert(entity, storeObject, resultHandler);
+      doInsert(entity, storeObject, future);
     } else {
-      doUpdate(entity, storeObject, resultHandler);
+      doUpdate(entity, storeObject, future);
     }
-
   }
 
   private void doInsert(T entity, MongoStoreObject<T> storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {

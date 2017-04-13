@@ -200,7 +200,17 @@ public class TestObserverHandler extends AbstractObserverTest {
    * @param context
    */
   @Test
-  public void test_BeforeSave_SingleRecord(TestContext context) {
+  public void test_BeforeInsert_SingleRecord(TestContext context) {
+    context.fail("unsupported");
+  }
+
+  /**
+   * The value of the field intValue must be set to 1 through the observer
+   * 
+   * @param context
+   */
+  @Test
+  public void test_BeforeUpdate_SingleRecord(TestContext context) {
     BeforeSaveObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverSettings<BeforeSaveObserver> os = new ObserverSettings<>(BeforeSaveObserver.class);

@@ -31,6 +31,7 @@ import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.mysql.MySqlDataStore;
 import de.braintags.vertx.jomnigate.mysql.SqlUtil;
 import de.braintags.vertx.jomnigate.mysql.dataaccess.SqlStoreObject.SqlSequence;
+import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -61,7 +62,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   }
 
   @Override
-  public Future<IWriteResult> internalSave() {
+  public Future<IWriteResult> internalSave(IObserverContext context) {
     Future<IWriteResult> f = Future.future();
     if (getObjectsToSave().isEmpty()) {
       f.complete(new SqlWriteResult());
