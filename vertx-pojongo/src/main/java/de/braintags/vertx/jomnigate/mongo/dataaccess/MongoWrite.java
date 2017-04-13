@@ -88,6 +88,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   private Future<IWriteEntry> save(T entity, IObserverContext context) {
+    // TODO refactoring / abstraction will follow when refactoring MySql
     Future<IWriteEntry> f = Future.future();
     getDataStore().getStoreObjectFactory().createStoreObject(getMapper(), entity, result -> {
       if (result.failed()) {

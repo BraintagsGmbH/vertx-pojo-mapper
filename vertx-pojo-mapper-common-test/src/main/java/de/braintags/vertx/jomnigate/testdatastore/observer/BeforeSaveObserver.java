@@ -13,6 +13,7 @@
 package de.braintags.vertx.jomnigate.testdatastore.observer;
 
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
+import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
@@ -36,21 +37,16 @@ public class BeforeSaveObserver implements IObserver {
    */
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
-    IWrite<?> write = (IWrite<?>) event.getAccessObject();
-    executed = true;
-    SimpleMapper sm = (SimpleMapper) event.getSource();
-    sm.intValue = context.get("counter", 1);
-    context.put("counter", sm.intValue + 1);
-
-    // Iterator<?> it = write.getSelection();
-    // while (it.hasNext()) {
-    // SimpleMapper sm = (SimpleMapper) it.next();
-    // sm.intValue = context.get("counter", 1);
-    // context.put("counter", sm.intValue + 1);
-    // executed = true;
-    // }
-
-    return Future.succeededFuture();
+    try {
+      IWrite<?> write = (IWrite<?>) event.getAccessObject();
+      executed = true;
+      SimpleMapper sm = ((IStoreObject<SimpleMapper, ?>) event.getSource()).getEntity();
+      sm.intValue = context.get("counter", 1);
+      context.put("counter", sm.intValue + 1);
+      return Future.succeededFuture();
+    } catch (Exception e) {
+      return Future.failedFuture(e);
+    }
   }
 
   @Override

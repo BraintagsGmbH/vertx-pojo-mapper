@@ -117,7 +117,7 @@ public class DefaultObserverHandler implements IObserverHandler {
     if (ol.isEmpty() || writeObject.size() <= 0) {
       f.complete();
     } else {
-      f = getBeforeSaveHandler().handle(writeObject, null, context, ol);
+      f = getBeforeSaveHandler().handle(writeObject, storeObject, context, ol);
     }
     return f;
   }
