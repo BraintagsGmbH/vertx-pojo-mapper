@@ -47,7 +47,7 @@ public class ObserverMapperSettings {
    * 
    * @param classDefinition
    */
-  public ObserverMapperSettings(String classDefinition) {
+  public ObserverMapperSettings(final String classDefinition) {
     setClassDefinition(classDefinition);
   }
 
@@ -57,7 +57,7 @@ public class ObserverMapperSettings {
    * 
    * @param annotation
    */
-  public ObserverMapperSettings(Class<? extends Annotation> annotation) {
+  public ObserverMapperSettings(final Class<? extends Annotation> annotation) {
     setAnnotation(annotation);
   }
 
@@ -87,7 +87,7 @@ public class ObserverMapperSettings {
    * @param classDefinition
    *          the classDefinition to set
    */
-  public void setClassDefinition(String classDefinition) {
+  public void setClassDefinition(final String classDefinition) {
     this.classDefinition = classDefinition;
     init();
   }
@@ -109,7 +109,7 @@ public class ObserverMapperSettings {
    * @param annotation
    *          the annotation to set
    */
-  public void setAnnotation(Class<? extends Annotation> annotation) {
+  public void setAnnotation(final Class<? extends Annotation> annotation) {
     this.annotation = annotation;
   }
 
@@ -119,7 +119,7 @@ public class ObserverMapperSettings {
    * @param mapper
    * @return true, if applicable
    */
-  boolean isApplicableFor(IMapper<?> mapper) {
+  boolean isApplicableFor(final IMapper<?> mapper) {
     boolean applicable = isApplicableFor(mapper.getMapperClass());
     if (applicable && annotation != null) {
       applicable = mapper.getAnnotation(annotation) != null;
@@ -142,7 +142,7 @@ public class ObserverMapperSettings {
    * @param instanceOf
    *          the instanceOf to set
    */
-  public void setInstanceOf(boolean instanceOf) {
+  public void setInstanceOf(final boolean instanceOf) {
     this.instanceOf = instanceOf;
   }
 
@@ -154,7 +154,7 @@ public class ObserverMapperSettings {
    * @return if the current definition contains a class specification, it will check wether the given checkClass fits;
    *         if there is no class definition, it will return true
    */
-  boolean isApplicableFor(Class<?> checkClass) {
+  boolean isApplicableFor(final Class<?> checkClass) {
     boolean applicable = mapperClass == null;
     if (!applicable) {
       if (isInstanceOf()) {
@@ -164,6 +164,18 @@ public class ObserverMapperSettings {
       }
     }
     return applicable;
+  }
+
+  /**
+   * Creates a deep (recursive) copy of the ObserverMapperSettings
+   */
+  public ObserverMapperSettings deepCopy() {
+    ObserverMapperSettings res = new ObserverMapperSettings();
+    res.classDefinition = classDefinition;
+    res.instanceOf = instanceOf;
+    res.mapperClass = mapperClass;
+    res.annotation = annotation;
+    return res;
   }
 
 }

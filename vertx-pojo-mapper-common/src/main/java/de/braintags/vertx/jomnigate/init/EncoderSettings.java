@@ -27,7 +27,7 @@ import de.braintags.vertx.util.security.crypt.IEncoder;
  * @author Michael Remme
  * 
  */
-public class EncoderSettings implements Cloneable {
+public class EncoderSettings {
   private String name;
   private Class<? extends IEncoder> encoderClass;
   private Properties properties = new Properties();
@@ -47,7 +47,7 @@ public class EncoderSettings implements Cloneable {
    * @param name
    *          the name to set
    */
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -66,7 +66,7 @@ public class EncoderSettings implements Cloneable {
    * @param endoderClass
    *          the endoderClass to set
    */
-  public void setEncoderClass(Class<? extends IEncoder> endoderClass) {
+  public void setEncoderClass(final Class<? extends IEncoder> endoderClass) {
     this.encoderClass = endoderClass;
   }
 
@@ -85,7 +85,7 @@ public class EncoderSettings implements Cloneable {
    * @param properties
    *          the properties to set
    */
-  public void setProperties(Properties properties) {
+  public void setProperties(final Properties properties) {
     this.properties = properties;
   }
 
@@ -104,8 +104,10 @@ public class EncoderSettings implements Cloneable {
     }
   }
 
-  @Override
-  public EncoderSettings clone() {
+  /**
+   * Creates a deep (recursive) copy of the EncoderSettings
+   */
+  public EncoderSettings deepCopy() {
     EncoderSettings res = new EncoderSettings();
     res.name = this.name;
     res.encoderClass = this.encoderClass;
