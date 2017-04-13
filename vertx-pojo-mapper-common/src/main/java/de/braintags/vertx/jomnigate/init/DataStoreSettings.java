@@ -14,6 +14,7 @@ package de.braintags.vertx.jomnigate.init;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,7 @@ import de.braintags.vertx.util.security.crypt.IEncoder;
  * @author mremme
  * 
  */
-public class DataStoreSettings implements Cloneable {
+public class DataStoreSettings {
   private Class<? extends IDataStoreInit> datastoreInit;
   private Properties properties = new Properties();
   private String databaseName;
@@ -209,7 +210,31 @@ public class DataStoreSettings implements Cloneable {
    * @param observerSettings
    *          the observerSettings to set
    */
-  private void setObserverSettings(final List<ObserverSettings<?>> observerSettings) {
+  public void setObserverSettings(final List<ObserverSettings<?>> observerSettings) {
     this.observerSettings = observerSettings;
   }
+  
+  /**
+   * Creates a deep (recursive) copy of the DataStoreSettings
+   */
+  public DataStoreSettings deepCopy() {
+    DataStoreSettings res = new DataStoreSettings(datastoreInit, databaseName);
+
+    res.properties = new Properties();
+    for (Entry<Object, Object> property : properties.entrySet()) {
+      res.properties.put(property.getKey(), property.getValue());
+    }
+    res.clearDatabaseOnInit = clearDatabaseOnInit;
+    
+    for (EncoderSettings encoder : encoders) {
+      res.encoders.add(encoder.deepCopy());
+    }
+
+    for (ObserverSettings<?> observer : observerSettings) {
+      res.observerSettings.add(observer.deepCopy());
+    }
+
+    return res;
+  }
+
 }
