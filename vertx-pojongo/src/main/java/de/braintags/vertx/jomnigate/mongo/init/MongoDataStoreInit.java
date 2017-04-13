@@ -272,7 +272,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
         internalStartMongoExe(startMongoLocal, localPort);
         LOGGER.warn("Local mongo started on second try");
       } catch (IOException e1) {
-        throw new RuntimeException(e1);
+        throw new InitException(e1);
       }
     }
   }

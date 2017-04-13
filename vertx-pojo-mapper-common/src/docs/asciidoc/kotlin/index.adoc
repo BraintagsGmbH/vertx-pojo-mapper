@@ -367,7 +367,7 @@ with your observer class. There are two methods to be implemented:
 public class DemoObserver implements IObserver {
 
   @Override
-  public boolean handlesEvent(IObserverEvent event, IObserverContext context) { // <1>
+  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) { // <1>
     return true;
   }
 

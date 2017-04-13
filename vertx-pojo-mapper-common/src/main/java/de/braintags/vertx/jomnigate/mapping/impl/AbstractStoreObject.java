@@ -31,7 +31,10 @@ import io.vertx.core.Handler;
  * An abstract implementation of IStoreObject
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the type of the entity
+ * @param <F>
+ *          the type, which is used internally as format, like Json for instance
  */
 public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
