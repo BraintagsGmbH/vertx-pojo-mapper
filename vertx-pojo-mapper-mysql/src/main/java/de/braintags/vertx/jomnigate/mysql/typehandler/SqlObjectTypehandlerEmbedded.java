@@ -36,7 +36,7 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
   /**
    * @param typeHandlerFactory
    */
-  public SqlObjectTypehandlerEmbedded(ITypeHandlerFactory typeHandlerFactory) {
+  public SqlObjectTypehandlerEmbedded(final ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory);
   }
 
@@ -48,8 +48,8 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object dbValue, IProperty field, Class<?> cls,
-      Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void fromStore(final Object dbValue, final IProperty field, final Class<?> cls,
+      final Handler<AsyncResult<ITypeHandlerResult>> handler) {
     try {
       JsonObject jsonObject = dbValue == null ? null : new JsonObject((String) dbValue);
       super.fromStore(jsonObject, field, cls, handler);
@@ -66,7 +66,7 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public void intoStore(Object embeddedObject, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  public void intoStore(final Object embeddedObject, final IProperty field, final Handler<AsyncResult<ITypeHandlerResult>> handler) {
     super.intoStore(embeddedObject, field, result -> {
       if (result.failed()) {
         handler.handle(result);
@@ -82,8 +82,8 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
   }
 
   @SuppressWarnings("rawtypes")
-  private void checkId(IDataStore store, Object embeddedObject, IMapper mapper, Handler<AsyncResult<Void>> handler) {
-    IProperty field = mapper.getIdField().getField();
+  private void checkId(final IDataStore store, final Object embeddedObject, final IMapper mapper, final Handler<AsyncResult<Void>> handler) {
+    IProperty field = mapper.getIdInfo().getField();
     Object id = field.getPropertyAccessor().readData(embeddedObject);
     if (id != null) {
       handler.handle(Future.succeededFuture());
@@ -115,8 +115,8 @@ public class SqlObjectTypehandlerEmbedded extends ObjectTypeHandlerEmbedded {
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
-  protected void writeSingleValueAsMapper(IDataStore<?, ?> store, Object embeddedObject, IMapper embeddedMapper,
-      IProperty field, Handler<AsyncResult<ITypeHandlerResult>> handler) {
+  protected void writeSingleValueAsMapper(final IDataStore<?, ?> store, final Object embeddedObject, final IMapper embeddedMapper,
+      final IProperty field, final Handler<AsyncResult<ITypeHandlerResult>> handler) {
     checkId(store, embeddedObject, embeddedMapper, idResult -> {
       if (idResult.failed()) {
         fail(idResult.cause(), handler);

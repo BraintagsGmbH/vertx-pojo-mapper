@@ -49,7 +49,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
   /**
    * @param typeHandlerFactory
    */
-  public ObjectTypeHandlerReferenced(ITypeHandlerFactory typeHandlerFactory) {
+  public ObjectTypeHandlerReferenced(final ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory);
   }
 
@@ -60,7 +60,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    * de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler#matchesAnnotation(java.lang.annotation.Annotation)
    */
   @Override
-  protected boolean matchesAnnotation(Annotation annotation) {
+  protected boolean matchesAnnotation(final Annotation annotation) {
     return annotation != null && annotation instanceof Referenced;
   }
 
@@ -71,8 +71,8 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public void fromStore(Object id, IProperty field, Class<?> cls,
-      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void fromStore(final Object id, final IProperty field, final Class<?> cls,
+      final Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     if (id == null) {
       success(null, resultHandler);
     } else if (field.getMapper().handleReferencedRecursive()) {
@@ -86,8 +86,8 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
   }
 
   @Override
-  public void resolveReferencedObject(IDataStore store, IObjectReference reference,
-      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void resolveReferencedObject(final IDataStore store, final IObjectReference reference,
+      final Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     LOGGER.debug("start resolveReferencedObject");
     Class<?> mapperClass = reference.getField().getType();
     if (mapperClass == null) {
@@ -108,11 +108,11 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    * @param id
    * @param resultHandler
    */
-  public void getReferencedObjectById(IDataStore store, IMapper<?> subMapper, Object id,
-      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void getReferencedObjectById(final IDataStore store, final IMapper<?> subMapper, final Object id,
+      final Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     LOGGER.debug("start getReferencedObjectById");
     IQuery<?> query = store.createQuery(subMapper.getMapperClass());
-    query.setSearchCondition(ISearchCondition.isEqual(subMapper.getIdField(), id));
+    query.setSearchCondition(ISearchCondition.isEqual(subMapper.getIdInfo().getIndexedField(), id));
     query.execute(result -> {
       if (result.failed()) {
         fail(result.cause(), resultHandler);
@@ -142,8 +142,8 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public void intoStore(Object referencedObject, IProperty field,
-      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public void intoStore(final Object referencedObject, final IProperty field,
+      final Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     IDataStore store = field.getMapper().getMapperFactory().getDataStore();
     if (referencedObject == null) {
       success(null, resultHandler);
@@ -158,8 +158,8 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
     }
   }
 
-  private void storeId(IDataStore store, IProperty field, Object id,
-      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  private void storeId(final IDataStore store, final IProperty field, final Object id,
+      final Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     ITypeHandler th = store.getMapperFactory().getTypeHandlerFactory().getTypeHandler(id.getClass(), null);
     th.intoStore(id, field, tmpResult -> {
       if (tmpResult.failed()) {
@@ -172,8 +172,8 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
   }
 
   @SuppressWarnings("unchecked")
-  private void saveReferencedObject(IDataStore store, Object referencedObject,
-      Handler<AsyncResult<Object>> resultHandler) {
+  private void saveReferencedObject(final IDataStore store, final Object referencedObject,
+      final Handler<AsyncResult<Object>> resultHandler) {
     IWrite<Object> write = store.createWrite(referencedObject.getClass());
     IMapper subMapper = write.getMapper();
     write.add(referencedObject);
@@ -182,7 +182,7 @@ public class ObjectTypeHandlerReferenced extends ObjectTypeHandler implements IT
         resultHandler.handle(Future.failedFuture(saveResult.cause()));
       }
       IWriteEntry we = saveResult.result().iterator().next();
-      IProperty idField = subMapper.getIdField().getField();
+      IProperty idField = subMapper.getIdInfo().getField();
       Object id = we.getId() == null ? idField.getPropertyAccessor().readData(referencedObject) : we.getId();
       if (id == null) {
         resultHandler.handle(Future.failedFuture(new MappingException(String.format(

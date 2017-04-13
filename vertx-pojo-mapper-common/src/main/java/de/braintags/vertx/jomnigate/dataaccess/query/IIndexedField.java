@@ -36,7 +36,7 @@ public interface IIndexedField {
    *          the field name to be used
    * @return
    */
-  public static IIndexedField create(String fieldName) {
+  public static IIndexedField create(final String fieldName) {
     return new IndexedField(fieldName);
   }
 
@@ -47,7 +47,7 @@ public interface IIndexedField {
    */
   String getFieldName();
 
-  static IIndexedField getIndexedField(String name, Class<?> pojoClass)
+  static IIndexedField getIndexedField(final String name, final Class<?> pojoClass)
       throws NoSuchFieldException, IllegalAccessException {
     Field field = pojoClass.getField(name);
     int modifiers = field.getModifiers();
@@ -68,7 +68,7 @@ public interface IIndexedField {
    *          the datastore to retrieve the mapper from, which has the column information
    * @return the column name for this field
    */
-  default String getColumnName(Class<?> pojoClass, IDataStore<?, ?> datastore) {
+  default String getColumnName(final Class<?> pojoClass, final IDataStore<?, ?> datastore) {
     return getColumnName(datastore.getMapperFactory().getMapper(pojoClass));
   }
 
@@ -79,7 +79,7 @@ public interface IIndexedField {
    *          the mapper which has the column information for the field
    * @return the column name for this field
    */
-  default String getColumnName(IMapper<?> mapper) {
+  default String getColumnName(final IMapper<?> mapper) {
     String fieldName = getFieldName();
     String subFieldName = "";
     int i = fieldName.indexOf('.');
@@ -92,5 +92,4 @@ public interface IIndexedField {
       throw new de.braintags.vertx.jomnigate.exception.NoSuchFieldException(getFieldName());
     return field.getColumnInfo().getName() + subFieldName;
   }
-
 }

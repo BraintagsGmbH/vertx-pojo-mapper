@@ -32,14 +32,14 @@ import io.vertx.core.Future;
  */
 @SuppressWarnings("serial")
 public abstract class AbstractEmbeddedSerialzer<T> extends AbstractDataStoreSerializer<T> {
-  private IMapper<?> mapper;
+  private final IMapper<?> mapper;
 
   /**
    * 
    * @param datastore
    * @param annotated
    */
-  public AbstractEmbeddedSerialzer(IDataStore datastore, Class mapperClass) {
+  public AbstractEmbeddedSerialzer(final IDataStore datastore, final Class mapperClass) {
     super(datastore);
     this.mapper = initMapper(datastore, mapperClass);
   }
@@ -50,7 +50,7 @@ public abstract class AbstractEmbeddedSerialzer<T> extends AbstractDataStoreSeri
    * @param beanDesc
    * @param beanProperty
    */
-  public AbstractEmbeddedSerialzer(IDataStore datastore, BeanDescription beanDesc, BeanPropertyWriter beanProperty) {
+  public AbstractEmbeddedSerialzer(final IDataStore datastore, final BeanDescription beanDesc, final BeanPropertyWriter beanProperty) {
     super(datastore);
     this.mapper = initMapper(datastore, beanProperty);
   }
@@ -61,7 +61,7 @@ public abstract class AbstractEmbeddedSerialzer<T> extends AbstractDataStoreSeri
    * @param datastore
    * @param beanProperty
    */
-  protected IMapper initMapper(IDataStore datastore, Class mapperClass) {
+  protected IMapper initMapper(final IDataStore datastore, final Class mapperClass) {
     IMapper<?> m = datastore.getMapperFactory().getMapper(mapperClass);
     if (m.getKeyGenerator() == null) {
       throw new MappingException(
@@ -76,7 +76,7 @@ public abstract class AbstractEmbeddedSerialzer<T> extends AbstractDataStoreSeri
    * @param datastore
    * @param beanProperty
    */
-  protected IMapper initMapper(IDataStore datastore, BeanPropertyWriter beanProperty) {
+  protected IMapper initMapper(final IDataStore datastore, final BeanPropertyWriter beanProperty) {
     IMapper<?> m = datastore.getMapperFactory().getMapper(beanProperty.getType().getRawClass());
     if (m.getKeyGenerator() == null) {
       throw new MappingException(
@@ -85,8 +85,8 @@ public abstract class AbstractEmbeddedSerialzer<T> extends AbstractDataStoreSeri
     return m;
   }
 
-  protected final boolean isNewRecord(IMapper mapper, Object entity) {
-    IProperty idProp = mapper.getIdField().getField();
+  protected final boolean isNewRecord(final IMapper mapper, final Object entity) {
+    IProperty idProp = mapper.getIdInfo().getField();
     return idProp.getPropertyAccessor().readData(entity) == null;
   }
 
@@ -97,13 +97,13 @@ public abstract class AbstractEmbeddedSerialzer<T> extends AbstractDataStoreSeri
    * @param entity
    * @return
    */
-  protected final Future<Object> generateKey(IMapper mapper, Object entity) {
+  protected final Future<Object> generateKey(final IMapper mapper, final Object entity) {
     Future<Object> f = Future.future();
     mapper.getKeyGenerator().generateKey(mapper, keyResult -> {
       if (keyResult.failed()) {
         f.fail(keyResult.cause());
       } else {
-        IProperty field = mapper.getIdField().getField();
+        IProperty field = mapper.getIdInfo().getField();
         field.getPropertyAccessor().writeData(entity, String.valueOf(keyResult.result().getKey()));
         f.complete(entity);
       }

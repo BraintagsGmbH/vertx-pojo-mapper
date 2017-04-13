@@ -89,11 +89,11 @@ public interface IMapper<T> {
   IProperty getField(String name);
 
   /**
-   * Get the {@link IProperty} which is defined to be the id
+   * Get the {@link IIdInfo} which contains access to the mapped field and the queryable field
    * 
    * @return the id field
    */
-  IMappedIdField getIdField();
+  IIdInfo getIdInfo();
 
   /**
    * Get the methods of the mapper which are annotated by the given lifecycle annotation like {@link BeforeLoad},
