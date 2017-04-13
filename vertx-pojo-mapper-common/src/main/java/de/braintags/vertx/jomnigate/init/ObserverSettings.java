@@ -23,7 +23,8 @@ import de.braintags.vertx.jomnigate.observer.ObserverEventType;
  * Used to define application of an {@link IObserver} instance
  * 
  * @author Michael Remme
- * 
+ * @param <T>
+ *          the type of IOberver used by this implementation
  */
 public class ObserverSettings<T extends IObserver> {
   private Class<T> observerClass;

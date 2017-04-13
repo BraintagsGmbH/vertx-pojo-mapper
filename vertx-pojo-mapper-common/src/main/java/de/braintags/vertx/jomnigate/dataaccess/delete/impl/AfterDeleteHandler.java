@@ -22,7 +22,7 @@ import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
-import de.braintags.vertx.jomnigate.observer.impl.AbstractEventHandler;
+import de.braintags.vertx.jomnigate.observer.impl.handler.AbstractEventHandler;
 import io.vertx.core.Future;
 
 /**

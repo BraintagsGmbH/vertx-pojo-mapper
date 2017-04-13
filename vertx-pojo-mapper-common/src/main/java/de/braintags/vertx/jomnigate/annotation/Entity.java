@@ -19,7 +19,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.braintags.vertx.jomnigate.datatypes.IMapperVersion;
+import de.braintags.vertx.jomnigate.versioning.IMapperVersion;
 
 /**
  * The annotation defines a class to be a mappable instance and allows to give further information about the entity

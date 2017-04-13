@@ -12,12 +12,19 @@
  */
 package de.braintags.vertx.jomnigate.testdatastore;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.exception.MappingException;
+import de.braintags.vertx.jomnigate.init.ObserverMapperSettings;
+import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningNoInterface;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWithInterface;
+import de.braintags.vertx.jomnigate.versioning.IMapperVersion;
+import de.braintags.vertx.jomnigate.versioning.SetMapperVersionObserver;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -28,6 +35,33 @@ import io.vertx.ext.unit.TestContext;
  */
 @SuppressWarnings({ "rawtypes", "unused" })
 public class TestDataVersioning extends DatastoreBaseTest {
+
+  /**
+   * check wether the {@link SetMapperVersionObserver} exists, cause it must be programmatically set by jomnigate
+   * 
+   * @param context
+   */
+  @Test
+  public void testExisting_SetVersionObserver_Definition(TestContext context) {
+    List<ObserverSettings<?>> osl = getDataStore(context).getSettings().getObserverSettings();
+    context.assertFalse(osl.isEmpty(), "No observer settings found");
+    ObserverSettings vs = null;
+    for (ObserverSettings os : osl) {
+      if (os.getObserverClass() == SetMapperVersionObserver.class) {
+        vs = os;
+      }
+    }
+    context.assertNotNull(vs,
+        "SetMapperVersionObserver is not existing and must be programmatically added by jomnigate itself");
+    context.assertEquals(Integer.MAX_VALUE, vs.getPriority());
+    context.assertFalse(vs.getMapperSettings().isEmpty(), "expcted valid mapper settings");
+    context.assertEquals(1, vs.getEventTypeList().size(), "Expected one event type");
+    context.assertTrue(vs.getEventTypeList().contains(ObserverEventType.BEFORE_SAVE),
+        "expected event type BEFORE_SAVE");
+    ObserverMapperSettings ms = (ObserverMapperSettings) vs.getMapperSettings().get(0);
+    context.assertTrue(ms.isInstanceOf());
+    context.assertEquals(IMapperVersion.class.getName(), ms.getClassDefinition());
+  }
 
   @Test
   public void testMappingCorrect(TestContext context) {
@@ -47,6 +81,7 @@ public class TestDataVersioning extends DatastoreBaseTest {
 
   @Test
   public void testVersioning(TestContext context) {
+    clearTable(context, VersioningWithInterface.class);
     VersioningWithInterface vi = new VersioningWithInterface();
     saveRecord(context, vi);
     context.assertEquals(5l, vi.getMapperVersion(), "version was not automatically set");

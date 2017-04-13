@@ -237,6 +237,8 @@
  * === The observer system
  * {@link de.braintags.vertx.jomnigate.observer}
  * 
+ * === Mapper versioning
+ * {@link de.braintags.vertx.jomnigate.versioning}
  * 
  * === Complexer mapper definitions
  * 

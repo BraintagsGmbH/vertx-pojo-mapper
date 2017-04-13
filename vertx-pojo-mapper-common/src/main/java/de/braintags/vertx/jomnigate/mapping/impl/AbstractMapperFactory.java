@@ -28,7 +28,7 @@ import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverHandler;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
-import de.braintags.vertx.jomnigate.observer.impl.BeforeMappingHandler;
+import de.braintags.vertx.jomnigate.observer.impl.handler.BeforeMappingHandler;
 import de.braintags.vertx.util.ResultObject;
 import de.braintags.vertx.util.exception.InitException;
 import io.vertx.core.Future;

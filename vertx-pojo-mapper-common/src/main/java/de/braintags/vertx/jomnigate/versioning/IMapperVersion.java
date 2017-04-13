@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.vertx.jomnigate.datatypes;
+package de.braintags.vertx.jomnigate.versioning;
 
 /**
  * IMapperVersion is the interface which is used by the mapperversioning system to store the version of a mapper inside

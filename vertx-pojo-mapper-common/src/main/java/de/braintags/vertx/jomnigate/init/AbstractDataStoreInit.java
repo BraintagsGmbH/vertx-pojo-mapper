@@ -17,6 +17,8 @@ import java.util.Properties;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.impl.AbstractDataStore;
+import de.braintags.vertx.jomnigate.observer.IObserver;
+import de.braintags.vertx.jomnigate.versioning.SetMapperVersionObserver;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -62,6 +64,7 @@ public abstract class AbstractDataStoreInit implements IDataStoreInit {
       } else {
         try {
           initEncoder(settings, result.result());
+          initDefaultObserver(settings);
         } catch (Exception e) {
           handler.handle(Future.failedFuture(e));
         }
@@ -70,6 +73,19 @@ public abstract class AbstractDataStoreInit implements IDataStoreInit {
     });
   }
 
+  /**
+   * Initialize needed instances of {@link IObserver} which must exist inside the current implementation
+   */
+  protected void initDefaultObserver(DataStoreSettings settings) {
+    settings.getObserverSettings().add(SetMapperVersionObserver.createObserverSettings());
+  }
+
+  /**
+   * Add all encoder definitions as valid IEncoder to the datastore
+   * 
+   * @param settings
+   * @param ds
+   */
   protected void initEncoder(DataStoreSettings settings, IDataStore ds) {
     List<EncoderSettings> esl = settings.getEncoders();
     esl.forEach(es -> ((AbstractDataStore) ds).getEncoderMap().put(es.getName(), es.toEncoder()));

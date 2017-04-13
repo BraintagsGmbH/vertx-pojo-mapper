@@ -13,8 +13,8 @@
 package de.braintags.vertx.jomnigate.testdatastore.mapper.versioning;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
-import de.braintags.vertx.jomnigate.datatypes.IMapperVersion;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
+import de.braintags.vertx.jomnigate.versioning.IMapperVersion;
 
 /**
  * 
