@@ -47,10 +47,26 @@ public interface IIndexedField {
           + "' must be static, final, and of type " + IIndexedField.class.getName());
   }
 
-  default String getColumnName(IDataStore<?, ?> datastore) {
-    return getColumnName(datastore.getMapperFactory().getMapper(getClass()));
+  /**
+   * Returns the column name for an indexed field, which may in some cases differ from the field name
+   * 
+   * @param pojoClass
+   *          the class that is mapped
+   * @param datastore
+   *          the datastore to retrieve the mapper from, which has the column information
+   * @return the column name for this field
+   */
+  default String getColumnName(Class<?> pojoClass, IDataStore<?, ?> datastore) {
+    return getColumnName(datastore.getMapperFactory().getMapper(pojoClass));
   }
 
+  /**
+   * Returns the column name for an indexed field, which may in some cases differ from the field name
+   * 
+   * @param mapper
+   *          the mapper which has the column information for the field
+   * @return the column name for this field
+   */
   default String getColumnName(IMapper<?> mapper) {
     String fieldName = getFieldName();
     String subFieldName = "";
