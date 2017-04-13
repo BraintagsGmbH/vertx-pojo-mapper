@@ -46,11 +46,7 @@ public class MappedIdFieldImpl extends IndexedIdField implements IMappedIdField 
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
     if (!super.equals(obj))
-      return false;
-    if (getClass() != obj.getClass())
       return false;
     MappedIdFieldImpl other = (MappedIdFieldImpl) obj;
     if (mappedField == null) {
