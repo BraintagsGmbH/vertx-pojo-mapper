@@ -15,6 +15,7 @@ package de.braintags.vertx.jomnigate.mapping.impl;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedIdField;
 import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 
 /**
  * Implementation of {@link IMappedIdField}
@@ -24,7 +25,7 @@ import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
  */
 public class MappedIdFieldImpl extends IndexedIdField implements IMappedIdField {
 
-  private MappedField mappedField;
+  private IProperty mappedField;
 
   /**
    * Generate a mapped ID field with the name of the mapped field as field- and column name
@@ -32,21 +33,8 @@ public class MappedIdFieldImpl extends IndexedIdField implements IMappedIdField 
    * @param mappedField
    *          the mapped field that has the {@link Id} annotation
    */
-  public MappedIdFieldImpl(MappedField mappedField) {
+  public MappedIdFieldImpl(IProperty mappedField) {
     super(mappedField.getName());
-    this.mappedField = mappedField;
-  }
-
-  /**
-   * Generate a mapped ID field with the name of the mapped field as field name, but a custom column name
-   * 
-   * @param mappedField
-   *          the mapped field that has the {@link Id} annotation
-   * @param columnName
-   *          the name of the ID column
-   */
-  public MappedIdFieldImpl(MappedField mappedField, String columnName) {
-    super(mappedField.getName(), columnName);
     this.mappedField = mappedField;
   }
 
@@ -56,8 +44,29 @@ public class MappedIdFieldImpl extends IndexedIdField implements IMappedIdField 
    * @see de.braintags.vertx.jomnigate.mapping.MappedIdField#getField()
    */
   @Override
-  public MappedField getField() {
+  public IProperty getField() {
     return mappedField;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((mappedField == null) ? 0 : mappedField.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!super.equals(obj))
+      return false;
+    MappedIdFieldImpl other = (MappedIdFieldImpl) obj;
+    if (mappedField == null) {
+      if (other.mappedField != null)
+        return false;
+    } else if (!mappedField.equals(other.mappedField))
+      return false;
+    return true;
   }
 
 }
