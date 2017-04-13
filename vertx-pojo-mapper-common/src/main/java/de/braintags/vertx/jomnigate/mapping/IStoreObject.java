@@ -23,6 +23,8 @@ import io.vertx.codegen.annotations.Fluent;
  * instance
  * 
  * @author Michael Remme
+ * @param <T>
+ *          the type of the entity
  * @param <F>
  *          the type, which is used internally as format, like Json for instance
  */

@@ -34,6 +34,8 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
  */
 @RunWith(VertxUnitRunner.class)
 public class TestClearDatastore {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(TestClearDatastore.class);
 
   /**
    * Ensure that records remain between datastore initialziations if 'clearDatabaseOnInit' is false
@@ -66,6 +68,7 @@ public class TestClearDatastore {
    * @param context
    *          the test context
    */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private void testDatastore(boolean shouldClear, TestContext context) {
     DataStoreSettings settings = TestHelper.getDatastoreContainer(context).createSettings();
     settings.setClearDatabaseOnInit(shouldClear);
@@ -78,11 +81,19 @@ public class TestClearDatastore {
       return;
     }
 
+    LOGGER.info("performing first datastore init");
     init.initDataStore(TestHelper.vertx, settings, context.asyncAssertSuccess((IDataStore datastore) -> {
-      IWrite<SimpleMapper> write = datastore.createWrite(SimpleMapper.class);
+      IWrite<SimpleMapper> write = null;
       SimpleMapper mapper = new SimpleMapper();
       mapper.name = "Test";
-      write.add(mapper);
+      try {
+        write = datastore.createWrite(SimpleMapper.class);
+        write.add(mapper);
+      } catch (Exception e1) {
+        LOGGER.error("", e1);
+        context.fail(e1);
+      }
+
       write.save(context.asyncAssertSuccess((IWriteResult writeResult) -> {
         IDataStoreInit init2;
         try {
@@ -92,6 +103,7 @@ public class TestClearDatastore {
           return;
         }
 
+        LOGGER.info("performing second datastore init");
         init2.initDataStore(TestHelper.vertx, settings, context.asyncAssertSuccess((IDataStore datastore2) -> {
           IQuery<SimpleMapper> query = datastore2.createQuery(SimpleMapper.class);
           query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField(), mapper.id));

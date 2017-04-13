@@ -14,9 +14,13 @@ package de.braintags.vertx.jomnigate.init;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.util.security.crypt.IEncoder;
 
 /**
@@ -33,6 +37,7 @@ public class DataStoreSettings {
   private String databaseName;
   private List<EncoderSettings> encoders = new ArrayList<>();
   private boolean clearDatabaseOnInit = false;
+  private List<ObserverSettings<?>> observerSettings = new ArrayList<>();
 
   /**
    * Standard constructor needed for saving as local file
@@ -49,7 +54,7 @@ public class DataStoreSettings {
    * @param databaseName
    *          the database used
    */
-  public DataStoreSettings(Class<? extends IDataStoreInit> datastoreInit, String databaseName) {
+  public DataStoreSettings(final Class<? extends IDataStoreInit> datastoreInit, final String databaseName) {
     this.datastoreInit = datastoreInit;
     this.databaseName = databaseName;
   }
@@ -71,7 +76,7 @@ public class DataStoreSettings {
    * @param datastoreInit
    *          the datastoreInit to set
    */
-  public final void setDatastoreInit(Class<? extends IDataStoreInit> datastoreInit) {
+  public final void setDatastoreInit(final Class<? extends IDataStoreInit> datastoreInit) {
     this.datastoreInit = datastoreInit;
   }
 
@@ -92,7 +97,7 @@ public class DataStoreSettings {
    * @param properties
    *          the properties to set
    */
-  public final void setProperties(Properties properties) {
+  public final void setProperties(final Properties properties) {
     this.properties = properties;
   }
 
@@ -111,7 +116,7 @@ public class DataStoreSettings {
    * @param databaseName
    *          the databaseName to set
    */
-  public final void setDatabaseName(String databaseName) {
+  public final void setDatabaseName(final String databaseName) {
     this.databaseName = databaseName;
   }
 
@@ -137,7 +142,7 @@ public class DataStoreSettings {
    * @param encoders
    *          the encoders to set
    */
-  public void setEncoders(List<EncoderSettings> encoders) {
+  public void setEncoders(final List<EncoderSettings> encoders) {
     this.encoders = encoders;
   }
 
@@ -160,7 +165,76 @@ public class DataStoreSettings {
    * @param clearDatabaseOnInit
    *          if the database should be cleared on initialization
    */
-  public void setClearDatabaseOnInit(boolean clearDatabaseOnInit) {
+  public void setClearDatabaseOnInit(final boolean clearDatabaseOnInit) {
     this.clearDatabaseOnInit = clearDatabaseOnInit;
   }
+
+  /**
+   * Get all defined {@link ObserverSettings}
+   * 
+   * @return the observerSettings
+   */
+  public List<ObserverSettings<?>> getObserverSettings() {
+    return observerSettings;
+  }
+
+  /**
+   * Get all {@link ObserverSettings} which are fitting the given mapper class for the event
+   * {@link ObserverEventType#BEFORE_MAPPING}
+   * 
+   * @param mapperClass
+   * @return
+   */
+  public List<ObserverSettings<?>> getObserverSettings(final Class<?> mapperClass) {
+    List<ObserverSettings<?>> tmpList = new ArrayList<>();
+    List<ObserverSettings<?>> osl = getObserverSettings();
+    osl.stream().filter(os -> os.isApplicableFor(mapperClass) && os.isApplicableFor(ObserverEventType.BEFORE_MAPPING))
+        .forEach(tmpList::add);
+    return tmpList;
+  }
+
+  /**
+   * Get all {@link ObserverSettings} which are fitting the given mapper
+   * 
+   * @param mapper
+   * @return
+   */
+  public List<ObserverSettings<?>> getObserverSettings(final IMapper<?> mapper) {
+    List<ObserverSettings<?>> osl = getObserverSettings();
+    List<ObserverSettings<?>> tmpList = osl.stream().filter(os -> os.isApplicableFor(mapper))
+        .collect(Collectors.toList());
+    return tmpList;
+  }
+
+  /**
+   * @param observerSettings
+   *          the observerSettings to set
+   */
+  public void setObserverSettings(final List<ObserverSettings<?>> observerSettings) {
+    this.observerSettings = observerSettings;
+  }
+  
+  /**
+   * Creates a deep (recursive) copy of the DataStoreSettings
+   */
+  public DataStoreSettings deepCopy() {
+    DataStoreSettings res = new DataStoreSettings(datastoreInit, databaseName);
+
+    res.properties = new Properties();
+    for (Entry<Object, Object> property : properties.entrySet()) {
+      res.properties.put(property.getKey(), property.getValue());
+    }
+    res.clearDatabaseOnInit = clearDatabaseOnInit;
+    
+    for (EncoderSettings encoder : encoders) {
+      res.encoders.add(encoder.deepCopy());
+    }
+
+    for (ObserverSettings<?> observer : observerSettings) {
+      res.observerSettings.add(observer.deepCopy());
+    }
+
+    return res;
+  }
+
 }

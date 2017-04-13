@@ -25,10 +25,10 @@ import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.ObjectFactory;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.exception.MappingException;
+import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
-import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.util.ClassUtil;
 import de.braintags.vertx.util.exception.ClassAccessException;
 

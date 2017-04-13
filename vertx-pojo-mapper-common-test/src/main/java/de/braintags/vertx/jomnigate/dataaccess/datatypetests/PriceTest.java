@@ -12,6 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.datatypetests;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.Test;
@@ -32,6 +33,12 @@ public class PriceTest extends AbstractDatatypeTest {
 
   public PriceTest() {
     super("price");
+  }
+
+  @Test
+  public void testValues(TestContext context) {
+    Price price = new Price(new BigDecimal("55.55"));
+    context.assertNotEquals("55.55", price.toString());
   }
 
   @Test

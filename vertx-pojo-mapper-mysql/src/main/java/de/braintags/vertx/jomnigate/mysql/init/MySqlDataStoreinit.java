@@ -82,7 +82,7 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
         });
       } else {
         this.mySQLClient = createMySqlClient();
-        datastore = new MySqlDataStore(vertx, mySQLClient, getConfig());
+        datastore = new MySqlDataStore(vertx, mySQLClient, getConfig(), settings);
         handler.handle(Future.succeededFuture(datastore));
       }
     } catch (Exception e) {
@@ -113,7 +113,7 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
           } else {
             // reinitialize the client because we dropped the database the temporary client used
             this.mySQLClient = createMySqlClient();
-            datastore = new MySqlDataStore(vertx, tempClient, getConfig());
+            datastore = new MySqlDataStore(vertx, tempClient, getConfig(), settings);
             handler.handle(Future.succeededFuture(datastore));
           }
         });
@@ -169,6 +169,23 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
    * @return
    */
   public static DataStoreSettings createSettings() {
+    DataStoreSettings settings = createDefaultSettings();
+    applySystemProperties(settings);
+    return settings;
+  }
+
+  /**
+   * This method applys the system properties to settings for MySql:
+   * <UL>
+   * <LI>MySqlDataStoreContainer.username to set the username of the database
+   * <LI>MySqlDataStoreContainer.password to set the password of the database
+   * <LI>MySqlDataStoreContainer.host to set the host of the database
+   * <LI>defaultKeyGenerator to set the name of the default keygenerator to be used
+   * </UL>
+   * 
+   * @return
+   */
+  public static void applySystemProperties(DataStoreSettings settings) {
     String database = "test";
     String username = System.getProperty("MySqlDataStoreContainer.username", null);
     if (username == null) {
@@ -183,7 +200,6 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
       throw new ParameterRequiredException("you must set the property 'MySqlDataStoreContainer.host'");
     }
     String keyGenerator = System.getProperty(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
-    DataStoreSettings settings = createDefaultSettings();
     settings.setDatabaseName(database);
     settings.getProperties().put(MySqlDataStoreinit.HOST_PROPERTY, host);
     settings.getProperties().put(MySqlDataStoreinit.PORT_PROPERTY, MySqlDataStoreinit.DEFAULT_PORT);
@@ -193,9 +209,8 @@ public class MySqlDataStoreinit extends AbstractDataStoreInit {
     settings.getProperties().put(MySqlDataStoreinit.HANDLE_REFERENCED_RECURSIVE_PROP, handleReferencedRecursive);
     settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, keyGenerator);
     LOGGER.info("SETTINGS ARE: " + settings.toString());
-    return settings;
-  }
-
+  }  
+  
   /**
    * Helper method which creates the default settings for an instance of {@link MySqlDataStore}
    * 

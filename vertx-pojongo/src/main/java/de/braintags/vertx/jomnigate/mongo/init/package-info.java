@@ -16,8 +16,5 @@
  * {@link de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit}
  *
  * 
- * @author Michael Remme
- * 
  */
-
 package de.braintags.vertx.jomnigate.mongo.init;

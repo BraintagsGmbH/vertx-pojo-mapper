@@ -27,9 +27,9 @@ import io.vertx.core.Handler;
 
 /**
  * A helper class with several static methods to simplyfy search actions
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class QueryHelper {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
@@ -40,7 +40,7 @@ public class QueryHelper {
 
   /**
    * Performs a query by id and returns the found instance, or null, if none
-   * 
+   *
    * @param datastore
    *          the datastore to be used
    * @param mapperClass
@@ -61,7 +61,7 @@ public class QueryHelper {
    * Executes the given {@link IQuery} and returns the first record directly to the handler. This method can be used,
    * when only one record is expected to be found, like an ID query, for instance. The same than
    * executeToFirstRecord(query, false, handler)
-   * 
+   *
    * @param query
    *          the query to be executed
    * @param handler
@@ -74,7 +74,7 @@ public class QueryHelper {
   /**
    * Executes the given {@link IQuery} and returns the first record directly to the handler. This method can be used,
    * when only one record is expected to be found, like an ID query, for instance
-   * 
+   *
    * @param query
    *          the query to be executed
    * @param required
@@ -111,7 +111,7 @@ public class QueryHelper {
   /**
    * Executes the given {@link IQuery} and returns all found records as {@link List} directly to
    * the handler
-   * 
+   *
    * @param query
    *          the query to be executed
    * @param handler
@@ -122,7 +122,7 @@ public class QueryHelper {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
-        LOGGER.info("executed query: " + result.result().toString());
+        LOGGER.debug("executed query: " + result.result().toString());
         queryResultToList(result.result(), handler);
       }
     });
@@ -130,7 +130,7 @@ public class QueryHelper {
 
   /**
    * Creates a complete {@link List} of objects from the given {@link IQueryResult}
-   * 
+   *
    * @param queryResult
    *          the {@link IQueryResult} to be handled
    * @param handler

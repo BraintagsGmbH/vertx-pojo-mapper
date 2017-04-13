@@ -17,11 +17,11 @@ import java.util.List;
 
 import com.mongodb.MongoException;
 
-import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.AbstractWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.impl.WriteEntry;
 import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
 import de.braintags.vertx.jomnigate.exception.WriteException;
@@ -59,19 +59,21 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   }
 
   @Override
-  public void internalSave(Handler<AsyncResult<IWriteResult>> resultHandler) {
+  public Future<IWriteResult> internalSave() {
+    Future<IWriteResult> f = Future.future();
     if (getObjectsToSave().isEmpty()) {
-      resultHandler.handle(Future.succeededFuture(new MongoWriteResult()));
+      f.complete(new MongoWriteResult());
     } else {
       CompositeFuture cf = saveRecords();
       cf.setHandler(cfr -> {
         if (cfr.failed()) {
-          resultHandler.handle(Future.failedFuture(cfr.cause()));
+          f.fail(cfr.cause());
         } else {
-          resultHandler.handle(Future.succeededFuture(new MongoWriteResult(cf.list())));
+          f.complete(new MongoWriteResult(cf.list()));
         }
       });
     }
+    return f;
   }
 
   @SuppressWarnings("rawtypes")
