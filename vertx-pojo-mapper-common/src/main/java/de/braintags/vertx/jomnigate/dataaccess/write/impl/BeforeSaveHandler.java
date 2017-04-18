@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
-import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
@@ -39,10 +38,9 @@ public class BeforeSaveHandler {
    * @param ol
    * @return
    */
-  public <T> Future<Void> handle(IWrite<T> write, IStoreObject<T, ?> storeObject, IObserverContext context,
-      List<IObserver> ol) {
+  public <T> Future<Void> handle(IWrite<T> write, T entity, IObserverContext context, List<IObserver> ol) {
     Future<Void> f = Future.future();
-    CompositeFuture cf = loopObserver(ol, write, storeObject, context);
+    CompositeFuture cf = loopObserver(ol, write, entity, context);
     cf.setHandler(cfr -> {
       if (cfr.failed()) {
         f.fail(cfr.cause());
@@ -63,11 +61,11 @@ public class BeforeSaveHandler {
    * @return
    */
   @SuppressWarnings("rawtypes")
-  protected <T> CompositeFuture loopObserver(List<IObserver> ol, IWrite<T> writeObject, IStoreObject<T, ?> storeObject,
+  protected <T> CompositeFuture loopObserver(List<IObserver> ol, IWrite<T> writeObject, T entity,
       IObserverContext context) {
     List<Future> fl = new ArrayList<>();
     for (IObserver observer : ol) {
-      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_SAVE, storeObject, null, writeObject,
+      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_SAVE, entity, null, writeObject,
           writeObject.getDataStore());
       if (observer.canHandleEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);

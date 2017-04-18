@@ -26,6 +26,7 @@ import de.braintags.vertx.jomnigate.dataaccess.write.impl.WriteEntry;
 import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
 import de.braintags.vertx.jomnigate.exception.WriteException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.mongo.MongoDataStore;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import io.vertx.core.AsyncResult;
@@ -90,25 +91,14 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   private Future<IWriteEntry> save(T entity, IObserverContext context) {
     // TODO refactoring / abstraction will follow when refactoring MySql
     Future<IWriteEntry> f = Future.future();
-    getDataStore().getStoreObjectFactory().createStoreObject(getMapper(), entity, result -> {
-      if (result.failed()) {
-        WriteException we = new WriteException(result.cause());
-        LOG.info("failed", we);
-        f.fail(we);
-      } else {
-        MongoStoreObject<T> sto = (MongoStoreObject) result.result();
-        preSave(sto, context).compose(wr -> doSave(entity, sto, f), f);
+    preSave(entity, context).compose(r1 -> createStoreObject(entity))
+        .compose(sto -> doSave(entity, (MongoStoreObject) sto, f), f);
+    return f;
+  }
 
-        // doSave(entity, sto, sResult -> {
-        // if (sResult.failed()) {
-        // LOG.info("failed", sResult.cause());
-        // f.fail(sResult.cause());
-        // } else {
-        // f.complete(sResult.result());
-        // }
-        // });
-      }
-    });
+  private Future<IStoreObject<T, ?>> createStoreObject(T entity) {
+    Future<IStoreObject<T, ?>> f = Future.future();
+    getDataStore().getStoreObjectFactory().createStoreObject(getMapper(), entity, f);
     return f;
   }
 
@@ -117,8 +107,8 @@ public class MongoWrite<T> extends AbstractWrite<T> {
    * 
    * @return
    */
-  protected Future<Void> preSave(MongoStoreObject<T> storeObject, IObserverContext context) {
-    return getMapper().getObserverHandler().handleBeforeSave(this, storeObject, context);
+  protected Future<Void> preSave(T entity, IObserverContext context) {
+    return getMapper().getObserverHandler().handleBeforeSave(this, entity, context);
   }
 
   /**

@@ -22,7 +22,6 @@ import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
-import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.observer.impl.handler.DefaultObserverHandler;
 import io.vertx.core.Future;
 
@@ -59,11 +58,11 @@ public interface IObserverHandler {
    * Performs the event {@link ObserverEventType#BEFORE_SAVE} for the storeObject
    * 
    * @param write
-   * @param storeObject
+   * @param entity
    * @param context
    * @return
    */
-  <T> Future<Void> handleBeforeSave(IWrite<T> write, IStoreObject<T, ?> storeObject, IObserverContext context);
+  <T> Future<Void> handleBeforeSave(IWrite<T> write, T entity, IObserverContext context);
 
   /**
    * Performs the event {@link ObserverEventType#AFTER_SAVE} to the records in the {@link IWrite}

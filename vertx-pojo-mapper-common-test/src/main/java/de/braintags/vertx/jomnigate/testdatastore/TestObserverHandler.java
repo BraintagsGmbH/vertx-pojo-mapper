@@ -201,7 +201,18 @@ public class TestObserverHandler extends AbstractObserverTest {
    */
   @Test
   public void test_BeforeInsert_SingleRecord(TestContext context) {
-    context.fail("unsupported");
+    BeforeSaveObserver.executed = false;
+    DataStoreSettings settings = getDataStore(context).getSettings();
+    ObserverSettings<BeforeSaveObserver> os = new ObserverSettings<>(BeforeSaveObserver.class);
+    os.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
+    settings.getObserverSettings().add(os);
+    SimpleMapper sm = new SimpleMapper("testname", "nix");
+    sm.intValue = -1;
+    saveRecord(context, sm);
+    context.assertTrue(BeforeSaveObserver.executed, "Observer wasn't executed");
+    SimpleMapper tmp = findRecordByID(context, SimpleMapper.class, sm.id);
+    context.assertNotNull(tmp, "instance not found");
+    context.assertEquals(1, tmp.intValue, "Observer did not set number correct");
   }
 
   /**
