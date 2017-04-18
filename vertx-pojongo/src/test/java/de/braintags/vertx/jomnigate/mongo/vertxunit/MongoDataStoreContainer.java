@@ -79,7 +79,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
 
   private static MongodExecutable exe;
   private MongoDataStore mongoDataStore;
-  private Map<String, String> thMap = new HashMap<>();
+  private final Map<String, String> thMap = new HashMap<>();
 
   /**
    * 
@@ -125,7 +125,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
    * io.vertx.core.Handler)
    */
   @Override
-  public void startup(Vertx vertx, Handler<AsyncResult<Void>> handler) {
+  public void startup(final Vertx vertx, final Handler<AsyncResult<Void>> handler) {
     try {
       if (mongoDataStore == null) {
         DataStoreSettings settings = createSettings();
@@ -184,7 +184,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
    * @see de.braintags.vertx.jomnigate.datastoretest.IDatastoreContainer#shutdown(io.vertx.core.Handler)
    */
   @Override
-  public void shutdown(Handler<AsyncResult<Void>> handler) {
+  public void shutdown(final Handler<AsyncResult<Void>> handler) {
     logger.info("shutdown performed");
     mongoDataStore.shutdown(result -> {
       if (result.failed()) {
@@ -206,7 +206,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
    * io.vertx.core.Handler)
    */
   @Override
-  public void dropTable(String collection, Handler<AsyncResult<Void>> handler) {
+  public void dropTable(final String collection, final Handler<AsyncResult<Void>> handler) {
     logger.info("DROPPING: " + collection);
     ((MongoClient) mongoDataStore.getClient()).dropCollection(collection, dropResult -> {
       if (dropResult.failed()) {
@@ -225,7 +225,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
    * io.vertx.core.Handler)
    */
   @Override
-  public void clearTable(String tablename, Handler<AsyncResult<Void>> handler) {
+  public void clearTable(final String tablename, final Handler<AsyncResult<Void>> handler) {
     dropTable(tablename, handler);
   }
 
@@ -236,7 +236,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
    *          the key of the property to be fetched
    * @return a valid value or null
    */
-  private static String getProperty(String name, String defaultValue) {
+  private static String getProperty(final String name, final String defaultValue) {
     String s = System.getProperty(name);
     if (s != null) {
       s = s.trim();
@@ -248,7 +248,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   }
 
   @Override
-  public String getExpectedTypehandlerName(Class<? extends AbstractTypeHandlerTest> testClass, String defaultName) {
+  public String getExpectedTypehandlerName(final Class<? extends AbstractTypeHandlerTest> testClass, final String defaultName) {
     if (thMap.containsKey(testClass.getName()))
       return thMap.get(testClass.getName());
     return defaultName;

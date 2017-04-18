@@ -18,7 +18,6 @@ import java.util.Set;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
-import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterDelete;
@@ -117,7 +116,7 @@ public interface IMapper<T> {
    * 
    * @return the index definitions
    */
-  Indexes getIndexDefinitions();
+  List<IIndexDefinition> getIndexDefinitions();
 
   /**
    * Get a defined {@link Annotation} of the given class

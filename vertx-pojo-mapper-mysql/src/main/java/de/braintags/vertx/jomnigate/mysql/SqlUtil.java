@@ -20,9 +20,9 @@ import java.util.List;
 import com.github.mauricio.async.db.mysql.exceptions.MySQLException;
 
 import de.braintags.vertx.jomnigate.annotation.Index;
-import de.braintags.vertx.jomnigate.annotation.IndexField;
-import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
+import de.braintags.vertx.jomnigate.mapping.IIndexFieldDefinition;
 import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
 import de.braintags.vertx.jomnigate.mysql.exception.SqlException;
 import io.vertx.core.AsyncResult;
@@ -72,17 +72,18 @@ public class SqlUtil {
    *          the datastore
    * @param collection
    *          the name of the collection to be used
-   * @param indexes
+   * @param indexDefinitions
    *          the index definition
    * @param handler
    *          the handler to be informed
    */
-  public static final void createIndexes(MySqlDataStore ds, String tableName, Indexes indexes,
-      Handler<AsyncResult<String>> handler) {
-    if (indexes == null || indexes.value().length == 0) {
+  public static final void createIndexes(final MySqlDataStore ds, final String tableName,
+      final List<IIndexDefinition> indexDefinitions,
+      final Handler<AsyncResult<String>> handler) {
+    if (indexDefinitions == null || indexDefinitions.isEmpty()) {
       handler.handle(Future.succeededFuture("No indexes defined"));
     } else {
-      List<Future> fl = createFutureList(ds, tableName, indexes);
+      List<Future> fl = createFutureList(ds, tableName, indexDefinitions);
       Buffer returnBuffer = Buffer.buffer();
       CompositeFuture cf = CompositeFuture.all(fl);
       cf.setHandler(result -> {
@@ -97,15 +98,17 @@ public class SqlUtil {
   }
 
   @SuppressWarnings("rawtypes")
-  private static List<Future> createFutureList(MySqlDataStore ds, String tableName, Indexes indexes) {
+  private static List<Future> createFutureList(final MySqlDataStore ds, final String tableName,
+      final List<IIndexDefinition> indexDefinitions) {
     List<Future> fl = new ArrayList<>();
-    for (Index index : indexes.value()) {
+    for (IIndexDefinition index : indexDefinitions) {
       fl.add(createIndex(ds, tableName, index));
     }
     return fl;
   }
 
-  private static final Future<String> createIndex(MySqlDataStore ds, String tableName, Index index) {
+  private static final Future<String> createIndex(final MySqlDataStore ds, final String tableName,
+      final IIndexDefinition index) {
     Future<String> f = Future.future();
     checkIndexExists(ds, tableName, index, result -> {
       if (result.failed()) {
@@ -113,7 +116,7 @@ public class SqlUtil {
       } else {
         switch (result.result().state) {
         case INDEX_EXISTS:
-          f.complete("Index exists: " + index.name());
+          f.complete("Index exists: " + index.getName());
           break;
         case INDEX_NOT_EXISTS:
           createIndex(ds, tableName, index, f.completer());
@@ -130,32 +133,33 @@ public class SqlUtil {
     return f;
   }
 
-  private static void createIndex(MySqlDataStore ds, String tableName, Index index,
-      Handler<AsyncResult<String>> handler) {
-    IndexField[] fields = index.fields();
-    if (fields.length > 1) {
+  private static void createIndex(final MySqlDataStore ds, final String tableName, final IIndexDefinition index,
+      final Handler<AsyncResult<String>> handler) {
+    List<IIndexFieldDefinition> fields = index.getFields();
+    if (fields.size() > 1) {
       handler.handle(
           Future.failedFuture(new UnsupportedOperationException("Not yet supported: more than one field in index")));
       return;
     }
-    for (IndexField field : fields) {
-      switch (field.type()) {
+    for (IIndexFieldDefinition field : fields) {
+      switch (field.getType()) {
       case GEO2DSPHERE:
       case GEO2D:
-        createGeoIndex(ds, index.name(), tableName, field, handler);
+        createGeoIndex(ds, index.getName(), tableName, field, handler);
         break;
 
       default:
         handler.handle(
-            Future.failedFuture(new UnsupportedOperationException("Index type not supported: " + field.type())));
+            Future.failedFuture(new UnsupportedOperationException("Index type not supported: " + field.getType())));
       }
     }
 
   }
 
-  private static void createGeoIndex(MySqlDataStore ds, String indexName, String tableName, IndexField field,
-      Handler<AsyncResult<String>> handler) {
-    String createString = String.format(GEO_INDEX, indexName, tableName, field.fieldName());
+  private static void createGeoIndex(final MySqlDataStore ds, final String indexName, final String tableName,
+      final IIndexFieldDefinition field,
+      final Handler<AsyncResult<String>> handler) {
+    String createString = String.format(GEO_INDEX, indexName, tableName, field.getName());
     execute(ds, createString, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -165,10 +169,11 @@ public class SqlUtil {
     });
   }
 
-  private static void modifyIndex(MySqlDataStore ds, String tableName, Index index, IndexResult res,
-      Handler<AsyncResult<String>> handler) {
+  private static void modifyIndex(final MySqlDataStore ds, final String tableName, final IIndexDefinition index,
+      final IndexResult res,
+      final Handler<AsyncResult<String>> handler) {
     handler.handle(Future.succeededFuture("Indexdefinition is modified and should be adapted in the database for table "
-        + tableName + " | " + index.name()));
+        + tableName + " | " + index.getName()));
   }
 
   /**
@@ -180,8 +185,8 @@ public class SqlUtil {
    * @param handler
    *          handler to be informed about existing index or null, if none with that name
    */
-  public static final void getIndexInfo(MySqlDataStore ds, String tableName, String index,
-      Handler<AsyncResult<JsonObject>> handler) {
+  public static final void getIndexInfo(final MySqlDataStore ds, final String tableName, final String index,
+      final Handler<AsyncResult<JsonObject>> handler) {
     String command = "SHOW INDEX FROM " + tableName;
     AsyncSQLClient client = (AsyncSQLClient) ds.getClient();
     query(client, command, result -> {
@@ -204,9 +209,10 @@ public class SqlUtil {
     });
   }
 
-  private static final void checkIndexExists(MySqlDataStore ds, String tableName, Index index,
-      Handler<AsyncResult<IndexResult>> handler) {
-    getIndexInfo(ds, tableName, index.name(), result -> {
+  private static final void checkIndexExists(final MySqlDataStore ds, final String tableName,
+      final IIndexDefinition index,
+      final Handler<AsyncResult<IndexResult>> handler) {
+    getIndexInfo(ds, tableName, index.getName(), result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
@@ -223,7 +229,7 @@ public class SqlUtil {
 
   }
 
-  private static IndexResult compare(JsonObject existingIndex, Index indexDef) {
+  private static IndexResult compare(final JsonObject existingIndex, final IIndexDefinition index) {
     IndexResult res = new IndexResult(INDEX_EXISTS);
     res.read = existingIndex;
     return res;
@@ -236,7 +242,7 @@ public class SqlUtil {
    *          the {@link IColumnInfo} to be checked
    * @return true, if numeric
    */
-  public static boolean isNumeric(IColumnInfo col) {
+  public static boolean isNumeric(final IColumnInfo col) {
     return NUMBERIC_TYPES.contains(col.getType().toUpperCase());
   }
 
@@ -247,7 +253,7 @@ public class SqlUtil {
    *          the {@link IColumnInfo} to be checked
    * @return true, if character based
    */
-  public static boolean isCharacter(IColumnInfo col) {
+  public static boolean isCharacter(final IColumnInfo col) {
     return CHARACTER_TYPES.contains(col.getType().toUpperCase());
   }
 
@@ -258,7 +264,7 @@ public class SqlUtil {
    *          the {@link IColumnInfo} to be checked
    * @return true, if date / time based
    */
-  public static boolean isDateTime(IColumnInfo col) {
+  public static boolean isDateTime(final IColumnInfo col) {
     return DATE_TYPES.contains(col.getType().toUpperCase());
   }
 
@@ -272,7 +278,7 @@ public class SqlUtil {
    * @param resultHandler
    *          a resulthandler to be informed
    */
-  public static void query(MySqlDataStore datastore, String command, Handler<AsyncResult<ResultSet>> resultHandler) {
+  public static void query(final MySqlDataStore datastore, final String command, final Handler<AsyncResult<ResultSet>> resultHandler) {
     query((AsyncSQLClient) datastore.getClient(), command, resultHandler);
   }
 
@@ -286,7 +292,7 @@ public class SqlUtil {
    * @param resultHandler
    *          a resulthandler to be informed
    */
-  public static void query(AsyncSQLClient sqlClient, String command, Handler<AsyncResult<ResultSet>> resultHandler) {
+  public static void query(final AsyncSQLClient sqlClient, final String command, final Handler<AsyncResult<ResultSet>> resultHandler) {
     LOGGER.debug("query: " + command);
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
@@ -306,7 +312,7 @@ public class SqlUtil {
    * @param resultHandler
    * @param connection
    */
-  private static void doQuery(String command, Handler<AsyncResult<ResultSet>> resultHandler, SQLConnection connection) {
+  private static void doQuery(final String command, final Handler<AsyncResult<ResultSet>> resultHandler, final SQLConnection connection) {
     connection.query(command, qr -> {
       if (qr.failed()) {
         Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command, qr.cause());
@@ -333,8 +339,8 @@ public class SqlUtil {
    * @param resultHandler
    *          a resulthandler to be informed
    */
-  public static void queryWithParams(MySqlDataStore datastore, String command, JsonArray params,
-      Handler<AsyncResult<ResultSet>> resultHandler) {
+  public static void queryWithParams(final MySqlDataStore datastore, final String command, final JsonArray params,
+      final Handler<AsyncResult<ResultSet>> resultHandler) {
     queryWithParams((AsyncSQLClient) datastore.getClient(), command, params, resultHandler);
   }
 
@@ -348,8 +354,8 @@ public class SqlUtil {
    * @param resultHandler
    *          a resulthandler to be informed
    */
-  public static void queryWithParams(AsyncSQLClient sqlClient, String command, JsonArray params,
-      Handler<AsyncResult<ResultSet>> resultHandler) {
+  public static void queryWithParams(final AsyncSQLClient sqlClient, final String command, final JsonArray params,
+      final Handler<AsyncResult<ResultSet>> resultHandler) {
     LOGGER.debug("queryWithParams: " + command + " | " + params);
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
@@ -370,8 +376,8 @@ public class SqlUtil {
    * @param resultHandler
    * @param connection
    */
-  private static void doQueryWithParams(String command, JsonArray params, Handler<AsyncResult<ResultSet>> resultHandler,
-      SQLConnection connection) {
+  private static void doQueryWithParams(final String command, final JsonArray params, final Handler<AsyncResult<ResultSet>> resultHandler,
+      final SQLConnection connection) {
     connection.queryWithParams(command, params, qr -> {
       if (qr.failed()) {
         Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command + " | " + params, qr.cause());
@@ -398,7 +404,7 @@ public class SqlUtil {
    * @param resultHandler
    *          a resulthandler to be informed
    */
-  public static void execute(MySqlDataStore datastore, String command, Handler<AsyncResult<Void>> resultHandler) {
+  public static void execute(final MySqlDataStore datastore, final String command, final Handler<AsyncResult<Void>> resultHandler) {
     if (datastore == null)
       throw new NullPointerException("datastore is null");
     execute((AsyncSQLClient) datastore.getClient(), command, resultHandler);
@@ -414,7 +420,7 @@ public class SqlUtil {
    * @param resultHandler
    *          a resulthandler to be informed
    */
-  public static void execute(AsyncSQLClient sqlClient, String command, Handler<AsyncResult<Void>> resultHandler) {
+  public static void execute(final AsyncSQLClient sqlClient, final String command, final Handler<AsyncResult<Void>> resultHandler) {
     LOGGER.debug("execute: " + command);
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
@@ -435,7 +441,7 @@ public class SqlUtil {
    * @param resultHandler
    * @param connection
    */
-  private static void doExecute(String command, Handler<AsyncResult<Void>> resultHandler, SQLConnection connection) {
+  private static void doExecute(final String command, final Handler<AsyncResult<Void>> resultHandler, final SQLConnection connection) {
     connection.execute(command, qr -> {
       if (qr.failed()) {
         if (qr.cause().getMessage().contains("doesn't exist")) {
@@ -465,8 +471,8 @@ public class SqlUtil {
    * @param resultHandler
    *          a resulthandler to be informed
    */
-  public static void update(MySqlDataStore datastore, String command,
-      Handler<AsyncResult<UpdateResult>> resultHandler) {
+  public static void update(final MySqlDataStore datastore, final String command,
+      final Handler<AsyncResult<UpdateResult>> resultHandler) {
     update((AsyncSQLClient) datastore.getClient(), command, resultHandler);
   }
 
@@ -480,8 +486,8 @@ public class SqlUtil {
    * @param resultHandler
    *          a resulthandler to be informed
    */
-  public static void update(AsyncSQLClient sqlClient, String command,
-      Handler<AsyncResult<UpdateResult>> resultHandler) {
+  public static void update(final AsyncSQLClient sqlClient, final String command,
+      final Handler<AsyncResult<UpdateResult>> resultHandler) {
     LOGGER.debug("update: " + command);
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
@@ -506,8 +512,8 @@ public class SqlUtil {
    * @param resultHandler
    *          a resulthandler to be informed
    */
-  public static void updateWithParams(MySqlDataStore datastore, String command, JsonArray params,
-      Handler<AsyncResult<UpdateResult>> resultHandler) {
+  public static void updateWithParams(final MySqlDataStore datastore, final String command, final JsonArray params,
+      final Handler<AsyncResult<UpdateResult>> resultHandler) {
     updateWithParams((AsyncSQLClient) datastore.getClient(), command, params, resultHandler);
   }
 
@@ -521,8 +527,8 @@ public class SqlUtil {
    * @param resultHandler
    *          a resulthandler to be informed
    */
-  public static void updateWithParams(AsyncSQLClient sqlClient, String command, JsonArray params,
-      Handler<AsyncResult<UpdateResult>> resultHandler) {
+  public static void updateWithParams(final AsyncSQLClient sqlClient, final String command, final JsonArray params,
+      final Handler<AsyncResult<UpdateResult>> resultHandler) {
     LOGGER.debug("updateWithParams: " + command + " | " + params);
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
@@ -537,8 +543,8 @@ public class SqlUtil {
     });
   }
 
-  private static void executeUpdate(SQLConnection connection, String command,
-      Handler<AsyncResult<UpdateResult>> resultHandler) {
+  private static void executeUpdate(final SQLConnection connection, final String command,
+      final Handler<AsyncResult<UpdateResult>> resultHandler) {
     connection.update(command, qr -> {
       if (qr.failed()) {
         Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command, qr.cause());
@@ -554,8 +560,8 @@ public class SqlUtil {
     });
   }
 
-  private static void executeUpdateWithParams(SQLConnection connection, String command, JsonArray params,
-      Handler<AsyncResult<UpdateResult>> resultHandler) {
+  private static void executeUpdateWithParams(final SQLConnection connection, final String command, final JsonArray params,
+      final Handler<AsyncResult<UpdateResult>> resultHandler) {
     connection.updateWithParams(command, params, qr -> {
       if (qr.failed()) {
         connection.close();
@@ -580,7 +586,7 @@ public class SqlUtil {
     short state = -1;
     JsonObject read;
 
-    IndexResult(short state) {
+    IndexResult(final short state) {
       this.state = state;
     }
   }

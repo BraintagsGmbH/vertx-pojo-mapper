@@ -19,7 +19,6 @@ import java.util.Map;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.annotation.IndexField;
-import de.braintags.vertx.jomnigate.annotation.IndexOptions;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 
@@ -32,7 +31,7 @@ import de.braintags.vertx.jomnigate.annotation.field.Id;
 
 @Entity(name = "PersonColumn")
 @Indexes(@Index(fields = { @IndexField(fieldName = "name"),
-    @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
+    @IndexField(fieldName = "weight") }, name = "testIndex"))
 public class PersonWithAnimals_Mini {
 
   @Id
@@ -56,14 +55,14 @@ public class PersonWithAnimals_Mini {
   /**
    * 
    */
-  public PersonWithAnimals_Mini(int count) {
+  public PersonWithAnimals_Mini(final int count) {
     this.name = "name " + count;
     this.animal = new Animal(0);
     this.chicken = new Animal(5);
     this.stringArray = createArray("story2 ", 5);
   }
 
-  private static Map<Integer, Animal> initAnimalMap(int count) {
+  private static Map<Integer, Animal> initAnimalMap(final int count) {
     Map<Integer, Animal> map = new HashMap<>();
     for (int i = 0; i < count; i++) {
       map.put(new Integer(i), new Animal(i));
@@ -71,7 +70,7 @@ public class PersonWithAnimals_Mini {
     return map;
   }
 
-  private static Map<Integer, Double> initMap(int count) {
+  private static Map<Integer, Double> initMap(final int count) {
     Map<Integer, Double> map = new HashMap<>();
     for (int i = 0; i < count; i++) {
       map.put(new Integer(i), new Double(i));
@@ -90,11 +89,11 @@ public class PersonWithAnimals_Mini {
    * @param name
    *          the name to set
    */
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
-  private static final ArrayList<String> createList(String prefix, int counter) {
+  private static final ArrayList<String> createList(final String prefix, final int counter) {
     ArrayList<String> returnList = new ArrayList<>();
     for (int i = 0; i < counter; i++) {
       returnList.add(prefix + counter);
@@ -102,7 +101,7 @@ public class PersonWithAnimals_Mini {
     return returnList;
   }
 
-  private static final String[] createArray(String prefix, int counter) {
+  private static final String[] createArray(final String prefix, final int counter) {
     String[] rs = new String[counter];
     for (int i = 0; i < counter; i++) {
       rs[i] = prefix + counter;

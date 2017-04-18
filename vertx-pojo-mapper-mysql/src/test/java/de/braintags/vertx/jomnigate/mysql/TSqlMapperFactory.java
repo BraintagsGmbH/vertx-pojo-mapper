@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -30,7 +31,6 @@ import org.junit.Test;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Index;
-import de.braintags.vertx.jomnigate.annotation.IndexOptions;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
@@ -50,6 +50,7 @@ import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapper;
+import de.braintags.vertx.jomnigate.mapping.IndexOptions;
 import de.braintags.vertx.jomnigate.mapping.impl.DefaultPropertyMapper;
 import de.braintags.vertx.jomnigate.mapping.impl.ParametrizedMappedField;
 import de.braintags.vertx.jomnigate.mysql.mapping.SqlPropertyMapperFactory;
@@ -151,11 +152,12 @@ public class TSqlMapperFactory {
       Assert.assertEquals("The name of the index is wrong", "testIndex", index.name());
       Assert.assertEquals("wrong number of fields", 2, index.fields().length);
 
-      IndexOptions options = index.options();
+      IndexOptions[] options = index.options();
       if (options == null)
         Assert.fail("IndexOptions must not be null");
       else {
-        Assert.assertEquals("wrong parameter unique in IndexOptions", false, options.unique());
+        Assert.assertEquals("wrong parameter unique in IndexOptions", false,
+            Arrays.asList(options).contains(IndexOptions.UNIQUE));
       }
     }
   }
@@ -201,15 +203,15 @@ public class TSqlMapperFactory {
 
   }
 
-  private void checkPropertyhandler(IMapper mapperdef, String fieldName,
-      Class<? extends IPropertyMapper> expectedPropertyMapper) {
+  private void checkPropertyhandler(final IMapper mapperdef, final String fieldName,
+      final Class<? extends IPropertyMapper> expectedPropertyMapper) {
     IProperty field = mapperDef.getField(fieldName);
     assertNotNull("property mapper must not be null for field: " + field.getFullName(), field.getPropertyMapper());
     assertEquals("wrong property mapper for field: " + field.getFullName(), expectedPropertyMapper,
         field.getPropertyMapper().getClass());
   }
 
-  private void checkTypeHandler(IMapper mapperdef, String fieldName, Class expectedTh, Class expectedSubTypeHandler) {
+  private void checkTypeHandler(final IMapper mapperdef, final String fieldName, final Class expectedTh, final Class expectedSubTypeHandler) {
     IProperty field = mapperDef.getField(fieldName);
     assertNotNull("Typehandler must not be null for field: " + field.getFullName(), field.getTypeHandler());
     assertEquals("wrong TypeHandler for field: " + field.getFullName(), expectedTh, field.getTypeHandler().getClass());

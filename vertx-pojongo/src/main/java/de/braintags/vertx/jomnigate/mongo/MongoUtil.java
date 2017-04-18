@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.annotation.Index;
-import de.braintags.vertx.jomnigate.annotation.IndexField;
-import de.braintags.vertx.jomnigate.annotation.IndexOptions;
-import de.braintags.vertx.jomnigate.annotation.Indexes;
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
+import de.braintags.vertx.jomnigate.mapping.IIndexFieldDefinition;
+import de.braintags.vertx.jomnigate.mapping.IndexOptions;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -46,7 +46,7 @@ public final class MongoUtil {
    * @param result
    *          returns the complete result with detailed information of every collection
    */
-  public static final void getCollections(MongoDataStore ds, Handler<AsyncResult<JsonObject>> result) {
+  public static final void getCollections(final MongoDataStore ds, final Handler<AsyncResult<JsonObject>> result) {
     JsonObject jsonCommand = new JsonObject().put("listCollections", 1);
     ((MongoClient) ds.getClient()).runCommand("listCollections", jsonCommand, result);
   }
@@ -59,7 +59,7 @@ public final class MongoUtil {
    * @param result
    *          returns the complete result with detailed information of every collection
    */
-  public static final void getCollectionNames(MongoDataStore ds, Handler<AsyncResult<List<String>>> result) {
+  public static final void getCollectionNames(final MongoDataStore ds, final Handler<AsyncResult<List<String>>> result) {
     getCollections(ds, res -> {
       if (res.failed()) {
         result.handle(Future.failedFuture(res.cause()));
@@ -79,7 +79,7 @@ public final class MongoUtil {
    * @param collection
    * @param handler
    */
-  public static void createCollection(MongoDataStore ds, String collection, Handler<AsyncResult<JsonObject>> handler) {
+  public static void createCollection(final MongoDataStore ds, final String collection, final Handler<AsyncResult<JsonObject>> handler) {
     JsonObject jsonCommand = new JsonObject().put("create", collection);
     ((MongoClient) ds.getClient()).runCommand("create", jsonCommand, result -> {
       if (result.failed()) {
@@ -97,7 +97,7 @@ public final class MongoUtil {
    * @param collection
    * @param handler
    */
-  public static void getIndexes(MongoDataStore ds, String collection, Handler<AsyncResult<JsonObject>> handler) {
+  public static void getIndexes(final MongoDataStore ds, final String collection, final Handler<AsyncResult<JsonObject>> handler) {
     JsonObject jsonCommand = new JsonObject().put("listIndexes", collection);
     ((MongoClient) ds.getClient()).runCommand("listIndexes", jsonCommand, result -> {
       if (result.failed()) {
@@ -115,8 +115,8 @@ public final class MongoUtil {
    * @param collection
    * @param handler
    */
-  public static final void getIndexNames(MongoDataStore ds, String collection,
-      Handler<AsyncResult<List<String>>> result) {
+  public static final void getIndexNames(final MongoDataStore ds, final String collection,
+      final Handler<AsyncResult<List<String>>> result) {
     getIndexes(ds, collection, res -> {
       if (res.failed()) {
         result.handle(Future.failedFuture(res.cause()));
@@ -136,18 +136,19 @@ public final class MongoUtil {
    *          the datastore
    * @param collection
    *          the name of the collection to be used
-   * @param indexes
+   * @param indexDefinitions
    *          the index definition
    * @param handler
    *          the handler to be informed with the result of the index creation
    */
-  public static final void createIndexes(MongoDataStore ds, String collection, Indexes indexes,
-      Handler<AsyncResult<JsonObject>> handler) {
+  public static final void createIndexes(final MongoDataStore ds, final String collection,
+      final List<IIndexDefinition> indexDefinitions,
+      final Handler<AsyncResult<JsonObject>> handler) {
     try {
       JsonObject indexCommand = new JsonObject().put("createIndexes", collection);
       JsonArray idx = new JsonArray();
-      for (Index index : indexes.value()) {
-        idx.add(createIndexDefinition(index));
+      for (IIndexDefinition indexDefinition : indexDefinitions) {
+        idx.add(createIndexDefinition(indexDefinition));
       }
       indexCommand.put("indexes", idx);
       ((MongoClient) ds.getClient()).runCommand("createIndexes", indexCommand, result -> {
@@ -162,24 +163,26 @@ public final class MongoUtil {
     }
   }
 
-  private static JsonObject createIndexDefinition(Index index) {
+  private static JsonObject createIndexDefinition(final IIndexDefinition indexDefinition) {
     JsonObject idxObject = new JsonObject();
-    idxObject.put("name", index.name());
+    idxObject.put("name", indexDefinition.getName());
     JsonObject keyObject = new JsonObject();
     idxObject.put("key", keyObject);
 
-    for (IndexField field : index.fields()) {
+    for (IIndexFieldDefinition field : indexDefinition.getFields()) {
       addIndexField(keyObject, field);
     }
-    addIndexOptions(idxObject, index.options());
+    addIndexOptions(idxObject, indexDefinition.getIndexOptions());
     return idxObject;
   }
 
-  private static void addIndexField(JsonObject keyObject, IndexField field) {
-    keyObject.put(field.fieldName(), field.type().toIndexValue());
+  private static void addIndexField(final JsonObject keyObject, final IIndexFieldDefinition field) {
+    keyObject.put(field.getName(), field.getType().toIndexValue());
   }
 
-  private static void addIndexOptions(JsonObject indexDef, IndexOptions options) {
-    indexDef.put("unique", options.unique());
+  private static void addIndexOptions(final JsonObject indexDef,
+      final List<de.braintags.vertx.jomnigate.mapping.IndexOptions> indexOptions) {
+    if (indexOptions.contains(IndexOptions.UNIQUE))
+      indexDef.put("unique", true);
   }
 }

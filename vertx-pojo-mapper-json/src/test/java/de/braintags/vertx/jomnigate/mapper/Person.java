@@ -21,7 +21,6 @@ import java.util.Map;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.annotation.IndexField;
-import de.braintags.vertx.jomnigate.annotation.IndexOptions;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
@@ -41,7 +40,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 
 @Entity(name = "PersonColumn")
 @Indexes(@Index(fields = { @IndexField(fieldName = "name"),
-    @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
+    @IndexField(fieldName = "weight") }, name = "testIndex"))
 public class Person extends AbstractPerson {
   public static final IIndexedField NAME = new IndexedField("name");
   public static final IIndexedField SEC_NAME = new IndexedField("secName");
@@ -120,7 +119,7 @@ public class Person extends AbstractPerson {
    *          the name to set
    */
   @Override
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -146,7 +145,7 @@ public class Person extends AbstractPerson {
    * @param ignoreField2
    *          the ignoreField2 to set
    */
-  public void setIgnoreField2(String ignoreField2) {
+  public void setIgnoreField2(final String ignoreField2) {
     this.ignoreField2 = ignoreField2;
   }
 

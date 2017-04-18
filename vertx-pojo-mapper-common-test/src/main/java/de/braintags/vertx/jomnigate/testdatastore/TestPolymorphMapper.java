@@ -52,7 +52,7 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
   private static Logger logger = LoggerFactory.getLogger(TestPolymorphMapper.class);
 
   @Test
-  public void testPolymorphism(TestContext context) {
+  public void testPolymorphism(final TestContext context) {
     clearTable(context, "PolyMapper");
 
     PolyMapper polyMapper = new PolyMapper();
@@ -70,24 +70,24 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
     context.assertEquals(2, pList.size(), "expected 2 records");
 
     // query must give 2 records in PolyMapper either
-    query = getDataStore(context).createQuery(PolySubMapper.class);
-    pList = findAll(context, query);
+    IQuery<PolySubMapper> subQuery = getDataStore(context).createQuery(PolySubMapper.class);
+    pList = findAll(context, subQuery);
     context.assertEquals(2, pList.size(), "expected 2 records");
 
-    query = getDataStore(context).createQuery(PolySubMapper.class);
-    query.setSearchCondition(ISearchCondition.isEqual(PolySubMapper.SUBFIELD, "testSub"));
-    pList = findAll(context, query);
+    subQuery = getDataStore(context).createQuery(PolySubMapper.class);
+    subQuery.setSearchCondition(ISearchCondition.isEqual(PolySubMapper.SUBFIELD, "testSub"));
+    pList = findAll(context, subQuery);
     context.assertEquals(1, pList.size(), "expected 1 records");
 
     query = getDataStore(context).createQuery(PolyMapper.class);
-    query.setSearchCondition(ISearchCondition.isEqual(PolyMapper.MAINFIELD, "testMain1"));
-    pList = findAll(context, query);
+    subQuery.setSearchCondition(ISearchCondition.isEqual(PolyMapper.MAINFIELD, "testMain1"));
+    pList = findAll(context, subQuery);
     context.assertEquals(1, pList.size(), "expected 1 records");
 
   }
 
   @Test
-  public void testPolymorphismSaveMixedList(TestContext context) {
+  public void testPolymorphismSaveMixedList(final TestContext context) {
     clearTable(context, "PolyMapper");
     List recs = new ArrayList<>();
     PolyMapper polyMapper = new PolyMapper();
@@ -106,8 +106,8 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
     context.assertEquals(2, pList.size(), "expected 2 records");
 
     // query must give 2 records in PolyMapper either
-    query = getDataStore(context).createQuery(PolySubMapper.class);
-    pList = findAll(context, query);
+    IQuery<PolySubMapper> subQuery = getDataStore(context).createQuery(PolySubMapper.class);
+    pList = findAll(context, subQuery);
     context.assertEquals(2, pList.size(), "expected 2 records");
   }
 
@@ -119,7 +119,7 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
    * @param context
    */
   @Test
-  public void testCheckUndefinedPolyClass(TestContext context) {
+  public void testCheckUndefinedPolyClass(final TestContext context) {
     try {
       IQuery<PolyMapper_WithoutPolyClass> query = getDataStore(context).createQuery(PolyMapper_WithoutPolyClass.class);
       context.fail("expected MappingException here");
@@ -137,9 +137,9 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
    * @param context
    */
   @Test
-  public void testCheckUndefined_JsonTypeInfo(TestContext context) {
+  public void testCheckUndefined_JsonTypeInfo(final TestContext context) {
     try {
-      IQuery<PolyMapper> query = getDataStore(context).createQuery(PolyMapper_WithoutType.class);
+      getDataStore(context).createQuery(PolyMapper_WithoutType.class);
       context.fail("expected MappingException here");
     } catch (MappingException e) {
       // expected result
@@ -147,7 +147,7 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
   }
 
   @Test
-  public void testDeserialization(TestContext context) throws JsonProcessingException {
+  public void testDeserialization(final TestContext context) throws JsonProcessingException {
     clearTable(context, "PolyMapper");
     PolyMapper polyMapper = new PolyMapper();
     polyMapper.setMainField("testMain1");
@@ -164,7 +164,7 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
     assertThat(poly2, instanceOf(PolyMapper.class));
   }
 
-  private void testMapper(PolyMapper polyMapper, PolyMapper otherPolyMapper, TestContext context) {
+  private void testMapper(final PolyMapper polyMapper, final PolyMapper otherPolyMapper, final TestContext context) {
     ResultContainer resultContainer = saveRecord(context, polyMapper);
     IWriteEntry we = resultContainer.writeResult.iterator().next();
     context.assertEquals(WriteAction.INSERT, we.getAction());
