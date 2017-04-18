@@ -13,6 +13,7 @@
 package de.braintags.vertx.jomnigate.dataaccess.query;
 
 import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.dataaccess.IAccessResult;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.util.CollectionAsync;
@@ -27,7 +28,7 @@ import de.braintags.vertx.util.CollectionAsync;
  * 
  */
 
-public interface IQueryResult<E> extends CollectionAsync<E> {
+public interface IQueryResult<E> extends CollectionAsync<E>, IAccessResult {
 
   /**
    * Get the {@link IDataStore} by which the current instance was created

@@ -35,7 +35,9 @@ import io.vertx.core.json.JsonObject;
 /**
  * An implementation of {@link IStoreObject} for use with sql databases
  * 
- * @author Michael Remme
+ * @uthor Michael Remme
+ * @param <T>
+ *          the type of the entity
  * 
  */
 
@@ -116,7 +118,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
   public IStoreObject<T, Object> put(IProperty field, Object value) {
     IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     if (ci == null) {
-      throw new MappingException("Can't find columninfo for field " + field.getFullName());
+      throw new MappingException("Can't find a columninfo for field " + field.getFullName());
     }
     if (field.isIdField() && value != null) {
       setNewInstance(false);
@@ -132,6 +134,8 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
   /**
    * Generates the sql statement to insert a record into the database and a list of fitting parameters
    * 
+   * @param resultHandler
+   *          the handler to be informed
    * @return the sql statement to be executed
    */
   public void generateSqlInsertStatement(Handler<AsyncResult<SqlSequence>> resultHandler) {
@@ -141,7 +145,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
       Set<String> fieldNames = getMapper().getFieldNames();
       for (String fieldName : fieldNames) {
         IProperty field = getMapper().getField(fieldName);
-        if (field != getMapper().getIdField()) {
+        if (!field.isIdField()) {
           sequence.addEntry(field.getColumnInfo().getName(), get(field));
         }
       }

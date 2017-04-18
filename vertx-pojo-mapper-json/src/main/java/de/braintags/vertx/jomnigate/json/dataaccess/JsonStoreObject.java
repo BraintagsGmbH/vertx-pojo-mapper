@@ -42,6 +42,8 @@ import io.vertx.core.json.JsonObject;
  * An implementation of {@link IStoreObject}, which uses a JsonObject as internal container
  * 
  * @author Michael Remme
+ * @param <T>
+ *          the type of the entity
  */
 
 public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {

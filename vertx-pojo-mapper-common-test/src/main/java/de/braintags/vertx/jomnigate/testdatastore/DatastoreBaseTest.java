@@ -244,7 +244,7 @@ public abstract class DatastoreBaseTest {
    * @return
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  public static Object findRecordByID(TestContext context, Class mapperClass, String id) {
+  public static <V> V findRecordByID(TestContext context, Class<V> mapperClass, String id) {
     Async async = context.async();
     ResultObject res = new ResultObject(null);
     QueryHelper.findRecordById(getDataStore(context), mapperClass, id, result -> {
@@ -260,7 +260,7 @@ public abstract class DatastoreBaseTest {
     if (res.isError()) {
       throw res.getRuntimeException();
     } else {
-      return res.getResult();
+      return (V) res.getResult();
     }
   }
 

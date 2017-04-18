@@ -115,6 +115,37 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     LOGGER.info("SETTINGS ARE: " + settings.toString());
     return settings;
   }
+  
+  /**
+   * This method applies the system properties to settings for mongo:
+   * <UL>
+   * <LI>{@value #CONNECTION_STRING_PROPERTY} to set the connection of the database
+   * <LI>{@value #START_MONGO_LOCAL_PROP} wether to start mongo temporary local or expecting a running instance
+   * <LI>{@value #LOCAL_PORT_PROP} If START_MONGO_LOCAL_PROP is set to true, then this defines the local port to be
+   * used. Default is 27017
+   * <LI>defaultKeyGenerator to set the name of the default keygenerator to be used
+   * </UL>
+   * 
+   * @return
+   */
+  public static DataStoreSettings applySystemProperties(DataStoreSettings settings) {
+    String connectionString = System.getProperty(MongoDataStoreInit.CONNECTION_STRING_PROPERTY, null);
+    if (connectionString != null) {
+      settings.getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY, connectionString);
+    }
+    String sl = System.getProperty(MongoDataStoreInit.START_MONGO_LOCAL_PROP, null);
+    if (sl != null) {
+      settings.getProperties().put(MongoDataStoreInit.START_MONGO_LOCAL_PROP, sl);
+    }
+    String localPort = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, null);
+    if (localPort != null) {
+      settings.getProperties().put(MongoDataStoreInit.LOCAL_PORT_PROP, localPort);
+    }
+    String keyGenerator = System.getProperty(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
+    settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, keyGenerator);
+    LOGGER.info("SETTINGS ARE: " + settings.toString());
+    return settings;
+  }  
 
   /**
    * Helper method which creates the default settings for an instance of {@link MongoDataStore}
@@ -148,7 +179,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
           LOGGER.error("could not start mongo client", initResult.cause());
           handler.handle(Future.failedFuture(new InitException(initResult.cause())));
         } else {
-          mongoDataStore = new MongoDataStore(vertx, mongoClient, getConfig());
+          mongoDataStore = new MongoDataStore(vertx, mongoClient, getConfig(), settings);
           handler.handle(Future.succeededFuture(mongoDataStore));
         }
       });
@@ -267,12 +298,12 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
       internalStartMongoExe(startMongoLocal, localPort);
     } catch (IOException e) {
       // retry once
-      LOGGER.error("Error starting local mongo, retrying..");
+      LOGGER.error("Error starting local mongo, retrying..", e);
       try {
         internalStartMongoExe(startMongoLocal, localPort);
         LOGGER.warn("Local mongo started on second try");
       } catch (IOException e1) {
-        throw new RuntimeException(e1);
+        throw new InitException(e1);
       }
     }
   }
@@ -284,9 +315,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
           .net(new Net(localPort, Network.localhostIsIPv6())).build();
       Logger logger = (Logger) new SLF4JLogDelegateFactory().createDelegate(MongoDataStoreInit.class.getCanonicalName())
           .unwrap();
-
       IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaultsWithLogger(Command.MongoD, logger).build();
-
       MongodExecutable temp = MongodStarter.getInstance(runtimeConfig).prepare(config);
       temp.start();
       // ensure client was successfully started before assigning to global field

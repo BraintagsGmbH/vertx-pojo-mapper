@@ -29,6 +29,7 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
 import de.braintags.vertx.jomnigate.mapping.impl.DefaultObjectFactory;
+import de.braintags.vertx.jomnigate.observer.IObserverHandler;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -47,14 +48,14 @@ public interface IMapper<T> {
    * 
    * @return the name
    */
-  public ITableInfo getTableInfo();
+  ITableInfo getTableInfo();
 
   /**
    * Get the underlaying class which defines the mapper
    * 
    * @return the class
    */
-  public Class<T> getMapperClass();
+  Class<T> getMapperClass();
 
   /**
    * Returns true if at least one field of the mapper is annotated with {@link Referenced}
@@ -76,7 +77,7 @@ public interface IMapper<T> {
    * 
    * @return the mapped fieldnames
    */
-  public Set<String> getFieldNames();
+  Set<String> getFieldNames();
 
   /**
    * Get the {@link IProperty} as a descriptor for the given field name
@@ -85,14 +86,14 @@ public interface IMapper<T> {
    *          the name of the field
    * @return an instance of {@link IProperty} or null, if field does not exist
    */
-  public IProperty getField(String name);
+  IProperty getField(String name);
 
   /**
    * Get the {@link IProperty} which is defined to be the id
    * 
    * @return the id field
    */
-  public IMappedIdField getIdField();
+  IMappedIdField getIdField();
 
   /**
    * Get the methods of the mapper which are annotated by the given lifecycle annotation like {@link BeforeLoad},
@@ -102,21 +103,21 @@ public interface IMapper<T> {
    *          an annotation like defined above
    * @return a list of annotated methods or null, if no method was annotated
    */
-  public List<IMethodProxy> getLifecycleMethods(Class<? extends Annotation> annotation);
+  List<IMethodProxy> getLifecycleMethods(Class<? extends Annotation> annotation);
 
   /**
    * Get the definition of {@link Entity}, if it was defined for the current mapper
    * 
    * @return the defined {@link Entity} or null
    */
-  public Entity getEntity();
+  Entity getEntity();
 
   /**
    * Get the definitions about indexes, which shall be created for the current mapper
    * 
    * @return the index definitions
    */
-  public Indexes getIndexDefinitions();
+  Indexes getIndexDefinitions();
 
   /**
    * Get a defined {@link Annotation} of the given class
@@ -125,7 +126,7 @@ public interface IMapper<T> {
    *          the annotation class where we are interested in
    * @return a defined annotation or null
    */
-  public Annotation getAnnotation(Class<? extends Annotation> annotationClass);
+  <U extends Annotation> U getAnnotation(Class<U> annotationClass);
 
   /**
    * Get all {@link IProperty} of the current mapper, which are annotated with the specified class
@@ -134,7 +135,7 @@ public interface IMapper<T> {
    *          the annotation class where we are interested in
    * @return found fields or empty array, if none is annotated with the given annotation class
    */
-  public IProperty[] getAnnotatedFields(Class<? extends Annotation> annotationClass);
+  IProperty[] getAnnotatedFields(Class<? extends Annotation> annotationClass);
 
   /**
    * Execute those lifecycle methods which are annotated by the given lifecycle annotation like {@link BeforeLoad},
@@ -145,22 +146,21 @@ public interface IMapper<T> {
    * @param entity
    *          the entity to be handled
    */
-  public void executeLifecycle(Class<? extends Annotation> annotationClass, T entity,
-      Handler<AsyncResult<Void>> handler);
+  void executeLifecycle(Class<? extends Annotation> annotationClass, T entity, Handler<AsyncResult<Void>> handler);
 
   /**
    * Get the parent {@link IMapperFactory}
    * 
    * @return the factory
    */
-  public IMapperFactory getMapperFactory();
+  IMapperFactory getMapperFactory();
 
   /**
    * If true, then the mapper should be synchronized with the underlaying {@link IDataStore}
    * 
    * @return the syncNeeded
    */
-  public boolean isSyncNeeded();
+  boolean isSyncNeeded();
 
   /**
    * If true, then the mapper should be synchronized with the underlaying {@link IDataStore}
@@ -168,7 +168,7 @@ public interface IMapper<T> {
    * @param syncNeeded
    *          the syncNeeded to set
    */
-  public void setSyncNeeded(boolean syncNeeded);
+  void setSyncNeeded(boolean syncNeeded);
 
   /**
    * This property defines, wether referenced objects inside a mapper are stored direct and recursive or wether they are
@@ -177,7 +177,7 @@ public interface IMapper<T> {
    * @return true, if referenced objects shall be stored recursive and false, if an {@link IObjectReference} shall be
    *         used
    */
-  public boolean handleReferencedRecursive();
+  boolean handleReferencedRecursive();
 
   /**
    * Retrive the {@link IKeyGenerator} for the current mapper. This method reacts to the annotation
@@ -185,12 +185,19 @@ public interface IMapper<T> {
    * 
    * @return an instance of {@link IKeyGenerator} or null, if none defined or supported by {@link IDataStore}
    */
-  public IKeyGenerator getKeyGenerator();
+  IKeyGenerator getKeyGenerator();
 
   /**
    * Get the reference, which is used to access a new key from a defined {@link IKeyGenerator}
    * 
    * @return
    */
-  public String getKeyGeneratorReference();
+  String getKeyGeneratorReference();
+
+  /**
+   * Get the instance of {@link IObserverHandler} for the current mapper
+   * 
+   * @return
+   */
+  IObserverHandler getObserverHandler();
 }

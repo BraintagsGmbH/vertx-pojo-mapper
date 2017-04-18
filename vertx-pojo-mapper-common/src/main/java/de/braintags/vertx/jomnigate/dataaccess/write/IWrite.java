@@ -58,4 +58,5 @@ public interface IWrite<T> extends IDataAccessObject<T> {
    * @return the count
    */
   public int size();
+
 }

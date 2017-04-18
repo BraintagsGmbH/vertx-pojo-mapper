@@ -32,7 +32,49 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class TestStoreObject extends DatastoreBaseTest {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(TestStoreObject.class);
+
+  @Test
+  public void testStoreObject(TestContext context) {
+    IStoreObjectFactory stof = getDataStore(context).getStoreObjectFactory();
+    NoKeyGeneratorMapper entity = new NoKeyGeneratorMapper();
+    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(entity.getClass());
+    try {
+      stof.createStoreObject((Object) null, mapper, res -> {
+        LOGGER.debug("test");
+      });
+    } catch (NullPointerException e) {
+      LOGGER.debug("Expected exception gained", e);
+    }
+
+    try {
+      stof.createStoreObject((IMapper) null, entity, res -> {
+        LOGGER.debug("test");
+      });
+    } catch (NullPointerException e) {
+      LOGGER.debug("Expected exception gained", e);
+    }
+
+    // stof.createStoreObject(mapper, entity, context.asyncAssertSuccess(res -> {
+    // LOGGER.debug(res.getClass().getName());
+    // AbstractStoreObject sto = (AbstractStoreObject) res;
+    // sto.initFromEntity(context.asyncAssertSuccess(res2 -> {
+    //
+    // }));
+    // }));
+
+    // stof.createStoreObjects(mapper, entities, handler);
+  }
+
+  /*
+   * 
+   * context.asyncAssertFailure(res -> {
+   * LOGGER.debug("", res);
+   * })
+   */
 
   @Test
   public void testWithNullKeyGenerator(TestContext context) {

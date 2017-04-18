@@ -12,9 +12,6 @@
  */
 package de.braintags.vertx.jomnigate.mapping.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
@@ -29,7 +26,6 @@ import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
  */
 
 public class MapperFactory extends AbstractMapperFactory {
-  private final Map<String, IMapper> mappedClasses = new HashMap<>();
   private ITypeHandlerFactory typeHandlerFactory;
   private IPropertyMapperFactory propertyMapperFactory;
 

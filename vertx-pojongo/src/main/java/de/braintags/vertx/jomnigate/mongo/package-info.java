@@ -15,7 +15,7 @@
  * == Implementation of pojo mapper for Mongo
  *
  * We provide an implementation of {@link de.braintags.vertx.jomnigate.IDataStore} which uses the Vert.x
- * {@link io.vertx.ext.mongo.MongoClient} to perform mapping of POJOs into the datastore
+ * io.vertx.ext.mongo.MongoClient to perform mapping of POJOs into the datastore
  *
  * To create an instance of MongoDataStore programmatically:
  *
@@ -25,10 +25,11 @@
  * ----
  * 
  * === Initialize by DataStoreSettings
- * {@link de.braintags.vertx.jomnigate.mongo.init}
+ * Please take the possible properties, which can be set from
+ * {@link de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit}
  * 
  * === Information about JsonDatastore
- * {@link de.braintags.vertx.jomnigate.json.jackson}
+ * {@link de.braintags.vertx.jomnigate.json}
  * 
  * 
  * The rest of the usage is the same than described in the documentation of

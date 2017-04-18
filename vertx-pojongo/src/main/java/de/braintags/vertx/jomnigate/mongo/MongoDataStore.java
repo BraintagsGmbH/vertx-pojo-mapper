@@ -17,6 +17,7 @@ import de.braintags.vertx.jomnigate.IDataStoreMetaData;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mongo.dataaccess.MongoDelete;
@@ -61,8 +62,8 @@ public class MongoDataStore extends JsonDatastore {
    * @param database
    *          the name of the database
    */
-  public MongoDataStore(Vertx vertx, MongoClient client, JsonObject properties) {
-    super(vertx, properties);
+  public MongoDataStore(Vertx vertx, MongoClient client, JsonObject properties, DataStoreSettings settings) {
+    super(vertx, properties, settings);
     this.client = client;
     metaData = new MongoMetaData(this);
     MongoMapperFactory mf = new MongoMapperFactory(this);

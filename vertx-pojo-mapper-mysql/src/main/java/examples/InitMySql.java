@@ -38,6 +38,6 @@ public class InitMySql {
         .put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DefaultKeyGenerator.NAME);
 
     mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
-    datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig);
+    datastore = new MySqlDataStore(vertx, mySQLClient, mySQLClientConfig, null);
   }
 }

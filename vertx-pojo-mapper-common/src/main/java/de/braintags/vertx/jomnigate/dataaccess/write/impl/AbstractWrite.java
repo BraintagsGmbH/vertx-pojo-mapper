@@ -11,19 +11,22 @@
  * #L%
  */
 
-package de.braintags.vertx.jomnigate.dataaccess.impl;
+package de.braintags.vertx.jomnigate.dataaccess.write.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterSave;
+import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
+import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -37,6 +40,9 @@ import io.vertx.core.Handler;
  */
 
 public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> implements IWrite<T> {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(AbstractWrite.class);
+
   private List<T> objectsToSave = new ArrayList<>();
 
   /**
@@ -47,6 +53,15 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
     super(mapperClass, datastore);
   }
 
+  /**
+   * Get the objects, which were defined to be saved
+   * 
+   * @return
+   */
+  Iterator<T> getSelection() {
+    return objectsToSave.iterator();
+  }
+
   @Override
   public final void save(Handler<AsyncResult<IWriteResult>> resultHandler) {
     sync(syncResult -> {
@@ -54,10 +69,39 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
       } else {
         try {
-          internalSave(resultHandler);
+          Future<IWriteResult> rf = Future.future();
+          rf.setHandler(resultHandler);
+          IObserverContext context = IObserverContext.createInstance();
+          preSave(context).compose(pre -> internalSave()).compose(wr -> postSave(wr, context, rf), rf);
         } catch (Exception e) {
           resultHandler.handle(Future.failedFuture(e));
         }
+      }
+    });
+  }
+
+  /**
+   * Execution done before instances are stored into the datastore
+   * 
+   * @return
+   */
+  protected Future<Void> preSave(IObserverContext context) {
+    return getMapper().getObserverHandler().handleBeforeSave(this, context);
+  }
+
+  /**
+   * Execution done after entities were stored into the datastore
+   * 
+   * @param wr
+   * @param nextFuture
+   */
+  protected void postSave(IWriteResult wr, IObserverContext context, Future<IWriteResult> nextFuture) {
+    Future<Void> f = getMapper().getObserverHandler().handleAfterSave(this, wr, context);
+    f.setHandler(res -> {
+      if (f.failed()) {
+        nextFuture.fail(f.cause());
+      } else {
+        nextFuture.complete(wr);
       }
     });
   }
@@ -67,7 +111,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * 
    * @param resultHandler
    */
-  protected abstract void internalSave(Handler<AsyncResult<IWriteResult>> resultHandler);
+  protected abstract Future<IWriteResult> internalSave();
 
   /**
    * Get the objects that shall be saved

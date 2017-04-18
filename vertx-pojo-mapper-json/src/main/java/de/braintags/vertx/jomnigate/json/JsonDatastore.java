@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.impl.AbstractDataStore;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.json.jackson.JOmnigateFactory;
 import de.braintags.vertx.jomnigate.json.jackson.JacksonModuleJomnigate;
 import de.braintags.vertx.jomnigate.mapping.IDataStoreSynchronizer;
@@ -45,8 +46,8 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
    * @param vertx
    * @param properties
    */
-  public JsonDatastore(Vertx vertx, JsonObject properties) {
-    super(vertx, properties);
+  public JsonDatastore(Vertx vertx, JsonObject properties, DataStoreSettings settings) {
+    super(vertx, properties, settings);
     // Do not change factory type, it is used by the @link{JomnigateJsonModule} to detect jOmnigate environment
     JOmnigateFactory jOmnigateFactory = new JOmnigateFactory(this, Json.mapper.getFactory(), Json.mapper);
     jacksonMapper = new ObjectMapper(jOmnigateFactory);

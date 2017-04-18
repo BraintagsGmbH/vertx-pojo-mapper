@@ -17,14 +17,14 @@ import java.util.concurrent.CountDownLatch;
 
 import de.braintags.vertx.util.ResultObject;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
-import io.vertx.rxjava.core.Future;
 
 /**
- * 
+ * How to execute a blocking query inside a blocking query?
  * 
  * @author Michael Remme
  * 
@@ -34,7 +34,7 @@ public class DlCheckMongo_ExecuteBlocking {
       .getLogger(DlCheckMongo_ExecuteBlocking.class);
 
   private Vertx vertx = Vertx.vertx();
-  private MongoClient mongoClient;
+  private static MongoClient mongoClient;
 
   /**
    * 
@@ -44,30 +44,38 @@ public class DlCheckMongo_ExecuteBlocking {
   }
 
   private void initMongoClient(boolean shared) {
-    JsonObject jconfig = createConfig();
-    mongoClient = shared ? MongoClient.createShared(vertx, jconfig) : MongoClient.createNonShared(vertx, jconfig);
-  }
-
-  protected JsonObject createConfig() {
     JsonObject config = new JsonObject();
     config.put("connection_string", "mongodb://localhost:27017");
     config.put("db_name", "deadlockDb");
-    return config;
+    mongoClient = shared ? MongoClient.createShared(vertx, config) : MongoClient.createNonShared(vertx, config);
   }
 
   public void execute() {
+    System.out.println("STARTING EXECUTION: Thread: " + Thread.currentThread().getName());
     String COLLECTION = "massInsert";
+    ResultObject<List<JsonObject>> ro = new ResultObject(null);
     CountDownLatch latch = new CountDownLatch(1);
 
-    FindOptions fo = new FindOptions().setLimit(5000);
-    ResultObject<List<JsonObject>> ro = new ResultObject(null);
-    mongoClient.findWithOptions(COLLECTION, new JsonObject(), fo, result -> {
-      try {
-        System.out.println(result.result().size());
-        ro.setResult(handleResult(mongoClient, result));
-      } catch (Throwable e) {
-        ro.setThrowable(e);
+    vertx.<List<JsonObject>> executeBlocking(future -> {
+      System.out.println("EXECUTE BLOCKING1: Thread: " + Thread.currentThread().getName());
+      FindOptions fo = new FindOptions().setLimit(5000);
+      mongoClient.findWithOptions(COLLECTION, new JsonObject(), fo, result -> {
+        try {
+          System.out.println("RESULT SIZE IS: " + result.result().size());
+          List<JsonObject> jList = executeBlocking2(mongoClient, result);
+          System.out.println("HANDLE RESULT SIZE IS: " + jList.size());
+          future.complete(jList);
+        } catch (Throwable e) {
+          future.fail(e);
+        }
+      });
+    }, false, result -> {
+      if (result.failed()) {
+        ro.setThrowable(result.cause());
+      } else {
+        ro.setResult(result.result());
       }
+      System.out.println("finishing first");
       latch.countDown();
     });
 
@@ -85,27 +93,21 @@ public class DlCheckMongo_ExecuteBlocking {
     vertx.close();
   }
 
-  private List<JsonObject> handleResult(MongoClient client, AsyncResult<List<JsonObject>> seachResult)
+  private List<JsonObject> executeBlocking2(MongoClient client, AsyncResult<List<JsonObject>> seachResult)
       throws Throwable {
     CountDownLatch latch = new CountDownLatch(1);
     ResultObject<List<JsonObject>> ro = new ResultObject(null);
 
-    Future<List<JsonObject>> future = executeQuery(client);
-    vertx.<List<JsonObject>> executeBlocking(fb -> {
-      LOGGER.info("starting fetch referenced subobject");
-      future.setHandler(result -> {
-        if (result.failed()) {
-          LOGGER.error("error occured", result.cause());
-          ro.setThrowable(result.cause());
-        } else {
-          LOGGER.info("created content as " + result.result());
-          ro.setResult(result.result());
-        }
-        latch.countDown();
-      });
-    }, res -> {
+    vertx.<List<JsonObject>> executeBlocking(future -> {
+      System.out.println("EXECUTE BLOCKING2: Thread: " + Thread.currentThread().getName());
+      future.complete();
+      // executeQuery(client, fb);
+    }, false, res -> {
       // all done already
+      System.out.println("got it");
+      latch.countDown();
     });
+
     latch.await();
     if (ro.isError()) {
       throw ro.getRuntimeException();
@@ -114,18 +116,9 @@ public class DlCheckMongo_ExecuteBlocking {
     }
   }
 
-  private Future<List<JsonObject>> executeQuery(MongoClient client) {
-    Future<List<JsonObject>> f = Future.future();
+  private void executeQuery(MongoClient client, Future f) {
     FindOptions fo = new FindOptions().setLimit(5000);
-    client.findWithOptions("MiniMapper", new JsonObject(), fo, result -> {
-      System.out.println("query executed");
-      if (result.failed()) {
-        f.fail(result.cause());
-      } else {
-        f.complete(result.result());
-      }
-    });
-    return f;
+    client.findWithOptions("MiniMapper", new JsonObject(), fo, f);
   }
 
   /**
