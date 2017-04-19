@@ -19,9 +19,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
- * Describes an index, which shall be defined in the datastore
+ * Describes the options of an {@link Index}
  * 
  * @author Michael Remme
  * 
@@ -31,27 +30,11 @@ import java.lang.annotation.Target;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.ANNOTATION_TYPE })
-public @interface Index {
+public @interface IndexOptions {
 
   /**
-   * The name of the index
-   * 
-   * @return the name
+   * Creates the index as a unique value index; inserting duplicates values in this field will cause errors
    */
-  String name();
-
-  /**
-   * The fields which are part of the index
-   * 
-   * @return Array of fields
-   */
-  IndexField[] fields();
-
-  /**
-   * Define some options for the index
-   * 
-   * @return the {@link IndexOptions}
-   */
-  IndexOptions options() default @IndexOptions();
+  boolean unique() default false;
 
 }

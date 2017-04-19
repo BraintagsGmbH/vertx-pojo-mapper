@@ -11,6 +11,7 @@ import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IIndexFieldDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IndexOption;
+import de.braintags.vertx.jomnigate.mapping.IndexOption.IndexFeature;
 
 /**
  * Implementation of {@link IIndexDefinition}
@@ -57,10 +58,7 @@ public class IndexDefinition implements IIndexDefinition {
       fields.add(def);
     }
     if (index.options() != null) {
-      for (de.braintags.vertx.jomnigate.annotation.IndexOption option : index.options()) {
-        IndexOption options = new IndexOption(option.feature(), option.value());
-        getIndexOptions().add(options);
-      }
+      getIndexOptions().add(new IndexOption(IndexFeature.UNIQUE, index.options().unique()));
     }
   }
 

@@ -1,4 +1,3 @@
-package de.braintags.vertx.jomnigate.mongo.vertxunit;
 /*
  * #%L
  * vertx-pojongo
@@ -11,16 +10,49 @@ package de.braintags.vertx.jomnigate.mongo.vertxunit;
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
+package de.braintags.vertx.jomnigate.mongo.vertxunit;
 
+import java.util.HashMap;
+import java.util.Map;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.IDataStoreInit;
+import de.braintags.vertx.jomnigate.json.typehandler.handler.ArrayTypeHandlerReferenced;
+import de.braintags.vertx.jomnigate.json.typehandler.handler.CollectionTypeHandlerReferenced;
+import de.braintags.vertx.jomnigate.json.typehandler.handler.MapTypeHandlerReferenced;
+import de.braintags.vertx.jomnigate.json.typehandler.handler.ObjectTypeHandler;
+import de.braintags.vertx.jomnigate.json.typehandler.handler.ObjectTypeHandlerReferenced;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mongo.MongoDataStore;
 import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
 import de.braintags.vertx.jomnigate.testdatastore.AbstractDataStoreContainer;
 import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.AbstractTypeHandlerTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.ArrayTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.BooleanTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.CalendarTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.CollectionTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.DateTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.EmbeddedArrayTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.EmbeddedListTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.EmbeddedMapTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.EmbeddedSingleTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.EmbeddedSingleTest_Null;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.EnumTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.JsonTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.LocaleTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.MapTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.MiscTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.NumericTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.PriceTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.PropertiesTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.ReferencedArrayTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.ReferencedListTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.ReferencedMapTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.ReferencedSingleTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.StringTest;
+import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.geo.GeoPointTest;
+import de.braintags.vertx.jomnigate.typehandler.stringbased.handlers.JsonTypeHandler;
 import de.braintags.vertx.util.exception.InitException;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import io.vertx.core.AsyncResult;
@@ -47,6 +79,44 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
 
   private static MongodExecutable exe;
   private MongoDataStore mongoDataStore;
+  private final Map<String, String> thMap = new HashMap<>();
+
+  /**
+   * 
+   */
+  public MongoDataStoreContainer() {
+    thMap.put(StringTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(NumericTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(PriceTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(MiscTest.class.getName(), ObjectTypeHandler.class.getName());
+
+    thMap.put(EnumTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(GeoPointTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(LocaleTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(JsonTest.class.getName(), ObjectTypeHandler.class.getName());
+
+    thMap.put(BooleanTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(DateTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(CalendarTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(JsonTest.class.getName(), JsonTypeHandler.class.getName());
+    thMap.put(PropertiesTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(MapTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(ArrayTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(CollectionTest.class.getName(), ObjectTypeHandler.class.getName());
+
+    thMap.put(GeoPointTest.class.getName(), ObjectTypeHandler.class.getName());
+
+    thMap.put(EmbeddedListTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(EmbeddedMapTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(EmbeddedArrayTest.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(EmbeddedSingleTest_Null.class.getName(), ObjectTypeHandler.class.getName());
+    thMap.put(EmbeddedSingleTest.class.getName(), ObjectTypeHandler.class.getName());
+
+    thMap.put(ReferencedSingleTest.class.getName(), ObjectTypeHandlerReferenced.class.getName());
+    thMap.put(ReferencedArrayTest.class.getName(), ArrayTypeHandlerReferenced.class.getName());
+    thMap.put(ReferencedListTest.class.getName(), CollectionTypeHandlerReferenced.class.getName());
+    thMap.put(ReferencedMapTest.class.getName(), MapTypeHandlerReferenced.class.getName());
+  }
 
   /*
    * (non-Javadoc)
@@ -55,7 +125,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
    * io.vertx.core.Handler)
    */
   @Override
-  public void startup(Vertx vertx, Handler<AsyncResult<Void>> handler) {
+  public void startup(final Vertx vertx, final Handler<AsyncResult<Void>> handler) {
     try {
       if (mongoDataStore == null) {
         DataStoreSettings settings = createSettings();
@@ -78,7 +148,8 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
     }
   }
 
-  private DataStoreSettings createSettings() {
+  @Override
+  public DataStoreSettings createSettings() {
     DataStoreSettings settings = MongoDataStoreInit.createDefaultSettings();
     settings.setDatabaseName("UnitTestDatabase");
     settings.getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY,
@@ -113,7 +184,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
    * @see de.braintags.vertx.jomnigate.datastoretest.IDatastoreContainer#shutdown(io.vertx.core.Handler)
    */
   @Override
-  public void shutdown(Handler<AsyncResult<Void>> handler) {
+  public void shutdown(final Handler<AsyncResult<Void>> handler) {
     logger.info("shutdown performed");
     mongoDataStore.shutdown(result -> {
       if (result.failed()) {
@@ -135,7 +206,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
    * io.vertx.core.Handler)
    */
   @Override
-  public void dropTable(String collection, Handler<AsyncResult<Void>> handler) {
+  public void dropTable(final String collection, final Handler<AsyncResult<Void>> handler) {
     logger.info("DROPPING: " + collection);
     ((MongoClient) mongoDataStore.getClient()).dropCollection(collection, dropResult -> {
       if (dropResult.failed()) {
@@ -154,7 +225,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
    * io.vertx.core.Handler)
    */
   @Override
-  public void clearTable(String tablename, Handler<AsyncResult<Void>> handler) {
+  public void clearTable(final String tablename, final Handler<AsyncResult<Void>> handler) {
     dropTable(tablename, handler);
   }
 
@@ -165,7 +236,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
    *          the key of the property to be fetched
    * @return a valid value or null
    */
-  private static String getProperty(String name, String defaultValue) {
+  private static String getProperty(final String name, final String defaultValue) {
     String s = System.getProperty(name);
     if (s != null) {
       s = s.trim();
@@ -177,7 +248,9 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   }
 
   @Override
-  public String getExpectedTypehandlerName(Class<? extends AbstractTypeHandlerTest> testClass, String defaultName) {
+  public String getExpectedTypehandlerName(final Class<? extends AbstractTypeHandlerTest> testClass, final String defaultName) {
+    if (thMap.containsKey(testClass.getName()))
+      return thMap.get(testClass.getName());
     return defaultName;
   }
 

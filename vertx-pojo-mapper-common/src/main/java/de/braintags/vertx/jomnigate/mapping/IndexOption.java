@@ -9,7 +9,7 @@ package de.braintags.vertx.jomnigate.mapping;
 public class IndexOption {
 
   private final IndexFeature feature;
-  private final boolean value;
+  private final Object value;
 
   /**
    * Create a new setting for an index
@@ -19,7 +19,7 @@ public class IndexOption {
    * @param value
    *          the value to set the feature to
    */
-  public IndexOption(final IndexFeature feature, final boolean value) {
+  public IndexOption(final IndexFeature feature, final Object value) {
     this.feature = feature;
     this.value = value;
   }
@@ -38,7 +38,7 @@ public class IndexOption {
    * 
    * @return the value
    */
-  public boolean getValue() {
+  public Object getValue() {
     return value;
   }
 
