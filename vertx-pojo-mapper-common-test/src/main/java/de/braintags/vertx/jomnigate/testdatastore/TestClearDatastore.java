@@ -43,7 +43,7 @@ public class TestClearDatastore {
    * @param context
    */
   @Test
-  public void testDatastore_noClearOnInit(TestContext context) {
+  public void testDatastore_noClearOnInit(final TestContext context) {
     testDatastore(false, context);
   }
 
@@ -53,7 +53,7 @@ public class TestClearDatastore {
    * @param context
    */
   @Test
-  public void testDatastore_clearOnInit(TestContext context) {
+  public void testDatastore_clearOnInit(final TestContext context) {
     testDatastore(true, context);
   }
 
@@ -69,7 +69,7 @@ public class TestClearDatastore {
    *          the test context
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private void testDatastore(boolean shouldClear, TestContext context) {
+  private void testDatastore(final boolean shouldClear, final TestContext context) {
     DataStoreSettings settings = TestHelper.getDatastoreContainer(context).createSettings();
     settings.setClearDatabaseOnInit(shouldClear);
 
@@ -82,7 +82,7 @@ public class TestClearDatastore {
     }
 
     LOGGER.info("performing first datastore init");
-    init.initDataStore(TestHelper.vertx, settings, context.asyncAssertSuccess((IDataStore datastore) -> {
+    init.initDataStore(TestHelper.vertx, settings, context.asyncAssertSuccess((final IDataStore datastore) -> {
       IWrite<SimpleMapper> write = null;
       SimpleMapper mapper = new SimpleMapper();
       mapper.name = "Test";
@@ -94,7 +94,7 @@ public class TestClearDatastore {
         context.fail(e1);
       }
 
-      write.save(context.asyncAssertSuccess((IWriteResult writeResult) -> {
+      write.save(context.asyncAssertSuccess((final IWriteResult writeResult) -> {
         IDataStoreInit init2;
         try {
           init2 = settings.getDatastoreInit().newInstance();
@@ -104,9 +104,10 @@ public class TestClearDatastore {
         }
 
         LOGGER.info("performing second datastore init");
-        init2.initDataStore(TestHelper.vertx, settings, context.asyncAssertSuccess((IDataStore datastore2) -> {
+        init2.initDataStore(TestHelper.vertx, settings, context.asyncAssertSuccess((final IDataStore datastore2) -> {
           IQuery<SimpleMapper> query = datastore2.createQuery(SimpleMapper.class);
-          query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField(), mapper.id));
+          query
+              .setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdInfo().getIndexedField(), mapper.id));
           query.execute(context.asyncAssertSuccess(queryResult -> {
             context.assertEquals(queryResult.iterator().hasNext(), !shouldClear,
                 "The record saved on one datastore should " + (shouldClear ? "not" : "still")

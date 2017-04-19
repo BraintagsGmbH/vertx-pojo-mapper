@@ -75,7 +75,7 @@ public class TestMapper extends DatastoreBaseTest {
     if (ann == null)
       Assert.fail("Annotation Id must not be null");
 
-    IProperty field = mapper.getIdField().getField();
+    IProperty field = mapper.getIdInfo().getField();
     context.assertNotNull(field);
     Assert.assertSame(field, idField);
 

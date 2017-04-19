@@ -118,7 +118,7 @@ public class Person extends AbstractPerson {
    *          the name to set
    */
   @Override
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -144,7 +144,7 @@ public class Person extends AbstractPerson {
    * @param ignoreField2
    *          the ignoreField2 to set
    */
-  public void setIgnoreField2(String ignoreField2) {
+  public void setIgnoreField2(final String ignoreField2) {
     this.ignoreField2 = ignoreField2;
   }
 

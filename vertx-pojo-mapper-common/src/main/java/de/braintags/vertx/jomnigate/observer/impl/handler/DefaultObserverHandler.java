@@ -114,24 +114,63 @@ public class DefaultObserverHandler implements IObserverHandler {
    */
   @Override
   public <T> Future<Void> handleBeforeUpdate(IWrite<T> writeObject, T entity, IObserverContext context) {
+    List<IObserver> ol = getObserver(ObserverEventType.BEFORE_UPDATE);
+    Future<Void> f = Future.future();
+    if (ol.isEmpty() || writeObject.size() <= 0) {
+      f.complete();
+    } else {
+      f = getBeforeUpdateHandler().handle(writeObject, entity, context, ol);
+    }
+    return f;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.observer.IObserverHandler#handleAfterUpdate(de.braintags.vertx.jomnigate.dataaccess.
+   * write.IWrite, de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult,
+   * de.braintags.vertx.jomnigate.observer.IObserverContext)
+   */
+  @Override
+  public <T> Future<Void> handleAfterUpdate(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context) {
+    List<IObserver> ol = getObserver(ObserverEventType.AFTER_UPDATE);
+    Future<Void> f = Future.future();
+    if (ol.isEmpty() || writeObject.size() <= 0) {
+      f.complete();
+    } else {
+      f = getAfterUpdateHandler().handle(writeObject, writeResult, context, ol);
+    }
+    return f;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.observer.IObserverHandler#handleBeforeInsert(de.braintags.vertx.jomnigate.dataaccess.
+   * write.IWrite, java.lang.Object, de.braintags.vertx.jomnigate.observer.IObserverContext)
+   */
+  @Override
+  public <T> Future<Void> handleBeforeInsert(IWrite<T> writeObject, T entity, IObserverContext context) {
     List<IObserver> ol = getObserver(ObserverEventType.BEFORE_INSERT);
     Future<Void> f = Future.future();
     if (ol.isEmpty() || writeObject.size() <= 0) {
       f.complete();
     } else {
-      f = getBeforeSaveHandler().handle(writeObject, entity, context, ol);
+      f = getBeforeInsertHandler().handle(writeObject, entity, context, ol);
     }
     return f;
   }
 
   @Override
   public <T> Future<Void> handleAfterInsert(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context) {
-    List<IObserver> ol = getObserver(ObserverEventType.AFTER_SAVE);
+    List<IObserver> ol = getObserver(ObserverEventType.AFTER_INSERT);
     Future<Void> f = Future.future();
     if (ol.isEmpty() || writeObject.size() <= 0) {
       f.complete();
     } else {
-      f = getAfterSaveHandler().handle(writeObject, writeResult, context, ol);
+      f = getAfterInsertHandler().handle(writeObject, writeResult, context, ol);
     }
     return f;
   }
@@ -236,17 +275,31 @@ public class DefaultObserverHandler implements IObserverHandler {
   }
 
   /**
-   * @return the beforeSaveHandler
+   * @return the beforeInsertHandler
    */
-  protected BeforeInsertHandler getBeforeSaveHandler() {
-    return beforeSaveHandler;
+  protected BeforeInsertHandler getBeforeInsertHandler() {
+    return beforeInsertHandler;
   }
 
   /**
-   * @return the afterSaveHandler
+   * @return the afterInsertHandler
    */
-  protected AfterInsertHandler getAfterSaveHandler() {
-    return afterSaveHandler;
+  protected AfterInsertHandler getAfterInsertHandler() {
+    return afterInsertHandler;
+  }
+
+  /**
+   * @return the beforeUpdateHandler
+   */
+  protected BeforeUpdateHandler getBeforeUpdateHandler() {
+    return beforeUpdateHandler;
+  }
+
+  /**
+   * @return the afterUpdateHandler
+   */
+  protected AfterUpdateHandler getAfterUpdateHandler() {
+    return afterUpdateHandler;
   }
 
   /**

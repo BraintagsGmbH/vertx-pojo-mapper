@@ -47,14 +47,14 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
    * Comment for <code>serialVersionUID</code>
    */
   private static final long serialVersionUID = 1L;
-  private MapType rawMapType;
-  private Class mapperClass;
+  private final MapType rawMapType;
+  private final Class mapperClass;
 
   /**
    * @param datastore
    * @param beanProperty
    */
-  public ReferencedMapDeserializer(IDataStore datastore, SettableBeanProperty beanProperty) {
+  public ReferencedMapDeserializer(final IDataStore datastore, final SettableBeanProperty beanProperty) {
     super(datastore, beanProperty);
     MapType type = (MapType) getBeanProperty().getType();
     TypeFactory tf = ((JsonDatastore) getDatastore()).getJacksonMapper().getTypeFactory();
@@ -71,7 +71,7 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
    */
   @SuppressWarnings({ "rawtypes", "unused" })
   @Override
-  public Map<?, ?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+  public Map<?, ?> deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException, JsonProcessingException {
     Map rawMap = ctxt.readValue(p, rawMapType);
     Map<?, ?> resultMap = null;
     if (rawMap != null) {
@@ -83,7 +83,7 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
   }
 
   @Override
-  protected Map instantiateInternal(DeserializationContext ct, JavaType type) {
+  protected Map instantiateInternal(final DeserializationContext ct, final JavaType type) {
     return new HashMap<>();
   }
 
@@ -98,12 +98,12 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
    * @return
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected Future<Void> getReferencedObjectsById(Class mapperClass, Map rawMap, Map<?, ?> resultMap) {
+  protected Future<Void> getReferencedObjectsById(final Class mapperClass, final Map rawMap, final Map<?, ?> resultMap) {
     if (rawMap == null) {
       return null;
     }
     IQuery q = getDatastore().createQuery(mapperClass);
-    q.setSearchCondition(ISearchCondition.in(q.getMapper().getIdField(), createIdList(rawMap)));
+    q.setSearchCondition(ISearchCondition.in(q.getMapper().getIdInfo().getIndexedField(), createIdList(rawMap)));
     Future<Void> f = Future.future();
     QueryHelper.executeToList(q, res -> {
       if (res.failed()) {
@@ -111,7 +111,7 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
       } else {
         List recList = res.result();
         try {
-          fillMap(q.getMapper().getIdField().getField(), recList, rawMap, resultMap);
+          fillMap(q.getMapper().getIdInfo().getField(), recList, rawMap, resultMap);
           f.complete();
         } catch (Exception e) {
           f.fail(e);
@@ -122,7 +122,7 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private void fillMap(IProperty idField, List recList, Map<?, String> rawMap, Map resultMap) {
+  private void fillMap(final IProperty idField, final List recList, final Map<?, String> rawMap, final Map resultMap) {
     rawMap.entrySet().forEach(entry -> {
       resultMap.put(entry.getKey(), findInstance(idField, entry.getValue(), recList));
     });
@@ -141,14 +141,14 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
    * @return
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private Object findInstance(IProperty idField, Object id, List queryResult) {
+  private Object findInstance(final IProperty idField, final Object id, final List queryResult) {
     Object ret = queryResult.stream().filter(o -> idField.getPropertyAccessor().readData(o).equals(id)).findFirst()
         .orElse(null);
     return ret;
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  private List<?> createIdList(Map rawMap) {
+  private List<?> createIdList(final Map rawMap) {
     List<Object> idList = new ArrayList<>();
     rawMap.values().stream().forEach(an -> idList.add(an));
     return idList;

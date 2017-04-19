@@ -22,7 +22,6 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IFieldValueResolver;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer;
 import de.braintags.vertx.jomnigate.dataaccess.query.IVariableFieldCondition;
-import de.braintags.vertx.jomnigate.dataaccess.query.IdField;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryOperator;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryLogicException;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryOperatorException;
@@ -93,7 +92,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
     } else if (value instanceof Enum) {
       transformedValue = ((Enum<?>) value).name();
     } else if (value instanceof GeoSearchArgument) {
-      transformedValue = new JsonObject(Json.encode(value));
+      transformedValue = JsonObject.mapFrom(value);
     } else {
       try {
         // can not use datastore object mapper here because only the JSON datastore has the object mapper
@@ -208,12 +207,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    */
   protected void parseFieldCondition(IFieldCondition fieldCondition, IFieldValueResolver resolver,
       Handler<AsyncResult<T>> handler) {
-    String columnName;
-    if (fieldCondition.getField() instanceof IdField) {
-      columnName = getMapper().getIdField().getColumnName();
-    } else {
-      columnName = fieldCondition.getField().getColumnName();
-    }
+    String columnName = fieldCondition.getField().getColumnName(getMapper());
     Object fieldValue = fieldCondition.getValue();
     if (fieldValue != null) {
       if (fieldCondition instanceof IVariableFieldCondition) {

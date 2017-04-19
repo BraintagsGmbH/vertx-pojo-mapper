@@ -43,7 +43,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
    * @param typeHandlerFactory
    *          the {@link ITypeHandlerFactory} where the current instance is part of
    */
-  public IdTypeHandler(ITypeHandlerFactory typeHandlerFactory) {
+  public IdTypeHandler(final ITypeHandlerFactory typeHandlerFactory) {
     super(typeHandlerFactory);
   }
 
@@ -54,8 +54,8 @@ public class IdTypeHandler extends AbstractTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, java.lang.Class, io.vertx.core.Handler)
    */
   @Override
-  public final void fromStore(final Object id, IProperty field, Class<?> cls,
-      Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public final void fromStore(final Object id, final IProperty field, final Class<?> cls,
+      final Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     @SuppressWarnings("rawtypes")
     Class fieldClass = field.getType();
     Object internalId = id;
@@ -76,7 +76,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
     getInternalTypeHandler(field).fromStore(internalId, field, cls, resultHandler);
   }
 
-  private final Object convertToString(Object id) {
+  private final Object convertToString(final Object id) {
     if (id == null) {
       return id;
     }
@@ -89,7 +89,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
     return String.valueOf(id);
   }
 
-  private final Object convertToLong(Object id) {
+  private final Object convertToLong(final Object id) {
     if (id == null) {
       return id;
     }
@@ -102,7 +102,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
     throw new UnsupportedOperationException("unsupported type to convert: " + id.getClass().getName());
   }
 
-  private final Object convertToInt(Object id) {
+  private final Object convertToInt(final Object id) {
     if (id == null) {
       return id;
     }
@@ -122,7 +122,7 @@ public class IdTypeHandler extends AbstractTypeHandler {
    * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
-  public final void intoStore(Object source, IProperty field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
+  public final void intoStore(Object source, final IProperty field, final Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     // getInternalTypeHandler(field).intoStore(source, field, resultHandler);
     // here we would need an ITypehandler reacting to the column type in spite of the java field, if types are different
     if (isCharacterColumn(field)) {
@@ -137,16 +137,16 @@ public class IdTypeHandler extends AbstractTypeHandler {
     resultHandler.handle(Future.succeededFuture(thResult));
   }
 
-  protected boolean isCharacterColumn(IProperty field) {
+  protected boolean isCharacterColumn(final IProperty field) {
     return CharSequence.class.isAssignableFrom(field.getType());
   }
 
-  protected boolean isNumericColumn(IProperty field) {
+  protected boolean isNumericColumn(final IProperty field) {
     return Number.class.isAssignableFrom(field.getType()) || field.getType().equals(long.class)
         || field.getType().equals(int.class);
   }
 
-  private final ITypeHandler getInternalTypeHandler(IProperty field) {
+  private final ITypeHandler getInternalTypeHandler(final IProperty field) {
     if (internalTypehandler == null) {
       internalTypehandler = getTypeHandlerFactory().getTypeHandler(field.getType(), field.getEmbedRef());
     }
@@ -161,8 +161,8 @@ public class IdTypeHandler extends AbstractTypeHandler {
    * IField)
    */
   @Override
-  public final short matches(IProperty field) {
-    if (field.getMapper().getIdField() == field)
+  public final short matches(final IProperty field) {
+    if (field.getMapper().getIdInfo().getIndexedField() == field)
       return MATCH_MAJOR;
     return MATCH_NONE;
   }

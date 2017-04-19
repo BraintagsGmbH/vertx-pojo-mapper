@@ -17,6 +17,7 @@ import java.util.List;
 
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.mapping.IDataStoreSynchronizer;
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.ISyncResult;
 import io.vertx.core.AsyncResult;
@@ -33,7 +34,7 @@ import io.vertx.core.logging.LoggerFactory;
  */
 public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSynchronizer<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDataStoreSynchronizer.class);
-  private List<String> synchronizedInstances = new ArrayList<>();
+  private final List<String> synchronizedInstances = new ArrayList<>();
 
   /*
    * (non-Javadoc)
@@ -42,7 +43,7 @@ public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSync
    * mapping .IMapper, io.vertx.core.Handler)
    */
   @Override
-  public final <U> void synchronize(IMapper<U> mapper, Handler<AsyncResult<ISyncResult<T>>> resultHandler) {
+  public final <U> void synchronize(final IMapper<U> mapper, final Handler<AsyncResult<ISyncResult<T>>> resultHandler) {
     if (synchronizedInstances.contains(mapper.getMapperClass().getName())) {
       resultHandler.handle(Future.succeededFuture(getSyncResult()));
     } else {
@@ -72,8 +73,8 @@ public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSync
    * @param mapper
    * @param resultHandler
    */
-  protected void syncIndexDefinitions(IMapper mapper, Handler<AsyncResult<Void>> resultHandler) {
-    if (mapper.getIndexDefinitions() == null) {
+  protected void syncIndexDefinitions(final IMapper<?> mapper, final Handler<AsyncResult<Void>> resultHandler) {
+    if (mapper.getIndexDefinitions() == null || mapper.getIndexDefinitions().isEmpty()) {
       resultHandler.handle(Future.succeededFuture());
     } else {
       LOGGER.debug("Start synchronization of IndexDefinitions");
@@ -85,10 +86,11 @@ public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSync
    * Called to perform the synchronization of the definitions found in {@link Indexes}
    * 
    * @param mapper
-   * @param indexes
+   * @param indexDefinitions
    * @param resultHandler
    */
-  protected abstract void syncIndexes(IMapper mapper, Indexes indexes, Handler<AsyncResult<Void>> resultHandler);
+  protected abstract void syncIndexes(IMapper<?> mapper, List<IIndexDefinition> indexDefinitions,
+      Handler<AsyncResult<Void>> resultHandler);
 
   /**
    * Called if the synchronization wasn't done yet. This method shall perform the synchronization for the table /

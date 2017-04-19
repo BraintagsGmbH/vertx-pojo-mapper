@@ -12,6 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.init;
 
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import de.braintags.vertx.jomnigate.IDataStore;
@@ -46,7 +47,7 @@ public class EncoderSettings {
    * @param name
    *          the name to set
    */
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -65,7 +66,7 @@ public class EncoderSettings {
    * @param endoderClass
    *          the endoderClass to set
    */
-  public void setEncoderClass(Class<? extends IEncoder> endoderClass) {
+  public void setEncoderClass(final Class<? extends IEncoder> endoderClass) {
     this.encoderClass = endoderClass;
   }
 
@@ -84,7 +85,7 @@ public class EncoderSettings {
    * @param properties
    *          the properties to set
    */
-  public void setProperties(Properties properties) {
+  public void setProperties(final Properties properties) {
     this.properties = properties;
   }
 
@@ -101,6 +102,20 @@ public class EncoderSettings {
     } catch (Exception e) {
       throw ExceptionUtil.createRuntimeException(e);
     }
+  }
+
+  /**
+   * Creates a deep (recursive) copy of the EncoderSettings
+   */
+  public EncoderSettings deepCopy() {
+    EncoderSettings res = new EncoderSettings();
+    res.name = this.name;
+    res.encoderClass = this.encoderClass;
+    res.properties = new Properties();
+    for (Entry<Object, Object> property : properties.entrySet()) {
+      res.properties.put(property.getKey(), property.getValue());
+    }
+    return res;
   }
 
 }

@@ -37,7 +37,7 @@ public class ObserverSettings<T extends IObserver> {
     // not externally usable
   }
 
-  public ObserverSettings(Class<T> observerClass) {
+  public ObserverSettings(final Class<T> observerClass) {
     this.observerClass = observerClass;
   }
 
@@ -56,7 +56,7 @@ public class ObserverSettings<T extends IObserver> {
    * @param observerClass
    *          the observerClass to set
    */
-  public void setObserverClass(Class<T> observerClass) {
+  public void setObserverClass(final Class<T> observerClass) {
     this.observerClass = observerClass;
   }
 
@@ -76,7 +76,7 @@ public class ObserverSettings<T extends IObserver> {
    *          the eventList to set
    */
   @SuppressWarnings("unused")
-  private void setEventTypeList(List<ObserverEventType> eventTypeList) {
+  private void setEventTypeList(final List<ObserverEventType> eventTypeList) {
     this.eventTypeList = eventTypeList;
   }
 
@@ -96,7 +96,7 @@ public class ObserverSettings<T extends IObserver> {
    *          the mapperList to set
    */
   @SuppressWarnings("unused")
-  private void setMapperSettings(List<ObserverMapperSettings> mapperSettings) {
+  private void setMapperSettings(final List<ObserverMapperSettings> mapperSettings) {
     this.mapperSettings = mapperSettings;
   }
 
@@ -113,7 +113,7 @@ public class ObserverSettings<T extends IObserver> {
    * @param priority
    *          the priority to set
    */
-  public void setPriority(int priority) {
+  public void setPriority(final int priority) {
     this.priority = priority;
   }
 
@@ -124,7 +124,7 @@ public class ObserverSettings<T extends IObserver> {
    * @param mapperClass
    * @return
    */
-  public boolean isApplicableFor(Class<?> mapperClass) {
+  public boolean isApplicableFor(final Class<?> mapperClass) {
     if (getMapperSettings().isEmpty()) {
       return true;
     }
@@ -138,7 +138,7 @@ public class ObserverSettings<T extends IObserver> {
    * @param mapper
    * @return
    */
-  public boolean isApplicableFor(IMapper<?> mapper) {
+  public boolean isApplicableFor(final IMapper<?> mapper) {
     if (getMapperSettings().isEmpty()) {
       return true;
     }
@@ -152,11 +152,26 @@ public class ObserverSettings<T extends IObserver> {
    * @param mapper
    * @return
    */
-  public boolean isApplicableFor(ObserverEventType eventType) {
+  public boolean isApplicableFor(final ObserverEventType eventType) {
     if (getEventTypeList().isEmpty()) {
       return true;
     }
     return getEventTypeList().stream().filter(evt -> evt.equals(eventType)).findFirst().isPresent();
+  }
+
+  /**
+   * Creates a deep (recursive) copy of the ObserverSettings
+   */
+  public ObserverSettings<T> deepCopy() {
+    ObserverSettings<T> res = new ObserverSettings<>(getObserverClass());
+    res.eventTypeList.addAll(getEventTypeList());
+    res.priority = getPriority();
+
+    for (ObserverMapperSettings mapperSetting : mapperSettings) {
+      res.mapperSettings.add(mapperSetting.deepCopy());
+    }
+
+    return res;
   }
 
 }

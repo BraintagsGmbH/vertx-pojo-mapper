@@ -13,7 +13,9 @@
 package de.braintags.vertx.jomnigate.mapping.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
@@ -31,9 +34,12 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterSave;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
+import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
+import de.braintags.vertx.jomnigate.dataaccess.query.IdField;
 import de.braintags.vertx.jomnigate.exception.MappingException;
+import de.braintags.vertx.jomnigate.mapping.IIdInfo;
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
-import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
@@ -44,6 +50,7 @@ import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
 import de.braintags.vertx.jomnigate.observer.IObserverHandler;
 import de.braintags.vertx.jomnigate.versioning.IMapperVersion;
 import de.braintags.vertx.util.ClassUtil;
+import de.braintags.vertx.util.exception.InitException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -74,14 +81,14 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   protected static final List<Class<? extends Annotation>> CLASS_ANNOTATIONS = Arrays.asList(Indexes.class,
       KeyGenerator.class);
 
-  private Map<String, IProperty> mappedProperties = new HashMap<>();
-  private Map<Class<? extends Annotation>, IProperty[]> propertyCache = new HashMap<>();
-  private Class<T> mapperClass;
-  private IMapperFactory mapperFactory;
+  private final Map<String, IProperty> mappedProperties = new HashMap<>();
+  private final Map<Class<? extends Annotation>, IProperty[]> propertyCache = new HashMap<>();
+  private final Class<T> mapperClass;
+  private final IMapperFactory mapperFactory;
   private IKeyGenerator keyGenerator;
-  private IMappedIdField idField;
+  private IIdInfo idInfo;
   private Entity entity;
-  private Indexes indexes;
+  private List<IIndexDefinition> indexes;
   private ITableInfo tableInfo;
   private boolean syncNeeded = true;
   private boolean hasReferencedFields = false;
@@ -97,7 +104,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    */
   private final Map<Class<? extends Annotation>, List<IMethodProxy>> lifecycleMethods = new HashMap<>();
 
-  public AbstractMapper(Class<T> mapperClass, IMapperFactory mapperFactory) {
+  public AbstractMapper(final Class<T> mapperClass, final IMapperFactory mapperFactory) {
     this.mapperFactory = mapperFactory;
     this.mapperClass = mapperClass;
     init();
@@ -112,9 +119,9 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     computeLifeCycleAnnotations();
     computeClassAnnotations();
     computeEntity();
-    computeIndize();
     computeKeyGenerator();
     generateTableInfo();
+    computeIndize();
     checkReferencedFields();
     observerHandler = IObserverHandler.createInstance(this);
     internalValidate();
@@ -124,7 +131,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * Validations, which are not overwritable
    */
   private final void internalValidate() {
-    if (idField == null)
+    if (idInfo == null)
       throw new MappingException("No id-field specified in mapper " + getMapperClass().getName());
     if (getEntity().version() > 0 && !IMapperVersion.class.isAssignableFrom(getMapperClass())) {
       throw new MappingException(
@@ -175,9 +182,28 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   }
 
   protected void computeIndize() {
+    List<IIndexDefinition> definitions = new ArrayList<>();
     if (getMapperClass().isAnnotationPresent(Indexes.class)) {
-      indexes = getMapperClass().getAnnotation(Indexes.class);
+      Indexes indexes = getMapperClass().getAnnotation(Indexes.class);
+      for (Index index : indexes.value()) {
+        definitions.add(new IndexDefinition(index));
+      }
     }
+    Field[] fields = getMapperClass().getFields();
+    for (Field field : fields) {
+      int modifiers = field.getModifiers();
+      Class<?> type = field.getType();
+      if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && IIndexedField.class.isAssignableFrom(type)
+          && !IdField.class.isAssignableFrom(type)) {
+        try {
+          IIndexedField indexedField = (IIndexedField) field.get(null);
+          definitions.add(new IndexDefinition(indexedField, this));
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+          throw new InitException(e);
+        }
+      }
+    }
+    this.indexes = definitions;
   }
 
   protected void computeKeyGenerator() {
@@ -230,7 +256,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#getField(java.lang.String)
    */
   @Override
-  public IProperty getField(String name) {
+  public IProperty getField(final String name) {
     IProperty field = this.mappedProperties.get(name);
     if (field == null)
       throw new de.braintags.vertx.jomnigate.exception.NoSuchFieldException(this, name);
@@ -243,7 +269,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#getAnnotatedFields(java.lang.Class)
    */
   @Override
-  public IProperty[] getAnnotatedFields(Class<? extends Annotation> annotationClass) {
+  public IProperty[] getAnnotatedFields(final Class<? extends Annotation> annotationClass) {
     if (!this.propertyCache.containsKey(annotationClass)) {
       IProperty[] result = new IProperty[0];
       for (IProperty field : this.mappedProperties.values()) {
@@ -265,8 +291,8 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#executeLifecycle(java.lang.Class, java.lang.Object)
    */
   @Override
-  public void executeLifecycle(Class<? extends Annotation> annotationClass, T entity,
-      Handler<AsyncResult<Void>> handler) {
+  public void executeLifecycle(final Class<? extends Annotation> annotationClass, final T entity,
+      final Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start executing Lifecycle " + annotationClass.getSimpleName());
     List<IMethodProxy> methods = getLifecycleMethods(annotationClass);
     if (methods == null || methods.isEmpty()) {
@@ -282,7 +308,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @param handler
    * @param methods
    */
-  private void executeLifecycleMethods(Object entity, Handler<AsyncResult<Void>> handler, List<IMethodProxy> methods) {
+  private void executeLifecycleMethods(final Object entity, final Handler<AsyncResult<Void>> handler, final List<IMethodProxy> methods) {
     CompositeFuture cf = CompositeFuture.all(createFutureList(entity, methods));
     cf.setHandler(res -> {
       if (res.failed()) {
@@ -294,7 +320,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  private List<Future> createFutureList(Object entity, List<IMethodProxy> methods) {
+  private List<Future> createFutureList(final Object entity, final List<IMethodProxy> methods) {
     List<Future> fl = new ArrayList<>();
     for (IMethodProxy mp : methods) {
       Future f = Future.future();
@@ -313,7 +339,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @param entity
    * @param handler
    */
-  private void executeMethod(IMethodProxy mp, Object entity, Handler<AsyncResult<Void>> handler) {
+  private void executeMethod(final IMethodProxy mp, final Object entity, final Handler<AsyncResult<Void>> handler) {
     Method method = mp.getMethod();
     method.setAccessible(true);
     Object[] args = mp.getParameterTypes() == null ? null
@@ -332,7 +358,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     }
   }
 
-  protected final void addLifecycleAnnotationMethod(Class<? extends Annotation> ann, Method method) {
+  protected final void addLifecycleAnnotationMethod(final Class<? extends Annotation> ann, final Method method) {
     List<IMethodProxy> lcMethods = lifecycleMethods.get(ann);
     if (lcMethods == null) {
       lcMethods = new ArrayList<>();
@@ -360,7 +386,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#getLifecycleMethods(java.lang.Class)
    */
   @Override
-  public final List<IMethodProxy> getLifecycleMethods(Class<? extends Annotation> annotation) {
+  public final List<IMethodProxy> getLifecycleMethods(final Class<? extends Annotation> annotation) {
     return lifecycleMethods.get(annotation);
   }
 
@@ -370,7 +396,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#getAnnotation(java.lang.Class)
    */
   @Override
-  public <U extends Annotation> U getAnnotation(Class<U> annotationClass) {
+  public <U extends Annotation> U getAnnotation(final Class<U> annotationClass) {
     U ann = (U) existingClassAnnotations.get(annotationClass);
     return ann;
   }
@@ -381,12 +407,12 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   }
 
   @Override
-  public final IMappedIdField getIdField() {
-    return idField;
+  public final IIdInfo getIdInfo() {
+    return idInfo;
   }
 
-  protected void setIdField(IMappedIdField idField) {
-    this.idField = idField;
+  protected void setIdInfo(final IIdInfo idInfo) {
+    this.idInfo = idInfo;
   }
 
   /*
@@ -425,7 +451,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @see de.braintags.vertx.jomnigate.mapping.IMapper#setSyncNeeded(boolean)
    */
   @Override
-  public final void setSyncNeeded(boolean syncNeeded) {
+  public final void setSyncNeeded(final boolean syncNeeded) {
     this.syncNeeded = syncNeeded;
   }
 
@@ -440,7 +466,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   }
 
   @Override
-  public Indexes getIndexDefinitions() {
+  public List<IIndexDefinition> getIndexDefinitions() {
     return indexes;
   }
 

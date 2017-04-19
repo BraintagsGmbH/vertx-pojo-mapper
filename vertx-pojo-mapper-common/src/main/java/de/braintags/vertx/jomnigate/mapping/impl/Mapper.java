@@ -25,7 +25,7 @@ import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.ObjectFactory;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
+import de.braintags.vertx.jomnigate.mapping.IIdInfo;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.IPropertyAccessor;
@@ -54,7 +54,7 @@ public class Mapper<T> extends AbstractMapper<T> {
    * @param mapperFactory
    *          the parent {@link MapperFactory}
    */
-  public Mapper(Class<T> mapperClass, MapperFactory mapperFactory) {
+  public Mapper(final Class<T> mapperClass, final MapperFactory mapperFactory) {
     super(mapperClass, mapperFactory);
     this.objectFactory = new DefaultObjectFactory();
     this.objectFactory.setMapper(this);
@@ -121,12 +121,12 @@ public class Mapper<T> extends AbstractMapper<T> {
    * @param beanDescriptors
    * @throws NoSuchFieldException
    */
-  private void loopPropertyDescriptors(PropertyDescriptor[] beanDescriptors) throws NoSuchFieldException {
-    for (int i = 0; i < beanDescriptors.length; i++) {
-      Method readMethod = beanDescriptors[i].getReadMethod();
-      Method writeMethod = beanDescriptors[i].getWriteMethod();
+  private void loopPropertyDescriptors(final PropertyDescriptor[] beanDescriptors) throws NoSuchFieldException {
+    for (PropertyDescriptor beanDescriptor : beanDescriptors) {
+      Method readMethod = beanDescriptor.getReadMethod();
+      Method writeMethod = beanDescriptor.getWriteMethod();
       if (readMethod != null && writeMethod != null) {
-        JavaBeanAccessor accessor = new JavaBeanAccessor(beanDescriptors[i]);
+        JavaBeanAccessor accessor = new JavaBeanAccessor(beanDescriptor);
         String name = accessor.getName();
         Field field = ClassUtil.getDeclaredField(getMapperClass(), name);
         if (field != null) {
@@ -141,13 +141,12 @@ public class Mapper<T> extends AbstractMapper<T> {
    */
   public void computeFieldProperties() {
     Field[] fieldArray = getMapperClass().getFields();
-    for (int i = 0; i < fieldArray.length; i++) {
-      Field field = fieldArray[i];
+    for (Field field : fieldArray) {
       int fieldModifiers = field.getModifiers();
       JavaFieldAccessor accessor = new JavaFieldAccessor(field);
       MappedField mf = createMappedField(field, accessor);
       if (!mf.isIgnore() && !Modifier.isTransient(fieldModifiers)
-          && (Modifier.isPublic(fieldModifiers) && !Modifier.isStatic(fieldModifiers))) {
+          && Modifier.isPublic(fieldModifiers) && !Modifier.isStatic(fieldModifiers)) {
         addMappedField(accessor.getName(), createMappedField(field, accessor));
       }
     }
@@ -159,11 +158,11 @@ public class Mapper<T> extends AbstractMapper<T> {
    * @param name
    * @param mf
    */
-  protected void addMappedField(String name, MappedField mf) {
+  protected void addMappedField(final String name, final MappedField mf) {
     if (mf.hasAnnotation(Id.class)) {
-      if (getIdField() != null)
+      if (getIdInfo() != null)
         throw new MappingException("duplicate Id field definition found for mapper " + getMapperClass());
-      setIdField(createIdField(mf));
+      setIdInfo(createIdInfo(mf));
     }
     if (!mf.isIgnore()) {
       this.getMappedProperties().put(name, mf);
@@ -171,14 +170,14 @@ public class Mapper<T> extends AbstractMapper<T> {
   }
 
   /**
-   * Create the id field for this mapper
+   * Create the id info for this mapper
    * 
    * @param mappedField
    *          the field with the {@link Id} annotation
-   * @return an id field
+   * @return the id info
    */
-  protected IMappedIdField createIdField(MappedField mappedField) {
-    return new MappedIdFieldImpl(mappedField);
+  protected IIdInfo createIdInfo(final MappedField mappedField) {
+    return new IdInfo(mappedField);
   }
 
   /**
@@ -188,7 +187,7 @@ public class Mapper<T> extends AbstractMapper<T> {
    * @param accessor
    * @return
    */
-  protected MappedField createMappedField(Field field, IPropertyAccessor accessor) {
+  protected MappedField createMappedField(final Field field, final IPropertyAccessor accessor) {
     return new MappedField(field, accessor, this);
   }
 
