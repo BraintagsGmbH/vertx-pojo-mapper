@@ -21,7 +21,6 @@ import static org.junit.Assert.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -31,6 +30,7 @@ import org.junit.Test;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Index;
+import de.braintags.vertx.jomnigate.annotation.IndexOption;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
@@ -50,7 +50,7 @@ import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IPropertyMapper;
-import de.braintags.vertx.jomnigate.mapping.IndexOptions;
+import de.braintags.vertx.jomnigate.mapping.IndexOption.IndexFeature;
 import de.braintags.vertx.jomnigate.mapping.impl.DefaultPropertyMapper;
 import de.braintags.vertx.jomnigate.mapping.impl.ParametrizedMappedField;
 import de.braintags.vertx.jomnigate.mysql.mapping.SqlPropertyMapperFactory;
@@ -152,12 +152,13 @@ public class TSqlMapperFactory {
       Assert.assertEquals("The name of the index is wrong", "testIndex", index.name());
       Assert.assertEquals("wrong number of fields", 2, index.fields().length);
 
-      IndexOptions[] options = index.options();
+      IndexOption[] options = index.options();
       if (options == null)
         Assert.fail("IndexOptions must not be null");
       else {
-        Assert.assertEquals("wrong parameter unique in IndexOptions", false,
-            Arrays.asList(options).contains(IndexOptions.UNIQUE));
+        Assert.assertEquals(1, options.length);
+        Assert.assertEquals(IndexFeature.UNIQUE, options[0].feature());
+        Assert.assertEquals("wrong parameter unique in IndexOptions", false, options[0].value());
       }
     }
   }

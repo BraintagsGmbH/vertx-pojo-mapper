@@ -1,7 +1,6 @@
 package de.braintags.vertx.jomnigate.mapping.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.annotation.Index;
@@ -11,7 +10,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IIndexFieldDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
-import de.braintags.vertx.jomnigate.mapping.IndexOptions;
+import de.braintags.vertx.jomnigate.mapping.IndexOption;
 
 /**
  * Implementation of {@link IIndexDefinition}
@@ -23,7 +22,7 @@ public class IndexDefinition implements IIndexDefinition {
 
   private String name;
   private final List<IIndexFieldDefinition> fields;
-  private List<IndexOptions> indexOptions;
+  private List<IndexOption> indexOptions;
 
   /**
    * Create a definition from an indexed field of a mapper
@@ -57,8 +56,12 @@ public class IndexDefinition implements IIndexDefinition {
       def.setType(field.type());
       fields.add(def);
     }
-    if (index.options() != null)
-      getIndexOptions().addAll(Arrays.asList(index.options()));
+    if (index.options() != null) {
+      for (de.braintags.vertx.jomnigate.annotation.IndexOption option : index.options()) {
+        IndexOption options = new IndexOption(option.feature(), option.value());
+        getIndexOptions().add(options);
+      }
+    }
   }
 
   @Override
@@ -76,7 +79,7 @@ public class IndexDefinition implements IIndexDefinition {
   }
 
   @Override
-  public List<IndexOptions> getIndexOptions() {
+  public List<IndexOption> getIndexOptions() {
     if (indexOptions == null)
       indexOptions = new ArrayList<>();
     return indexOptions;

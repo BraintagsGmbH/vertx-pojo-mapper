@@ -18,7 +18,7 @@ import java.util.List;
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IIndexFieldDefinition;
-import de.braintags.vertx.jomnigate.mapping.IndexOptions;
+import de.braintags.vertx.jomnigate.mapping.IndexOption;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -181,8 +181,15 @@ public final class MongoUtil {
   }
 
   private static void addIndexOptions(final JsonObject indexDef,
-      final List<de.braintags.vertx.jomnigate.mapping.IndexOptions> indexOptions) {
-    if (indexOptions.contains(IndexOptions.UNIQUE))
-      indexDef.put("unique", true);
+      final List<de.braintags.vertx.jomnigate.mapping.IndexOption> indexOptions) {
+    for (IndexOption option : indexOptions) {
+      switch (option.getFeature()) {
+      case UNIQUE:
+        indexDef.put("unique", option.getValue());  
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown IndexFeature: " + option.getFeature());
+      }
+    }
   }
 }

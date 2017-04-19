@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.annotation.IndexField;
+import de.braintags.vertx.jomnigate.annotation.IndexOption;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.field.Embedded;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
@@ -30,6 +31,7 @@ import de.braintags.vertx.jomnigate.annotation.field.Ignore;
 import de.braintags.vertx.jomnigate.annotation.field.Property;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
+import de.braintags.vertx.jomnigate.mapping.IndexOption.IndexFeature;
 
 /**
  * Person is used as mapper class
@@ -40,7 +42,7 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 
 @Entity(name = "PersonColumn")
 @Indexes(@Index(fields = { @IndexField(fieldName = "name"),
-    @IndexField(fieldName = "weight") }, name = "testIndex"))
+    @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOption(feature = IndexFeature.UNIQUE, value = false)))
 public class Person extends AbstractPerson {
   public static final int NUMBER_OF_PROPERTIES = 23;
 

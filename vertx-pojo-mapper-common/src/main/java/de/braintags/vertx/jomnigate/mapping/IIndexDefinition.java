@@ -29,5 +29,5 @@ public interface IIndexDefinition {
    * 
    * @return the options
    */
-  public List<IndexOptions> getIndexOptions();
+  public List<IndexOption> getIndexOptions();
 }

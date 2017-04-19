@@ -19,7 +19,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.braintags.vertx.jomnigate.mapping.IndexOptions;
 
 /**
  * Describes an index, which shall be defined in the datastore
@@ -51,8 +50,8 @@ public @interface Index {
   /**
    * Define some options for the index
    * 
-   * @return the {@link IndexOptions}
+   * @return the {@link IndexOption}
    */
-  de.braintags.vertx.jomnigate.mapping.IndexOptions[] options() default {};
+  IndexOption[] options() default {};
 
 }
