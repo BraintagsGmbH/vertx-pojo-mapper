@@ -178,8 +178,8 @@ public class MongoWrite<T> extends AbstractWrite<T> {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     IMapper<T> mapper = getMapper();
     String collection = mapper.getTableInfo().getName();
-    final Object currentId = storeObject.get(mapper.getIdField().getField());
-    String idFieldName = mapper.getIdField().getField().getColumnInfo().getName();
+    final Object currentId = storeObject.get(mapper.getIdInfo().getField());
+    String idFieldName = mapper.getIdInfo().getField().getColumnInfo().getName();
     JsonObject query = new JsonObject();
     query.put(idFieldName, currentId);
 

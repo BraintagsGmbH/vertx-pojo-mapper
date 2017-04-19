@@ -25,12 +25,12 @@ import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
-import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
+import de.braintags.vertx.jomnigate.mapping.IIdInfo;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.impl.AbstractMapper;
-import de.braintags.vertx.jomnigate.mapping.impl.MappedIdFieldImpl;
+import de.braintags.vertx.jomnigate.mapping.impl.IdInfo;
 
 /**
  * An implementation of {@link IMapper} which uses jackson
@@ -40,10 +40,10 @@ import de.braintags.vertx.jomnigate.mapping.impl.MappedIdFieldImpl;
  */
 public class JacksonMapper<T> extends AbstractMapper<T> {
   private BeanDescription beanDescription;
-  private String keyGeneratorReference;
-  private Class<?> creatorClass;
+  private final String keyGeneratorReference;
+  private final Class<?> creatorClass;
 
-  public JacksonMapper(Class<T> mapperClass, JacksonMapperFactory mapperFactory) {
+  public JacksonMapper(final Class<T> mapperClass, final JacksonMapperFactory mapperFactory) {
     super(mapperClass, mapperFactory);
     creatorClass = getEntity().polyClass() == Object.class ? getMapperClass() : getEntity().polyClass();
     this.keyGeneratorReference = creatorClass.getSimpleName();
@@ -73,7 +73,7 @@ public class JacksonMapper<T> extends AbstractMapper<T> {
   }
 
   @Override
-  public <U extends Annotation> U getAnnotation(Class<U> annotationClass) {
+  public <U extends Annotation> U getAnnotation(final Class<U> annotationClass) {
     U ann = super.getAnnotation(annotationClass);
     if (ann == null) {
       ann = beanDescription.getClassAnnotations().get(annotationClass);
@@ -111,19 +111,19 @@ public class JacksonMapper<T> extends AbstractMapper<T> {
    * @param name
    * @param mf
    */
-  protected void addMappedField(String name, IProperty mf) {
+  protected void addMappedField(final String name, final IProperty mf) {
     if (mf.hasAnnotation(Id.class)) {
-      if (getIdField() != null)
+      if (getIdInfo() != null)
         throw new MappingException("duplicate Id field definition found for mapper " + getMapperClass());
-      setIdField(createIdProperty(mf));
+      setIdInfo(createIdInfo(mf));
     }
     if (!mf.isIgnore()) {
       this.getMappedProperties().put(name, mf);
     }
   }
 
-  protected IMappedIdField createIdProperty(IProperty property) {
-    return new MappedIdFieldImpl(property);
+  protected IIdInfo createIdInfo(final IProperty property) {
+    return new IdInfo(property);
   }
 
   /**

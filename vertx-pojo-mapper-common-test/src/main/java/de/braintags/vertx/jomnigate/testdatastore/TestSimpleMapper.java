@@ -35,7 +35,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
   private static boolean dropTable = false;
 
   @Test
-  public void findById(TestContext context) {
+  public void findById(final TestContext context) {
     clearTable(context, "SimpleMapper");
     SimpleMapper sm = new SimpleMapper();
     sm.name = "testName";
@@ -52,12 +52,12 @@ public class TestSimpleMapper extends DatastoreBaseTest {
 
     // SimpleQuery for all records
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField(), sm.id));
+    query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdInfo().getIndexedField(), sm.id));
     resultContainer = find(context, query, 1);
   }
 
   @Test
-  public void testSimpleMapper(TestContext context) {
+  public void testSimpleMapper(final TestContext context) {
     clearTable(context, "SimpleMapper");
     SimpleMapper sm = new SimpleMapper();
     sm.name = "testName";
