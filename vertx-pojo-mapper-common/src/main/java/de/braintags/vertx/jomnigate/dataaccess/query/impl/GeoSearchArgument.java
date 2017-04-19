@@ -45,9 +45,13 @@ public class GeoSearchArgument {
   @JsonProperty("$geometry")
   @JsonTypeInfo(include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", use = JsonTypeInfo.Id.CUSTOM)
   @JsonTypeIdResolver(GeoSearchArgumentTypeResolver.class)
-  private final GeoJsonObject geoJson;
+  private GeoJsonObject geoJson;
   @JsonProperty("$maxDistance")
   private int distance = -1;
+
+  protected GeoSearchArgument() {
+    // default constructor for jackson
+  }
 
   public GeoSearchArgument(final GeoJsonObject geoJson, final int distance) {
     this.geoJson = geoJson;
