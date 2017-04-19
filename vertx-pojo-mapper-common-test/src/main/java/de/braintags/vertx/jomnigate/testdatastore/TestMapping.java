@@ -74,29 +74,29 @@ public class TestMapping extends DatastoreBaseTest {
    * @throws java.lang.Exception
    */
   @Before
-  public void setUpBeforeClass(TestContext context) throws Exception {
+  public void setUpBeforeClass(final TestContext context) throws Exception {
     mapperDef = getDataStore(context).getMapperFactory().getMapper(Person.class);
   }
 
   @Test
-  public void testClassAnnotation(TestContext context) {
+  public void testClassAnnotation(final TestContext context) {
     JsonTypeInfo ti = PolyMapper.class.getAnnotation(JsonTypeInfo.class);
     JsonTypeInfo[] til = PolyMapper.class.getAnnotationsByType(JsonTypeInfo.class);
     context.assertNotNull(til);
   }
 
   @Test
-  public void testPrivateIdField(TestContext context) {
+  public void testPrivateIdField(final TestContext context) {
     IMapper<PrivateIdMapper> mapper = getDataStore(context).getMapperFactory().getMapper(PrivateIdMapper.class);
   }
 
   @Test
-  public void simpleTest(TestContext context) {
+  public void simpleTest(final TestContext context) {
     IMapper<MiniMapper> mapper = getDataStore(context).getMapperFactory().getMapper(MiniMapper.class);
   }
 
   @Test
-  public void testMiniMapper_BeanMethodWithoutField(TestContext context) {
+  public void testMiniMapper_BeanMethodWithoutField(final TestContext context) {
     IMapper<MiniMapper_BeanMethodWithoutField> mapper = getDataStore(context).getMapperFactory()
         .getMapper(MiniMapper_BeanMethodWithoutField.class);
   }
@@ -174,7 +174,7 @@ public class TestMapping extends DatastoreBaseTest {
       if (options == null)
         Assert.fail("IndexOptions must not be null");
       else {
-        Assert.assertEquals("wrong parameter unique in IndexOptions", false, options.unique());
+        Assert.assertFalse("wrong parameter unique in IndexOptions", options.unique());
       }
     }
   }
@@ -194,7 +194,7 @@ public class TestMapping extends DatastoreBaseTest {
   }
 
   @Test
-  public void testJsonMapping(TestContext context) {
+  public void testJsonMapping(final TestContext context) {
     try {
       ObjectMapper mapper = Json.mapper;
       examine(mapper, MiniMapper.class);
@@ -207,7 +207,7 @@ public class TestMapping extends DatastoreBaseTest {
 
   }
 
-  private void checkTypeHandler(IMapper mapperdef, String fieldName, Class expectedTh, Class expectedSubTypeHandler) {
+  private void checkTypeHandler(final IMapper mapperdef, final String fieldName, final Class expectedTh, final Class expectedSubTypeHandler) {
     IProperty field = mapperDef.getField(fieldName);
     assertNotNull("Typehandler must not be null for field: " + field.getFullName(), field.getTypeHandler());
     assertEquals("wrong TypeHandler for field: " + field.getFullName(), expectedTh, field.getTypeHandler().getClass());
@@ -375,7 +375,7 @@ public class TestMapping extends DatastoreBaseTest {
   /**
    * @param mapper
    */
-  private void examine(ObjectMapper mapper, Class mapperClass) {
+  private void examine(final ObjectMapper mapper, final Class mapperClass) {
     LOGGER.info("examine " + mapperClass.getName());
     JavaType type = mapper.constructType(mapperClass);
     BeanDescription desc = mapper.getSerializationConfig().introspect(type);
@@ -386,7 +386,7 @@ public class TestMapping extends DatastoreBaseTest {
     }
   }
 
-  private void checkPropertyhandler(IMapper mapperdef, String fieldName, String classNamePart) {
+  private void checkPropertyhandler(final IMapper mapperdef, final String fieldName, final String classNamePart) {
     IProperty field = mapperDef.getField(fieldName);
     assertNotNull("property mapper must not be null for field: " + field.getFullName(), field.getPropertyMapper());
     String className = field.getPropertyMapper().getClass().getName();

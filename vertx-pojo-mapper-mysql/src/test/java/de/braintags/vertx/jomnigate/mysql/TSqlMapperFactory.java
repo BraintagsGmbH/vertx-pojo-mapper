@@ -155,7 +155,7 @@ public class TSqlMapperFactory {
       if (options == null)
         Assert.fail("IndexOptions must not be null");
       else {
-        Assert.assertEquals("wrong parameter unique in IndexOptions", false, options.unique());
+        Assert.assertFalse("wrong parameter unique in IndexOptions", options.unique());
       }
     }
   }
@@ -201,15 +201,15 @@ public class TSqlMapperFactory {
 
   }
 
-  private void checkPropertyhandler(IMapper mapperdef, String fieldName,
-      Class<? extends IPropertyMapper> expectedPropertyMapper) {
+  private void checkPropertyhandler(final IMapper mapperdef, final String fieldName,
+      final Class<? extends IPropertyMapper> expectedPropertyMapper) {
     IProperty field = mapperDef.getField(fieldName);
     assertNotNull("property mapper must not be null for field: " + field.getFullName(), field.getPropertyMapper());
     assertEquals("wrong property mapper for field: " + field.getFullName(), expectedPropertyMapper,
         field.getPropertyMapper().getClass());
   }
 
-  private void checkTypeHandler(IMapper mapperdef, String fieldName, Class expectedTh, Class expectedSubTypeHandler) {
+  private void checkTypeHandler(final IMapper mapperdef, final String fieldName, final Class expectedTh, final Class expectedSubTypeHandler) {
     IProperty field = mapperDef.getField(fieldName);
     assertNotNull("Typehandler must not be null for field: " + field.getFullName(), field.getTypeHandler());
     assertEquals("wrong TypeHandler for field: " + field.getFullName(), expectedTh, field.getTypeHandler().getClass());

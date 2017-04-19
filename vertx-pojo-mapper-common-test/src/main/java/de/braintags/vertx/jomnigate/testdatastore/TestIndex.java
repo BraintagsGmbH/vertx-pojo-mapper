@@ -32,7 +32,7 @@ public class TestIndex extends DatastoreBaseTest {
       .getLogger(TestIndex.class);
 
   @Test
-  public void testGeoIndex(TestContext context) {
+  public void testGeoIndex(final TestContext context) {
     clearTable(context, GeoMapper2.class.getSimpleName());
     IQuery<GeoMapper2> q = getDataStore(context).createQuery(GeoMapper2.class);
     findAll(context, q);
@@ -40,7 +40,7 @@ public class TestIndex extends DatastoreBaseTest {
   }
 
   @Test
-  public void testIndexMiniMapper(TestContext context) {
+  public void testIndexMiniMapper(final TestContext context) {
     clearTable(context, MiniMapperIndex.class.getSimpleName());
     IQuery<MiniMapperIndex> q = getDataStore(context).createQuery(MiniMapperIndex.class);
     findAll(context, q);
@@ -48,7 +48,7 @@ public class TestIndex extends DatastoreBaseTest {
   }
 
   @BeforeClass
-  public static void beforeClass(TestContext context) {
+  public static void beforeClass(final TestContext context) {
     dropTable(context, GeoMapper2.class.getSimpleName());
   }
 }

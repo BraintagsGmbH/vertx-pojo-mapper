@@ -13,7 +13,9 @@
 package de.braintags.vertx.jomnigate.mapping.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
@@ -31,8 +34,11 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterSave;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeLoad;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
+import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
+import de.braintags.vertx.jomnigate.dataaccess.query.IdField;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.mapping.IIdInfo;
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
@@ -43,6 +49,7 @@ import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
 import de.braintags.vertx.jomnigate.observer.IObserverHandler;
 import de.braintags.vertx.util.ClassUtil;
+import de.braintags.vertx.util.exception.InitException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -80,7 +87,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   private IKeyGenerator keyGenerator;
   private IIdInfo idInfo;
   private Entity entity;
-  private Indexes indexes;
+  private List<IIndexDefinition> indexes;
   private ITableInfo tableInfo;
   private boolean syncNeeded = true;
   private boolean hasReferencedFields = false;
@@ -111,9 +118,9 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     computeLifeCycleAnnotations();
     computeClassAnnotations();
     computeEntity();
-    computeIndize();
     computeKeyGenerator();
     generateTableInfo();
+    computeIndize();
     checkReferencedFields();
     observerHandler = IObserverHandler.createInstance(this);
     validate();
@@ -164,9 +171,28 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   }
 
   protected void computeIndize() {
+    List<IIndexDefinition> definitions = new ArrayList<>();
     if (getMapperClass().isAnnotationPresent(Indexes.class)) {
-      indexes = getMapperClass().getAnnotation(Indexes.class);
+      Indexes indexes = getMapperClass().getAnnotation(Indexes.class);
+      for (Index index : indexes.value()) {
+        definitions.add(new IndexDefinition(index));
+      }
     }
+    Field[] fields = getMapperClass().getFields();
+    for (Field field : fields) {
+      int modifiers = field.getModifiers();
+      Class<?> type = field.getType();
+      if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && IIndexedField.class.isAssignableFrom(type)
+          && !IdField.class.isAssignableFrom(type)) {
+        try {
+          IIndexedField indexedField = (IIndexedField) field.get(null);
+          definitions.add(new IndexDefinition(indexedField, this));
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+          throw new InitException(e);
+        }
+      }
+    }
+    this.indexes = definitions;
   }
 
   protected void computeKeyGenerator() {
@@ -429,7 +455,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   }
 
   @Override
-  public Indexes getIndexDefinitions() {
+  public List<IIndexDefinition> getIndexDefinitions() {
     return indexes;
   }
 

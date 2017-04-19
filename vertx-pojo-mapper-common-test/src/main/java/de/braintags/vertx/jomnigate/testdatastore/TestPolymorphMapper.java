@@ -70,18 +70,18 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
     context.assertEquals(2, pList.size(), "expected 2 records");
 
     // query must give 2 records in PolyMapper either
-    query = getDataStore(context).createQuery(PolySubMapper.class);
-    pList = findAll(context, query);
+    IQuery<PolySubMapper> subQuery = getDataStore(context).createQuery(PolySubMapper.class);
+    pList = findAll(context, subQuery);
     context.assertEquals(2, pList.size(), "expected 2 records");
 
-    query = getDataStore(context).createQuery(PolySubMapper.class);
-    query.setSearchCondition(ISearchCondition.isEqual(PolySubMapper.SUBFIELD, "testSub"));
-    pList = findAll(context, query);
+    subQuery = getDataStore(context).createQuery(PolySubMapper.class);
+    subQuery.setSearchCondition(ISearchCondition.isEqual(PolySubMapper.SUBFIELD, "testSub"));
+    pList = findAll(context, subQuery);
     context.assertEquals(1, pList.size(), "expected 1 records");
 
     query = getDataStore(context).createQuery(PolyMapper.class);
-    query.setSearchCondition(ISearchCondition.isEqual(PolyMapper.MAINFIELD, "testMain1"));
-    pList = findAll(context, query);
+    subQuery.setSearchCondition(ISearchCondition.isEqual(PolyMapper.MAINFIELD, "testMain1"));
+    pList = findAll(context, subQuery);
     context.assertEquals(1, pList.size(), "expected 1 records");
 
   }
@@ -106,8 +106,8 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
     context.assertEquals(2, pList.size(), "expected 2 records");
 
     // query must give 2 records in PolyMapper either
-    query = getDataStore(context).createQuery(PolySubMapper.class);
-    pList = findAll(context, query);
+    IQuery<PolySubMapper> subQuery = getDataStore(context).createQuery(PolySubMapper.class);
+    pList = findAll(context, subQuery);
     context.assertEquals(2, pList.size(), "expected 2 records");
   }
 
@@ -139,7 +139,7 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
   @Test
   public void testCheckUndefined_JsonTypeInfo(final TestContext context) {
     try {
-      IQuery<PolyMapper> query = getDataStore(context).createQuery(PolyMapper_WithoutType.class);
+      getDataStore(context).createQuery(PolyMapper_WithoutType.class);
       context.fail("expected MappingException here");
     } catch (MappingException e) {
       // expected result
