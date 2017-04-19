@@ -167,7 +167,7 @@
  * This event is called after execution of an IQuery. The source
  * of the IObserverEvent is a loaded instance; accessResult is IQueryResult; accessObject is the IQuery
  * 
- * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#BEFORE_SAVE} +
+ * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#BEFORE_INSERT} +
  * This event is called before execution of an IWrite. The source
  * of the IObserverEvent is the instance to be saved; accessResult is null; accessObject is the IWrite
  * 

@@ -37,9 +37,13 @@ public enum ObserverEventType {
    */
   AFTER_LOAD,
   /**
-   * Event type which is executed after an instance was inserted or updated in the datastore
+   * Event type which is executed after an instance was inserted into the datastore
    */
-  AFTER_SAVE,
+  AFTER_INSERT,
+  /**
+   * Event type which is executed after an instance was updated into the datastore
+   */
+  AFTER_UPDATE,
   /**
    * Event type which is executed directly before an instance is deleted from the datastore
    */
@@ -49,8 +53,12 @@ public enum ObserverEventType {
    */
   BEFORE_LOAD,
   /**
-   * Event type which is executed directly before an instance is inserted or updated in the datastore
+   * Event type which is executed directly before an instance is inserted into the datastore
    */
-  BEFORE_SAVE;
+  BEFORE_INSERT,
+  /**
+   * Event type which is executed directly before an instance is updated into the datastore
+   */
+  BEFORE_UPDATE;
 
 }

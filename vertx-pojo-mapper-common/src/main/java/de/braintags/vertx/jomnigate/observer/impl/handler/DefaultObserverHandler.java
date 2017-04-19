@@ -26,8 +26,10 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
-import de.braintags.vertx.jomnigate.dataaccess.write.impl.AfterSaveHandler;
-import de.braintags.vertx.jomnigate.dataaccess.write.impl.BeforeSaveHandler;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.AfterInsertHandler;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.AfterUpdateHandler;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.BeforeInsertHandler;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.BeforeUpdateHandler;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
@@ -47,8 +49,10 @@ public class DefaultObserverHandler implements IObserverHandler {
   private List<ObserverSettings<?>> observerList = new ArrayList<>();
   private Map<ObserverEventType, List<IObserver>> eventObserverCache = new HashMap<>();
   private IMapper<?> mapper;
-  private BeforeSaveHandler beforeSaveHandler = new BeforeSaveHandler();
-  private AfterSaveHandler afterSaveHandler = new AfterSaveHandler();
+  private BeforeInsertHandler beforeInsertHandler = new BeforeInsertHandler();
+  private BeforeUpdateHandler beforeUpdateHandler = new BeforeUpdateHandler();
+  private AfterInsertHandler afterInsertHandler = new AfterInsertHandler();
+  private AfterUpdateHandler afterUpdateHandler = new AfterUpdateHandler();
   private AfterLoadHandler afterLoadHandler = new AfterLoadHandler();
   private BeforeLoadHandler beforeLoadHandler = new BeforeLoadHandler();
   private AfterDeleteHandler afterDeleteHandler = new AfterDeleteHandler();
@@ -109,8 +113,8 @@ public class DefaultObserverHandler implements IObserverHandler {
    * write.IWrite)
    */
   @Override
-  public <T> Future<Void> handleBeforeSave(IWrite<T> writeObject, T entity, IObserverContext context) {
-    List<IObserver> ol = getObserver(ObserverEventType.BEFORE_SAVE);
+  public <T> Future<Void> handleBeforeUpdate(IWrite<T> writeObject, T entity, IObserverContext context) {
+    List<IObserver> ol = getObserver(ObserverEventType.BEFORE_INSERT);
     Future<Void> f = Future.future();
     if (ol.isEmpty() || writeObject.size() <= 0) {
       f.complete();
@@ -120,15 +124,8 @@ public class DefaultObserverHandler implements IObserverHandler {
     return f;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.vertx.jomnigate.observer.IObserverHandler#handleAfterSave(de.braintags.vertx.jomnigate.dataaccess.
-   * write.IWrite, de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult)
-   */
   @Override
-  public <T> Future<Void> handleAfterSave(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context) {
+  public <T> Future<Void> handleAfterInsert(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context) {
     List<IObserver> ol = getObserver(ObserverEventType.AFTER_SAVE);
     Future<Void> f = Future.future();
     if (ol.isEmpty() || writeObject.size() <= 0) {
@@ -241,14 +238,14 @@ public class DefaultObserverHandler implements IObserverHandler {
   /**
    * @return the beforeSaveHandler
    */
-  protected BeforeSaveHandler getBeforeSaveHandler() {
+  protected BeforeInsertHandler getBeforeSaveHandler() {
     return beforeSaveHandler;
   }
 
   /**
    * @return the afterSaveHandler
    */
-  protected AfterSaveHandler getAfterSaveHandler() {
+  protected AfterInsertHandler getAfterSaveHandler() {
     return afterSaveHandler;
   }
 

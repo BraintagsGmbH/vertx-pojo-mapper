@@ -177,11 +177,11 @@ public class TestObserverHandler extends AbstractObserverTest {
    * @param context
    */
   @Test
-  public void test_AfterSave_SingleRecord(TestContext context) {
+  public void test_AfterInsert_SingleRecord(TestContext context) {
     SimpleMapperObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverSettings<SimpleMapperObserver> os = new ObserverSettings<>(SimpleMapperObserver.class);
-    os.getEventTypeList().add(ObserverEventType.AFTER_SAVE);
+    os.getEventTypeList().add(ObserverEventType.AFTER_INSERT);
     settings.getObserverSettings().add(os);
     SimpleMapper sm = new SimpleMapper("testname", "nix");
     sm.intValue = -1;
@@ -204,7 +204,7 @@ public class TestObserverHandler extends AbstractObserverTest {
     BeforeSaveObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverSettings<BeforeSaveObserver> os = new ObserverSettings<>(BeforeSaveObserver.class);
-    os.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
+    os.getEventTypeList().add(ObserverEventType.BEFORE_INSERT);
     settings.getObserverSettings().add(os);
     SimpleMapper sm = new SimpleMapper("testname", "nix");
     sm.intValue = -1;
@@ -225,13 +225,21 @@ public class TestObserverHandler extends AbstractObserverTest {
     BeforeSaveObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverSettings<BeforeSaveObserver> os = new ObserverSettings<>(BeforeSaveObserver.class);
-    os.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
+    os.getEventTypeList().add(ObserverEventType.BEFORE_UPDATE);
     settings.getObserverSettings().add(os);
+
     SimpleMapper sm = new SimpleMapper("testname", "nix");
     sm.intValue = -1;
     saveRecord(context, sm);
-    context.assertTrue(BeforeSaveObserver.executed, "Observer wasn't executed");
+    context.assertFalse(BeforeSaveObserver.executed, "Observer should not be executed for INSERT");
     SimpleMapper tmp = findRecordByID(context, SimpleMapper.class, sm.id);
+    context.assertEquals(-1, tmp.intValue, "Observer must not set the value by INSERT");
+
+    tmp.name = "updated name";
+    saveRecord(context, sm);
+    context.assertTrue(BeforeSaveObserver.executed, "Observer wasn't executed by UPDATE");
+
+    tmp = findRecordByID(context, SimpleMapper.class, sm.id);
     context.assertNotNull(tmp, "instance not found");
     context.assertEquals(1, tmp.intValue, "Observer did not set number correct");
   }
@@ -242,12 +250,12 @@ public class TestObserverHandler extends AbstractObserverTest {
    * @param context
    */
   @Test
-  public void test_BeforeSave_Selection(TestContext context) {
+  public void test_BeforeInsert_Selection(TestContext context) {
     clearTable(context, SimpleMapper.class);
     BeforeSaveObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverSettings<BeforeSaveObserver> os = new ObserverSettings<>(BeforeSaveObserver.class);
-    os.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
+    os.getEventTypeList().add(ObserverEventType.BEFORE_INSERT);
     settings.getObserverSettings().add(os);
     List<SimpleMapper> selection = new ArrayList<>();
     for (int i = 0; i < 5; i++) {

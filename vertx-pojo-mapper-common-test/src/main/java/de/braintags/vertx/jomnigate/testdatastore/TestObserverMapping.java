@@ -92,7 +92,7 @@ public class TestObserverMapping extends AbstractObserverTest {
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverSettings<TestObserver2> os = new ObserverSettings<>(TestObserver2.class);
     os.getEventTypeList().add(ObserverEventType.AFTER_DELETE);
-    os.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
+    os.getEventTypeList().add(ObserverEventType.BEFORE_INSERT);
     settings.getObserverSettings().add(os);
 
     IMapper<ObserverAnnotatedMapper_TwoEvents> mapper = getDataStore(context).getMapperFactory()
@@ -100,7 +100,7 @@ public class TestObserverMapping extends AbstractObserverTest {
 
     checkObserver(context, mapper, 2, ObserverEventType.AFTER_DELETE);
     checkObserver(context, mapper, 1, ObserverEventType.BEFORE_DELETE);
-    checkObserver(context, mapper, 1, ObserverEventType.BEFORE_SAVE);
+    checkObserver(context, mapper, 1, ObserverEventType.BEFORE_INSERT);
     checkObserver(context, mapper, 0, ObserverEventType.AFTER_LOAD, ObserverEventType.AFTER_SAVE,
         ObserverEventType.BEFORE_LOAD);
   }
@@ -116,7 +116,7 @@ public class TestObserverMapping extends AbstractObserverTest {
         .getMapper(ObserverAnnotatedMapper_TwoEvents.class);
     checkObserver(context, mapper, 1, ObserverEventType.AFTER_DELETE, ObserverEventType.BEFORE_DELETE);
     checkObserver(context, mapper, 0, ObserverEventType.AFTER_LOAD, ObserverEventType.AFTER_SAVE,
-        ObserverEventType.BEFORE_LOAD, ObserverEventType.BEFORE_SAVE);
+        ObserverEventType.BEFORE_LOAD, ObserverEventType.BEFORE_INSERT);
   }
 
   /**
@@ -226,11 +226,11 @@ public class TestObserverMapping extends AbstractObserverTest {
     ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
     os.getMapperSettings().add(new ObserverMapperSettings(SimpleMapper.class.getName()));
     os.getEventTypeList().add(ObserverEventType.AFTER_SAVE);
-    os.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
+    os.getEventTypeList().add(ObserverEventType.BEFORE_INSERT);
     settings.getObserverSettings().add(os);
 
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
-    checkObserver(context, mapper, 1, ObserverEventType.AFTER_SAVE, ObserverEventType.BEFORE_SAVE);
+    checkObserver(context, mapper, 1, ObserverEventType.AFTER_SAVE, ObserverEventType.BEFORE_INSERT);
     checkObserver(context, mapper, 0, ObserverEventType.AFTER_DELETE, ObserverEventType.AFTER_LOAD,
         ObserverEventType.BEFORE_DELETE, ObserverEventType.BEFORE_LOAD);
 
@@ -266,16 +266,16 @@ public class TestObserverMapping extends AbstractObserverTest {
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
     os.getEventTypeList().add(ObserverEventType.AFTER_SAVE);
-    os.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
+    os.getEventTypeList().add(ObserverEventType.BEFORE_INSERT);
     settings.getObserverSettings().add(os);
 
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
-    checkObserver(context, mapper, 1, ObserverEventType.AFTER_SAVE, ObserverEventType.BEFORE_SAVE);
+    checkObserver(context, mapper, 1, ObserverEventType.AFTER_SAVE, ObserverEventType.BEFORE_INSERT);
     checkObserver(context, mapper, 0, ObserverEventType.AFTER_DELETE, ObserverEventType.AFTER_LOAD,
         ObserverEventType.BEFORE_DELETE, ObserverEventType.BEFORE_LOAD);
 
     IMapper<Person> mapper2 = getDataStore(context).getMapperFactory().getMapper(Person.class);
-    checkObserver(context, mapper2, 1, ObserverEventType.AFTER_SAVE, ObserverEventType.BEFORE_SAVE);
+    checkObserver(context, mapper2, 1, ObserverEventType.AFTER_SAVE, ObserverEventType.BEFORE_INSERT);
     checkObserver(context, mapper2, 0, ObserverEventType.AFTER_DELETE, ObserverEventType.AFTER_LOAD,
         ObserverEventType.BEFORE_DELETE, ObserverEventType.BEFORE_LOAD);
   }

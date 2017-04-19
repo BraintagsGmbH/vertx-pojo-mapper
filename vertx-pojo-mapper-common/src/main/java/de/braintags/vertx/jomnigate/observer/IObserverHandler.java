@@ -55,24 +55,44 @@ public interface IObserverHandler {
   List<IObserver> getObserver(ObserverEventType event);
 
   /**
-   * Performs the event {@link ObserverEventType#BEFORE_SAVE} for the storeObject
+   * Performs the event {@link ObserverEventType#BEFORE_UPDATE} for the storeObject
    * 
    * @param write
    * @param entity
    * @param context
    * @return
    */
-  <T> Future<Void> handleBeforeSave(IWrite<T> write, T entity, IObserverContext context);
+  <T> Future<Void> handleBeforeUpdate(IWrite<T> write, T entity, IObserverContext context);
 
   /**
-   * Performs the event {@link ObserverEventType#AFTER_SAVE} to the records in the {@link IWrite}
+   * Performs the event {@link ObserverEventType#BEFORE_INSERT} for the storeObject
+   * 
+   * @param write
+   * @param entity
+   * @param context
+   * @return
+   */
+  <T> Future<Void> handleBeforeInsert(IWrite<T> write, T entity, IObserverContext context);
+
+  /**
+   * Performs the event {@link ObserverEventType#AFTER_INSERT} to the records in the {@link IWrite}
    * 
    * @param writeObject
    * @param writeResult
    * @param context
    * @return
    */
-  <T> Future<Void> handleAfterSave(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context);
+  <T> Future<Void> handleAfterInsert(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context);
+
+  /**
+   * Performs the event {@link ObserverEventType#AFTER_UPDATE} to the records in the {@link IWrite}
+   * 
+   * @param writeObject
+   * @param writeResult
+   * @param context
+   * @return
+   */
+  <T> Future<Void> handleAfterUpdate(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context);
 
   /**
    * Performs the event {@link ObserverEventType#BEFORE_LOAD} to the records in the {@link IWrite}

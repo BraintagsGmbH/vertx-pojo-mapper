@@ -61,7 +61,7 @@ public interface IObserverEvent {
    * <UL>
    * <LI>{@link ObserverEventType#BEFORE_MAPPING} the class to be mapped
    * <LI>{@link ObserverEventType#AFTER_MAPPING} the {@link IMapper} which was created
-   * <LI>{@link ObserverEventType#BEFORE_SAVE} the instance to be saved
+   * <LI>{@link ObserverEventType#BEFORE_INSERT} the instance to be saved
    * <LI>{@link ObserverEventType#AFTER_SAVE} the instance, which was saved
    * <LI>{@link ObserverEventType#BEFORE_LOAD} null
    * <LI>{@link ObserverEventType#AFTER_LOAD} the instance, which was loaded
@@ -80,7 +80,7 @@ public interface IObserverEvent {
    * <UL>
    * <LI>{@link ObserverEventType#BEFORE_MAPPING} null
    * <LI>{@link ObserverEventType#AFTER_MAPPING} null
-   * <LI>{@link ObserverEventType#BEFORE_SAVE} {@link IWriteResult}
+   * <LI>{@link ObserverEventType#BEFORE_INSERT} {@link IWriteResult}
    * <LI>{@link ObserverEventType#AFTER_SAVE} {@link IWriteResult}
    * <LI>{@link ObserverEventType#BEFORE_LOAD} null
    * <LI>{@link ObserverEventType#AFTER_LOAD} {@link IQueryResult}
@@ -98,7 +98,7 @@ public interface IObserverEvent {
    * <UL>
    * <LI>{@link ObserverEventType#BEFORE_MAPPING} null
    * <LI>{@link ObserverEventType#AFTER_MAPPING} null
-   * <LI>{@link ObserverEventType#BEFORE_SAVE} {@link IWrite}
+   * <LI>{@link ObserverEventType#BEFORE_INSERT} {@link IWrite}
    * <LI>{@link ObserverEventType#AFTER_SAVE} {@link IWrite}
    * <LI>{@link ObserverEventType#BEFORE_LOAD} {@link IQuery}
    * <LI>{@link ObserverEventType#AFTER_LOAD} {@link IQuery}

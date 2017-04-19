@@ -23,7 +23,7 @@ import de.braintags.vertx.jomnigate.versioning.IMapperVersion;
  * 
  */
 @Entity(version = 5)
-public class VersioningWithInterface extends BaseRecord implements IMapperVersion {
+public class VersioningWithInterface_V5 extends BaseRecord implements IMapperVersion {
 
   private long version;
 

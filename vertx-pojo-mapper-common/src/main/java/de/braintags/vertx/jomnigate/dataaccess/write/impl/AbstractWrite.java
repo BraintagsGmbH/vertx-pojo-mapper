@@ -87,7 +87,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * @param nextFuture
    */
   protected void postSave(IWriteResult wr, IObserverContext context, Future<IWriteResult> nextFuture) {
-    Future<Void> f = getMapper().getObserverHandler().handleAfterSave(this, wr, context);
+    Future<Void> f = getMapper().getObserverHandler().handleAfterInsert(this, wr, context);
     f.setHandler(res -> {
       if (f.failed()) {
         nextFuture.fail(f.cause());

@@ -33,7 +33,7 @@ public class SetMapperVersionObserver implements IObserver {
   public static ObserverSettings<SetMapperVersionObserver> createObserverSettings() {
     ObserverSettings<SetMapperVersionObserver> settings = new ObserverSettings<>(SetMapperVersionObserver.class);
     settings.setPriority(Integer.MAX_VALUE);
-    settings.getEventTypeList().add(ObserverEventType.BEFORE_SAVE);
+    settings.getEventTypeList().add(ObserverEventType.BEFORE_INSERT);
     ObserverMapperSettings ms = new ObserverMapperSettings(IMapperVersion.class.getName());
     ms.setInstanceOf(true);
     settings.getMapperSettings().add(ms);

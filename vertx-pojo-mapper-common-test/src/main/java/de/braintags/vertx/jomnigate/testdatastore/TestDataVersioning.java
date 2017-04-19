@@ -16,13 +16,14 @@ import java.util.List;
 
 import org.junit.Test;
 
+import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.init.ObserverMapperSettings;
 import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningNoInterface;
-import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWithInterface;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWithInterface_V5;
 import de.braintags.vertx.jomnigate.versioning.IMapperVersion;
 import de.braintags.vertx.jomnigate.versioning.SetMapperVersionObserver;
 import io.vertx.ext.unit.TestContext;
@@ -56,7 +57,7 @@ public class TestDataVersioning extends DatastoreBaseTest {
     context.assertEquals(Integer.MAX_VALUE, vs.getPriority());
     context.assertFalse(vs.getMapperSettings().isEmpty(), "expcted valid mapper settings");
     context.assertEquals(1, vs.getEventTypeList().size(), "Expected one event type");
-    context.assertTrue(vs.getEventTypeList().contains(ObserverEventType.BEFORE_SAVE),
+    context.assertTrue(vs.getEventTypeList().contains(ObserverEventType.BEFORE_INSERT),
         "expected event type BEFORE_SAVE");
     ObserverMapperSettings ms = (ObserverMapperSettings) vs.getMapperSettings().get(0);
     context.assertTrue(ms.isInstanceOf());
@@ -65,8 +66,10 @@ public class TestDataVersioning extends DatastoreBaseTest {
 
   @Test
   public void testMappingCorrect(TestContext context) {
-    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(VersioningWithInterface.class);
+    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(VersioningWithInterface_V5.class);
     context.assertNotNull(mapper);
+    Entity entity = mapper.getEntity();
+    context.assertEquals(5l, entity.version());
   }
 
   @Test
@@ -81,11 +84,11 @@ public class TestDataVersioning extends DatastoreBaseTest {
 
   @Test
   public void testVersioning(TestContext context) {
-    clearTable(context, VersioningWithInterface.class);
-    VersioningWithInterface vi = new VersioningWithInterface();
+    clearTable(context, VersioningWithInterface_V5.class);
+    VersioningWithInterface_V5 vi = new VersioningWithInterface_V5();
     saveRecord(context, vi);
     context.assertEquals(5l, vi.getMapperVersion(), "version was not automatically set");
-    VersioningWithInterface vi2 = findRecordByID(context, VersioningWithInterface.class, vi.id);
+    VersioningWithInterface_V5 vi2 = findRecordByID(context, VersioningWithInterface_V5.class, vi.id);
     context.assertEquals(5l, vi2.getMapperVersion(), "version was saved");
 
   }

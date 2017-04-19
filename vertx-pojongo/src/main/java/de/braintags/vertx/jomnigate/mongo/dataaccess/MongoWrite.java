@@ -96,6 +96,17 @@ public class MongoWrite<T> extends AbstractWrite<T> {
     return f;
   }
 
+  /**
+   * We need the info before the {@link IStoreObject} is created for the event beforeSave
+   * 
+   * @param entity
+   * @return
+   */
+  private boolean isNewInstance(T entity) {
+    Object javaValue = getMapper().getIdField().getField().getPropertyAccessor().readData(entity);
+    return javaValue == null;
+  }
+
   private Future<IStoreObject<T, ?>> createStoreObject(T entity) {
     Future<IStoreObject<T, ?>> f = Future.future();
     getDataStore().getStoreObjectFactory().createStoreObject(getMapper(), entity, f);
@@ -108,7 +119,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
    * @return
    */
   protected Future<Void> preSave(T entity, IObserverContext context) {
-    return getMapper().getObserverHandler().handleBeforeSave(this, entity, context);
+    return getMapper().getObserverHandler().handleBeforeUpdate(this, entity, context);
   }
 
   /**

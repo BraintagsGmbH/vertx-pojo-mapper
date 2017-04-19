@@ -24,12 +24,12 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 
 /**
- * Handles the event {@link ObserverEventType#BEFORE_SAVE }
+ * Handles the event {@link ObserverEventType#BEFORE_INSERT }
  * 
  * @author Michael Remme
  * 
  */
-public class BeforeSaveHandler {
+public class BeforeInsertHandler {
 
   /**
    * @param write
@@ -65,7 +65,7 @@ public class BeforeSaveHandler {
       IObserverContext context) {
     List<Future> fl = new ArrayList<>();
     for (IObserver observer : ol) {
-      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_SAVE, entity, null, writeObject,
+      IObserverEvent event = IObserverEvent.createEvent(getEventType(), entity, null, writeObject,
           writeObject.getDataStore());
       if (observer.canHandleEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
@@ -77,4 +77,7 @@ public class BeforeSaveHandler {
     return CompositeFuture.all(fl);
   }
 
+  protected ObserverEventType getEventType() {
+    return ObserverEventType.BEFORE_INSERT;
+  }
 }
