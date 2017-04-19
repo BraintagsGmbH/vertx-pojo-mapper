@@ -167,7 +167,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
         resultHandler.handle(Future.failedFuture(keyResult.cause()));
       } else {
         Object genKey = keyResult.result().getKey();
-        IProperty idField = getMapper().getIdField().getField();
+        IProperty idField = getMapper().getIdInfo().getField();
         idField.getTypeHandler().intoStore(genKey, idField, thResult -> {
           if (thResult.failed()) {
             resultHandler.handle(Future.failedFuture(thResult.cause()));
@@ -189,7 +189,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    */
   public SqlSequence generateSqlUpdateStatement() {
     ITableInfo tInfo = getMapper().getTableInfo();
-    IProperty idField = getMapper().getIdField().getField();
+    IProperty idField = getMapper().getIdInfo().getField();
     Object id = get(idField);
 
     SqlSequence sequence = new SqlSequence(tInfo.getName(), idField.getColumnInfo(), id);

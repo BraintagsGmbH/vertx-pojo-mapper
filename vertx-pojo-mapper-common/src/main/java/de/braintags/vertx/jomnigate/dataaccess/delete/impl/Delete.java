@@ -26,7 +26,8 @@ import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
 import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
-import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
+import de.braintags.vertx.jomnigate.dataaccess.query.IdField;
+import de.braintags.vertx.jomnigate.mapping.IIdInfo;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.util.exception.ParameterRequiredException;
@@ -46,13 +47,13 @@ import io.vertx.core.Handler;
 public abstract class Delete<T> extends AbstractDataAccessObject<T> implements IDelete<T> {
   private static final String ERROR_MESSAGE = "You can only use ONE source for deletion, either an IQuery or a list of instances";
   private IQuery<T> query;
-  private List<T> recordList = new ArrayList<>();
+  private final List<T> recordList = new ArrayList<>();
 
   /**
    * @param mapperClass
    * @param datastore
    */
-  public Delete(Class<T> mapperClass, IDataStore datastore) {
+  public Delete(final Class<T> mapperClass, final IDataStore datastore) {
     super(mapperClass, datastore);
   }
 
@@ -71,7 +72,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * @see de.braintags.vertx.jomnigate.dataaccess.delete.IDelete#delete(io.vertx.core.Handler)
    */
   @Override
-  public final void delete(Handler<AsyncResult<IDeleteResult>> resultHandler) {
+  public final void delete(final Handler<AsyncResult<IDeleteResult>> resultHandler) {
     if (getQuery() != null) {
       deleteQuery(query, resultHandler);
     } else if (!recordList.isEmpty()) {
@@ -101,7 +102,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * @param resultHandler
    *          the handler to be informed
    */
-  protected final void deleteRecords(Handler<AsyncResult<IDeleteResult>> resultHandler) {
+  protected final void deleteRecords(final Handler<AsyncResult<IDeleteResult>> resultHandler) {
     if (recordList.isEmpty()) {
       resultHandler.handle(Future.succeededFuture());
       return;
@@ -126,8 +127,9 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
 
   private Future<IDeleteResult> doDeleteRecords() {
     Future<IDeleteResult> f = Future.future();
-    IMappedIdField idField = getMapper().getIdField();
-    CompositeFuture cf = CompositeFuture.all(getRecordIds(idField.getField()));
+    IIdInfo idInfo = getMapper().getIdInfo();
+    IdField idField = idInfo.getIndexedField();
+    CompositeFuture cf = CompositeFuture.all(getRecordIds(idInfo.getField()));
     cf.setHandler(res -> {
       if (res.failed()) {
         f.fail(res.cause());
@@ -143,7 +145,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * 
    * @return
    */
-  protected Future<Void> preDelete(IObserverContext context) {
+  protected Future<Void> preDelete(final IObserverContext context) {
     return getMapper().getObserverHandler().handleBeforeDelete(this, context);
   }
 
@@ -153,7 +155,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * @param wr
    * @param nextFuture
    */
-  protected void postDelete(IDeleteResult dr, IObserverContext context, Future<IDeleteResult> nextFuture) {
+  protected void postDelete(final IDeleteResult dr, final IObserverContext context, final Future<IDeleteResult> nextFuture) {
     Future<Void> f = getMapper().getObserverHandler().handleAfterDelete(this, dr, context);
     f.setHandler(res -> {
       if (res.failed()) {
@@ -165,7 +167,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
   }
 
   @SuppressWarnings("rawtypes")
-  private List<Future> executeLifeCycle(Class lifecycleClass) {
+  private List<Future> executeLifeCycle(final Class lifecycleClass) {
     List<Future> fl = new ArrayList<>();
     for (T record : getRecordList()) {
       Future<Void> f = Future.future();
@@ -183,7 +185,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * .query.IQuery)
    */
   @Override
-  public void setQuery(IQuery<T> query) {
+  public void setQuery(final IQuery<T> query) {
     if (!recordList.isEmpty())
       throw new UnsupportedOperationException(ERROR_MESSAGE);
     this.query = query;
@@ -195,7 +197,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * @see de.braintags.vertx.jomnigate.dataaccess.delete.IDelete#add(java.lang.Object)
    */
   @Override
-  public void add(T record) {
+  public void add(final T record) {
     if (query != null)
       throw new UnsupportedOperationException(ERROR_MESSAGE);
     recordList.add(record);
@@ -208,7 +210,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    */
   @SuppressWarnings("unchecked")
   @Override
-  public void add(T... records) {
+  public void add(final T... records) {
     if (query != null)
       throw new UnsupportedOperationException(ERROR_MESSAGE);
     recordList.addAll(Arrays.asList(records));
@@ -236,7 +238,7 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * @param resultHandler
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private List<Future> getRecordIds(IProperty idField) {
+  private List<Future> getRecordIds(final IProperty idField) {
     List<Future> fList = new ArrayList<>();
     for (T record : getRecordList()) {
       Future f = Future.future();
@@ -256,8 +258,8 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * @param resultHandler
    *          the handler to be informed
    */
-  protected void deleteRecordsById(IMappedIdField idField, List<Object> objectIds,
-      Handler<AsyncResult<IDeleteResult>> resultHandler) {
+  protected void deleteRecordsById(final IdField idField, final List<Object> objectIds,
+      final Handler<AsyncResult<IDeleteResult>> resultHandler) {
     IQuery<T> q = getDataStore().createQuery(getMapperClass());
     q.setSearchCondition(ISearchCondition.in(idField, objectIds));
     deleteQuery(q, dr -> {

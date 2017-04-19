@@ -28,7 +28,7 @@ public class MongoMapper<T> extends JacksonMapper<T> {
    * @param mapperClass
    * @param mapperFactory
    */
-  public MongoMapper(Class<T> mapperClass, MongoMapperFactory mapperFactory) {
+  public MongoMapper(final Class<T> mapperClass, final MongoMapperFactory mapperFactory) {
     super(mapperClass, mapperFactory);
     checkIdField();
   }
@@ -38,7 +38,7 @@ public class MongoMapper<T> extends JacksonMapper<T> {
    */
   @SuppressWarnings("rawtypes")
   private void checkIdField() {
-    Class idClass = getIdField().getField().getType();
+    Class idClass = getIdInfo().getField().getType();
     if (!CharSequence.class.isAssignableFrom(idClass))
       throw new UnsupportedOperationException(
           "Currently the id field must be Character based for mongo driver. Class: " + getMapperClass());

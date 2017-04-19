@@ -177,7 +177,8 @@ public class TestPolymorphMapper extends DatastoreBaseTest {
           "Records should be in the same collection and thus should not have the same ID");
 
     IQuery<PolyMapper> query = getDataStore(context).createQuery(PolyMapper.class);
-    query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField(), polyMapper.getId()));
+    query.setSearchCondition(
+        ISearchCondition.isEqual(query.getMapper().getIdInfo().getIndexedField(), polyMapper.getId()));
     resultContainer = find(context, query, 1);
     Async async = context.async();
     resultContainer.queryResult.iterator().next(context.asyncAssertSuccess(loadedPolyMapper -> {

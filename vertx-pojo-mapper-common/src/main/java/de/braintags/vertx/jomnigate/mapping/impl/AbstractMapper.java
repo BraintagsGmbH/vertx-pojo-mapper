@@ -37,9 +37,8 @@ import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
 import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 import de.braintags.vertx.jomnigate.dataaccess.query.IdField;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
+import de.braintags.vertx.jomnigate.mapping.IIdInfo;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
-import de.braintags.vertx.jomnigate.mapping.IMappedIdField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.IMethodProxy;
@@ -85,7 +84,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   private final Class<T> mapperClass;
   private final IMapperFactory mapperFactory;
   private IKeyGenerator keyGenerator;
-  private IMappedIdField idField;
+  private IIdInfo idInfo;
   private Entity entity;
   private List<IIndexDefinition> indexes;
   private ITableInfo tableInfo;
@@ -130,7 +129,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * Validation for required properties etc
    */
   protected void validate() {
-    if (idField == null)
+    if (idInfo == null)
       throw new MappingException("No id-field specified in mapper " + getMapperClass().getName());
   }
 
@@ -297,8 +296,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @param handler
    * @param methods
    */
-  private void executeLifecycleMethods(final Object entity, final Handler<AsyncResult<Void>> handler,
-      final List<IMethodProxy> methods) {
+  private void executeLifecycleMethods(final Object entity, final Handler<AsyncResult<Void>> handler, final List<IMethodProxy> methods) {
     CompositeFuture cf = CompositeFuture.all(createFutureList(entity, methods));
     cf.setHandler(res -> {
       if (res.failed()) {
@@ -397,12 +395,12 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   }
 
   @Override
-  public final IMappedIdField getIdField() {
-    return idField;
+  public final IIdInfo getIdInfo() {
+    return idInfo;
   }
 
-  protected void setIdField(final IMappedIdField idField) {
-    this.idField = idField;
+  protected void setIdInfo(final IIdInfo idInfo) {
+    this.idInfo = idInfo;
   }
 
   /*

@@ -50,10 +50,10 @@ public class QueryHelper {
    * @param handler
    *          the handler to be informed
    */
-  public static final <T> void findRecordById(IDataStore datastore, Class<T> mapperClass, String id,
-      Handler<AsyncResult<T>> handler) {
+  public static final <T> void findRecordById(final IDataStore datastore, final Class<T> mapperClass, final String id,
+      final Handler<AsyncResult<T>> handler) {
     IQuery<T> query = datastore.createQuery(mapperClass);
-    query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdField(), id));
+    query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdInfo().getIndexedField(), id));
     executeToFirstRecord(query, handler);
   }
 
@@ -67,7 +67,7 @@ public class QueryHelper {
    * @param handler
    *          the handler, which will receive the first object
    */
-  public static <T> void executeToFirstRecord(IQuery<T> query, Handler<AsyncResult<T>> handler) {
+  public static <T> void executeToFirstRecord(final IQuery<T> query, final Handler<AsyncResult<T>> handler) {
     executeToFirstRecord(query, false, handler);
   }
 
@@ -82,7 +82,7 @@ public class QueryHelper {
    * @param handler
    *          the handler, which will receive the first object
    */
-  public static <T> void executeToFirstRecord(IQuery<T> query, boolean required, Handler<AsyncResult<T>> handler) {
+  public static <T> void executeToFirstRecord(final IQuery<T> query, final boolean required, final Handler<AsyncResult<T>> handler) {
     query.execute(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -117,7 +117,7 @@ public class QueryHelper {
    * @param handler
    *          the handler, which will receive the list of objects
    */
-  public static <T> void executeToList(IQuery<T> query, Handler<AsyncResult<List<T>>> handler) {
+  public static <T> void executeToList(final IQuery<T> query, final Handler<AsyncResult<List<T>>> handler) {
     query.execute(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -137,7 +137,7 @@ public class QueryHelper {
    *          the handler to be informed
    */
   @SuppressWarnings("unchecked")
-  public static final <T> void queryResultToList(IQueryResult<T> queryResult, Handler<AsyncResult<List<T>>> handler) {
+  public static final <T> void queryResultToList(final IQueryResult<T> queryResult, final Handler<AsyncResult<List<T>>> handler) {
     queryResult.toArray(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
