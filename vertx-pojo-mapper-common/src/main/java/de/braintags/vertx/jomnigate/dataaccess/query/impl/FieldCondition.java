@@ -41,11 +41,11 @@ import io.vertx.core.json.Json;
 
 public class FieldCondition implements IFieldCondition {
 
-  private IIndexedField field;
-  private QueryOperator operator;
-  private JsonNode value;
+  private final IIndexedField field;
+  private final QueryOperator operator;
+  private final JsonNode value;
 
-  private Map<Class<? extends IQueryExpression>, Object> cacheMap = new HashMap<>(1);
+  private final Map<Class<? extends IQueryExpression>, Object> cacheMap = new HashMap<>(1);
 
   /**
    * Creates a complete field condition
@@ -57,7 +57,7 @@ public class FieldCondition implements IFieldCondition {
    * @param value
    *          the value of this condition, can be null
    */
-  public FieldCondition(IIndexedField field, QueryOperator logic, @Nullable Object value) {
+  public FieldCondition(final IIndexedField field, final QueryOperator logic, @Nullable final Object value) {
     this.field = field;
     this.operator = logic;
     this.value = transformObject(value);
@@ -65,13 +65,13 @@ public class FieldCondition implements IFieldCondition {
   }
 
   @JsonCreator
-  protected FieldCondition(IIndexedField field, QueryOperator logic, @Nullable JsonNode value) {
+  protected FieldCondition(final IIndexedField field, final QueryOperator logic, @Nullable final JsonNode value) {
     this.field = field;
     this.operator = logic;
     this.value = value;
   }
 
-  public static JsonNode transformObject(@Nullable Object object) {
+  public static JsonNode transformObject(@Nullable final Object object) {
     JsonNode node = Json.mapper.convertValue(object, JsonNode.class);
     return node;
   }
@@ -84,7 +84,7 @@ public class FieldCondition implements IFieldCondition {
    */
   @Override
   @JsonIgnore
-  public void setIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass, Object result) {
+  public void setIntermediateResult(final Class<? extends IQueryExpression> queryExpressionClass, final Object result) {
     cacheMap.put(queryExpressionClass, result);
   }
 
@@ -95,7 +95,7 @@ public class FieldCondition implements IFieldCondition {
    */
   @Override
   @JsonIgnore
-  public Object getIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass) {
+  public Object getIntermediateResult(final Class<? extends IQueryExpression> queryExpressionClass) {
     return cacheMap.get(queryExpressionClass);
   }
 
@@ -140,7 +140,7 @@ public class FieldCondition implements IFieldCondition {
    * IMapper)
    */
   @Override
-  public <T> void validate(IMapper<T> mapper) {
+  public <T> void validate(final IMapper<T> mapper) {
     String fieldName = field.getFieldName();
     int dot = fieldName.indexOf('.');
     if (dot > 0) { // for now we are checking the base field only
@@ -154,13 +154,14 @@ public class FieldCondition implements IFieldCondition {
     validateValue(null);
   }
 
-  private void validateValue(Object originalValue) {
+  private void validateValue(final Object originalValue) {
     if (value != null) {
       if (value.isObject()) {
         if (originalValue != null) {
           if (!(originalValue instanceof GeoSearchArgument)) {
             throw new InvalidQueryValueException(
-                "Only values that convert into primitive values, or GeoSearchArgument are allowed");
+                "Only values that convert into primitive values, or GeoSearchArgument are allowed, not: "
+                    + originalValue.getClass());
           }
         } else {
           // currently only geo search values are allowed, otherwise the value must convert to a primitive type
@@ -168,7 +169,7 @@ public class FieldCondition implements IFieldCondition {
             Json.mapper.convertValue(value, GeoSearchArgument.class);
           } catch (Exception e) {
             throw new InvalidQueryValueException(
-                "Only values that convert into primitive values, or GeoSearchArgument are allowed");
+                "Only values that convert into primitive values, or GeoSearchArgument are allowed, not: " + value);
           }
         }
       } else if (value.isArray()) {
@@ -186,14 +187,14 @@ public class FieldCondition implements IFieldCondition {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((field == null) ? 0 : field.hashCode());
-    result = prime * result + ((operator == null) ? 0 : operator.hashCode());
-    result = prime * result + ((value == null) ? 0 : value.hashCode());
+    result = prime * result + (field == null ? 0 : field.hashCode());
+    result = prime * result + (operator == null ? 0 : operator.hashCode());
+    result = prime * result + (value == null ? 0 : value.hashCode());
     return result;
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj)
       return true;
     if (obj == null)
