@@ -15,6 +15,8 @@ package de.braintags.vertx.jomnigate.mongo;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.ImmutableSet;
+
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IIndexFieldDefinition;
@@ -142,7 +144,7 @@ public final class MongoUtil {
    *          the handler to be informed with the result of the index creation
    */
   public static final void createIndexes(final MongoDataStore ds, final String collection,
-      final List<IIndexDefinition> indexDefinitions,
+      final ImmutableSet<IIndexDefinition> indexDefinitions,
       final Handler<AsyncResult<JsonObject>> handler) {
     try {
       JsonObject indexCommand = new JsonObject().put("createIndexes", collection);

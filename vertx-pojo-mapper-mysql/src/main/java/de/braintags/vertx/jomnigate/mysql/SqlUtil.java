@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.github.mauricio.async.db.mysql.exceptions.MySQLException;
+import com.google.common.collect.ImmutableSet;
 
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
@@ -78,7 +79,7 @@ public class SqlUtil {
    *          the handler to be informed
    */
   public static final void createIndexes(final MySqlDataStore ds, final String tableName,
-      final List<IIndexDefinition> indexDefinitions,
+      final ImmutableSet<IIndexDefinition> indexDefinitions,
       final Handler<AsyncResult<String>> handler) {
     if (indexDefinitions == null || indexDefinitions.isEmpty()) {
       handler.handle(Future.succeededFuture("No indexes defined"));
@@ -99,7 +100,7 @@ public class SqlUtil {
 
   @SuppressWarnings("rawtypes")
   private static List<Future> createFutureList(final MySqlDataStore ds, final String tableName,
-      final List<IIndexDefinition> indexDefinitions) {
+      final ImmutableSet<IIndexDefinition> indexDefinitions) {
     List<Future> fl = new ArrayList<>();
     for (IIndexDefinition index : indexDefinitions) {
       fl.add(createIndex(ds, tableName, index));

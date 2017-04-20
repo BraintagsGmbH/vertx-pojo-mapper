@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
@@ -88,7 +90,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   private IKeyGenerator keyGenerator;
   private IIdInfo idInfo;
   private Entity entity;
-  private List<IIndexDefinition> indexes;
+  private ImmutableSet<IIndexDefinition> indexes;
   private ITableInfo tableInfo;
   private boolean syncNeeded = true;
   private boolean hasReferencedFields = false;
@@ -182,13 +184,18 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   }
 
   protected void computeIndize() {
-    List<IIndexDefinition> definitions = new ArrayList<>();
+    Map<String, IIndexDefinition> definitions = new HashMap<>();
     if (getMapperClass().isAnnotationPresent(Indexes.class)) {
       Indexes indexes = getMapperClass().getAnnotation(Indexes.class);
       for (Index index : indexes.value()) {
-        definitions.add(new IndexDefinition(index));
+        IndexDefinition indexDefinition = new IndexDefinition(index);
+        IIndexDefinition old = definitions.put(indexDefinition.getIdentifier(), indexDefinition);
+        if (old != null) {
+          throw new IllegalStateException("duplicate index definition:" + indexDefinition);
+        }
       }
     }
+
     Field[] fields = getMapperClass().getFields();
     for (Field field : fields) {
       int modifiers = field.getModifiers();
@@ -197,13 +204,20 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
           && !IdField.class.isAssignableFrom(type)) {
         try {
           IIndexedField indexedField = (IIndexedField) field.get(null);
-          definitions.add(new IndexDefinition(indexedField, this));
+          IndexDefinition indexDefinition = new IndexDefinition(indexedField, this);
+          if (definitions.containsKey(indexDefinition.getIdentifier())) {
+            assert indexDefinition.getIndexOptions()
+                .isEmpty() : "if indexed fields define index options, incompatibility must be checked here";
+            LOGGER.info(
+                "Didn't add index definition because there already is one for its identifier: " + indexDefinition);
+          } else
+            definitions.put(indexDefinition.getIdentifier(), indexDefinition);
         } catch (IllegalArgumentException | IllegalAccessException e) {
           throw new InitException(e);
         }
       }
     }
-    this.indexes = definitions;
+    this.indexes = ImmutableSet.copyOf(definitions.values());
   }
 
   protected void computeKeyGenerator() {
@@ -308,7 +322,8 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @param handler
    * @param methods
    */
-  private void executeLifecycleMethods(final Object entity, final Handler<AsyncResult<Void>> handler, final List<IMethodProxy> methods) {
+  private void executeLifecycleMethods(final Object entity, final Handler<AsyncResult<Void>> handler,
+      final List<IMethodProxy> methods) {
     CompositeFuture cf = CompositeFuture.all(createFutureList(entity, methods));
     cf.setHandler(res -> {
       if (res.failed()) {
@@ -466,7 +481,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   }
 
   @Override
-  public List<IIndexDefinition> getIndexDefinitions() {
+  public ImmutableSet<IIndexDefinition> getIndexDefinitions() {
     return indexes;
   }
 

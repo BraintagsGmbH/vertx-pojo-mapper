@@ -42,6 +42,11 @@ public class IndexOption {
     return value;
   }
 
+  @Override
+  public String toString() {
+    return "IndexOption [feature=" + feature + ", value=" + value + "]";
+  }
+
   /**
    * Holds the different features that can be enabled or disabled
    */
