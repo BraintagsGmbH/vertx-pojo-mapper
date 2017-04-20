@@ -101,8 +101,9 @@ public class IndexDefinition implements IIndexDefinition {
    * @return a unique identifier for the fields of the definition
    */
   private String createIdentifier() {
-    return String.valueOf(fields.stream().map(IIndexFieldDefinition::getName).sorted().collect(Collectors.joining())
-        .toLowerCase(Locale.US).hashCode());
+    return fields.stream().map(field -> field.getName() + ":" + field.getType()).sorted()
+        .collect(Collectors.joining(".:"))
+        .toLowerCase(Locale.US);
   }
 
   @Override

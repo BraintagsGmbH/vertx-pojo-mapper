@@ -178,7 +178,10 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
       Indexes indexes = getMapperClass().getAnnotation(Indexes.class);
       for (Index index : indexes.value()) {
         IndexDefinition indexDefinition = new IndexDefinition(index);
-        definitions.put(indexDefinition.getIdentifier(), indexDefinition);
+        IIndexDefinition old = definitions.put(indexDefinition.getIdentifier(), indexDefinition);
+        if (old != null) {
+          throw new IllegalStateException("duplicate index definition:" + indexDefinition);
+        }
       }
     }
 
@@ -191,10 +194,12 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
         try {
           IIndexedField indexedField = (IIndexedField) field.get(null);
           IndexDefinition indexDefinition = new IndexDefinition(indexedField, this);
-          if (definitions.containsKey(indexDefinition.getIdentifier()))
+          if (definitions.containsKey(indexDefinition.getIdentifier())) {
+            assert indexDefinition.getIndexOptions()
+                .isEmpty() : "if indexed fields define index options, incompatibility must be checked here";
             LOGGER.info(
                 "Didn't add index definition because there already is one for its identifier: " + indexDefinition);
-          else
+          } else
             definitions.put(indexDefinition.getIdentifier(), indexDefinition);
         } catch (IllegalArgumentException | IllegalAccessException e) {
           throw new InitException(e);
