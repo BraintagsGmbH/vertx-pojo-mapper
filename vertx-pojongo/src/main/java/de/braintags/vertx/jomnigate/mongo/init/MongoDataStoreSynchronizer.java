@@ -12,7 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.mongo.init;
 
-import java.util.List;
+import com.google.common.collect.ImmutableSet;
 
 import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
@@ -61,7 +61,7 @@ public class MongoDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Js
    * pojomapper.mapping.IMapper, de.braintags.vertx.jomnigate.annotation.Indexes, io.vertx.core.Handler)
    */
   @Override
-  protected void syncIndexes(final IMapper<?> mapper, final List<IIndexDefinition> indexes,
+  protected void syncIndexes(final IMapper<?> mapper, final ImmutableSet<IIndexDefinition> indexes,
       final Handler<AsyncResult<Void>> resultHandler) {
     MongoUtil.createIndexes(ds, mapper.getTableInfo().getName(), mapper.getIndexDefinitions(), result -> {
       if (result.failed()) {

@@ -15,6 +15,8 @@ package de.braintags.vertx.jomnigate.mapping.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.ImmutableSet;
+
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.mapping.IDataStoreSynchronizer;
 import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
@@ -89,7 +91,7 @@ public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSync
    * @param indexDefinitions
    * @param resultHandler
    */
-  protected abstract void syncIndexes(IMapper<?> mapper, List<IIndexDefinition> indexDefinitions,
+  protected abstract void syncIndexes(IMapper<?> mapper, ImmutableSet<IIndexDefinition> indexDefinitions,
       Handler<AsyncResult<Void>> resultHandler);
 
   /**

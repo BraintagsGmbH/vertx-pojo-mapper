@@ -16,6 +16,8 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
@@ -116,7 +118,7 @@ public interface IMapper<T> {
    * 
    * @return the index definitions
    */
-  List<IIndexDefinition> getIndexDefinitions();
+  ImmutableSet<IIndexDefinition> getIndexDefinitions();
 
   /**
    * Get a defined {@link Annotation} of the given class
