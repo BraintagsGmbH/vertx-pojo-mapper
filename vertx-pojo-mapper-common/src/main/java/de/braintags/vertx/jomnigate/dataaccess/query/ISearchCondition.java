@@ -17,6 +17,9 @@ import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.FieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.GeoSearchArgument;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.QueryAnd;
@@ -42,7 +45,10 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
  *
  * @author sschmitt
  */
-@FunctionalInterface
+@JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes({ @JsonSubTypes.Type(value = QueryAnd.class, name = "and"),
+    @JsonSubTypes.Type(value = QueryOr.class, name = "or"),
+    @JsonSubTypes.Type(value = FieldCondition.class, name = "condition"), })
 public interface ISearchCondition {
 
   /**

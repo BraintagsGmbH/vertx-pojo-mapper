@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class GeoPoint extends GeoJsonObject {
   @JsonIgnoreProperties(ignoreUnknown = true)
   private GeoJsonType type = GeoJsonType.POINT;
-  private Position coordinate;
+  private Position coordinates;
 
   public GeoPoint() {
     // empty
@@ -38,7 +38,7 @@ public class GeoPoint extends GeoJsonObject {
    *          the non-null coordinate of the point
    */
   public GeoPoint(final Position coordinate) {
-    setCoordinates(notNull("coordinates", coordinate));
+    this.coordinates = notNull("coordinates", coordinate);
     validateCoordinates(coordinate);
   }
 
@@ -65,11 +65,7 @@ public class GeoPoint extends GeoJsonObject {
    * @return the coordinates
    */
   public Position getCoordinates() {
-    return coordinate;
-  }
-
-  private void setCoordinates(Position coordinate) {
-    this.coordinate = coordinate;
+    return coordinates;
   }
 
   @Override
@@ -77,7 +73,10 @@ public class GeoPoint extends GeoJsonObject {
     if (!super.equals(o)) {
       return false;
     }
-    if (!coordinate.equals(((GeoPoint) o).coordinate)) {
+
+    GeoPoint point = (GeoPoint) o;
+
+    if (!coordinates.equals(point.coordinates)) {
       return false;
     }
 
@@ -87,12 +86,12 @@ public class GeoPoint extends GeoJsonObject {
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    return 31 * result + coordinate.hashCode();
+    return 31 * result + coordinates.hashCode();
   }
 
   @Override
   public String toString() {
-    return "Point{" + "coordinate=" + coordinate + '}';
+    return "Point{" + "coordinate=" + coordinates + '}';
   }
 
 }

@@ -15,15 +15,20 @@ package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryOperator;
+import de.braintags.vertx.jomnigate.dataaccess.query.exception.InvalidQueryValueException;
 import de.braintags.vertx.jomnigate.exception.NoSuchFieldException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
 import io.vertx.codegen.annotations.Nullable;
+import io.vertx.core.json.Json;
 
 /**
  * Simple implementation of {@link IFieldCondition}<br>
@@ -36,11 +41,11 @@ import io.vertx.codegen.annotations.Nullable;
 
 public class FieldCondition implements IFieldCondition {
 
-  private IIndexedField field;
-  private QueryOperator operator;
-  private Object value;
+  private final IIndexedField field;
+  private final QueryOperator operator;
+  private final JsonNode value;
 
-  private Map<Class<? extends IQueryExpression>, Object> cacheMap = new HashMap<>(1);
+  private final Map<Class<? extends IQueryExpression>, Object> cacheMap = new HashMap<>(1);
 
   /**
    * Creates a complete field condition
@@ -52,10 +57,23 @@ public class FieldCondition implements IFieldCondition {
    * @param value
    *          the value of this condition, can be null
    */
-  public FieldCondition(IIndexedField field, QueryOperator logic, @Nullable Object value) {
+  public FieldCondition(final IIndexedField field, final QueryOperator logic, @Nullable final Object value) {
+    this.field = field;
+    this.operator = logic;
+    this.value = transformObject(value);
+    validateValue(value);
+  }
+
+  @JsonCreator
+  protected FieldCondition(final IIndexedField field, final QueryOperator logic, @Nullable final JsonNode value) {
     this.field = field;
     this.operator = logic;
     this.value = value;
+  }
+
+  public static JsonNode transformObject(@Nullable final Object object) {
+    JsonNode node = Json.mapper.convertValue(object, JsonNode.class);
+    return node;
   }
 
   /*
@@ -65,7 +83,8 @@ public class FieldCondition implements IFieldCondition {
    * java.lang.Object)
    */
   @Override
-  public void setIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass, Object result) {
+  @JsonIgnore
+  public void setIntermediateResult(final Class<? extends IQueryExpression> queryExpressionClass, final Object result) {
     cacheMap.put(queryExpressionClass, result);
   }
 
@@ -75,7 +94,8 @@ public class FieldCondition implements IFieldCondition {
    * @see de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition#getIntermediateResult(java.lang.Class)
    */
   @Override
-  public Object getIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass) {
+  @JsonIgnore
+  public Object getIntermediateResult(final Class<? extends IQueryExpression> queryExpressionClass) {
     return cacheMap.get(queryExpressionClass);
   }
 
@@ -99,7 +119,7 @@ public class FieldCondition implements IFieldCondition {
    * @return the value of this condition, can be null
    */
   @Override
-  public Object getValue() {
+  public JsonNode getValue() {
     return value;
   }
 
@@ -110,8 +130,7 @@ public class FieldCondition implements IFieldCondition {
    */
   @Override
   public String toString() {
-    return field + " " + operator + " "
-        + (value instanceof Iterable<?> ? "(" + StringUtils.join((Iterable<?>) value, ",") + ")" : value);
+    return field + " " + operator + " " + String.valueOf(value);
   }
 
   /*
@@ -121,7 +140,7 @@ public class FieldCondition implements IFieldCondition {
    * IMapper)
    */
   @Override
-  public <T> void validate(IMapper<T> mapper) {
+  public <T> void validate(final IMapper<T> mapper) {
     String fieldName = field.getFieldName();
     int dot = fieldName.indexOf('.');
     if (dot > 0) { // for now we are checking the base field only
@@ -131,5 +150,70 @@ public class FieldCondition implements IFieldCondition {
     if (p == null) {
       throw new NoSuchFieldException(mapper, fieldName);
     }
+
+    validateValue(null);
+  }
+
+  private void validateValue(final Object originalValue) {
+    if (value != null) {
+      if (value.isObject()) {
+        if (originalValue != null) {
+          if (!(originalValue instanceof GeoSearchArgument)) {
+            throw new InvalidQueryValueException(
+                "Only values that convert into primitive values, or GeoSearchArgument are allowed, not: "
+                    + originalValue.getClass());
+          }
+        } else {
+          // currently only geo search values are allowed, otherwise the value must convert to a primitive type
+          try {
+            Json.mapper.convertValue(value, GeoSearchArgument.class);
+          } catch (Exception e) {
+            throw new InvalidQueryValueException(
+                "Only values that convert into primitive values, or GeoSearchArgument are allowed, not: " + value);
+          }
+        }
+      } else if (value.isArray()) {
+        ArrayNode arrayNode = (ArrayNode) value;
+        for (JsonNode subNode : arrayNode) {
+          if (subNode.isArray() || subNode.isObject())
+            throw new InvalidQueryValueException(
+                "Only primitive types are allowed inside arrays, not: " + subNode.getNodeType());
+        }
+      }
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (field == null ? 0 : field.hashCode());
+    result = prime * result + (operator == null ? 0 : operator.hashCode());
+    result = prime * result + (value == null ? 0 : value.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    FieldCondition other = (FieldCondition) obj;
+    if (field == null) {
+      if (other.field != null)
+        return false;
+    } else if (!field.equals(other.field))
+      return false;
+    if (operator != other.operator)
+      return false;
+    if (value == null) {
+      if (other.value != null)
+        return false;
+    } else if (!value.equals(other.value))
+      return false;
+    return true;
   }
 }

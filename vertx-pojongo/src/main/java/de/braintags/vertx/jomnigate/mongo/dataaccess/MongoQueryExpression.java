@@ -12,18 +12,24 @@
  */
 package de.braintags.vertx.jomnigate.mongo.dataaccess;
 
+import java.io.IOException;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISortDefinition;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryLogic;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryOperator;
+import de.braintags.vertx.jomnigate.dataaccess.query.exception.InvalidQueryValueException;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryLogicException;
 import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryOperatorException;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.SortDefinition;
+import de.braintags.vertx.util.json.JsonConverter;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -122,28 +128,32 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
    */
   @Override
-  protected JsonObject buildFieldConditionResult(IFieldCondition fieldCondition, String columnName, Object parsedValue)
-      throws UnknownQueryOperatorException {
+  protected JsonObject buildFieldConditionResult(IFieldCondition fieldCondition, String columnName, JsonNode value)
+      throws UnknownQueryOperatorException, InvalidQueryValueException {
     QueryOperator operator = fieldCondition.getOperator();
-
+    JsonNode parsedValue;
     switch (operator) {
     case CONTAINS:
-      parsedValue = ".*" + parsedValue + ".*";
+      parsedValue = new TextNode(".*" + value.textValue() + ".*");
       break;
     case STARTS:
-      parsedValue = parsedValue + ".*";
+      parsedValue = new TextNode(value.textValue() + ".*");
       break;
     case ENDS:
-      parsedValue = ".*" + parsedValue;
+      parsedValue = new TextNode(".*" + value.textValue());
       break;
     default:
-      // noop
+      parsedValue = value;
       break;
     }
 
     String parsedOperator = translateOperator(operator);
     JsonObject logicCondition = new JsonObject();
-    logicCondition.put(parsedOperator, parsedValue);
+    try {
+      logicCondition.put(parsedOperator, JsonConverter.convertJsonNodeToVertx(parsedValue));
+    } catch (IOException e) {
+      throw new InvalidQueryValueException(e);
+    }
     // make RegEx comparisons case insensitive
     if (operator == QueryOperator.CONTAINS || operator == QueryOperator.STARTS || operator == QueryOperator.ENDS)
       logicCondition.put("$options", "i");

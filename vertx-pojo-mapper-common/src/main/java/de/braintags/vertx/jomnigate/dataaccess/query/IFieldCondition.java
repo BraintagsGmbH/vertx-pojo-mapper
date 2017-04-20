@@ -12,6 +12,8 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.query;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression;
 
 /**
@@ -38,7 +40,7 @@ public interface IFieldCondition extends ISearchCondition {
   /**
    * @return the value of the condition
    */
-  public Object getValue();
+  public JsonNode getValue();
 
   /**
    * Cache the intermediate result of the conversion from this object to the native database object

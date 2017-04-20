@@ -12,6 +12,9 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryLogic;
 
@@ -30,6 +33,7 @@ public class QueryAnd extends AbstractSearchConditionContainer {
    * 
    * @param conditions
    */
+  @JsonCreator
   public QueryAnd(ISearchCondition... searchConditions) {
     super(searchConditions);
   }
@@ -40,6 +44,7 @@ public class QueryAnd extends AbstractSearchConditionContainer {
    * @see de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer#getQueryLogic()
    */
   @Override
+  @JsonIgnore
   public QueryLogic getQueryLogic() {
     return QueryLogic.AND;
   }

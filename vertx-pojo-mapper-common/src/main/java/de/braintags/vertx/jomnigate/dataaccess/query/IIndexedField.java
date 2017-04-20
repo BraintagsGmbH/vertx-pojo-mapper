@@ -15,6 +15,9 @@ package de.braintags.vertx.jomnigate.dataaccess.query;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
@@ -36,6 +39,7 @@ public interface IIndexedField {
    *          the field name to be used
    * @return
    */
+  @JsonCreator
   public static IIndexedField create(final String fieldName) {
     return new IndexedField(fieldName);
   }
@@ -45,6 +49,7 @@ public interface IIndexedField {
    * 
    * @return the field name
    */
+  @JsonValue
   String getFieldName();
 
   static IIndexedField getIndexedField(final String name, final Class<?> pojoClass)

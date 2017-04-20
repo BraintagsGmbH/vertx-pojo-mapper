@@ -12,6 +12,9 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldValueResolver;
 import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 import de.braintags.vertx.jomnigate.dataaccess.query.IVariableFieldCondition;
@@ -38,6 +41,7 @@ public class VariableFieldCondition extends FieldCondition implements IVariableF
    * @param value
    *          the value of this condition, must contain a variable
    */
+  @JsonCreator
   public VariableFieldCondition(IIndexedField field, QueryOperator logic, @Nullable Object value) {
     super(field, logic, value);
   }
@@ -49,6 +53,7 @@ public class VariableFieldCondition extends FieldCondition implements IVariableF
    * java.lang.Object)
    */
   @Override
+  @JsonIgnore
   public void setIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass, Object result) {
     // never cache a field condition that contains a variable
   }
@@ -59,6 +64,7 @@ public class VariableFieldCondition extends FieldCondition implements IVariableF
    * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.FieldCondition#getIntermediateResult(java.lang.Class)
    */
   @Override
+  @JsonIgnore
   public Object getIntermediateResult(Class<? extends IQueryExpression> queryExpressionClass) {
     // never cache a field condition that contains a variable
     return null;
