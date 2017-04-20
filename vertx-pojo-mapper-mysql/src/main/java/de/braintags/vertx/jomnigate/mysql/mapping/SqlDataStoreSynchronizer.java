@@ -17,9 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 import de.braintags.vertx.jomnigate.annotation.EntityOption;
-import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.exception.MappingException;
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.ISyncResult;
@@ -52,9 +54,9 @@ import io.vertx.ext.sql.ResultSet;
 
 public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<String> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SqlDataStoreSynchronizer.class);
-  private DefaultSyncResult internalSyncResult = new DefaultSyncResult();
+  private final DefaultSyncResult internalSyncResult = new DefaultSyncResult();
 
-  private MySqlDataStore datastore;
+  private final MySqlDataStore datastore;
 
   private static final String TABLE_QUERY = "SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='%s' AND TABLE_NAME='%s'";
   private static final String COLUMN_QUERY = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA='%s' AND TABLE_NAME='%s'";
@@ -66,12 +68,12 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
    * @param ds
    *          the {@link MySqlDataStore} used
    */
-  public SqlDataStoreSynchronizer(MySqlDataStore ds) {
+  public SqlDataStoreSynchronizer(final MySqlDataStore ds) {
     this.datastore = ds;
   }
 
   @Override
-  public void syncTable(IMapper mapper, Handler<AsyncResult<Void>> resultHandler) {
+  public void syncTable(final IMapper mapper, final Handler<AsyncResult<Void>> resultHandler) {
     LOGGER.debug("starting synchronization for mapper " + mapper.getClass().getSimpleName());
     readTableFromDatabase(mapper, res -> checkTable((Mapper) mapper, res, result -> {
       if (result.failed()) {
@@ -83,8 +85,8 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
     }));
   }
 
-  private void checkTable(Mapper mapper, AsyncResult<SqlTableInfo> tableResult,
-      Handler<AsyncResult<DefaultSyncCommand>> resultHandler) {
+  private void checkTable(final Mapper mapper, final AsyncResult<SqlTableInfo> tableResult,
+      final Handler<AsyncResult<DefaultSyncCommand>> resultHandler) {
     if (tableResult.failed()) {
       resultHandler.handle(Future.failedFuture(tableResult.cause()));
     } else {
@@ -102,8 +104,8 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
 
   }
 
-  private void compareTables(IMapper mapper, SqlTableInfo currentDbTable,
-      Handler<AsyncResult<DefaultSyncCommand>> resultHandler) {
+  private void compareTables(final IMapper mapper, final SqlTableInfo currentDbTable,
+      final Handler<AsyncResult<DefaultSyncCommand>> resultHandler) {
     Map<String, SyncAction> syncMap = currentDbTable.compareColumns(mapper);
     if (!syncMap.isEmpty()) {
       logSyncMap(mapper, syncMap);
@@ -114,7 +116,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
     }
   }
 
-  private void logSyncMap(IMapper mapper, Map<String, SyncAction> syncMap) {
+  private void logSyncMap(final IMapper mapper, final Map<String, SyncAction> syncMap) {
     LOGGER.info(mapper.getMapperClass().getName() + ": " + syncMap);
   }
 
@@ -125,7 +127,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
    * ENGINE=InnoDB DEFAULT CHARSET=utf8;
    * 
    */
-  private void generateNewTable(Mapper mapper, Handler<AsyncResult<DefaultSyncCommand>> resultHandler) {
+  private void generateNewTable(final Mapper mapper, final Handler<AsyncResult<DefaultSyncCommand>> resultHandler) {
     DefaultSyncCommand syncCommand = createSyncCommand(mapper, SyncAction.CREATE);
     SqlUtil.query(datastore, syncCommand.getCommand(), exec -> {
       if (exec.failed()) {
@@ -145,7 +147,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
     });
   }
 
-  private DefaultSyncCommand createSyncCommand(IMapper mapper, SyncAction action) {
+  private DefaultSyncCommand createSyncCommand(final IMapper mapper, final SyncAction action) {
     String columnPart = generateColumnPart(mapper);
     String tableName = mapper.getTableInfo().getName();
     String database = datastore.getDatabase();
@@ -153,7 +155,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
     return new DefaultSyncCommand(action, sqlCommand);
   }
 
-  private String getOptions(IMapper mapper) {
+  private String getOptions(final IMapper mapper) {
     Buffer buffer = Buffer.buffer();
     for (EntityOption option : mapper.getEntity().options()) {
       if ("ENGINE".equalsIgnoreCase(option.key()) || "DEFAULT CHARSET".equalsIgnoreCase(option.key())) {
@@ -172,9 +174,9 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
    * @param mapper
    * @return
    */
-  private String generateColumnPart(IMapper mapper) {
+  private String generateColumnPart(final IMapper mapper) {
     StringBuilder buffer = new StringBuilder();
-    IProperty idField = mapper.getIdField().getField();
+    IProperty idField = mapper.getIdInfo().getField();
     ITableInfo ti = mapper.getTableInfo();
     Set<String> fieldNames = mapper.getFieldNames();
 
@@ -186,7 +188,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
     return buffer.toString();
   }
 
-  private String generateColumn(IMapper mapper, ITableInfo ti, String fieldName) {
+  private String generateColumn(final IMapper mapper, final ITableInfo ti, final String fieldName) {
     IProperty field = mapper.getField(fieldName);
     IColumnInfo ci = ti.getColumnInfo(field);
     IColumnHandler ch = ci.getColumnHandler();
@@ -199,7 +201,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
     return colString;
   }
 
-  private void readTableFromDatabase(IMapper mapper, Handler<AsyncResult<SqlTableInfo>> resultHandler) {
+  private void readTableFromDatabase(final IMapper mapper, final Handler<AsyncResult<SqlTableInfo>> resultHandler) {
     String tableQuery = String.format(TABLE_QUERY, datastore.getDatabase(), mapper.getTableInfo().getName());
     SqlUtil.query(datastore, tableQuery, result -> {
       if (result.failed()) {
@@ -230,8 +232,8 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
    * @param resultHandler
    *          the handler to be called
    */
-  private void readColumns(SqlTableInfo tInfo, AsyncResult<ResultSet> result,
-      Handler<AsyncResult<SqlTableInfo>> resultHandler) {
+  private void readColumns(final SqlTableInfo tInfo, final AsyncResult<ResultSet> result,
+      final Handler<AsyncResult<SqlTableInfo>> resultHandler) {
     if (result.failed()) {
       resultHandler.handle(Future.failedFuture(result.cause()));
     } else {
@@ -255,7 +257,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
     }
   }
 
-  private SqlTableInfo createTableInfo(IMapper mapper, ResultSet resultSet) {
+  private SqlTableInfo createTableInfo(final IMapper mapper, final ResultSet resultSet) {
     if (resultSet.getNumRows() == 0)
       return null;
     return new SqlTableInfo(mapper);
@@ -278,7 +280,8 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
    * pojomapper.mapping.IMapper, de.braintags.vertx.jomnigate.annotation.Indexes, io.vertx.core.Handler)
    */
   @Override
-  protected void syncIndexes(IMapper mapper, Indexes indexes, Handler<AsyncResult<Void>> resultHandler) {
+  protected void syncIndexes(final IMapper<?> mapper, final ImmutableSet<IIndexDefinition> indexes,
+      final Handler<AsyncResult<Void>> resultHandler) {
     SqlUtil.createIndexes(datastore, mapper.getTableInfo().getName(), mapper.getIndexDefinitions(), result -> {
       if (result.failed()) {
         LOGGER.debug("Error creating indexes: " + result.cause());

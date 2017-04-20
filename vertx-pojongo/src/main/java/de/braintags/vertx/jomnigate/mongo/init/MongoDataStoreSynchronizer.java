@@ -12,7 +12,9 @@
  */
 package de.braintags.vertx.jomnigate.mongo.init;
 
-import de.braintags.vertx.jomnigate.annotation.Indexes;
+import com.google.common.collect.ImmutableSet;
+
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.ISyncResult;
 import de.braintags.vertx.jomnigate.mapping.impl.AbstractDataStoreSynchronizer;
@@ -30,15 +32,15 @@ import io.vertx.core.json.JsonObject;
  * 
  */
 public class MongoDataStoreSynchronizer extends AbstractDataStoreSynchronizer<JsonObject> {
-  private MongoSyncResult syncResult = new MongoSyncResult();
-  private MongoDataStore ds;
+  private final MongoSyncResult syncResult = new MongoSyncResult();
+  private final MongoDataStore ds;
 
-  public MongoDataStoreSynchronizer(MongoDataStore ds) {
+  public MongoDataStoreSynchronizer(final MongoDataStore ds) {
     this.ds = ds;
   }
 
   @Override
-  protected void syncTable(IMapper mapper, Handler<AsyncResult<Void>> resultHandler) {
+  protected void syncTable(final IMapper mapper, final Handler<AsyncResult<Void>> resultHandler) {
     resultHandler.handle(Future.succeededFuture());
   }
 
@@ -59,7 +61,8 @@ public class MongoDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Js
    * pojomapper.mapping.IMapper, de.braintags.vertx.jomnigate.annotation.Indexes, io.vertx.core.Handler)
    */
   @Override
-  protected void syncIndexes(IMapper mapper, Indexes indexes, Handler<AsyncResult<Void>> resultHandler) {
+  protected void syncIndexes(final IMapper<?> mapper, final ImmutableSet<IIndexDefinition> indexes,
+      final Handler<AsyncResult<Void>> resultHandler) {
     MongoUtil.createIndexes(ds, mapper.getTableInfo().getName(), mapper.getIndexDefinitions(), result -> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));

@@ -124,7 +124,7 @@ public class TMapperFactory {
 
   @Test
   public void testIndex() {
-    Indexes ann = (Indexes) mapperDef.getAnnotation(Indexes.class);
+    Indexes ann = mapperDef.getAnnotation(Indexes.class);
     if (ann == null)
       Assert.fail("Annotation for Indexes must not be null");
     else {
@@ -137,7 +137,7 @@ public class TMapperFactory {
       if (options == null)
         Assert.fail("IndexOptions must not be null");
       else {
-        Assert.assertEquals("wrong parameter unique in IndexOptions", false, options.unique());
+        Assert.assertFalse("wrong parameter unique in IndexOptions", options.unique());
       }
     }
   }
@@ -173,7 +173,7 @@ public class TMapperFactory {
 
   }
 
-  private void checkTypeHandler(IMapper mapperdef, String fieldName, Class expectedTh, Class expectedSubTypeHandler) {
+  private void checkTypeHandler(final IMapper mapperdef, final String fieldName, final Class expectedTh, final Class expectedSubTypeHandler) {
     IProperty field = mapperDef.getField(fieldName);
     assertNotNull("Typehandler must not be null for field: " + field.getFullName(), field.getTypeHandler());
     assertEquals("wrong TypeHandler for field: " + field.getFullName(), expectedTh, field.getTypeHandler().getClass());
@@ -218,7 +218,7 @@ public class TMapperFactory {
     if (ann == null)
       Assert.fail("Annotation Id must not be null");
 
-    IProperty field = mapperDef.getIdField().getField();
+    IProperty field = mapperDef.getIdInfo().getField();
     assertNotNull(field);
     IProperty field2 = mapperDef.getField(field.getName());
     Assert.assertSame(field, field2);

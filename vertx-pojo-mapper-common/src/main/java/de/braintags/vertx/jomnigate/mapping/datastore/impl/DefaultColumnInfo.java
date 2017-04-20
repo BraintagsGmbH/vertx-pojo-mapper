@@ -28,7 +28,7 @@ import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
  */
 
 public abstract class DefaultColumnInfo implements IColumnInfo {
-  private String colName;
+  private final String colName;
   private IColumnHandler columnHandler;
 
   private String type = Property.UNDEFINED_COLUMN_TYPE;
@@ -45,7 +45,7 @@ public abstract class DefaultColumnInfo implements IColumnInfo {
    * @param colName
    *          the name of the column
    */
-  protected DefaultColumnInfo(String colName) {
+  protected DefaultColumnInfo(final String colName) {
     this.colName = colName;
   }
 
@@ -57,13 +57,13 @@ public abstract class DefaultColumnInfo implements IColumnInfo {
    * @param columnHandler
    *          the {@link IColumnHandler} to be used
    */
-  public DefaultColumnInfo(IProperty field, IColumnHandler columnHandler) {
+  public DefaultColumnInfo(final IProperty field, final IColumnHandler columnHandler) {
     this.columnHandler = columnHandler;
     colName = computePropertyName(field);
     init(field, columnHandler);
   }
 
-  protected String computePropertyName(IProperty field) {
+  protected String computePropertyName(final IProperty field) {
     Property prop = (Property) field.getAnnotation(Property.class);
     if (prop != null) {
       String propName = prop.value();
@@ -73,7 +73,7 @@ public abstract class DefaultColumnInfo implements IColumnInfo {
     return field.getName();
   }
 
-  protected void init(IProperty field, IColumnHandler columnHandler) {
+  protected void init(final IProperty field, final IColumnHandler columnHandler) {
     Property prop = (Property) field.getAnnotation(Property.class);
     if (prop != null) {
       type = prop.columnType();
@@ -82,7 +82,7 @@ public abstract class DefaultColumnInfo implements IColumnInfo {
       precision = prop.precision();
       nullable = prop.nullable();
     }
-    if (field.getMapper().getIdField() == field)
+    if (field.getMapper().getIdInfo().getIndexedField() == field)
       id = true;
   }
 
@@ -160,7 +160,7 @@ public abstract class DefaultColumnInfo implements IColumnInfo {
    * @param type
    *          the type to set
    */
-  public final void setType(String type) {
+  public final void setType(final String type) {
     this.type = type;
   }
 
@@ -168,7 +168,7 @@ public abstract class DefaultColumnInfo implements IColumnInfo {
    * @param length
    *          the length to set
    */
-  public final void setLength(int length) {
+  public final void setLength(final int length) {
     this.length = length;
   }
 
@@ -176,7 +176,7 @@ public abstract class DefaultColumnInfo implements IColumnInfo {
    * @param scale
    *          the scale to set
    */
-  public final void setScale(int scale) {
+  public final void setScale(final int scale) {
     this.scale = scale;
   }
 
@@ -184,7 +184,7 @@ public abstract class DefaultColumnInfo implements IColumnInfo {
    * @param precision
    *          the precision to set
    */
-  public final void setPrecision(int precision) {
+  public final void setPrecision(final int precision) {
     this.precision = precision;
   }
 
@@ -192,7 +192,7 @@ public abstract class DefaultColumnInfo implements IColumnInfo {
    * @param nullable
    *          the nullable to set
    */
-  public final void setNullable(boolean nullable) {
+  public final void setNullable(final boolean nullable) {
     this.nullable = nullable;
   }
 

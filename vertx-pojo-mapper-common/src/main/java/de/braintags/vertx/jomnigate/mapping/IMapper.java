@@ -16,9 +16,10 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
-import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterDelete;
@@ -89,11 +90,11 @@ public interface IMapper<T> {
   IProperty getField(String name);
 
   /**
-   * Get the {@link IProperty} which is defined to be the id
+   * Get the {@link IIdInfo} which contains access to the mapped field and the queryable field
    * 
    * @return the id field
    */
-  IMappedIdField getIdField();
+  IIdInfo getIdInfo();
 
   /**
    * Get the methods of the mapper which are annotated by the given lifecycle annotation like {@link BeforeLoad},
@@ -117,7 +118,7 @@ public interface IMapper<T> {
    * 
    * @return the index definitions
    */
-  Indexes getIndexDefinitions();
+  ImmutableSet<IIndexDefinition> getIndexDefinitions();
 
   /**
    * Get a defined {@link Annotation} of the given class

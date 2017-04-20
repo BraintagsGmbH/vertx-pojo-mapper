@@ -22,7 +22,6 @@ import java.util.Map;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.annotation.IndexField;
-import de.braintags.vertx.jomnigate.annotation.IndexOptions;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.field.Id;
 import de.braintags.vertx.jomnigate.annotation.field.Ignore;
@@ -37,7 +36,7 @@ import de.braintags.vertx.jomnigate.annotation.field.Property;
 
 @Entity(name = "PersonColumn")
 @Indexes(@Index(fields = { @IndexField(fieldName = "name"),
-    @IndexField(fieldName = "weight") }, name = "testIndex", options = @IndexOptions(unique = false)))
+    @IndexField(fieldName = "weight") }, name = "testIndex"))
 public class PersonPure {
 
   @Id
@@ -87,7 +86,7 @@ public class PersonPure {
   /**
    * 
    */
-  public PersonPure(int count) {
+  public PersonPure(final int count) {
     this.name = "name " + count;
     this.animal = "animal";
     this.animalArray = new String[10];
@@ -118,7 +117,7 @@ public class PersonPure {
     this.weight = new Double(788.56);
   }
 
-  private static Map<Integer, Animal> initAnimalMap(int count) {
+  private static Map<Integer, Animal> initAnimalMap(final int count) {
     Map<Integer, Animal> map = new HashMap<>();
     for (int i = 0; i < count; i++) {
       map.put(new Integer(i), new Animal(i));
@@ -126,7 +125,7 @@ public class PersonPure {
     return map;
   }
 
-  private static Map<Integer, Double> initMap(int count) {
+  private static Map<Integer, Double> initMap(final int count) {
     Map<Integer, Double> map = new HashMap<>();
     for (int i = 0; i < count; i++) {
       map.put(new Integer(i), new Double(i));
@@ -145,7 +144,7 @@ public class PersonPure {
    * @param name
    *          the name to set
    */
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -160,11 +159,11 @@ public class PersonPure {
    * @param ignoreField2
    *          the ignoreField2 to set
    */
-  public void setIgnoreField2(String ignoreField2) {
+  public void setIgnoreField2(final String ignoreField2) {
     this.ignoreField2 = ignoreField2;
   }
 
-  private static final ArrayList<String> createList(String prefix, int counter) {
+  private static final ArrayList<String> createList(final String prefix, final int counter) {
     ArrayList<String> returnList = new ArrayList<>();
     for (int i = 0; i < counter; i++) {
       returnList.add(prefix + counter);
@@ -172,7 +171,7 @@ public class PersonPure {
     return returnList;
   }
 
-  private static final String[] createArray(String prefix, int counter) {
+  private static final String[] createArray(final String prefix, final int counter) {
     String[] rs = new String[counter];
     for (int i = 0; i < counter; i++) {
       rs[i] = prefix + counter;

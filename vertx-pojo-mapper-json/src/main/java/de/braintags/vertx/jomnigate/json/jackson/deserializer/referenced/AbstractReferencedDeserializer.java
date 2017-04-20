@@ -47,14 +47,14 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
    */
   private static final long serialVersionUID = 1L;
 
-  private SettableBeanProperty beanProperty;
+  private final SettableBeanProperty beanProperty;
   private ValueInstantiator valueInstantiator;
 
   /**
    * @param datastore
    * @param beanProperty
    */
-  public AbstractReferencedDeserializer(IDataStore datastore, SettableBeanProperty beanProperty) {
+  public AbstractReferencedDeserializer(final IDataStore datastore, final SettableBeanProperty beanProperty) {
     super(datastore, null);
     this.beanProperty = beanProperty;
   }
@@ -76,7 +76,7 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
    * @param resultHandler
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected Future getReferencedObjectById(Object id, Class mapperClass) {
+  protected Future getReferencedObjectById(final Object id, final Class mapperClass) {
     LOGGER.debug("start getReferencedObjectById");
     Future<Object> f = Future.future();
     QueryHelper.findRecordById(getDatastore(), mapperClass, id.toString(), f.completer());
@@ -91,13 +91,13 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
    * @return
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected Future<Collection<?>> getReferencedObjectsById(ArrayNode node, Class mapperClass, Collection destination) {
+  protected Future<Collection<?>> getReferencedObjectsById(final ArrayNode node, final Class mapperClass, final Collection destination) {
     if (node == null || node.size() <= 0) {
       return null;
     }
     LOGGER.debug("start getReferencedObjectsById");
     IQuery q = getDatastore().createQuery(mapperClass);
-    q.setSearchCondition(ISearchCondition.in(q.getMapper().getIdField(), createIdList(node)));
+    q.setSearchCondition(ISearchCondition.in(q.getMapper().getIdInfo().getIndexedField(), createIdList(node)));
     Future<Collection<?>> f = Future.future();
     QueryHelper.executeToList(q, res -> {
       if (res.failed()) {
@@ -118,7 +118,7 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
    * @return
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected Future getReferencedObjectsByIdAsArray(ArrayNode node, Class mapperClass) {
+  protected Future getReferencedObjectsByIdAsArray(final ArrayNode node, final Class mapperClass) {
     if (node == null || node.size() < 0) {
       return null;
     }
@@ -127,7 +127,7 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
     Future f = Future.future();
     if (node.size() > 0) {
       IQuery q = getDatastore().createQuery(mapperClass);
-      q.setSearchCondition(ISearchCondition.in(q.getMapper().getIdField(), createIdList(node)));
+      q.setSearchCondition(ISearchCondition.in(q.getMapper().getIdInfo().getIndexedField(), createIdList(node)));
       QueryHelper.executeToList(q, res -> {
         if (res.failed()) {
           f.fail(res.cause());
@@ -145,7 +145,7 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
     return f;
   }
 
-  private List<?> createIdList(ArrayNode node) {
+  private List<?> createIdList(final ArrayNode node) {
     List<Object> idList = new ArrayList<>();
     node.forEach(an -> idList.add(an.asText()));
     return idList;
@@ -160,7 +160,7 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
    * @throws IOException
    */
   @SuppressWarnings("unchecked")
-  protected T instantiate(DeserializationContext ct, JavaType type) throws IOException {
+  protected T instantiate(final DeserializationContext ct, final JavaType type) throws IOException {
     T result;
     ValueInstantiator vi = getValueInstantiator(ct, type);
     if (vi.canInstantiate()) {
@@ -182,11 +182,11 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
    * @param type
    * @return
    */
-  protected T instantiateInternal(DeserializationContext ct, JavaType type) {
+  protected T instantiateInternal(final DeserializationContext ct, final JavaType type) {
     return null;
   }
 
-  protected ValueInstantiator getValueInstantiator(DeserializationContext ct, JavaType type) throws IOException {
+  protected ValueInstantiator getValueInstantiator(final DeserializationContext ct, final JavaType type) throws IOException {
     if (valueInstantiator == null) {
       BeanDescription desc = ct.getConfig().introspectClassAnnotations(type);
       valueInstantiator = ct.getFactory().findValueInstantiator(ct, desc);
@@ -201,7 +201,7 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
    * @param f
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected void storePostHandler(DeserializationContext ct, Future f) {
+  protected void storePostHandler(final DeserializationContext ct, final Future f) {
     List<ReferencedPostHandler> list = (List<ReferencedPostHandler>) ct
         .findInjectableValue(JsonStoreObject.REFERENCED_LIST, null, null);
     if (list == null) {
@@ -219,7 +219,7 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
    * @param f
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected void storePostHandler(DeserializationContext ct, Object instance, Future f) {
+  protected void storePostHandler(final DeserializationContext ct, final Object instance, final Future f) {
     List<ReferencedPostHandler> list = (List<ReferencedPostHandler>) ct
         .findInjectableValue(JsonStoreObject.REFERENCED_LIST, null, null);
     if (list == null) {
