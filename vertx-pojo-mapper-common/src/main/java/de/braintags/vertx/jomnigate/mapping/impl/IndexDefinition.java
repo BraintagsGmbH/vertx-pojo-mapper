@@ -2,6 +2,8 @@ package de.braintags.vertx.jomnigate.mapping.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.annotation.IndexField;
@@ -24,6 +26,7 @@ public class IndexDefinition implements IIndexDefinition {
   private String name;
   private final List<IIndexFieldDefinition> fields;
   private List<IndexOption> indexOptions;
+  private String identifier;
 
   /**
    * Create a definition from an indexed field of a mapper
@@ -81,5 +84,30 @@ public class IndexDefinition implements IIndexDefinition {
     if (indexOptions == null)
       indexOptions = new ArrayList<>();
     return indexOptions;
+  }
+
+  @Override
+  public String getIdentifier() {
+    if (identifier == null) {
+      identifier = createIdentifier();
+    }
+    return identifier;
+  }
+
+  /**
+   * Create a unique identifier consisting of all field names sorted, combined, and transformed to lowercase. The
+   * resulting string is hashed to prevent overly long identifiers.
+   * 
+   * @return a unique identifier for the fields of the definition
+   */
+  private String createIdentifier() {
+    return String.valueOf(fields.stream().map(IIndexFieldDefinition::getName).sorted().collect(Collectors.joining())
+        .toLowerCase(Locale.US).hashCode());
+  }
+
+  @Override
+  public String toString() {
+    return "IndexDefinition [name=" + name + ", fields=" + fields + ", indexOptions=" + indexOptions + ", identifier="
+        + getIdentifier() + "]";
   }
 }

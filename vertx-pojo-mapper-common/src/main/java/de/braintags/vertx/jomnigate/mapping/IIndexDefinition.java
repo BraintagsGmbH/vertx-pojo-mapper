@@ -30,4 +30,12 @@ public interface IIndexDefinition {
    * @return the options
    */
   public List<IndexOption> getIndexOptions();
+
+  /**
+   * Return a unique identifier to prevent potentially forbidden duplicate indices for the same configuration. The
+   * identifier must only be unique for the table of the index, not for the whole database
+   * 
+   * @return a unique identifier for this index
+   */
+  public String getIdentifier();
 }

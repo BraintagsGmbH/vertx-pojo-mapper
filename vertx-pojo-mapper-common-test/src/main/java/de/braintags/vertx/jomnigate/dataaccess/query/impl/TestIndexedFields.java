@@ -37,7 +37,7 @@ public class TestIndexedFields extends DatastoreBaseTest {
   public void testIndexedField_createIndex(final TestContext context) {
     IMapper<TestMapperIndex> mapper = getDataStore(context).getMapperFactory().getMapper(TestMapperIndex.class);
     assertThat(mapper.getIndexDefinitions(), hasSize(1));
-    IIndexDefinition indexDefinition = mapper.getIndexDefinitions().get(0);
+    IIndexDefinition indexDefinition = mapper.getIndexDefinitions().iterator().next();
     assertThat(indexDefinition.getIndexOptions(), empty());
     assertThat(indexDefinition.getFields(), hasSize(1));
     IIndexFieldDefinition field = indexDefinition.getFields().get(0);

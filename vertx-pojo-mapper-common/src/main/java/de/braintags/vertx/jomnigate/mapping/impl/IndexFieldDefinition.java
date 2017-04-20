@@ -9,6 +9,10 @@ import de.braintags.vertx.jomnigate.mapping.IIndexFieldDefinition;
  * @author sschmitt
  *
  */
+/**
+ * @author sschmitt
+ *
+ */
 public class IndexFieldDefinition implements IIndexFieldDefinition {
 
   private String name;
@@ -31,4 +35,10 @@ public class IndexFieldDefinition implements IIndexFieldDefinition {
   public void setType(final IndexType type) {
     this.type = type;
   }
+
+  @Override
+  public String toString() {
+    return "IndexFieldDefinition [name=" + name + ", type=" + type + "]";
+  }
+
 }
