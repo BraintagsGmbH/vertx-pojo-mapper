@@ -12,14 +12,12 @@
  */
 package de.braintags.vertx.jomnigate.testdatastore;
 
-import java.util.List;
-
 import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.exception.MappingException;
+import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import de.braintags.vertx.jomnigate.init.ObserverMapperSettings;
-import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningNoInterface;
@@ -44,14 +42,10 @@ public class TestDataVersioning extends DatastoreBaseTest {
    */
   @Test
   public void testExisting_SetVersionObserver_Definition(TestContext context) {
-    List<ObserverSettings<?>> osl = getDataStore(context).getSettings().getObserverSettings();
-    context.assertFalse(osl.isEmpty(), "No observer settings found");
-    ObserverSettings vs = null;
-    for (ObserverSettings os : osl) {
-      if (os.getObserverClass() == SetMapperVersionObserver.class) {
-        vs = os;
-      }
-    }
+    context.assertFalse(getDataStore(context).getSettings().getObserverSettings().isEmpty(),
+        "No observer settings found");
+    ObserverDefinition vs = getDataStore(context).getSettings().getObserverSettings()
+        .getDefinition(SetMapperVersionObserver.class);
     context.assertNotNull(vs,
         "SetMapperVersionObserver is not existing and must be programmatically added by jomnigate itself");
     context.assertEquals(Integer.MAX_VALUE, vs.getPriority());

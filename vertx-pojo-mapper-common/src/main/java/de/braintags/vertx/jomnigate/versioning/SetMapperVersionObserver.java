@@ -14,7 +14,7 @@ package de.braintags.vertx.jomnigate.versioning;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.init.ObserverMapperSettings;
-import de.braintags.vertx.jomnigate.init.ObserverSettings;
+import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
@@ -30,8 +30,8 @@ import io.vertx.core.Future;
  */
 public class SetMapperVersionObserver implements IObserver {
 
-  public static ObserverSettings<SetMapperVersionObserver> createObserverSettings() {
-    ObserverSettings<SetMapperVersionObserver> settings = new ObserverSettings<>(SetMapperVersionObserver.class);
+  public static ObserverDefinition<SetMapperVersionObserver> createObserverSettings() {
+    ObserverDefinition<SetMapperVersionObserver> settings = new ObserverDefinition<>(SetMapperVersionObserver.class);
     settings.setPriority(Integer.MAX_VALUE);
     settings.getEventTypeList().add(ObserverEventType.BEFORE_INSERT);
     ObserverMapperSettings ms = new ObserverMapperSettings(IMapperVersion.class.getName());
@@ -61,8 +61,8 @@ public class SetMapperVersionObserver implements IObserver {
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
     IMapperVersion vrec = (IMapperVersion) event.getSource();
-
-    return Future.failedFuture(new UnsupportedOperationException());
+    vrec.setMapperVersion(event.getAccessObject().getMapper().getEntity().version());
+    return Future.succeededFuture();
   }
 
 }

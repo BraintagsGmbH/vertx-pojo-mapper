@@ -21,7 +21,7 @@ import java.util.concurrent.CountDownLatch;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.init.ObserverSettings;
+import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.observer.IObserver;
@@ -164,7 +164,8 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
    * @return
    */
   private List<IObserver> getObserver(Class<?> mapperClass) {
-    List<ObserverSettings<?>> osList = getDataStore().getSettings().getObserverSettings(mapperClass);
+    List<ObserverDefinition<?>> osList = getDataStore().getSettings().getObserverSettings()
+        .getObserverDefinitions(mapperClass);
     List<IObserver> ol = new ArrayList<>();
     osList.forEach(os -> {
       try {

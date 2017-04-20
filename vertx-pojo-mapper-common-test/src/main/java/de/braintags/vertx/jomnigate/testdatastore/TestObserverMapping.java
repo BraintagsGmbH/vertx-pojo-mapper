@@ -19,8 +19,8 @@ import org.junit.Test;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
+import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import de.braintags.vertx.jomnigate.init.ObserverMapperSettings;
-import de.braintags.vertx.jomnigate.init.ObserverSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
@@ -58,15 +58,15 @@ public class TestObserverMapping extends AbstractObserverTest {
   @Test
   public void testObserverAndGlobal_Priority(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
-    ObserverSettings<TestObserver4> os = new ObserverSettings<>(TestObserver4.class);
+    ObserverDefinition<TestObserver4> os = new ObserverDefinition<>(TestObserver4.class);
     os.setPriority(500);
     settings.getObserverSettings().add(os);
 
-    ObserverSettings<TestObserver2> os2 = new ObserverSettings<>(TestObserver2.class);
+    ObserverDefinition<TestObserver2> os2 = new ObserverDefinition<>(TestObserver2.class);
     os2.setPriority(200);
     settings.getObserverSettings().add(os2);
 
-    ObserverSettings<TestObserver3> os3 = new ObserverSettings<>(TestObserver3.class);
+    ObserverDefinition<TestObserver3> os3 = new ObserverDefinition<>(TestObserver3.class);
     os3.setPriority(501);
     settings.getObserverSettings().add(os3);
 
@@ -90,7 +90,7 @@ public class TestObserverMapping extends AbstractObserverTest {
   @Test
   public void testMapperObserverAndGlobal_TwoEvents(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
-    ObserverSettings<TestObserver2> os = new ObserverSettings<>(TestObserver2.class);
+    ObserverDefinition<TestObserver2> os = new ObserverDefinition<>(TestObserver2.class);
     os.getEventTypeList().add(ObserverEventType.AFTER_DELETE);
     os.getEventTypeList().add(ObserverEventType.BEFORE_INSERT);
     settings.getObserverSettings().add(os);
@@ -142,7 +142,7 @@ public class TestObserverMapping extends AbstractObserverTest {
   public void testGlobalObserver_Annotated(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
 
-    ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
+    ObserverDefinition<TestObserver> os = new ObserverDefinition<>(TestObserver.class);
     os.getMapperSettings().add(new ObserverMapperSettings(JsonTypeInfo.class));
     settings.getObserverSettings().add(os);
 
@@ -164,15 +164,15 @@ public class TestObserverMapping extends AbstractObserverTest {
   public void testGlobalObserver_Priority(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
 
-    ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
+    ObserverDefinition<TestObserver> os = new ObserverDefinition<>(TestObserver.class);
     os.setPriority(500);
     settings.getObserverSettings().add(os);
 
-    ObserverSettings<TestObserver2> os2 = new ObserverSettings<>(TestObserver2.class);
+    ObserverDefinition<TestObserver2> os2 = new ObserverDefinition<>(TestObserver2.class);
     os2.setPriority(200);
     settings.getObserverSettings().add(os2);
 
-    ObserverSettings<TestObserver3> os3 = new ObserverSettings<>(TestObserver3.class);
+    ObserverDefinition<TestObserver3> os3 = new ObserverDefinition<>(TestObserver3.class);
     os3.setPriority(501);
     settings.getObserverSettings().add(os3);
 
@@ -195,7 +195,7 @@ public class TestObserverMapping extends AbstractObserverTest {
   @Test
   public void testGlobalObserver_InstanceOf(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
-    ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
+    ObserverDefinition<TestObserver> os = new ObserverDefinition<>(TestObserver.class);
 
     ObserverMapperSettings oms = new ObserverMapperSettings(BaseRecord.class.getName());
     oms.setInstanceOf(true);
@@ -223,7 +223,7 @@ public class TestObserverMapping extends AbstractObserverTest {
   @Test
   public void testGlobalObserver_OneMapper_TwoEvents(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
-    ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
+    ObserverDefinition<TestObserver> os = new ObserverDefinition<>(TestObserver.class);
     os.getMapperSettings().add(new ObserverMapperSettings(SimpleMapper.class.getName()));
     os.getEventTypeList().add(ObserverEventType.AFTER_INSERT);
     os.getEventTypeList().add(ObserverEventType.BEFORE_INSERT);
@@ -246,7 +246,7 @@ public class TestObserverMapping extends AbstractObserverTest {
   @Test
   public void testGlobalObserver_OneMapper_AllEvents(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
-    ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
+    ObserverDefinition<TestObserver> os = new ObserverDefinition<>(TestObserver.class);
     os.getMapperSettings().add(new ObserverMapperSettings(SimpleMapper.class.getName()));
     settings.getObserverSettings().add(os);
 
@@ -264,7 +264,7 @@ public class TestObserverMapping extends AbstractObserverTest {
   @Test
   public void testGlobalObserver_TwoEvents(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
-    ObserverSettings<TestObserver> os = new ObserverSettings<>(TestObserver.class);
+    ObserverDefinition<TestObserver> os = new ObserverDefinition<>(TestObserver.class);
     os.getEventTypeList().add(ObserverEventType.AFTER_INSERT);
     os.getEventTypeList().add(ObserverEventType.BEFORE_INSERT);
     settings.getObserverSettings().add(os);
@@ -288,7 +288,7 @@ public class TestObserverMapping extends AbstractObserverTest {
   @Test
   public void testGlobalObserver_All(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
-    settings.getObserverSettings().add(new ObserverSettings<>(TestObserver.class));
+    settings.getObserverSettings().add(new ObserverDefinition<>(TestObserver.class));
 
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
     checkObserver_AllEvents(context, mapper, 1);
@@ -302,7 +302,7 @@ public class TestObserverMapping extends AbstractObserverTest {
   @Test
   public void testClassNotFound_ObserverClass(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
-    settings.getObserverSettings().add(new ObserverSettings<>(TestObserver_NoDefaultConstructor.class));
+    settings.getObserverSettings().add(new ObserverDefinition<>(TestObserver_NoDefaultConstructor.class));
     try {
       IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
       // we are expecting instantiation exception here

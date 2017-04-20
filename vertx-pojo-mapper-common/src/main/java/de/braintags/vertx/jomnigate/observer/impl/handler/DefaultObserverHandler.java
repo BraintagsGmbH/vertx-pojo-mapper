@@ -31,7 +31,7 @@ import de.braintags.vertx.jomnigate.dataaccess.write.impl.AfterUpdateHandler;
 import de.braintags.vertx.jomnigate.dataaccess.write.impl.BeforeInsertHandler;
 import de.braintags.vertx.jomnigate.dataaccess.write.impl.BeforeUpdateHandler;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.init.ObserverSettings;
+import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
@@ -46,7 +46,7 @@ import io.vertx.core.Future;
  * 
  */
 public class DefaultObserverHandler implements IObserverHandler {
-  private List<ObserverSettings<?>> observerList = new ArrayList<>();
+  private List<ObserverDefinition<?>> observerList = new ArrayList<>();
   private Map<ObserverEventType, List<IObserver>> eventObserverCache = new HashMap<>();
   private IMapper<?> mapper;
   private BeforeInsertHandler beforeInsertHandler = new BeforeInsertHandler();
@@ -73,11 +73,11 @@ public class DefaultObserverHandler implements IObserverHandler {
    * Computes the list of all observers, which can be executed for the current mapper class.
    */
   private void computeObserver() {
-    List<ObserverSettings<?>> tmpList = mapper.getMapperFactory().getDataStore().getSettings()
-        .getObserverSettings(mapper);
+    List<ObserverDefinition<?>> tmpList = mapper.getMapperFactory().getDataStore().getSettings().getObserverSettings()
+        .getObserverDefinitions(mapper);
     Observer ob = mapper.getAnnotation(Observer.class);
     if (ob != null) {
-      ObserverSettings<?> os = new ObserverSettings<>(ob.observerClass());
+      ObserverDefinition<?> os = new ObserverDefinition<>(ob.observerClass());
       os.setPriority(ob.priority());
       ObserverEventType[] tl = ob.eventTypes();
       for (ObserverEventType t : tl) {

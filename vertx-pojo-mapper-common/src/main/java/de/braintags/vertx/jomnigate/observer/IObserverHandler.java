@@ -20,7 +20,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
-import de.braintags.vertx.jomnigate.init.ObserverSettings;
+import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.impl.handler.DefaultObserverHandler;
 import io.vertx.core.Future;
@@ -47,7 +47,7 @@ public interface IObserverHandler {
 
   /**
    * Get all observers, which are registered for the current mapper and the given event. The list should be sorted by
-   * priority of the underlaying {@link ObserverSettings}
+   * priority of the underlaying {@link ObserverDefinition}
    * 
    * @param event
    * @return a list of all fitting IObserver

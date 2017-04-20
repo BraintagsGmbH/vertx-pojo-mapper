@@ -17,8 +17,6 @@ import java.util.Properties;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.impl.AbstractDataStore;
-import de.braintags.vertx.jomnigate.observer.IObserver;
-import de.braintags.vertx.jomnigate.versioning.SetMapperVersionObserver;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -64,20 +62,12 @@ public abstract class AbstractDataStoreInit implements IDataStoreInit {
       } else {
         try {
           initEncoder(settings, result.result());
-          initDefaultObserver(settings);
         } catch (Exception e) {
           handler.handle(Future.failedFuture(e));
         }
         handler.handle(result);
       }
     });
-  }
-
-  /**
-   * Initialize needed instances of {@link IObserver} which must exist inside the current implementation
-   */
-  protected void initDefaultObserver(DataStoreSettings settings) {
-    settings.getObserverSettings().add(SetMapperVersionObserver.createObserverSettings());
   }
 
   /**
