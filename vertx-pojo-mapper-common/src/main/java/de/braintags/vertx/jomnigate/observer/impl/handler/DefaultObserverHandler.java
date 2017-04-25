@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.braintags.vertx.jomnigate.annotation.Observer;
+import de.braintags.vertx.jomnigate.annotation.VersionInfo;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
 import de.braintags.vertx.jomnigate.dataaccess.delete.impl.AfterDeleteHandler;
@@ -37,6 +38,7 @@ import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverHandler;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
+import de.braintags.vertx.jomnigate.versioning.ExecuteVersionConverter;
 import io.vertx.core.Future;
 
 /**
@@ -100,6 +102,10 @@ public class DefaultObserverHandler implements IObserverHandler {
           throw new MappingException(e);
         }
       });
+      if (mapper.getVersionInfo() != null && event.equals(mapper.getVersionInfo().eventType())) {
+        VersionInfo vi = mapper.getVersionInfo();
+        ol.add(new ExecuteVersionConverter(vi));
+      }
       eventObserverCache.put(event, ol);
     }
     return eventObserverCache.get(event);

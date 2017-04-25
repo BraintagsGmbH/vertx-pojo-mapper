@@ -12,7 +12,13 @@
  */
 package de.braintags.vertx.jomnigate.versioning;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import de.braintags.vertx.jomnigate.annotation.VersionConverterDefinition;
 import de.braintags.vertx.jomnigate.annotation.VersionInfo;
+import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
@@ -27,15 +33,22 @@ import io.vertx.core.Future;
  * 
  */
 public class ExecuteVersionConverter implements IObserver {
+  private List<ConverterEntry> converter = new ArrayList<>();
 
   /**
-   * Creates a new instance and adds the observer into the observer system
+   * Creates a new instance based on the information of the {@link VersionInfo}
    * 
    * @param versionInfo
-   * @return
    */
-  static final ExecuteVersionConverter createInstance(VersionInfo versionInfo) {
-    throw new UnsupportedOperationException();
+  public ExecuteVersionConverter(VersionInfo versionInfo) {
+    for (VersionConverterDefinition vcd : versionInfo.versionConverter()) {
+      try {
+        converter.add(new ConverterEntry(vcd.destinationVersion(), vcd.converter().newInstance()));
+      } catch (InstantiationException | IllegalAccessException e) {
+        throw new MappingException(e);
+      }
+    }
+    Collections.sort(converter);
   }
 
   /*
@@ -46,7 +59,7 @@ public class ExecuteVersionConverter implements IObserver {
    */
   @Override
   public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return false;
+    return true;
   }
 
   /*
@@ -59,6 +72,27 @@ public class ExecuteVersionConverter implements IObserver {
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
     return Future.failedFuture(new UnsupportedOperationException());
+  }
+
+  private class ConverterEntry implements Comparable<ConverterEntry> {
+    private Long destinationVersion;
+    private IVersionConverter converter;
+
+    ConverterEntry(long destinationVersion, IVersionConverter converter) {
+      this.destinationVersion = destinationVersion;
+      this.converter = converter;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(ConverterEntry o) {
+      return destinationVersion.compareTo(o.destinationVersion);
+    }
+
   }
 
 }

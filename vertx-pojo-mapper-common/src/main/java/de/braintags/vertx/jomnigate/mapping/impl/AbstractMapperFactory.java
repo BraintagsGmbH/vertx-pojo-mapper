@@ -147,7 +147,7 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
    * @return
    */
   private <T> Future<Void> handleBeforeMapping(Class<T> mapperClass, IObserverContext context) {
-    List<IObserver> ol = getObserver(mapperClass);
+    List<IObserver> ol = getObserver(mapperClass, ObserverEventType.BEFORE_MAPPING);
     Future<Void> f = null;
     if (ol.isEmpty()) {
       f = Future.succeededFuture();
@@ -163,9 +163,9 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
    * @param mapperClass
    * @return
    */
-  private List<IObserver> getObserver(Class<?> mapperClass) {
+  private List<IObserver> getObserver(final Class<?> mapperClass, final ObserverEventType eventType) {
     List<ObserverDefinition<?>> osList = getDataStore().getSettings().getObserverSettings()
-        .getObserverDefinitions(mapperClass);
+        .getObserverDefinitions(mapperClass, eventType);
     List<IObserver> ol = new ArrayList<>();
     osList.forEach(os -> {
       try {

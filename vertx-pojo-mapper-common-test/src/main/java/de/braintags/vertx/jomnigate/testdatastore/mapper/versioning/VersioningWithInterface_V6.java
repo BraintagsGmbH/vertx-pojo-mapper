@@ -13,7 +13,7 @@
 package de.braintags.vertx.jomnigate.testdatastore.mapper.versioning;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
-import de.braintags.vertx.jomnigate.annotation.VersionConverter;
+import de.braintags.vertx.jomnigate.annotation.VersionConverterDefinition;
 import de.braintags.vertx.jomnigate.annotation.VersionInfo;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.converter.V6Converter;
 
@@ -25,7 +25,7 @@ import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.converter.V6
  */
 @Entity(name = "VersioningTable")
 @VersionInfo(version = 6, versionConverter = {
-    @VersionConverter(destinationVersion = 6, converter = V6Converter.class) })
+    @VersionConverterDefinition(destinationVersion = 6, converter = V6Converter.class) })
 public class VersioningWithInterface_V6 extends VersioningWithInterface_V5 {
   public String newName;
 

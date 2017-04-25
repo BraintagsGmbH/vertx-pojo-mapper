@@ -12,6 +12,8 @@
  */
 package de.braintags.vertx.jomnigate.testdatastore;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
@@ -19,6 +21,7 @@ import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import de.braintags.vertx.jomnigate.init.ObserverMapperSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningNoInterface;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWithInterface_V5;
@@ -123,6 +126,9 @@ public class TestDataVersioning extends DatastoreBaseTest {
     IMapper mapper = getDataStore(context).getMapperFactory().getMapper(VersioningWithInterface_V6.class);
     context.assertNotNull(mapper.getVersionInfo(), "expected valid VersionInfo in mapper dclaration");
     context.assertTrue(mapper.getVersionInfo().versionConverter().length > 0, "Expected a defined VersionConverter");
+
+    List<IObserver> osl = mapper.getObserverHandler().getObserver(ObserverEventType.BEFORE_UPDATE);
+    context.assertFalse(osl.isEmpty(), "No definition for version conversion found");
 
     VersioningWithInterface_V6 vi3 = findRecordByID(context, VersioningWithInterface_V6.class, vi.id);
     context.assertEquals(5l, vi3.getMapperVersion(), "version was NOT saved");

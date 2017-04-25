@@ -55,6 +55,6 @@ public @interface VersionInfo {
    * 
    * @return
    */
-  VersionConverter[] versionConverter() default {};
+  VersionConverterDefinition[] versionConverter() default {};
 
 }

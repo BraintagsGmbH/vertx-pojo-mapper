@@ -74,17 +74,17 @@ public class ObserverSettings {
   }
 
   /**
-   * Get all {@link ObserverDefinition} which are fitting the given mapper class for the event
-   * {@link ObserverEventType#BEFORE_MAPPING}
+   * Get all {@link ObserverDefinition} which are fitting the given mapper class for the given event
    * 
    * @param mapperClass
+   * @param eventType
    * @return
    */
-  public List<ObserverDefinition<?>> getObserverDefinitions(final Class<?> mapperClass) {
+  public List<ObserverDefinition<?>> getObserverDefinitions(final Class<?> mapperClass,
+      final ObserverEventType eventType) {
     List<ObserverDefinition<?>> tmpList = new ArrayList<>();
     List<ObserverDefinition<?>> osl = getObserverDefinitions();
-    osl.stream().filter(os -> os.isApplicableFor(mapperClass) && os.isApplicableFor(ObserverEventType.BEFORE_MAPPING))
-        .forEach(tmpList::add);
+    osl.stream().filter(os -> os.isApplicableFor(mapperClass) && os.isApplicableFor(eventType)).forEach(tmpList::add);
     return tmpList;
   }
 

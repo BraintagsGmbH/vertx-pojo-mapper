@@ -20,7 +20,7 @@ import de.braintags.vertx.jomnigate.versioning.IVersionConverter;
  * @author Michael Remme
  * 
  */
-public @interface VersionConverter {
+public @interface VersionConverterDefinition {
 
   /**
    * Defines the version, which the converter shall reach
