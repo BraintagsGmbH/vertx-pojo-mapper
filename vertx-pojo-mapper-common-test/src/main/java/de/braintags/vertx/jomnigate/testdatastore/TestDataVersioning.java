@@ -26,8 +26,10 @@ import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningNoInterface;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWithInterface_V5;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWithInterface_V6;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWithInterface_V7;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWrongEvent;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.converter.V6Converter;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.converter.V7Converter;
 import de.braintags.vertx.jomnigate.versioning.IMapperVersion;
 import de.braintags.vertx.jomnigate.versioning.SetMapperVersionObserver;
 import io.vertx.ext.unit.TestContext;
@@ -152,6 +154,7 @@ public class TestDataVersioning extends DatastoreBaseTest {
     context.assertTrue(vi3.newName == null || vi3.newName.length() == 0, "newName must not be filled here");
 
     V6Converter.executed = false;
+    V6Converter.throwException = false;
     // by savong the new record the value of the field "newName" must be filled because of VersionConverter
     saveRecord(context, vi3);
     context.assertTrue(V6Converter.executed, "V6Convefter was not executed");
@@ -167,14 +170,96 @@ public class TestDataVersioning extends DatastoreBaseTest {
 
   }
 
+  /**
+   * Save record as VersioningWithInterface_V5 with a defined version in entity definition and check for the version
+   * inside a stored record.
+   * Then load the same record, but as a new version, VersioningWithInterface_V6. Here the new field inside the record
+   * must be empty.
+   * Then save the record, an exception should be provocated by the converter, not blocking the process
+   * 
+   * @param context
+   */
   @Test
-  public void testVersioningEmbeddedMapper(TestContext context) {
-    context.fail("unimplemented");
+  public void testVersioning_ProvocateException(TestContext context) {
+    clearTable(context, VersioningWithInterface_V5.class);
+    VersioningWithInterface_V5 vi = new VersioningWithInterface_V5();
+    saveRecord(context, vi);
+    context.assertEquals(5l, vi.getMapperVersion(), "version was not automatically set");
+    VersioningWithInterface_V5 vi2 = findRecordByID(context, VersioningWithInterface_V5.class, vi.id);
+    context.assertEquals(5l, vi2.getMapperVersion(), "version was NOT saved");
+
+    // use the new version within a defined converter
+    getDataStore(context).getMapperFactory().reset();
+    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(VersioningWithInterface_V6.class);
+    context.assertNotNull(mapper.getVersionInfo(), "expected valid VersionInfo in mapper dclaration");
+    context.assertTrue(mapper.getVersionInfo().versionConverter().length > 0, "Expected a defined VersionConverter");
+
+    List<IObserver> osl = mapper.getObserverHandler().getObserver(ObserverEventType.BEFORE_UPDATE);
+    context.assertFalse(osl.isEmpty(), "No definition for version conversion found");
+
+    VersioningWithInterface_V6 vi3 = findRecordByID(context, VersioningWithInterface_V6.class, vi.id);
+    context.assertEquals(5l, vi3.getMapperVersion(), "version was NOT saved");
+    context.assertTrue(vi3.newName == null || vi3.newName.length() == 0, "newName must not be filled here");
+
+    V6Converter.executed = false;
+    V6Converter.throwException = true;
+    // by savong the new record the value of the field "newName" must be filled because of VersionConverter
+    try {
+      saveRecord(context, vi3);
+      context.fail("expected exception here");
+    } catch (AssertionError e) {
+      context.assertTrue(e.toString().contains("testexception"),
+          "expected message part 'testexception' in " + e.toString());
+    }
   }
 
+  /**
+   * Save record as VersioningWithInterface_V5 with a defined version in entity definition and check for the version
+   * inside a stored record.
+   * Then load the same record, but as a new version, VersioningWithInterface_V7. Here the new field inside the record
+   * must be empty.
+   * Then save the record, afterwards the new field should be converted with a new value
+   * 
+   * @param context
+   */
   @Test
-  public void testVersioningReferencedMapper(TestContext context) {
-    context.fail("unimplemented");
+  public void testVersioning_ThreeVersions(TestContext context) {
+    clearTable(context, VersioningWithInterface_V5.class);
+    VersioningWithInterface_V5 vi = new VersioningWithInterface_V5();
+    saveRecord(context, vi);
+    context.assertEquals(5l, vi.getMapperVersion(), "version was not automatically set");
+    VersioningWithInterface_V5 vi2 = findRecordByID(context, VersioningWithInterface_V5.class, vi.id);
+    context.assertEquals(5l, vi2.getMapperVersion(), "version was NOT saved");
+
+    // use the new version within a defined converter
+    getDataStore(context).getMapperFactory().reset();
+    IMapper mapper = getDataStore(context).getMapperFactory().getMapper(VersioningWithInterface_V7.class);
+    context.assertNotNull(mapper.getVersionInfo(), "expected valid VersionInfo in mapper dclaration");
+    context.assertTrue(mapper.getVersionInfo().versionConverter().length > 0, "Expected a defined VersionConverter");
+
+    List<IObserver> osl = mapper.getObserverHandler().getObserver(ObserverEventType.BEFORE_UPDATE);
+    context.assertFalse(osl.isEmpty(), "No definition for version conversion found");
+
+    VersioningWithInterface_V7 vi3 = findRecordByID(context, VersioningWithInterface_V7.class, vi.id);
+    context.assertEquals(5l, vi3.getMapperVersion(), "version was NOT saved");
+    context.assertTrue(vi3.newName == null || vi3.newName.length() == 0, "newName must not be filled here");
+
+    V6Converter.executed = false;
+    V7Converter.executed = false;
+    // by savong the new record the value of the field "newName" must be filled because of VersionConverter
+    saveRecord(context, vi3);
+    context.assertTrue(V6Converter.executed, "V6Converter was not executed");
+    context.assertTrue(V7Converter.executed, "V7Converter was not executed");
+    context.assertEquals(7l, vi3.getMapperVersion(), "mapper version not correctly raised");
+    context.assertTrue(vi3.newName != null && vi3.newName.equals("converted Value V7"),
+        "converter did not work; value is '" + vi3.newName);
+
+    // check the saved instance
+    VersioningWithInterface_V7 vi4 = findRecordByID(context, VersioningWithInterface_V7.class, vi.id);
+    context.assertEquals(7l, vi4.getMapperVersion(), "mapper version not correctly raised");
+    context.assertTrue(vi4.newName != null && vi4.newName.equals("converted Value V7"),
+        "converter did not work; value is '" + vi3.newName);
+
   }
 
 }

@@ -168,11 +168,19 @@
  * of the IObserverEvent is a loaded instance; accessResult is IQueryResult; accessObject is the IQuery
  * 
  * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#BEFORE_INSERT} +
- * This event is called before execution of an IWrite. The source
+ * This event is called before execution of an IWrite for a new instance. The source
  * of the IObserverEvent is the instance to be saved; accessResult is null; accessObject is the IWrite
  * 
- * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#AFTER_SAVE} +
- * This event is called after execution of an IWrite. The source
+ * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#BEFORE_UPDATE} +
+ * This event is called before execution of an IWrite for an existing instance. The source
+ * of the IObserverEvent is the instance to be saved; accessResult is null; accessObject is the IWrite
+ * 
+ * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#AFTER_INSERT} +
+ * This event is called after execution of an IWrite for a new instance. The source
+ * of the IObserverEvent is a saved instance; accessResult is IWriteResult; accessObject is the IWrite
+ * 
+ * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#AFTER_UPDATE} +
+ * This event is called after execution of an IWrite for an existing instance. The source
  * of the IObserverEvent is a saved instance; accessResult is IWriteResult; accessObject is the IWrite
  * 
  * * {@link de.braintags.vertx.jomnigate.observer.ObserverEventType#BEFORE_DELETE} +

@@ -526,12 +526,20 @@ of the IObserverEvent is null; accessResult is null; accessObject is the IQuery
 This event is called after execution of an IQuery. The source
 of the IObserverEvent is a loaded instance; accessResult is IQueryResult; accessObject is the IQuery
 
-* `link:todo[BEFORE_SAVE]` +
-This event is called before execution of an IWrite. The source
+* `link:todo[BEFORE_INSERT]` +
+This event is called before execution of an IWrite for a new instance. The source
 of the IObserverEvent is the instance to be saved; accessResult is null; accessObject is the IWrite
 
-* `link:todo[AFTER_SAVE]` +
-This event is called after execution of an IWrite. The source
+* `link:todo[BEFORE_UPDATE]` +
+This event is called before execution of an IWrite for an existing instance. The source
+of the IObserverEvent is the instance to be saved; accessResult is null; accessObject is the IWrite
+
+* `link:todo[AFTER_INSERT]` +
+This event is called after execution of an IWrite for a new instance. The source
+of the IObserverEvent is a saved instance; accessResult is IWriteResult; accessObject is the IWrite
+
+* `link:todo[AFTER_UPDATE]` +
+This event is called after execution of an IWrite for an existing instance. The source
 of the IObserverEvent is a saved instance; accessResult is IWriteResult; accessObject is the IWrite
 
 * `link:todo[BEFORE_DELETE]` +
@@ -542,6 +550,8 @@ of the IObserverEvent is the instance to be deleted; accessResult is null; acces
 This event is called after execution of an IDelete. The source
 of the IObserverEvent is a deleted instance; accessResult is IDeleteResult; accessObject is the IDelete
 
+=== Mapper versioning
+//TODO add documentation
 
 === Complexer mapper definitions
 
@@ -980,6 +990,12 @@ implementation you are able to set it by adding this annotation to the mapper cl
 The annotation Observer is used to define an `link:unavailable[IObserver]`, which shall be
 executed for a certain mapper. The annotation extends the possible globale definition of
 `link:unavailable#get_observer_settings-instance_method[getObserverSettings]`
+
+===== `link:unavailable[@VersionInfo]`
+The annotation VersionInfo is used to declare all information for the version control system of jomnigate. With this
+annotation the current version of a mapper can be declared; additionally version converter can be defined as well,
+which are converting instances from one version to the next higher one. See chapter "Mapper versioning" for more
+information
 
 ===== `link:unavailable[@AfterLoad]`
 

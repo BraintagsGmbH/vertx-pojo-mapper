@@ -14,24 +14,19 @@ package de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.converter;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
-import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWithInterface_V6;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWithInterface_V7;
 import de.braintags.vertx.jomnigate.versioning.IVersionConverter;
 import io.vertx.core.Future;
 
-public class V6Converter implements IVersionConverter<VersioningWithInterface_V6> {
+public class V7Converter implements IVersionConverter<VersioningWithInterface_V7> {
   public static boolean executed;
-  public static boolean throwException;
 
   @Override
-  public Future<Void> convert(IDataStore<?, ?> datastore, VersioningWithInterface_V6 toBeConverted,
+  public Future<Void> convert(IDataStore<?, ?> datastore, VersioningWithInterface_V7 toBeConverted,
       IObserverContext context) {
-    if (throwException) {
-      return Future.failedFuture(new IllegalArgumentException("testexception"));
-    } else {
-      toBeConverted.newName = "converted Value V6";
-      executed = true;
-      return Future.succeededFuture();
-    }
+    toBeConverted.newName = "converted Value V7";
+    executed = true;
+    return Future.succeededFuture();
   }
 
 }

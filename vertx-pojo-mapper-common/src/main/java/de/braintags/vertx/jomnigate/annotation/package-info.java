@@ -64,6 +64,13 @@
  * executed for a certain mapper. The annotation extends the possible globale definition of
  * {@link de.braintags.vertx.jomnigate.init.DataStoreSettings#getObserverSettings()}
  * 
+ * ===== {@link de.braintags.vertx.jomnigate.annotation.VersionInfo}
+ * The annotation VersionInfo is used to declare all information for the version control system of jomnigate. With this
+ * annotation the current version of a mapper can be declared; additionally version converter can be defined as well,
+ * which are converting instances from one version to the next higher one. See chapter "Data versioning and conversion"
+ * for more
+ * information
+ * 
  * ===== {@link de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad}
  * 
  * All methods, which are annotated by this annotation are executed after an instance was loaded from the
