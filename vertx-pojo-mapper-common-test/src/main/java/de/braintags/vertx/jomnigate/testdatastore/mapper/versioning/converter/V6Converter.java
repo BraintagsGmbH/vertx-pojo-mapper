@@ -12,14 +12,21 @@
  */
 package de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.converter;
 
+import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.observer.IObserverContext;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWithInterface_V6;
 import de.braintags.vertx.jomnigate.versioning.IVersionConverter;
 import io.vertx.core.Future;
 
-public class V6Converter implements IVersionConverter {
+public class V6Converter implements IVersionConverter<VersioningWithInterface_V6> {
+  public static boolean executed;
 
   @Override
-  public Future<Void> convert() {
-    return Future.failedFuture(new UnsupportedOperationException());
+  public Future<Void> convert(IDataStore<?, ?> datastore, VersioningWithInterface_V6 toBeConverted,
+      IObserverContext context) {
+    toBeConverted.newName = "converted Value V6";
+    executed = true;
+    return Future.succeededFuture();
   }
 
 }

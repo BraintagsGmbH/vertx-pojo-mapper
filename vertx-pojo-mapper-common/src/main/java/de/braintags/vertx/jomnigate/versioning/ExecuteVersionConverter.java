@@ -14,6 +14,7 @@ package de.braintags.vertx.jomnigate.versioning;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.annotation.VersionConverterDefinition;
@@ -22,6 +23,7 @@ import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 
 /**
@@ -33,7 +35,8 @@ import io.vertx.core.Future;
  * 
  */
 public class ExecuteVersionConverter implements IObserver {
-  private List<ConverterEntry> converter = new ArrayList<>();
+  private List<ConverterEntry> converterList = new ArrayList<>();
+  private long currentVersion;
 
   /**
    * Creates a new instance based on the information of the {@link VersionInfo}
@@ -41,14 +44,15 @@ public class ExecuteVersionConverter implements IObserver {
    * @param versionInfo
    */
   public ExecuteVersionConverter(VersionInfo versionInfo) {
+    this.currentVersion = versionInfo.version();
     for (VersionConverterDefinition vcd : versionInfo.versionConverter()) {
       try {
-        converter.add(new ConverterEntry(vcd.destinationVersion(), vcd.converter().newInstance()));
+        converterList.add(new ConverterEntry(vcd.destinationVersion(), vcd.converter().newInstance()));
       } catch (InstantiationException | IllegalAccessException e) {
         throw new MappingException(e);
       }
     }
-    Collections.sort(converter);
+    Collections.sort(converterList);
   }
 
   /*
@@ -59,7 +63,7 @@ public class ExecuteVersionConverter implements IObserver {
    */
   @Override
   public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return true;
+    return !converterList.isEmpty() && ((IMapperVersion) event.getSource()).getMapperVersion() < currentVersion;
   }
 
   /*
@@ -69,9 +73,37 @@ public class ExecuteVersionConverter implements IObserver {
    * de.braintags.vertx.jomnigate.observer.IObserver#handleEvent(de.braintags.vertx.jomnigate.observer.IObserverEvent,
    * de.braintags.vertx.jomnigate.observer.IObserverContext)
    */
+  @SuppressWarnings("unchecked")
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
-    return Future.failedFuture(new UnsupportedOperationException());
+    IMapperVersion record = (IMapperVersion) event.getSource();
+    Iterator<ConverterEntry> entries = converterList.stream()
+        .filter(con -> con.destinationVersion > record.getMapperVersion()).iterator();
+    if (entries.hasNext()) {
+      List<Future> fl = new ArrayList<>();
+      while (entries.hasNext()) {
+        try {
+          ConverterEntry entry = entries.next();
+          record.setMapperVersion(entry.destinationVersion);
+          Future<Void> tmp = entry.converter.convert(event.getDataStore(), record, context);
+          fl.add(tmp);
+        } catch (Exception e) {
+          return Future.failedFuture(e);
+        }
+      }
+      CompositeFuture cf = CompositeFuture.all(fl);
+      Future<Void> f = Future.future();
+      cf.setHandler(res -> {
+        if (res.failed()) {
+          f.fail(res.cause());
+        } else {
+          f.complete();
+        }
+      });
+      return f;
+    } else {
+      return Future.succeededFuture();
+    }
   }
 
   private class ConverterEntry implements Comparable<ConverterEntry> {

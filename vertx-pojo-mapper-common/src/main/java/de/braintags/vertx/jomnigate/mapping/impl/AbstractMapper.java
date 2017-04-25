@@ -51,6 +51,7 @@ import de.braintags.vertx.jomnigate.mapping.datastore.IColumnHandler;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableGenerator;
 import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
 import de.braintags.vertx.jomnigate.observer.IObserverHandler;
+import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.versioning.IMapperVersion;
 import de.braintags.vertx.util.ClassUtil;
 import de.braintags.vertx.util.exception.InitException;
@@ -142,6 +143,11 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
       throw new MappingException(
           "Mapper, where the property Entity.version is set must implement the interface IMapperVersion");
     }
+    if (getVersionInfo() != null && !getVersionInfo().eventType().equals(ObserverEventType.AFTER_LOAD)
+        && !getVersionInfo().eventType().equals(ObserverEventType.BEFORE_UPDATE)) {
+      throw new MappingException("VersionConverter can only be handled at phase AFTER_LOAD or BEFORE_UPDATE; mapper: "
+          + getMapperClass().getName());
+    }
     validate();
   }
 
@@ -195,8 +201,8 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   protected void computeIndize() {
     Map<String, IIndexDefinition> definitions = new HashMap<>();
     if (getMapperClass().isAnnotationPresent(Indexes.class)) {
-      Indexes indexes = getMapperClass().getAnnotation(Indexes.class);
-      for (Index index : indexes.value()) {
+      Indexes tmpIndexes = getMapperClass().getAnnotation(Indexes.class);
+      for (Index index : tmpIndexes.value()) {
         IndexDefinition indexDefinition = new IndexDefinition(index);
         IIndexDefinition old = definitions.put(indexDefinition.getIdentifier(), indexDefinition);
         if (old != null) {
@@ -204,29 +210,43 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
         }
       }
     }
+    computeIndize(definitions);
+    this.indexes = ImmutableSet.copyOf(definitions.values());
+  }
 
+  /**
+   * @param definitions
+   */
+  private void computeIndize(Map<String, IIndexDefinition> definitions) {
     Field[] fields = getMapperClass().getFields();
     for (Field field : fields) {
-      int modifiers = field.getModifiers();
-      Class<?> type = field.getType();
-      if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && IIndexedField.class.isAssignableFrom(type)
-          && !IdField.class.isAssignableFrom(type)) {
-        try {
-          IIndexedField indexedField = (IIndexedField) field.get(null);
-          IndexDefinition indexDefinition = new IndexDefinition(indexedField, this);
-          if (definitions.containsKey(indexDefinition.getIdentifier())) {
-            assert indexDefinition.getIndexOptions()
-                .isEmpty() : "if indexed fields define index options, incompatibility must be checked here";
-            LOGGER.info(
-                "Didn't add index definition because there already is one for its identifier: " + indexDefinition);
-          } else
-            definitions.put(indexDefinition.getIdentifier(), indexDefinition);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
-          throw new InitException(e);
-        }
+      computeIndexByField(definitions, field);
+    }
+  }
+
+  /**
+   * @param definitions
+   * @param field
+   */
+  private void computeIndexByField(Map<String, IIndexDefinition> definitions, Field field) {
+    int modifiers = field.getModifiers();
+    Class<?> type = field.getType();
+    if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && IIndexedField.class.isAssignableFrom(type)
+        && !IdField.class.isAssignableFrom(type)) {
+      try {
+        IIndexedField indexedField = (IIndexedField) field.get(null);
+        IndexDefinition indexDefinition = new IndexDefinition(indexedField, this);
+        if (definitions.containsKey(indexDefinition.getIdentifier())) {
+          assert indexDefinition.getIndexOptions()
+              .isEmpty() : "if indexed fields define index options, incompatibility must be checked here";
+          LOGGER
+              .info("Didn't add index definition because there already is one for its identifier: " + indexDefinition);
+        } else
+          definitions.put(indexDefinition.getIdentifier(), indexDefinition);
+      } catch (IllegalArgumentException | IllegalAccessException e) {
+        throw new InitException(e);
       }
     }
-    this.indexes = ImmutableSet.copyOf(definitions.values());
   }
 
   protected void computeKeyGenerator() {
@@ -421,8 +441,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    */
   @Override
   public <U extends Annotation> U getAnnotation(final Class<U> annotationClass) {
-    U ann = (U) existingClassAnnotations.get(annotationClass);
-    return ann;
+    return (U) existingClassAnnotations.get(annotationClass);
   }
 
   @Override

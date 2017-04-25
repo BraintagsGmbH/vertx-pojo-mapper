@@ -26,6 +26,8 @@ import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningNoInterface;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWithInterface_V5;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWithInterface_V6;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.VersioningWrongEvent;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.converter.V6Converter;
 import de.braintags.vertx.jomnigate.versioning.IMapperVersion;
 import de.braintags.vertx.jomnigate.versioning.SetMapperVersionObserver;
 import io.vertx.ext.unit.TestContext;
@@ -76,6 +78,21 @@ public class TestDataVersioning extends DatastoreBaseTest {
     try {
       IMapper mapper = getDataStore(context).getMapperFactory().getMapper(VersioningNoInterface.class);
       context.fail("expected a MappingException here");
+    } catch (MappingException e) {
+      // expected result
+    }
+  }
+
+  /**
+   * Version conversion is only allowed at AFTER_LOAD and BEFORE_UPDATE
+   * 
+   * @param context
+   */
+  @Test
+  public void testMappingWrongEventType(TestContext context) {
+    try {
+      IMapper mapper = getDataStore(context).getMapperFactory().getMapper(VersioningWrongEvent.class);
+      context.fail("expected a MappingException here because of wrong event type");
     } catch (MappingException e) {
       // expected result
     }
@@ -134,9 +151,19 @@ public class TestDataVersioning extends DatastoreBaseTest {
     context.assertEquals(5l, vi3.getMapperVersion(), "version was NOT saved");
     context.assertTrue(vi3.newName == null || vi3.newName.length() == 0, "newName must not be filled here");
 
+    V6Converter.executed = false;
     // by savong the new record the value of the field "newName" must be filled because of VersionConverter
     saveRecord(context, vi3);
-    context.assertTrue(vi3.newName != null && vi3.newName.equals("converted Value V6"), "converter did not work");
+    context.assertTrue(V6Converter.executed, "V6Convefter was not executed");
+    context.assertEquals(6l, vi3.getMapperVersion(), "mapper version not correctly raised");
+    context.assertTrue(vi3.newName != null && vi3.newName.equals("converted Value V6"),
+        "converter did not work; value is '" + vi3.newName);
+
+    // check the saved instance
+    VersioningWithInterface_V6 vi4 = findRecordByID(context, VersioningWithInterface_V6.class, vi.id);
+    context.assertEquals(6l, vi4.getMapperVersion(), "mapper version not correctly raised");
+    context.assertTrue(vi4.newName != null && vi4.newName.equals("converted Value V6"),
+        "converter did not work; value is '" + vi3.newName);
 
   }
 

@@ -46,7 +46,7 @@ public class AfterInsertHandler extends AbstractEventHandler<IWrite<?>, IWriteRe
     List<Future> fl = new ArrayList<>();
     Iterator<?> selection = ((AbstractWrite) writeObject).getSelection();
     while (selection.hasNext()) {
-      IObserverEvent event = IObserverEvent.createEvent(getEventType(), selection.next(), null, writeObject,
+      IObserverEvent event = IObserverEvent.createEvent(getEventType(), selection.next(), result, writeObject,
           writeObject.getDataStore());
       if (observer.canHandleEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
