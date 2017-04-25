@@ -29,6 +29,7 @@ import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.annotation.Indexes;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
+import de.braintags.vertx.jomnigate.annotation.VersionInfo;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad;
@@ -90,6 +91,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   private IKeyGenerator keyGenerator;
   private IIdInfo idInfo;
   private Entity entity;
+  private VersionInfo versionInfo;
   private ImmutableSet<IIndexDefinition> indexes;
   private ITableInfo tableInfo;
   private boolean syncNeeded = true;
@@ -121,6 +123,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     computeLifeCycleAnnotations();
     computeClassAnnotations();
     computeEntity();
+    computeVersionInfo();
     computeKeyGenerator();
     generateTableInfo();
     computeIndize();
@@ -135,7 +138,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   private final void internalValidate() {
     if (idInfo == null)
       throw new MappingException("No id-field specified in mapper " + getMapperClass().getName());
-    if (getEntity().version() > 0 && !IMapperVersion.class.isAssignableFrom(getMapperClass())) {
+    if (getVersionInfo() != null && !IMapperVersion.class.isAssignableFrom(getMapperClass())) {
       throw new MappingException(
           "Mapper, where the property Entity.version is set must implement the interface IMapperVersion");
     }
@@ -174,6 +177,12 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
         IColumnHandler ch = tg.getColumnHandler(field);
         this.tableInfo.createColumnInfo(field, ch);
       }
+    }
+  }
+
+  protected void computeVersionInfo() {
+    if (mapperClass.isAnnotationPresent(VersionInfo.class)) {
+      versionInfo = mapperClass.getAnnotation(VersionInfo.class);
     }
   }
 
@@ -478,6 +487,11 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   @Override
   public Entity getEntity() {
     return this.entity;
+  }
+
+  @Override
+  public VersionInfo getVersionInfo() {
+    return versionInfo;
   }
 
   @Override

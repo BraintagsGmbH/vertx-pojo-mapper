@@ -13,6 +13,7 @@
 package de.braintags.vertx.jomnigate.testdatastore.mapper.versioning;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.annotation.VersionInfo;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
 
 /**
@@ -21,6 +22,7 @@ import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
  * @author Michael Remme
  * 
  */
-@Entity(version = 5)
+@Entity
+@VersionInfo(version = 5)
 public class VersioningNoInterface extends BaseRecord {
 }

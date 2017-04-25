@@ -13,9 +13,9 @@
 package de.braintags.vertx.jomnigate.testdatastore.mapper.versioning;
 
 import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.annotation.VersionConverter;
 import de.braintags.vertx.jomnigate.annotation.VersionInfo;
-import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
-import de.braintags.vertx.jomnigate.versioning.IMapperVersion;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.versioning.converter.V6Converter;
 
 /**
  * 
@@ -24,20 +24,9 @@ import de.braintags.vertx.jomnigate.versioning.IMapperVersion;
  * 
  */
 @Entity(name = "VersioningTable")
-@VersionInfo(version = 5)
-public class VersioningWithInterface_V5 extends BaseRecord implements IMapperVersion {
-
-  private long version;
-  public String name;
-
-  @Override
-  public long getMapperVersion() {
-    return version;
-  }
-
-  @Override
-  public void setMapperVersion(long version) {
-    this.version = version;
-  }
+@VersionInfo(version = 6, versionConverter = {
+    @VersionConverter(destinationVersion = 6, converter = V6Converter.class) })
+public class VersioningWithInterface_V6 extends VersioningWithInterface_V5 {
+  public String newName;
 
 }

@@ -13,31 +13,29 @@
 package de.braintags.vertx.jomnigate.versioning;
 
 import de.braintags.vertx.jomnigate.annotation.VersionInfo;
-import de.braintags.vertx.jomnigate.init.ObserverDefinition;
-import de.braintags.vertx.jomnigate.init.ObserverMapperSettings;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
-import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import io.vertx.core.Future;
 
 /**
- * The observer is responsible to set the version value of all entities, where a {@link VersionInfo} is
- * defined. The observer is programmatically added to the observer system with the highest priority.
+ * This observer implementation is used to execute version conversion for those instances, where a {@link VersionInfo}
+ * is defined. It is created and added into the observer list automatically by the mapper, when {@link VersionInfo} is
+ * found.
  * 
  * @author Michael Remme
  * 
  */
-public class SetMapperVersionObserver implements IObserver {
+public class ExecuteVersionConverter implements IObserver {
 
-  public static ObserverDefinition<SetMapperVersionObserver> createObserverSettings() {
-    ObserverDefinition<SetMapperVersionObserver> settings = new ObserverDefinition<>(SetMapperVersionObserver.class);
-    settings.setPriority(Integer.MAX_VALUE);
-    settings.getEventTypeList().add(ObserverEventType.BEFORE_INSERT);
-    ObserverMapperSettings ms = new ObserverMapperSettings(IMapperVersion.class.getName());
-    ms.setInstanceOf(true);
-    settings.getMapperSettings().add(ms);
-    return settings;
+  /**
+   * Creates a new instance and adds the observer into the observer system
+   * 
+   * @param versionInfo
+   * @return
+   */
+  static final ExecuteVersionConverter createInstance(VersionInfo versionInfo) {
+    throw new UnsupportedOperationException();
   }
 
   /*
@@ -48,7 +46,7 @@ public class SetMapperVersionObserver implements IObserver {
    */
   @Override
   public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return true;
+    return false;
   }
 
   /*
@@ -60,12 +58,7 @@ public class SetMapperVersionObserver implements IObserver {
    */
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
-    IMapperVersion vrec = (IMapperVersion) event.getSource();
-    VersionInfo vi = event.getAccessObject().getMapper().getVersionInfo();
-    if (vi != null) {
-      vrec.setMapperVersion(vi.version());
-    }
-    return Future.succeededFuture();
+    return Future.failedFuture(new UnsupportedOperationException());
   }
 
 }

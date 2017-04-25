@@ -19,8 +19,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.braintags.vertx.jomnigate.versioning.IMapperVersion;
-
 /**
  * The annotation defines a class to be a mappable instance and allows to give further information about the entity
  * inside the used datastore ( database table, column in mongo or others ). All classes, which shall be mapped into a
@@ -60,11 +58,4 @@ public @interface Entity {
    */
   EntityOption[] options() default {};
 
-  /**
-   * Defines the version of the mapper for the mapper versioning system. If this value is defined with a value > 0, the
-   * mapper versioning system expects the mapper to be an instance of {@link IMapperVersion}
-   * 
-   * @return the current version of the mapper
-   */
-  long version() default -1;
 }
