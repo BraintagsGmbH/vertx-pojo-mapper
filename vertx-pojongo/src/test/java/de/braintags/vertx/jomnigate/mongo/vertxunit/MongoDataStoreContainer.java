@@ -15,7 +15,6 @@ package de.braintags.vertx.jomnigate.mongo.vertxunit;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.IDataStoreInit;
 import de.braintags.vertx.jomnigate.json.typehandler.handler.ArrayTypeHandlerReferenced;
@@ -78,7 +77,6 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   private static boolean handleReferencedRecursive = true;
 
   private static MongodExecutable exe;
-  private MongoDataStore mongoDataStore;
   private final Map<String, String> thMap = new HashMap<>();
 
   /**
@@ -127,7 +125,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   @Override
   public void startup(final Vertx vertx, final Handler<AsyncResult<Void>> handler) {
     try {
-      if (mongoDataStore == null) {
+      if (getDataStore() == null) {
         DataStoreSettings settings = createSettings();
         IDataStoreInit dsInit = settings.getDatastoreInit().newInstance();
         dsInit.initDataStore(vertx, settings, initResult -> {
@@ -135,7 +133,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
             logger.error("could not start mongo client", initResult.cause());
             handler.handle(Future.failedFuture(new InitException(initResult.cause())));
           } else {
-            mongoDataStore = (MongoDataStore) initResult.result();
+            setDatastore(initResult.result());
             exe = ((MongoDataStoreInit) dsInit).getMongodExecutable();
             handler.handle(Future.succeededFuture());
           }
@@ -171,26 +169,17 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.vertx.jomnigate.datastoretest.IDatastoreContainer#getDataStore()
-   */
-  @Override
-  public IDataStore getDataStore() {
-    return mongoDataStore;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
    * @see de.braintags.vertx.jomnigate.datastoretest.IDatastoreContainer#shutdown(io.vertx.core.Handler)
    */
   @Override
   public void shutdown(final Handler<AsyncResult<Void>> handler) {
     logger.info("shutdown performed");
-    mongoDataStore.shutdown(result -> {
+
+    ((MongoDataStore) getDataStore()).shutdown(result -> {
       if (result.failed()) {
         logger.error("", result.cause());
       }
-      mongoDataStore = null;
+      setDatastore(null);
       if (exe != null) {
         exe.stop();
       }
@@ -208,7 +197,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   @Override
   public void dropTable(final String collection, final Handler<AsyncResult<Void>> handler) {
     logger.info("DROPPING: " + collection);
-    ((MongoClient) mongoDataStore.getClient()).dropCollection(collection, dropResult -> {
+    ((MongoClient) ((MongoDataStore) getDataStore()).getClient()).dropCollection(collection, dropResult -> {
       if (dropResult.failed()) {
         logger.error("", dropResult.cause());
         handler.handle(dropResult);
@@ -248,7 +237,8 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   }
 
   @Override
-  public String getExpectedTypehandlerName(final Class<? extends AbstractTypeHandlerTest> testClass, final String defaultName) {
+  public String getExpectedTypehandlerName(final Class<? extends AbstractTypeHandlerTest> testClass,
+      final String defaultName) {
     if (thMap.containsKey(testClass.getName()))
       return thMap.get(testClass.getName());
     return defaultName;

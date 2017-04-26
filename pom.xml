@@ -25,7 +25,8 @@ see: http://stackoverflow.com/questions/21585037/maven-reporting-and-site-genera
 		<module>vertx-pojo-mapper-common-test</module>
 		<module>vertx-pojo-mapper-json</module>
 		<module>vertx-pojongo</module>
-		<module>vertx-pojo-mapper-mysql</module>
+		<module>jomnigate-sql</module>
+		<module>jomnigate-mysql</module>
 	</modules>
 
 	<properties>

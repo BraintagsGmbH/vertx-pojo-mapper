@@ -43,14 +43,15 @@ import io.vertx.ext.mongo.MongoClient;
 public class MongoDataStore extends JsonDatastore {
 
   /**
+   * The name of the property inside the JsonObject, which describes the database to be used
+   */
+  public static final String DATABASE_NAME = "db_name";
+
+  /**
    * The minimal version of MongoDb, which is expected by the current implementation
    */
   public static final String EXPECTED_VERSION_STARTS_WITH = "3.2.";
 
-  /**
-   * The name of the property, which describes the database to be used
-   */
-  public static final String DATABASE_NAME = "db_name";
   private MongoClient client;
   private MongoMetaData metaData;
 
@@ -113,6 +114,14 @@ public class MongoDataStore extends JsonDatastore {
     return client;
   }
 
+  /**
+   * @return the database
+   */
+  @Override
+  public final String getDatabase() {
+    return getProperties().getString(DATABASE_NAME).toLowerCase();
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -121,14 +130,6 @@ public class MongoDataStore extends JsonDatastore {
   @Override
   public IDataStoreMetaData getMetaData() {
     return metaData;
-  }
-
-  /**
-   * @return the database
-   */
-  @Override
-  public final String getDatabase() {
-    return getProperties().getString(DATABASE_NAME).toLowerCase();
   }
 
   /*
