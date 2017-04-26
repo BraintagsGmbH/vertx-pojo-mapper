@@ -550,8 +550,98 @@ of the IObserverEvent is the instance to be deleted; accessResult is null; acces
 This event is called after execution of an IDelete. The source
 of the IObserverEvent is a deleted instance; accessResult is IDeleteResult; accessObject is the IDelete
 
-=== Mapper versioning
-//TODO add documentation
+=== Data versioning and conversion
+The data versioning and conversion system of jomnigate allows to declare versions of mappers and to convert existing
+data, when a new mapper version is released.
+
+[source, java]
+----
+@Source(translate = false)
+@Entity(name = "VersionedMapper") // <1>
+@VersionInfo(version = 1) // <2>
+public class VersionedMapper_V1 implements IMapperVersion {
+  @Id
+  public String id;
+  private String name;
+  private long mapperVersion = -1;
+
+  @Override
+  public long getMapperVersion() {
+    return mapperVersion;
+  }
+
+  @Override
+  public void setMapperVersion(long mapperVersion) {
+    this.mapperVersion = mapperVersion;
+  }
+
+}
+----
+
+<1> To use the data versioning and conversion system, you have to add the annotation VersionInfo to your mapper and
+set the property version to the current version. Additionally the mapper must implement the interface
+`link:../../apidocs/de/braintags/vertx/jomnigate/versioning/IMapperVersion.html[IMapperVersion]`, otherwise the initialization of the mapper will fail.
+
+<2> In general it is a good idea to integrate a version flag into the mapper class name as well from the beginning on
+and to use the "name"-property of the annotation Entity either, so that following versions will write into the same
+table or collection.
+
+By declaring a mapper in this described way, the data versioning and conversion system will automatically set the
+value of the property "mapperVersion" to the current version for new instances.
+
+Lets now assume, that there were some requirements, which are changing the VersionedMapper. The mapper shall get a
+new property "newProperty" as String. The value of all records, which are existing already, shall be "oldValue", for
+new instances it shall be "newValue".
+
+We are declaring the new version of the mapper:
+
+[source, java]
+----
+@Source(translate = false)
+@Entity(name = "VersionedMapper")
+@VersionInfo(version = 2, versionConverter = {
+    @VersionConverterDefinition(destinationVersion = 2, converter = V2Converter.class) })
+public class VersionedMapper_V2 extends VersionedMapper_V1 {
+  public String newProperty = "newValue";
+}
+----
+
+First we are raising the version number of the mapper to 2, so that all new instances from now on will automatically
+get the mapperVersion 2. Second we are adding the property "versionConverter", which will be explained below.
+
+We are setting the default value of "newProperty" to "newValue", so that new instances are getting this value by
+default. If after this change we would load, modify and save an existing record, it would get the same value - which
+is not our aim. So we are defining now a version converter:
+
+[source, java]
+----
+@Source(translate = false)
+public class V2Converter implements IVersionConverter<VersionedMapper_V2> {
+
+  @Override
+  public Future<Void> convert(IDataStore<?, ?> datastore, VersionedMapper_V2 toBeConverted, IObserverContext context) {
+    toBeConverted.newProperty = "oldValue";
+    return Future.succeededFuture();
+  }
+
+}
+----
+
+In the implementation of the method "convert" we are setting the value of the property "newProperty" to "oldValue" as
+required. The activation of this converter is done by the the addition "versionConverter" in the annotation
+VersionInfo, which shall contain a list of annotations VersionConverterDefinition.
+
+The annotation `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/VersionConverterDefinition.html[@VersionConverterDefinition]` declares the
+destinationVersion, which shall be the result after the conversion was done, and the converter class, which shall be
+executed, which is the V2Converter in our case.
+Additionally we can define the phase, during which the conversion shall be executed, by adding the property
+"eventType" to the annotation VersionInfo. Currently the value can be defined as BEFORE_UPDATE or AFTER_LOAD, where
+the default is BEFORE_UPDATE.
+
+From now on, for each existing record, the system is checking wether a conversion must be processed by comparing the
+mapperVersion to the current version definition. If the version of the record is smaller than the current version and
+if converters are defined, the system will search for all converters, which must be applied, execute them in the
+correct order and sets the current version to the destination version of the converter.
 
 === Complexer mapper definitions
 
@@ -994,8 +1084,8 @@ executed for a certain mapper. The annotation extends the possible globale defin
 ===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/VersionInfo.html[@VersionInfo]`
 The annotation VersionInfo is used to declare all information for the version control system of jomnigate. With this
 annotation the current version of a mapper can be declared; additionally version converter can be defined as well,
-which are converting instances from one version to the next higher one. See chapter "Mapper versioning" for more
-information
+which are converting instances from one version to the next higher one. See chapter "Data versioning and conversion"
+for more information
 
 ===== `link:../../apidocs/de/braintags/vertx/jomnigate/annotation/lifecycle/AfterLoad.html[@AfterLoad]`
 

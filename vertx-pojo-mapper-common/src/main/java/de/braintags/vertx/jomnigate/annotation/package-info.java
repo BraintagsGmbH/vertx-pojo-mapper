@@ -68,8 +68,7 @@
  * The annotation VersionInfo is used to declare all information for the version control system of jomnigate. With this
  * annotation the current version of a mapper can be declared; additionally version converter can be defined as well,
  * which are converting instances from one version to the next higher one. See chapter "Data versioning and conversion"
- * for more
- * information
+ * for more information
  * 
  * ===== {@link de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad}
  * 
