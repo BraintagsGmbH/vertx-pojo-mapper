@@ -38,7 +38,6 @@ import io.vertx.ext.sql.SQLConnection;
 public class MySqlDataStoreInit extends AbstractDataStoreInit {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(MySqlDataStoreInit.class);
-  private static boolean handleReferencedRecursive = true;
 
   /**
    * The property which defines the host of the database
@@ -206,7 +205,6 @@ public class MySqlDataStoreInit extends AbstractDataStoreInit {
     settings.getProperties().put(MySqlDataStoreInit.USERNAME_PROPERTY, username);
     settings.getProperties().put(MySqlDataStoreInit.PASSWORD_PROPERTY, password);
     settings.getProperties().put(MySqlDataStoreInit.SHARED_PROP, "true");
-    settings.getProperties().put(MySqlDataStoreInit.HANDLE_REFERENCED_RECURSIVE_PROP, handleReferencedRecursive);
     settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, keyGenerator);
     LOGGER.info("SETTINGS ARE: " + settings.toString());
   }
@@ -223,7 +221,6 @@ public class MySqlDataStoreInit extends AbstractDataStoreInit {
     settings.getProperties().put(USERNAME_PROPERTY, "testusername");
     settings.getProperties().put(PASSWORD_PROPERTY, "testpassword");
     settings.getProperties().put(SHARED_PROP, "false");
-    settings.getProperties().put(HANDLE_REFERENCED_RECURSIVE_PROP, "true");
     settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
 
     EncoderSettings es = new EncoderSettings();

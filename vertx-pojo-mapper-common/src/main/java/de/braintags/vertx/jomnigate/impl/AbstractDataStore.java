@@ -57,6 +57,7 @@ public abstract class AbstractDataStore<S, U> implements IDataStore<S, U> {
   private Map<String, IEncoder> encoderMap = new HashMap<>();
   private int defaultQueryLimit;
   private DataStoreSettings settings;
+  private DefaultKeyGenerator defaultKeyGenerator = new DefaultKeyGenerator(this);
 
   /**
    * Create a new instance. The possible properties are defined by its concete implementation
@@ -241,6 +242,17 @@ public abstract class AbstractDataStore<S, U> implements IDataStore<S, U> {
   @Override
   public DataStoreSettings getSettings() {
     return settings;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.IDataStore#getDefaultKeyGenerator()
+   */
+  @Override
+  public final IKeyGenerator getDefaultKeyGenerator() {
+    String genName = getProperties().getString(IKeyGenerator.DEFAULT_KEY_GENERATOR);
+    return genName == null ? defaultKeyGenerator : getKeyGenerator(genName);
   }
 
 }

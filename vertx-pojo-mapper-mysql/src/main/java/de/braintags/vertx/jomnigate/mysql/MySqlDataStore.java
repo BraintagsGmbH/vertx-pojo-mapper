@@ -19,8 +19,6 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.impl.AbstractDataStore;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
-import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
-import de.braintags.vertx.jomnigate.mapping.impl.keygen.DefaultKeyGenerator;
 import de.braintags.vertx.jomnigate.mysql.dataaccess.SqlDelete;
 import de.braintags.vertx.jomnigate.mysql.dataaccess.SqlQuery;
 import de.braintags.vertx.jomnigate.mysql.dataaccess.SqlStoreObjectFactory;
@@ -49,7 +47,6 @@ public class MySqlDataStore extends AbstractDataStore<Object, String> {
 
   private AsyncSQLClient sqlClient;
   private MySqlMetaData metaData;
-  private DefaultKeyGenerator defaultKeyGenerator = new DefaultKeyGenerator(this);
 
   /**
    * Constructor for a sql based datastore
@@ -138,17 +135,6 @@ public class MySqlDataStore extends AbstractDataStore<Object, String> {
   @Override
   public void shutdown(Handler<AsyncResult<Void>> resultHandler) {
     sqlClient.close(resultHandler);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.IDataStore#getDefaultKeyGenerator()
-   */
-  @Override
-  public final IKeyGenerator getDefaultKeyGenerator() {
-    String genName = getProperties().getString(IKeyGenerator.DEFAULT_KEY_GENERATOR);
-    return genName == null ? defaultKeyGenerator : getKeyGenerator(genName);
   }
 
 }

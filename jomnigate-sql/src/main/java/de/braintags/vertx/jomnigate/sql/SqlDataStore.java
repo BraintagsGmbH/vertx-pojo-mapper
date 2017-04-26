@@ -19,7 +19,6 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
-import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -34,6 +33,7 @@ import io.vertx.ext.sql.SQLConnection;
  * 
  */
 public abstract class SqlDataStore extends JsonDatastore {
+  private SqlMetaData metaData;
 
   /**
    * @param vertx
@@ -42,6 +42,7 @@ public abstract class SqlDataStore extends JsonDatastore {
    */
   public SqlDataStore(Vertx vertx, JsonObject properties, DataStoreSettings settings) {
     super(vertx, properties, settings);
+    metaData = new SqlMetaData(this);
   }
 
   /**
@@ -98,17 +99,7 @@ public abstract class SqlDataStore extends JsonDatastore {
    */
   @Override
   public IDataStoreMetaData getMetaData() {
-    throw new UnsupportedOperationException();
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.IDataStore#getDefaultKeyGenerator()
-   */
-  @Override
-  public IKeyGenerator getDefaultKeyGenerator() {
-    throw new UnsupportedOperationException();
+    return metaData;
   }
 
   /*

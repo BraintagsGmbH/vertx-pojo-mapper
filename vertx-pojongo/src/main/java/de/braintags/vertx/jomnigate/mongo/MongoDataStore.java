@@ -19,7 +19,6 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
-import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
 import de.braintags.vertx.jomnigate.mongo.dataaccess.MongoDelete;
 import de.braintags.vertx.jomnigate.mongo.dataaccess.MongoQuery;
 import de.braintags.vertx.jomnigate.mongo.dataaccess.MongoWrite;
@@ -145,17 +144,6 @@ public class MongoDataStore extends JsonDatastore {
     } catch (Exception e) {
       resultHandler.handle(Future.failedFuture(new RuntimeException(e)));
     }
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.IDataStore#getDefaultKeyGenerator()
-   */
-  @Override
-  public final IKeyGenerator getDefaultKeyGenerator() {
-    String genName = getProperties().getString(IKeyGenerator.DEFAULT_KEY_GENERATOR);
-    return genName == null ? null : getKeyGenerator(genName);
   }
 
 }

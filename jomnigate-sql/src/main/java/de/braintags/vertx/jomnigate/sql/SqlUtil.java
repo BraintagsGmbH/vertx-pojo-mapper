@@ -12,8 +12,13 @@
  */
 package de.braintags.vertx.jomnigate.sql;
 
+import java.util.List;
+
 import de.braintags.vertx.jomnigate.sql.exception.SqlException;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 
 /**
@@ -31,6 +36,78 @@ public class SqlUtil {
   private static final String CONNECTION_CLOSED = "connection closed";
 
   private SqlUtil() {
+  }
+
+  /**
+   * Get information about an index with the given name
+   * 
+   * @param ds
+   * @param tableName
+   * @param index
+   * @return a future which contains the information about the index or null, if none with that name
+   */
+  public static final Future<JsonObject> getIndexInfo(final SqlDataStore ds, final String tableName,
+      final String index) {
+    String command = "SHOW INDEX FROM " + tableName;
+    Future<JsonObject> f = Future.future();
+    query(ds, command).compose(resultSet -> extractIndexInfo(resultSet, index), f);
+    return f;
+  }
+
+  private static Future<JsonObject> extractIndexInfo(ResultSet rs, String index) {
+    Future<JsonObject> f = Future.future();
+    List<JsonObject> results = rs.getRows();
+    JsonObject res = null;
+    for (JsonObject entry : results) {
+      String indexName = entry.getString("Key_name");
+      if (indexName == null || indexName.hashCode() == 0) {
+        f.fail(new SqlException("Could not determine index name"));
+      } else if (indexName.equals(index)) {
+        res = entry;
+        break;
+      }
+    }
+    f.complete(res);
+    return f;
+  }
+
+  /**
+   * Executes the given query and returns the {@link ResultSet} to the {@link Handler}
+   * 
+   * @param sqlClient
+   *          the sqlClient to obtain the connection from
+   * @param command
+   *          the command to be executed
+   * @return a Future whith the ResultSet
+   */
+  public static Future<ResultSet> query(final SqlDataStore datastore, final String command) {
+    LOGGER.debug("query: " + command);
+    Future<ResultSet> f = Future.future();
+    datastore.getConnection().compose(connection -> doQuery(command, connection), f);
+    return f;
+  }
+
+  /**
+   * @param command
+   * @param resultHandler
+   * @param connection
+   */
+  private static Future<ResultSet> doQuery(final String command, final SQLConnection connection) {
+    Future<ResultSet> f = Future.future();
+    connection.query(command, qr -> {
+      if (qr.failed()) {
+        Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command, qr.cause());
+        LOGGER.error("", sqlEx);
+        connection.close();
+        f.fail(sqlEx);
+      }
+      ResultSet res = qr.result();
+      LOGGER.debug(COMMAND_SUCCESS);
+      connection.close();
+      LOGGER.debug(CONNECTION_CLOSED);
+      f.complete(res);
+    });
+    return f;
   }
 
   /**
