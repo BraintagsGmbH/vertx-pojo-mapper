@@ -13,7 +13,6 @@
 package de.braintags.vertx.jomnigate.mongo;
 
 import de.braintags.vertx.jomnigate.IDataStore;
-import de.braintags.vertx.jomnigate.IDataStoreMetaData;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
@@ -39,7 +38,7 @@ import io.vertx.ext.mongo.MongoClient;
  * 
  */
 
-public class MongoDataStore extends JsonDatastore {
+public class MongoDataStore extends JsonDatastore<JsonObject> {
 
   /**
    * The name of the property inside the JsonObject, which describes the database to be used
@@ -52,7 +51,6 @@ public class MongoDataStore extends JsonDatastore {
   public static final String EXPECTED_VERSION_STARTS_WITH = "3.2.";
 
   private MongoClient client;
-  private MongoMetaData metaData;
 
   /**
    * Constructor using the given {@link MongoClient}
@@ -65,7 +63,7 @@ public class MongoDataStore extends JsonDatastore {
   public MongoDataStore(Vertx vertx, MongoClient client, JsonObject properties, DataStoreSettings settings) {
     super(vertx, properties, settings);
     this.client = client;
-    metaData = new MongoMetaData(this);
+    setMetaData(new MongoMetaData(this));
     MongoMapperFactory mf = new MongoMapperFactory(this);
     setMapperFactory(mf);
     setStoreObjectFactory(new MongoStoreObjectFactory());
@@ -119,16 +117,6 @@ public class MongoDataStore extends JsonDatastore {
   @Override
   public final String getDatabase() {
     return getProperties().getString(DATABASE_NAME).toLowerCase();
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.IDataStore#getMetaData()
-   */
-  @Override
-  public IDataStoreMetaData getMetaData() {
-    return metaData;
   }
 
   /*

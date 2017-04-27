@@ -22,7 +22,6 @@ import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.json.jackson.JOmnigateFactory;
 import de.braintags.vertx.jomnigate.json.jackson.JacksonModuleJomnigate;
 import de.braintags.vertx.jomnigate.mapping.IDataStoreSynchronizer;
-import de.braintags.vertx.jomnigate.mapping.IStoreObjectFactory;
 import de.braintags.vertx.util.json.JsonConfig;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
@@ -33,12 +32,10 @@ import io.vertx.core.json.JsonObject;
  * 
  * @author Michael Remme
  * 
- * @param <S>
- *          the type of the {@link IStoreObjectFactory}
  * @param <U>
  *          the format used by the underlaing {@link IDataStoreSynchronizer}
  */
-public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonObject> {
+public abstract class JsonDatastore<U> extends AbstractDataStore<JsonObject, U> {
   private final ObjectMapper jacksonMapper;
   private final ObjectMapper jacksonPrettyMapper;
 

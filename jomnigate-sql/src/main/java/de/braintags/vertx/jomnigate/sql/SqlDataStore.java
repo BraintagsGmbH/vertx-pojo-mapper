@@ -13,12 +13,15 @@
 package de.braintags.vertx.jomnigate.sql;
 
 import de.braintags.vertx.jomnigate.IDataStore;
-import de.braintags.vertx.jomnigate.IDataStoreMetaData;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
+import de.braintags.vertx.jomnigate.sql.dataaccess.SqlStoreObjectFactory;
+import de.braintags.vertx.jomnigate.sql.mapping.SqlDataStoreSynchronizer;
+import de.braintags.vertx.jomnigate.sql.mapping.SqlMapperFactory;
+import de.braintags.vertx.jomnigate.sql.mapping.SqlTableGenerator;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -32,8 +35,7 @@ import io.vertx.ext.sql.SQLConnection;
  * @author Michael Remme
  * 
  */
-public abstract class SqlDataStore extends JsonDatastore {
-  private SqlMetaData metaData;
+public abstract class SqlDataStore extends JsonDatastore<String> {
 
   /**
    * @param vertx
@@ -42,7 +44,11 @@ public abstract class SqlDataStore extends JsonDatastore {
    */
   public SqlDataStore(Vertx vertx, JsonObject properties, DataStoreSettings settings) {
     super(vertx, properties, settings);
-    metaData = new SqlMetaData(this);
+    setMetaData(new SqlMetaData(this));
+    setMapperFactory(new SqlMapperFactory(this));
+    setTableGenerator(new SqlTableGenerator());
+    setStoreObjectFactory(new SqlStoreObjectFactory());
+    setDataStoreSynchronizer(new SqlDataStoreSynchronizer(this));
   }
 
   /**
@@ -90,16 +96,6 @@ public abstract class SqlDataStore extends JsonDatastore {
   @Override
   public String getDatabase() {
     throw new UnsupportedOperationException();
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.IDataStore#getMetaData()
-   */
-  @Override
-  public IDataStoreMetaData getMetaData() {
-    return metaData;
   }
 
   /*

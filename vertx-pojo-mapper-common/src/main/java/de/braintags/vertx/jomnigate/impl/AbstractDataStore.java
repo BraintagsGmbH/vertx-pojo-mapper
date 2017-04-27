@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.IDataStoreMetaData;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
 import de.braintags.vertx.jomnigate.exception.UnsupportedKeyGenerator;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
@@ -58,6 +59,7 @@ public abstract class AbstractDataStore<S, U> implements IDataStore<S, U> {
   private int defaultQueryLimit;
   private DataStoreSettings settings;
   private DefaultKeyGenerator defaultKeyGenerator = new DefaultKeyGenerator(this);
+  private IDataStoreMetaData metaData;
 
   /**
    * Create a new instance. The possible properties are defined by its concete implementation
@@ -253,6 +255,20 @@ public abstract class AbstractDataStore<S, U> implements IDataStore<S, U> {
   public final IKeyGenerator getDefaultKeyGenerator() {
     String genName = getProperties().getString(IKeyGenerator.DEFAULT_KEY_GENERATOR);
     return genName == null ? defaultKeyGenerator : getKeyGenerator(genName);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.IDataStore#getMetaData()
+   */
+  @Override
+  public final IDataStoreMetaData getMetaData() {
+    return metaData;
+  }
+
+  protected void setMetaData(IDataStoreMetaData metaData) {
+    this.metaData = metaData;
   }
 
 }
