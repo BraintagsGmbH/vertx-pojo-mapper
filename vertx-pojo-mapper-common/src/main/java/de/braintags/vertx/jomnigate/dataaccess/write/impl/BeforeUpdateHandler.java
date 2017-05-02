@@ -15,7 +15,7 @@ package de.braintags.vertx.jomnigate.dataaccess.write.impl;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 
 /**
- * 
+ * Handles the event {@link ObserverEventType#BEFORE_UPDATE }
  * 
  * @author Michael Remme
  * 

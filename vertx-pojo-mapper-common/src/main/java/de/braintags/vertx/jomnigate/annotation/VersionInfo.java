@@ -37,6 +37,7 @@ public @interface VersionInfo {
 
   /**
    * Defines the event type, during which defined converters shall be executed
+   * Allowed event types are BEFORE_UPDATE or AFTER_LOAD, default is BEFORE_UPDATE
    * 
    * @return
    */

@@ -26,7 +26,7 @@ import de.braintags.vertx.jomnigate.observer.impl.handler.AbstractEventHandler;
 import io.vertx.core.Future;
 
 /**
- * 
+ * Handles the event {@link ObserverEventType#AFTER_INSERT }
  * 
  * @author Michael Remme
  * 

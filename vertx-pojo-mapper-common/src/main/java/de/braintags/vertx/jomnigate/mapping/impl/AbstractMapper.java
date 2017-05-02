@@ -127,7 +127,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     computeVersionInfo();
     computeKeyGenerator();
     generateTableInfo();
-    computeIndize();
+    computeIndexes();
     checkReferencedFields();
     observerHandler = IObserverHandler.createInstance(this);
     internalValidate();
@@ -198,7 +198,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     }
   }
 
-  protected void computeIndize() {
+  protected void computeIndexes() {
     Map<String, IIndexDefinition> definitions = new HashMap<>();
     if (getMapperClass().isAnnotationPresent(Indexes.class)) {
       Indexes tmpIndexes = getMapperClass().getAnnotation(Indexes.class);

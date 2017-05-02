@@ -64,9 +64,9 @@ public class BeforeInsertHandler {
   protected <T> CompositeFuture loopObserver(List<IObserver> ol, IWrite<T> writeObject, T entity,
       IObserverContext context) {
     List<Future> fl = new ArrayList<>();
+    IObserverEvent event = IObserverEvent.createEvent(getEventType(), entity, null, writeObject,
+        writeObject.getDataStore());
     for (IObserver observer : ol) {
-      IObserverEvent event = IObserverEvent.createEvent(getEventType(), entity, null, writeObject,
-          writeObject.getDataStore());
       if (observer.canHandleEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
         if (tf != null) {
