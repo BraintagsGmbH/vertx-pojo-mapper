@@ -210,14 +210,14 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
         }
       }
     }
-    computeIndize(definitions);
+    computeIndexes(definitions);
     this.indexes = ImmutableSet.copyOf(definitions.values());
   }
 
   /**
    * @param definitions
    */
-  private void computeIndize(Map<String, IIndexDefinition> definitions) {
+  private void computeIndexes(Map<String, IIndexDefinition> definitions) {
     Field[] fields = getMapperClass().getFields();
     for (Field field : fields) {
       computeIndexByField(definitions, field);
