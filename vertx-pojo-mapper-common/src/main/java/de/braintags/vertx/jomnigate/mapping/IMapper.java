@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.annotation.KeyGenerator;
+import de.braintags.vertx.jomnigate.annotation.VersionInfo;
 import de.braintags.vertx.jomnigate.annotation.field.Referenced;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterDelete;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterLoad;
@@ -112,6 +113,13 @@ public interface IMapper<T> {
    * @return the defined {@link Entity} or null
    */
   Entity getEntity();
+
+  /**
+   * If a mapper shall be versioned, the declaration is returned here
+   * 
+   * @return
+   */
+  VersionInfo getVersionInfo();
 
   /**
    * Get the definitions about indexes, which shall be created for the current mapper

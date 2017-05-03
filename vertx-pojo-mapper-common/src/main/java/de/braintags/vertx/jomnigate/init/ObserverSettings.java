@@ -14,163 +14,118 @@ package de.braintags.vertx.jomnigate.init;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
+import de.braintags.vertx.jomnigate.versioning.SetMapperVersionObserver;
 
 /**
- * Used to define application of an {@link IObserver} instance
+ * Contains all {@link ObserverDefinition}s of the running system
  * 
  * @author Michael Remme
  * 
  */
-public class ObserverSettings<T extends IObserver> {
-  private Class<T> observerClass;
-  private List<ObserverEventType> eventTypeList = new ArrayList<>();
-  private List<ObserverMapperSettings> mapperSettings = new ArrayList<>();
-  private int priority;
-
-  @SuppressWarnings("unused")
-  private ObserverSettings() {
-    // not externally usable
-  }
-
-  public ObserverSettings(final Class<T> observerClass) {
-    this.observerClass = observerClass;
-  }
+@JsonIgnoreProperties(value = { "empty" })
+public class ObserverSettings {
+  private List<ObserverDefinition<?>> observerDefinitions = new ArrayList<>();
 
   /**
-   * The class of the observer to be used
-   * 
-   * @return the observerClass
+   * Default creator which initializes the default observer
    */
-  public Class<T> getObserverClass() {
-    return observerClass;
+  public ObserverSettings() {
+    initDefaultObserver();
   }
 
   /**
-   * The class of the observer to be used
+   * Creates a cloned intance
+   * 
+   * @param source
+   */
+  public ObserverSettings(ObserverSettings source) {
+    for (ObserverDefinition<?> observer : source.getObserverDefinitions()) {
+      observerDefinitions.add(observer.deepCopy());
+    }
+  }
+
+  /**
+   * Initialize needed instances of {@link IObserver} which must exist inside the current implementation
+   */
+  protected void initDefaultObserver() {
+    observerDefinitions.add(SetMapperVersionObserver.createObserverSettings());
+  }
+
+  /**
+   * Get the ObserverDefinition which contains an IObserver with the given class
    * 
    * @param observerClass
-   *          the observerClass to set
+   * @return
    */
-  public void setObserverClass(final Class<T> observerClass) {
-    this.observerClass = observerClass;
+  public ObserverDefinition<?> getDefinition(Class<? extends IObserver> observerClass) {
+    for (ObserverDefinition os : observerDefinitions) {
+      if (os.getObserverClass() == observerClass) {
+        return os;
+      }
+    }
+    return null;
   }
 
   /**
-   * The list of all events, where the defined observer shall be executed on
-   * 
-   * @return the eventList
-   */
-  public List<ObserverEventType> getEventTypeList() {
-    return eventTypeList;
-  }
-
-  /**
-   * The list of all events, where the defined observer shall be executed on
-   * 
-   * @param eventList
-   *          the eventList to set
-   */
-  @SuppressWarnings("unused")
-  private void setEventTypeList(final List<ObserverEventType> eventTypeList) {
-    this.eventTypeList = eventTypeList;
-  }
-
-  /**
-   * This list defines, on which mappers the current definition shall be executed
-   * 
-   * @return the mapperList
-   */
-  public List<ObserverMapperSettings> getMapperSettings() {
-    return mapperSettings;
-  }
-
-  /**
-   * This list defines, on which mappers the current definition shall be executed
-   * 
-   * @param mapperSettings
-   *          the mapperList to set
-   */
-  @SuppressWarnings("unused")
-  private void setMapperSettings(final List<ObserverMapperSettings> mapperSettings) {
-    this.mapperSettings = mapperSettings;
-  }
-
-  /**
-   * The priority for the current definition will define the execution order
-   * 
-   * @return the priority
-   */
-  public int getPriority() {
-    return priority;
-  }
-
-  /**
-   * @param priority
-   *          the priority to set
-   */
-  public void setPriority(final int priority) {
-    this.priority = priority;
-  }
-
-  /**
-   * Checks wether the current settings are applicable to the given IMapper. The definition is applicable, if no mapper
-   * settings are defined or if mapper settings are defined and one is fitting
+   * Get all {@link ObserverDefinition} which are fitting the given mapper class for the given event
    * 
    * @param mapperClass
+   * @param eventType
    * @return
    */
-  public boolean isApplicableFor(final Class<?> mapperClass) {
-    if (getMapperSettings().isEmpty()) {
-      return true;
-    }
-    return getMapperSettings().stream().filter(s -> s.isApplicableFor(mapperClass)).findFirst().isPresent();
+  public List<ObserverDefinition<?>> getObserverDefinitions(final Class<?> mapperClass,
+      final ObserverEventType eventType) {
+    List<ObserverDefinition<?>> tmpList = new ArrayList<>();
+    List<ObserverDefinition<?>> osl = getObserverDefinitions();
+    osl.stream().filter(os -> os.isApplicableFor(mapperClass) && os.isApplicableFor(eventType)).forEach(tmpList::add);
+    return tmpList;
   }
 
   /**
-   * Checks wether the current settings are applicable to the given IMapper. The definition is applicable, if no mapper
-   * settings are defined or if mapper settings are defined and one is fitting
+   * Get all {@link ObserverDefinition} which are fitting the given mapper
    * 
    * @param mapper
    * @return
    */
-  public boolean isApplicableFor(final IMapper<?> mapper) {
-    if (getMapperSettings().isEmpty()) {
-      return true;
-    }
-    return getMapperSettings().stream().filter(s -> s.isApplicableFor(mapper)).findFirst().isPresent();
+  public List<ObserverDefinition<?>> getObserverDefinitions(final IMapper<?> mapper) {
+    List<ObserverDefinition<?>> osl = getObserverDefinitions();
+    return osl.stream().filter(os -> os.isApplicableFor(mapper)).collect(Collectors.toList());
   }
 
   /**
-   * Checks wether the current settings are applicable for the given ObserverEventType. The definition is applicable, if
-   * no event type is defined or if at least one event type is defined, which is fitting the given one
+   * Get all defined {@link ObserverDefinition}
    * 
-   * @param mapper
-   * @return
+   * @return the observerSettings
    */
-  public boolean isApplicableFor(final ObserverEventType eventType) {
-    if (getEventTypeList().isEmpty()) {
-      return true;
-    }
-    return getEventTypeList().stream().filter(evt -> evt.equals(eventType)).findFirst().isPresent();
+  private List<ObserverDefinition<?>> getObserverDefinitions() {
+    return observerDefinitions;
   }
 
   /**
-   * Creates a deep (recursive) copy of the ObserverSettings
+   * Add a new definition to the internal list
+   * 
+   * @param definition
    */
-  public ObserverSettings<T> deepCopy() {
-    ObserverSettings<T> res = new ObserverSettings<>(getObserverClass());
-    res.eventTypeList.addAll(getEventTypeList());
-    res.priority = getPriority();
-
-    for (ObserverMapperSettings mapperSetting : mapperSettings) {
-      res.mapperSettings.add(mapperSetting.deepCopy());
-    }
-
-    return res;
+  public void add(ObserverDefinition<?> definition) {
+    observerDefinitions.add(definition);
   }
 
+  /**
+   * Reset the settings to their initial values
+   */
+  public void reset() {
+    observerDefinitions.clear();
+    initDefaultObserver();
+  }
+
+  public boolean isEmpty() {
+    return observerDefinitions.isEmpty();
+  }
 }

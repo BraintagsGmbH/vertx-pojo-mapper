@@ -33,15 +33,6 @@ import de.braintags.vertx.jomnigate.testdatastore.typehandler.TypeHandlerTestSui
 @SuiteClasses({ TSqlMapperFactory.class, TestSqlExpressions.class, TQuery.class, TReflection.class, TestMapper.class,
     TypeHandlerTestSuite.class, AllTestsCommon.class })
 public class TestAllMySql {
-  /*
-   * 
-   * -DIDatastoreContainer=de.braintags.vertx.jomnigate.mysql.MySqlDataStoreContainer
-   * -DMySqlDataStoreContainer.host=192.168.42.180 -DMySqlDataStoreContainer.username=root
-   * -DMySqlDataStoreContainer.password=xt1729x -DBlockedThreadCheckInterval=100000
-   * -DWarningExceptionTime=100000
-   * -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4jLogDelegateFactory
-   * 
-   */
 
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TestAllMySql.class);

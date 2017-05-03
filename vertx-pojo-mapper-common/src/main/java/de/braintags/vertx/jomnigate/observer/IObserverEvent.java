@@ -61,8 +61,10 @@ public interface IObserverEvent {
    * <UL>
    * <LI>{@link ObserverEventType#BEFORE_MAPPING} the class to be mapped
    * <LI>{@link ObserverEventType#AFTER_MAPPING} the {@link IMapper} which was created
-   * <LI>{@link ObserverEventType#BEFORE_SAVE} the instance to be saved
-   * <LI>{@link ObserverEventType#AFTER_SAVE} the instance, which was saved
+   * <LI>{@link ObserverEventType#BEFORE_INSERT} the instance to be saved
+   * <LI>{@link ObserverEventType#BEFORE_UPDATE} the instance to be saved
+   * <LI>{@link ObserverEventType#AFTER_INSERT} the instance, which was saved
+   * <LI>{@link ObserverEventType#AFTER_UPDATE} the instance, which was saved
    * <LI>{@link ObserverEventType#BEFORE_LOAD} null
    * <LI>{@link ObserverEventType#AFTER_LOAD} the instance, which was loaded
    * <LI>{@link ObserverEventType#BEFORE_DELETE} the instance, which shall be deleted
@@ -80,8 +82,10 @@ public interface IObserverEvent {
    * <UL>
    * <LI>{@link ObserverEventType#BEFORE_MAPPING} null
    * <LI>{@link ObserverEventType#AFTER_MAPPING} null
-   * <LI>{@link ObserverEventType#BEFORE_SAVE} {@link IWriteResult}
-   * <LI>{@link ObserverEventType#AFTER_SAVE} {@link IWriteResult}
+   * <LI>{@link ObserverEventType#BEFORE_INSERT} null
+   * <LI>{@link ObserverEventType#BEFORE_UPDATE} null
+   * <LI>{@link ObserverEventType#AFTER_INSERT} {@link IWriteResult}
+   * <LI>{@link ObserverEventType#AFTER_UPDATE} {@link IWriteResult}
    * <LI>{@link ObserverEventType#BEFORE_LOAD} null
    * <LI>{@link ObserverEventType#AFTER_LOAD} {@link IQueryResult}
    * <LI>{@link ObserverEventType#BEFORE_DELETE} {@link IDeleteResult}
@@ -98,8 +102,10 @@ public interface IObserverEvent {
    * <UL>
    * <LI>{@link ObserverEventType#BEFORE_MAPPING} null
    * <LI>{@link ObserverEventType#AFTER_MAPPING} null
-   * <LI>{@link ObserverEventType#BEFORE_SAVE} {@link IWrite}
-   * <LI>{@link ObserverEventType#AFTER_SAVE} {@link IWrite}
+   * <LI>{@link ObserverEventType#BEFORE_INSERT} {@link IWrite}
+   * <LI>{@link ObserverEventType#BEFORE_UPDATE} {@link IWrite}
+   * <LI>{@link ObserverEventType#AFTER_INSERT} {@link IWrite}
+   * <LI>{@link ObserverEventType#AFTER_UPDATE} {@link IWrite}
    * <LI>{@link ObserverEventType#BEFORE_LOAD} {@link IQuery}
    * <LI>{@link ObserverEventType#AFTER_LOAD} {@link IQuery}
    * <LI>{@link ObserverEventType#BEFORE_DELETE} {@link IDelete}
@@ -116,4 +122,5 @@ public interface IObserverEvent {
    * @return
    */
   IDataStore<?, ?> getDataStore();
+
 }

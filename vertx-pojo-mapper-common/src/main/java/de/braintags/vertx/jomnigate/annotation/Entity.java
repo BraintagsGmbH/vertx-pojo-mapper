@@ -57,4 +57,5 @@ public @interface Entity {
    * @return
    */
   EntityOption[] options() default {};
+
 }

@@ -22,16 +22,16 @@ import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
-import de.braintags.vertx.jomnigate.observer.impl.AbstractEventHandler;
+import de.braintags.vertx.jomnigate.observer.impl.handler.AbstractEventHandler;
 import io.vertx.core.Future;
 
 /**
- * 
+ * Handles the event {@link ObserverEventType#AFTER_INSERT }
  * 
  * @author Michael Remme
  * 
  */
-public class AfterSaveHandler extends AbstractEventHandler<IWrite<?>, IWriteResult> {
+public class AfterInsertHandler extends AbstractEventHandler<IWrite<?>, IWriteResult> {
 
   /**
    * @param observer
@@ -46,8 +46,8 @@ public class AfterSaveHandler extends AbstractEventHandler<IWrite<?>, IWriteResu
     List<Future> fl = new ArrayList<>();
     Iterator<?> selection = ((AbstractWrite) writeObject).getSelection();
     while (selection.hasNext()) {
-      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.AFTER_SAVE, selection.next(), null,
-          writeObject, writeObject.getDataStore());
+      IObserverEvent event = IObserverEvent.createEvent(getEventType(), selection.next(), result, writeObject,
+          writeObject.getDataStore());
       if (observer.canHandleEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
         if (tf != null) {
@@ -56,6 +56,10 @@ public class AfterSaveHandler extends AbstractEventHandler<IWrite<?>, IWriteResu
       }
     }
     return fl;
+  }
+
+  protected ObserverEventType getEventType() {
+    return ObserverEventType.AFTER_INSERT;
   }
 
 }

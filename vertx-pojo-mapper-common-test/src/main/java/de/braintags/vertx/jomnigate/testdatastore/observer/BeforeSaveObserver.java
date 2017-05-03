@@ -34,23 +34,19 @@ public class BeforeSaveObserver implements IObserver {
    * @see
    * de.braintags.vertx.jomnigate.observer.IObserver#handleEvent(de.braintags.vertx.jomnigate.observer.IObserverEvent)
    */
+  @SuppressWarnings({ "unused", "unchecked" })
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
-    IWrite<?> write = (IWrite<?>) event.getAccessObject();
-    executed = true;
-    SimpleMapper sm = (SimpleMapper) event.getSource();
-    sm.intValue = context.get("counter", 1);
-    context.put("counter", sm.intValue + 1);
-
-    // Iterator<?> it = write.getSelection();
-    // while (it.hasNext()) {
-    // SimpleMapper sm = (SimpleMapper) it.next();
-    // sm.intValue = context.get("counter", 1);
-    // context.put("counter", sm.intValue + 1);
-    // executed = true;
-    // }
-
-    return Future.succeededFuture();
+    try {
+      IWrite<?> write = (IWrite<?>) event.getAccessObject();
+      executed = true;
+      SimpleMapper sm = (SimpleMapper) event.getSource();
+      sm.intValue = context.get("counter", 1);
+      context.put("counter", sm.intValue + 1);
+      return Future.succeededFuture();
+    } catch (Exception e) {
+      return Future.failedFuture(e);
+    }
   }
 
   @Override

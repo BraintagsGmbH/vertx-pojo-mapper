@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.vertx.jomnigate.observer.impl;
+package de.braintags.vertx.jomnigate.observer.impl.handler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.braintags.vertx.jomnigate.annotation.Observer;
+import de.braintags.vertx.jomnigate.annotation.VersionInfo;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
 import de.braintags.vertx.jomnigate.dataaccess.delete.impl.AfterDeleteHandler;
@@ -26,15 +27,18 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
-import de.braintags.vertx.jomnigate.dataaccess.write.impl.AfterSaveHandler;
-import de.braintags.vertx.jomnigate.dataaccess.write.impl.BeforeSaveHandler;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.AfterInsertHandler;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.AfterUpdateHandler;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.BeforeInsertHandler;
+import de.braintags.vertx.jomnigate.dataaccess.write.impl.BeforeUpdateHandler;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.init.ObserverSettings;
+import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverHandler;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
+import de.braintags.vertx.jomnigate.versioning.ExecuteVersionConverter;
 import io.vertx.core.Future;
 
 /**
@@ -44,11 +48,13 @@ import io.vertx.core.Future;
  * 
  */
 public class DefaultObserverHandler implements IObserverHandler {
-  private List<ObserverSettings<?>> observerList = new ArrayList<>();
+  private List<ObserverDefinition<?>> observerList = new ArrayList<>();
   private Map<ObserverEventType, List<IObserver>> eventObserverCache = new HashMap<>();
   private IMapper<?> mapper;
-  private BeforeSaveHandler beforeSaveHandler = new BeforeSaveHandler();
-  private AfterSaveHandler afterSaveHandler = new AfterSaveHandler();
+  private BeforeInsertHandler beforeInsertHandler = new BeforeInsertHandler();
+  private BeforeUpdateHandler beforeUpdateHandler = new BeforeUpdateHandler();
+  private AfterInsertHandler afterInsertHandler = new AfterInsertHandler();
+  private AfterUpdateHandler afterUpdateHandler = new AfterUpdateHandler();
   private AfterLoadHandler afterLoadHandler = new AfterLoadHandler();
   private BeforeLoadHandler beforeLoadHandler = new BeforeLoadHandler();
   private AfterDeleteHandler afterDeleteHandler = new AfterDeleteHandler();
@@ -69,11 +75,11 @@ public class DefaultObserverHandler implements IObserverHandler {
    * Computes the list of all observers, which can be executed for the current mapper class.
    */
   private void computeObserver() {
-    List<ObserverSettings<?>> tmpList = mapper.getMapperFactory().getDataStore().getSettings()
-        .getObserverSettings(mapper);
+    List<ObserverDefinition<?>> tmpList = mapper.getMapperFactory().getDataStore().getSettings().getObserverSettings()
+        .getObserverDefinitions(mapper);
     Observer ob = mapper.getAnnotation(Observer.class);
     if (ob != null) {
-      ObserverSettings<?> os = new ObserverSettings<>(ob.observerClass());
+      ObserverDefinition<?> os = new ObserverDefinition<>(ob.observerClass());
       os.setPriority(ob.priority());
       ObserverEventType[] tl = ob.eventTypes();
       for (ObserverEventType t : tl) {
@@ -96,6 +102,10 @@ public class DefaultObserverHandler implements IObserverHandler {
           throw new MappingException(e);
         }
       });
+      if (mapper.getVersionInfo() != null && event.equals(mapper.getVersionInfo().eventType())) {
+        VersionInfo vi = mapper.getVersionInfo();
+        ol.add(new ExecuteVersionConverter(vi));
+      }
       eventObserverCache.put(event, ol);
     }
     return eventObserverCache.get(event);
@@ -109,13 +119,13 @@ public class DefaultObserverHandler implements IObserverHandler {
    * write.IWrite)
    */
   @Override
-  public <T> Future<Void> handleBeforeSave(IWrite<T> writeObject, IObserverContext context) {
-    List<IObserver> ol = getObserver(ObserverEventType.BEFORE_SAVE);
+  public <T> Future<Void> handleBeforeUpdate(IWrite<T> writeObject, T entity, IObserverContext context) {
+    List<IObserver> ol = getObserver(ObserverEventType.BEFORE_UPDATE);
     Future<Void> f = Future.future();
     if (ol.isEmpty() || writeObject.size() <= 0) {
       f.complete();
     } else {
-      f = getBeforeSaveHandler().handle(writeObject, null, context, ol);
+      f = getBeforeUpdateHandler().handle(writeObject, entity, context, ol);
     }
     return f;
   }
@@ -124,17 +134,49 @@ public class DefaultObserverHandler implements IObserverHandler {
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.vertx.jomnigate.observer.IObserverHandler#handleAfterSave(de.braintags.vertx.jomnigate.dataaccess.
-   * write.IWrite, de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult)
+   * de.braintags.vertx.jomnigate.observer.IObserverHandler#handleAfterUpdate(de.braintags.vertx.jomnigate.dataaccess.
+   * write.IWrite, de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult,
+   * de.braintags.vertx.jomnigate.observer.IObserverContext)
    */
   @Override
-  public <T> Future<Void> handleAfterSave(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context) {
-    List<IObserver> ol = getObserver(ObserverEventType.AFTER_SAVE);
+  public <T> Future<Void> handleAfterUpdate(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context) {
+    List<IObserver> ol = getObserver(ObserverEventType.AFTER_UPDATE);
     Future<Void> f = Future.future();
     if (ol.isEmpty() || writeObject.size() <= 0) {
       f.complete();
     } else {
-      f = getAfterSaveHandler().handle(writeObject, writeResult, context, ol);
+      f = getAfterUpdateHandler().handle(writeObject, writeResult, context, ol);
+    }
+    return f;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.braintags.vertx.jomnigate.observer.IObserverHandler#handleBeforeInsert(de.braintags.vertx.jomnigate.dataaccess.
+   * write.IWrite, java.lang.Object, de.braintags.vertx.jomnigate.observer.IObserverContext)
+   */
+  @Override
+  public <T> Future<Void> handleBeforeInsert(IWrite<T> writeObject, T entity, IObserverContext context) {
+    List<IObserver> ol = getObserver(ObserverEventType.BEFORE_INSERT);
+    Future<Void> f = Future.future();
+    if (ol.isEmpty() || writeObject.size() <= 0) {
+      f.complete();
+    } else {
+      f = getBeforeInsertHandler().handle(writeObject, entity, context, ol);
+    }
+    return f;
+  }
+
+  @Override
+  public <T> Future<Void> handleAfterInsert(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context) {
+    List<IObserver> ol = getObserver(ObserverEventType.AFTER_INSERT);
+    Future<Void> f = Future.future();
+    if (ol.isEmpty() || writeObject.size() <= 0) {
+      f.complete();
+    } else {
+      f = getAfterInsertHandler().handle(writeObject, writeResult, context, ol);
     }
     return f;
   }
@@ -239,17 +281,31 @@ public class DefaultObserverHandler implements IObserverHandler {
   }
 
   /**
-   * @return the beforeSaveHandler
+   * @return the beforeInsertHandler
    */
-  protected BeforeSaveHandler getBeforeSaveHandler() {
-    return beforeSaveHandler;
+  protected BeforeInsertHandler getBeforeInsertHandler() {
+    return beforeInsertHandler;
   }
 
   /**
-   * @return the afterSaveHandler
+   * @return the afterInsertHandler
    */
-  protected AfterSaveHandler getAfterSaveHandler() {
-    return afterSaveHandler;
+  protected AfterInsertHandler getAfterInsertHandler() {
+    return afterInsertHandler;
+  }
+
+  /**
+   * @return the beforeUpdateHandler
+   */
+  protected BeforeUpdateHandler getBeforeUpdateHandler() {
+    return beforeUpdateHandler;
+  }
+
+  /**
+   * @return the afterUpdateHandler
+   */
+  protected AfterUpdateHandler getAfterUpdateHandler() {
+    return afterUpdateHandler;
   }
 
   /**

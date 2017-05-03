@@ -47,7 +47,7 @@ public abstract class AbstractObserverTest extends DatastoreBaseTest {
     getDataStore(context).getMapperFactory().reset();
     DataStoreSettings settings = getDataStore(context).getSettings();
     serializeDeserializeSettings(context, settings);
-    settings.getObserverSettings().clear();
+    settings.getObserverSettings().reset();
   }
 
   /**

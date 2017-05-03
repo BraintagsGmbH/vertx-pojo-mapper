@@ -18,7 +18,7 @@ import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 
 /**
- * The part of {@link ObserverSettings} which defines, on which {@link IMapper} the ObserverSettings shall be executed.
+ * The part of {@link ObserverDefinition} which defines, on which {@link IMapper} the ObserverSettings shall be executed.
  * The property classDefinition and annotation contain the definition. Examples for a class definition are:
  * <UL>
  * <LI>my.mapper.class<br/>

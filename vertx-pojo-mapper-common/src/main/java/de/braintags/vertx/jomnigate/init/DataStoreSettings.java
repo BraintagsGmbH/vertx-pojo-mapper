@@ -16,11 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import de.braintags.vertx.jomnigate.IDataStore;
-import de.braintags.vertx.jomnigate.mapping.IMapper;
-import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.util.security.crypt.IEncoder;
 
 /**
@@ -37,7 +34,7 @@ public class DataStoreSettings {
   private String databaseName;
   private List<EncoderSettings> encoders = new ArrayList<>();
   private boolean clearDatabaseOnInit = false;
-  private List<ObserverSettings<?>> observerSettings = new ArrayList<>();
+  private ObserverSettings observerSettings = new ObserverSettings();
 
   /**
    * Standard constructor needed for saving as local file
@@ -170,51 +167,6 @@ public class DataStoreSettings {
   }
 
   /**
-   * Get all defined {@link ObserverSettings}
-   * 
-   * @return the observerSettings
-   */
-  public List<ObserverSettings<?>> getObserverSettings() {
-    return observerSettings;
-  }
-
-  /**
-   * Get all {@link ObserverSettings} which are fitting the given mapper class for the event
-   * {@link ObserverEventType#BEFORE_MAPPING}
-   * 
-   * @param mapperClass
-   * @return
-   */
-  public List<ObserverSettings<?>> getObserverSettings(final Class<?> mapperClass) {
-    List<ObserverSettings<?>> tmpList = new ArrayList<>();
-    List<ObserverSettings<?>> osl = getObserverSettings();
-    osl.stream().filter(os -> os.isApplicableFor(mapperClass) && os.isApplicableFor(ObserverEventType.BEFORE_MAPPING))
-        .forEach(tmpList::add);
-    return tmpList;
-  }
-
-  /**
-   * Get all {@link ObserverSettings} which are fitting the given mapper
-   * 
-   * @param mapper
-   * @return
-   */
-  public List<ObserverSettings<?>> getObserverSettings(final IMapper<?> mapper) {
-    List<ObserverSettings<?>> osl = getObserverSettings();
-    List<ObserverSettings<?>> tmpList = osl.stream().filter(os -> os.isApplicableFor(mapper))
-        .collect(Collectors.toList());
-    return tmpList;
-  }
-
-  /**
-   * @param observerSettings
-   *          the observerSettings to set
-   */
-  public void setObserverSettings(final List<ObserverSettings<?>> observerSettings) {
-    this.observerSettings = observerSettings;
-  }
-  
-  /**
    * Creates a deep (recursive) copy of the DataStoreSettings
    */
   public DataStoreSettings deepCopy() {
@@ -225,16 +177,21 @@ public class DataStoreSettings {
       res.properties.put(property.getKey(), property.getValue());
     }
     res.clearDatabaseOnInit = clearDatabaseOnInit;
-    
+
     for (EncoderSettings encoder : encoders) {
       res.encoders.add(encoder.deepCopy());
     }
-
-    for (ObserverSettings<?> observer : observerSettings) {
-      res.observerSettings.add(observer.deepCopy());
-    }
-
+    res.observerSettings = new ObserverSettings(observerSettings);
     return res;
+  }
+
+  /**
+   * The list of defined ObserverDefinitions
+   * 
+   * @return the observerSettings
+   */
+  public ObserverSettings getObserverSettings() {
+    return observerSettings;
   }
 
 }

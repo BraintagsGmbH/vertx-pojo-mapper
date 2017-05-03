@@ -217,4 +217,8 @@ public class Mapper<T> extends AbstractMapper<T> {
   public String getKeyGeneratorReference() {
     return keyGeneratorReference;
   }
+
+  @Override
+  protected void validate() {
+  }
 }

@@ -13,41 +13,60 @@
 package de.braintags.vertx.jomnigate.dataaccess.write.impl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
-import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
-import de.braintags.vertx.jomnigate.observer.impl.AbstractEventHandler;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 
 /**
- * Handles the event {@link ObserverEventType#BEFORE_SAVE }
+ * Handles the event {@link ObserverEventType#BEFORE_INSERT }
  * 
  * @author Michael Remme
  * 
  */
-public class BeforeSaveHandler extends AbstractEventHandler<IWrite<?>, IWriteResult> {
+public class BeforeInsertHandler {
 
   /**
-   * @param observer
-   * @param writeObject
+   * @param write
+   * @param storeObject
+   * @param context
+   * @param ol
+   * @return
+   */
+  public <T> Future<Void> handle(IWrite<T> write, T entity, IObserverContext context, List<IObserver> ol) {
+    Future<Void> f = Future.future();
+    CompositeFuture cf = loopObserver(ol, write, entity, context);
+    cf.setHandler(cfr -> {
+      if (cfr.failed()) {
+        f.fail(cfr.cause());
+      } else {
+        f.complete();
+      }
+    });
+    return f;
+  }
+
+  /**
+   * for each defined observer, process the instance
+   * 
+   * @param ol
+   * @param write
+   * @param storeObject
    * @param context
    * @return
    */
   @SuppressWarnings("rawtypes")
-  @Override
-  protected List<Future> createEntityFutureList(IObserver observer, IWrite<?> writeObject, IWriteResult result,
+  protected <T> CompositeFuture loopObserver(List<IObserver> ol, IWrite<T> writeObject, T entity,
       IObserverContext context) {
     List<Future> fl = new ArrayList<>();
-    Iterator<?> selection = ((AbstractWrite) writeObject).getSelection();
-    while (selection.hasNext()) {
-      IObserverEvent event = IObserverEvent.createEvent(ObserverEventType.BEFORE_SAVE, selection.next(), null,
-          writeObject, writeObject.getDataStore());
+    IObserverEvent event = IObserverEvent.createEvent(getEventType(), entity, null, writeObject,
+        writeObject.getDataStore());
+    for (IObserver observer : ol) {
       if (observer.canHandleEvent(event, context)) {
         Future tf = observer.handleEvent(event, context);
         if (tf != null) {
@@ -55,7 +74,10 @@ public class BeforeSaveHandler extends AbstractEventHandler<IWrite<?>, IWriteRes
         }
       }
     }
-    return fl;
+    return CompositeFuture.all(fl);
   }
 
+  protected ObserverEventType getEventType() {
+    return ObserverEventType.BEFORE_INSERT;
+  }
 }
