@@ -13,7 +13,7 @@
 package de.braintags.vertx.jomnigate.annotation;
 
 /**
- * Defines an option for an entity, which is interpreted by teh implementation of IDataStore
+ * Defines an option for an entity, which is interpreted by the implementation of IDataStore
  * 
  * @author Michael Remme
  * 

@@ -70,6 +70,12 @@ public abstract class AbstractDataStoreInit implements IDataStoreInit {
     });
   }
 
+  /**
+   * Add all encoder definitions as valid IEncoder to the datastore
+   * 
+   * @param settings
+   * @param ds
+   */
   protected void initEncoder(DataStoreSettings settings, IDataStore ds) {
     List<EncoderSettings> esl = settings.getEncoders();
     esl.forEach(es -> ((AbstractDataStore) ds).getEncoderMap().put(es.getName(), es.toEncoder()));

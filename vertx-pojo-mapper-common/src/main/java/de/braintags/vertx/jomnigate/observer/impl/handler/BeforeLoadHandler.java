@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.vertx.jomnigate.observer.impl;
+package de.braintags.vertx.jomnigate.observer.impl.handler;
 
 import java.util.ArrayList;
 import java.util.List;

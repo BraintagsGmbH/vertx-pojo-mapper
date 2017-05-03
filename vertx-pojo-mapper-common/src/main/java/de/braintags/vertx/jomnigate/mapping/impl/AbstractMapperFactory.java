@@ -21,14 +21,14 @@ import java.util.concurrent.CountDownLatch;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.Entity;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.init.ObserverSettings;
+import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverHandler;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
-import de.braintags.vertx.jomnigate.observer.impl.BeforeMappingHandler;
+import de.braintags.vertx.jomnigate.observer.impl.handler.BeforeMappingHandler;
 import de.braintags.vertx.util.ResultObject;
 import de.braintags.vertx.util.exception.InitException;
 import io.vertx.core.Future;
@@ -147,7 +147,7 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
    * @return
    */
   private <T> Future<Void> handleBeforeMapping(Class<T> mapperClass, IObserverContext context) {
-    List<IObserver> ol = getObserver(mapperClass);
+    List<IObserver> ol = getObserver(mapperClass, ObserverEventType.BEFORE_MAPPING);
     Future<Void> f = null;
     if (ol.isEmpty()) {
       f = Future.succeededFuture();
@@ -163,8 +163,9 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
    * @param mapperClass
    * @return
    */
-  private List<IObserver> getObserver(Class<?> mapperClass) {
-    List<ObserverSettings<?>> osList = getDataStore().getSettings().getObserverSettings(mapperClass);
+  private List<IObserver> getObserver(final Class<?> mapperClass, final ObserverEventType eventType) {
+    List<ObserverDefinition<?>> osList = getDataStore().getSettings().getObserverSettings()
+        .getObserverDefinitions(mapperClass, eventType);
     List<IObserver> ol = new ArrayList<>();
     osList.forEach(os -> {
       try {

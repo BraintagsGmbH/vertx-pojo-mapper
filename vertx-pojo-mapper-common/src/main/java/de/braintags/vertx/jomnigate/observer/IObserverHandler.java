@@ -20,9 +20,9 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
-import de.braintags.vertx.jomnigate.init.ObserverSettings;
+import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
-import de.braintags.vertx.jomnigate.observer.impl.DefaultObserverHandler;
+import de.braintags.vertx.jomnigate.observer.impl.handler.DefaultObserverHandler;
 import io.vertx.core.Future;
 
 /**
@@ -47,7 +47,7 @@ public interface IObserverHandler {
 
   /**
    * Get all observers, which are registered for the current mapper and the given event. The list should be sorted by
-   * priority of the underlaying {@link ObserverSettings}
+   * priority of the underlaying {@link ObserverDefinition}
    * 
    * @param event
    * @return a list of all fitting IObserver
@@ -55,23 +55,44 @@ public interface IObserverHandler {
   List<IObserver> getObserver(ObserverEventType event);
 
   /**
-   * Performs the event {@link ObserverEventType#BEFORE_SAVE} to the records in the {@link IWrite}
+   * Performs the event {@link ObserverEventType#BEFORE_UPDATE} for the storeObject
    * 
-   * @param writeObject
+   * @param write
+   * @param entity
    * @param context
    * @return
    */
-  <T> Future<Void> handleBeforeSave(IWrite<T> writeObject, IObserverContext context);
+  <T> Future<Void> handleBeforeUpdate(IWrite<T> write, T entity, IObserverContext context);
 
   /**
-   * Performs the event {@link ObserverEventType#AFTER_SAVE} to the records in the {@link IWrite}
+   * Performs the event {@link ObserverEventType#BEFORE_INSERT} for the storeObject
+   * 
+   * @param write
+   * @param entity
+   * @param context
+   * @return
+   */
+  <T> Future<Void> handleBeforeInsert(IWrite<T> write, T entity, IObserverContext context);
+
+  /**
+   * Performs the event {@link ObserverEventType#AFTER_INSERT} to the records in the {@link IWrite}
    * 
    * @param writeObject
    * @param writeResult
    * @param context
    * @return
    */
-  <T> Future<Void> handleAfterSave(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context);
+  <T> Future<Void> handleAfterInsert(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context);
+
+  /**
+   * Performs the event {@link ObserverEventType#AFTER_UPDATE} to the records in the {@link IWrite}
+   * 
+   * @param writeObject
+   * @param writeResult
+   * @param context
+   * @return
+   */
+  <T> Future<Void> handleAfterUpdate(IWrite<T> writeObject, IWriteResult writeResult, IObserverContext context);
 
   /**
    * Performs the event {@link ObserverEventType#BEFORE_LOAD} to the records in the {@link IWrite}
