@@ -62,7 +62,9 @@ public interface IProperty {
    * Get the fitting {@link ITypeHandler} which is responsible to change data into and from the propriate format
    * 
    * @return
+   * @deprecated removed because of usage of jackson
    */
+  @Deprecated
   public ITypeHandler getTypeHandler();
 
   /**
@@ -110,7 +112,9 @@ public interface IProperty {
    * @param parameters
    *          the parameters of the required Constructor
    * @return a constructor with the arguments or null
+   * @deprecated removed because of usage of jackson
    */
+  @Deprecated
   @SuppressWarnings("rawtypes")
   public Constructor getConstructor(Class<?>... parameters);
 
@@ -118,7 +122,9 @@ public interface IProperty {
    * Get the underlaying {@link Field}
    * 
    * @return the field
+   * @deprecated removed because of usage of jackson
    */
+  @Deprecated
   public Field getField();
 
   /**
@@ -163,14 +169,18 @@ public interface IProperty {
    * ITypeHandler is returned
    * 
    * @return the {@link ITypeHandler} to deal with the subtype, or NULL if subtype can't be read
+   * @deprecated removed because of usage of jackson
    */
+  @Deprecated
   public ITypeHandler getSubTypeHandler();
 
   /**
    * If the java field is a list / array / map the the sub type is returned
    * 
    * @return the subtype
+   * @deprecated removed because of usage of jackson
    */
+  @Deprecated
   public Type getSubType();
 
   /**
@@ -184,7 +194,9 @@ public interface IProperty {
    * Get the list of defined type parameters of the current field
    * 
    * @return the list of type parameters
+   * @deprecated removed because of usage of jackson
    */
+  @Deprecated
   public List<IProperty> getTypeParameters();
 
   /**
@@ -235,5 +247,19 @@ public interface IProperty {
    * @return
    */
   boolean isIgnore();
+
+  /**
+   * Checks wether the current definition is a character based property
+   * 
+   * @return
+   */
+  boolean isCharacterColumn();
+
+  /**
+   * checks wether the current definition is a numeric based property
+   * 
+   * @return
+   */
+  boolean isNumericColumn();
 
 }

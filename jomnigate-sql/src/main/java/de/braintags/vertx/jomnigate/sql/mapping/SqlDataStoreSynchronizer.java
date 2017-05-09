@@ -32,7 +32,6 @@ import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
 import de.braintags.vertx.jomnigate.mapping.impl.AbstractDataStoreSynchronizer;
 import de.braintags.vertx.jomnigate.mapping.impl.DefaultSyncCommand;
 import de.braintags.vertx.jomnigate.mapping.impl.DefaultSyncResult;
-import de.braintags.vertx.jomnigate.mapping.impl.Mapper;
 import de.braintags.vertx.jomnigate.sql.SqlDataStore;
 import de.braintags.vertx.jomnigate.sql.SqlUtil;
 import io.vertx.core.AsyncResult;
@@ -74,7 +73,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
   @Override
   public void syncTable(final IMapper mapper, final Handler<AsyncResult<Void>> resultHandler) {
     LOGGER.debug("starting synchronization for mapper " + mapper.getClass().getSimpleName());
-    readTableFromDatabase(mapper, res -> checkTable((Mapper) mapper, res, result -> {
+    readTableFromDatabase(mapper, res -> checkTable(mapper, res, result -> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
@@ -84,7 +83,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
     }));
   }
 
-  private void checkTable(final Mapper mapper, final AsyncResult<SqlTableInfo> tableResult,
+  private void checkTable(final IMapper mapper, final AsyncResult<SqlTableInfo> tableResult,
       final Handler<AsyncResult<DefaultSyncCommand>> resultHandler) {
     if (tableResult.failed()) {
       resultHandler.handle(Future.failedFuture(tableResult.cause()));
@@ -126,7 +125,7 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
    * ENGINE=InnoDB DEFAULT CHARSET=utf8;
    * 
    */
-  private void generateNewTable(final Mapper mapper, final Handler<AsyncResult<DefaultSyncCommand>> resultHandler) {
+  private void generateNewTable(final IMapper mapper, final Handler<AsyncResult<DefaultSyncCommand>> resultHandler) {
     DefaultSyncCommand syncCommand = createSyncCommand(mapper, SyncAction.CREATE);
     SqlUtil.query(datastore, syncCommand.getCommand()).setHandler(exec -> {
       if (exec.failed()) {

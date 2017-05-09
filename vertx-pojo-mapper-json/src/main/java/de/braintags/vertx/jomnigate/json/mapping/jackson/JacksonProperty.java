@@ -29,7 +29,7 @@ import de.braintags.vertx.jomnigate.mapping.impl.AbstractProperty;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 
 /**
- * An implementation of IProperty which uses
+ * An implementation of IProperty which uses {@link BeanPropertyDefinition} as source
  * 
  * @author Michael Remme
  * 
@@ -210,6 +210,16 @@ public class JacksonProperty extends AbstractProperty {
   }
 
   /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.mapping.IProperty#getPropertyMapper()
+   */
+  @Override
+  public IPropertyMapper getPropertyMapper() {
+    return propertyMapper;
+  }
+
+  /*
    * ##################################
    * UNSUPPORTED BY THIS IMPLEMENTATION
    * ##################################
@@ -223,16 +233,6 @@ public class JacksonProperty extends AbstractProperty {
   @Override
   public ITypeHandler getTypeHandler() {
     throw new UnsupportedOperationException("this implementation should not use ITypeHandler");
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.mapping.IProperty#getPropertyMapper()
-   */
-  @Override
-  public IPropertyMapper getPropertyMapper() {
-    return propertyMapper;
   }
 
   /*

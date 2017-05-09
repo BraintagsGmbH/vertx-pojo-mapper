@@ -41,7 +41,6 @@ import de.braintags.vertx.util.exception.ClassAccessException;
  * @param <T>
  *          the class of the underlaying mapper
  */
-
 public class Mapper<T> extends AbstractMapper<T> {
   private IObjectFactory objectFactory;
   private String keyGeneratorReference;
@@ -145,8 +144,8 @@ public class Mapper<T> extends AbstractMapper<T> {
       int fieldModifiers = field.getModifiers();
       JavaFieldAccessor accessor = new JavaFieldAccessor(field);
       MappedField mf = createMappedField(field, accessor);
-      if (!mf.isIgnore() && !Modifier.isTransient(fieldModifiers)
-          && Modifier.isPublic(fieldModifiers) && !Modifier.isStatic(fieldModifiers)) {
+      if (!mf.isIgnore() && !Modifier.isTransient(fieldModifiers) && Modifier.isPublic(fieldModifiers)
+          && !Modifier.isStatic(fieldModifiers)) {
         addMappedField(accessor.getName(), createMappedField(field, accessor));
       }
     }

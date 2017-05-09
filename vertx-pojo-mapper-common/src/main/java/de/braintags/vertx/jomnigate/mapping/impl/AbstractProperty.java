@@ -130,4 +130,14 @@ public abstract class AbstractProperty implements IProperty {
     return getFullName();
   }
 
+  @Override
+  public boolean isCharacterColumn() {
+    return CharSequence.class.isAssignableFrom(getType());
+  }
+
+  @Override
+  public boolean isNumericColumn() {
+    return Number.class.isAssignableFrom(getType()) || getType().equals(long.class) || getType().equals(int.class);
+  }
+
 }

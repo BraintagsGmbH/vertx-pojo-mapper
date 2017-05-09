@@ -19,12 +19,11 @@ import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.json.JsonDatastore;
 import de.braintags.vertx.jomnigate.sql.dataaccess.SqlStoreObjectFactory;
+import de.braintags.vertx.jomnigate.sql.dataaccess.SqlWrite;
 import de.braintags.vertx.jomnigate.sql.mapping.SqlDataStoreSynchronizer;
 import de.braintags.vertx.jomnigate.sql.mapping.SqlMapperFactory;
 import de.braintags.vertx.jomnigate.sql.mapping.SqlTableGenerator;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.sql.SQLConnection;
@@ -36,6 +35,10 @@ import io.vertx.ext.sql.SQLConnection;
  * 
  */
 public abstract class SqlDataStore extends JsonDatastore<String> {
+  /**
+   * The name of the property, which describes the database to be used
+   */
+  public static final String DATABASE_NAME = "database";
 
   /**
    * @param vertx
@@ -75,7 +78,7 @@ public abstract class SqlDataStore extends JsonDatastore<String> {
    */
   @Override
   public <T> IWrite<T> createWrite(Class<T> mapper) {
-    throw new UnsupportedOperationException();
+    return new SqlWrite<>(mapper, this);
   }
 
   /*
@@ -95,27 +98,7 @@ public abstract class SqlDataStore extends JsonDatastore<String> {
    */
   @Override
   public String getDatabase() {
-    throw new UnsupportedOperationException();
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.IDataStore#shutdown(io.vertx.core.Handler)
-   */
-  @Override
-  public void shutdown(Handler<AsyncResult<Void>> resultHandler) {
-    throw new UnsupportedOperationException();
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.IDataStore#getClient()
-   */
-  @Override
-  public Object getClient() {
-    throw new UnsupportedOperationException();
+    return getProperties().getString(DATABASE_NAME);
   }
 
 }

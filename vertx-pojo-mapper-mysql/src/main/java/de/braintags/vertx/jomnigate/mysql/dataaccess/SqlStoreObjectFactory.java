@@ -16,9 +16,9 @@ package de.braintags.vertx.jomnigate.mysql.dataaccess;
 import java.util.Map;
 
 import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
+import de.braintags.vertx.jomnigate.json.dataaccess.JsonStoreObjectFactory;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
-import de.braintags.vertx.jomnigate.mapping.impl.AbstractStoreObjectFactory;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -29,7 +29,7 @@ import io.vertx.core.Handler;
  * 
  */
 
-public class SqlStoreObjectFactory extends AbstractStoreObjectFactory<String> {
+public class SqlStoreObjectFactory extends JsonStoreObjectFactory {
 
   /**
    * Craetes a new instance of IStoreObject by using a {@link Map} as internal format

@@ -201,7 +201,7 @@ public class MySqlDataStoreInit extends AbstractDataStoreInit {
     String keyGenerator = System.getProperty(IKeyGenerator.DEFAULT_KEY_GENERATOR, DEFAULT_KEY_GENERATOR);
     settings.setDatabaseName(database);
     settings.getProperties().put(MySqlDataStoreInit.HOST_PROPERTY, host);
-    settings.getProperties().put(MySqlDataStoreInit.PORT_PROPERTY, MySqlDataStoreInit.DEFAULT_PORT);
+    settings.getProperties().put(MySqlDataStoreInit.PORT_PROPERTY, String.valueOf(MySqlDataStoreInit.DEFAULT_PORT));
     settings.getProperties().put(MySqlDataStoreInit.USERNAME_PROPERTY, username);
     settings.getProperties().put(MySqlDataStoreInit.PASSWORD_PROPERTY, password);
     settings.getProperties().put(MySqlDataStoreInit.SHARED_PROP, "true");

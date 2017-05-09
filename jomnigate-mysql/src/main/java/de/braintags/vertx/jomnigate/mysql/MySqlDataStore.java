@@ -14,7 +14,9 @@ package de.braintags.vertx.jomnigate.mysql;
 
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.sql.SqlDataStore;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
@@ -44,6 +46,16 @@ public class MySqlDataStore extends SqlDataStore {
     Future<SQLConnection> f = Future.future();
     sqlClient.getConnection(f);
     return f;
+  }
+
+  @Override
+  public void shutdown(Handler<AsyncResult<Void>> resultHandler) {
+    sqlClient.close(resultHandler);
+  }
+
+  @Override
+  public Object getClient() {
+    return sqlClient;
   }
 
 }

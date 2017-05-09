@@ -19,7 +19,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
-import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper_NO_INDEX;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.TestContext;
@@ -31,13 +31,15 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class TestSimpleMapper extends DatastoreBaseTest {
+  private static final String TEST_NAME_MODIFIED = "testNameModified";
+  private static final String SUCCEEDED = "succeeded";
   private static Logger logger = LoggerFactory.getLogger(TestSimpleMapper.class);
   private static boolean dropTable = false;
 
   @Test
   public void findById(final TestContext context) {
     clearTable(context, "SimpleMapper");
-    SimpleMapper sm = new SimpleMapper();
+    SimpleMapper_NO_INDEX sm = new SimpleMapper_NO_INDEX();
     sm.name = "testName";
     sm.setSecondProperty("my second property");
     context.assertNull(sm.id);
@@ -51,7 +53,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
     logger.info("ID is: " + sm.id);
 
     // SimpleQuery for all records
-    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper_NO_INDEX> query = getDataStore(context).createQuery(SimpleMapper_NO_INDEX.class);
     query.setSearchCondition(ISearchCondition.isEqual(query.getMapper().getIdInfo().getIndexedField(), sm.id));
     resultContainer = find(context, query, 1);
   }
@@ -59,7 +61,7 @@ public class TestSimpleMapper extends DatastoreBaseTest {
   @Test
   public void testSimpleMapper(final TestContext context) {
     clearTable(context, "SimpleMapper");
-    SimpleMapper sm = new SimpleMapper();
+    SimpleMapper_NO_INDEX sm = new SimpleMapper_NO_INDEX();
     sm.name = "testName";
     sm.setSecondProperty("my second property");
     context.assertNull(sm.id);
@@ -73,14 +75,14 @@ public class TestSimpleMapper extends DatastoreBaseTest {
     context.assertTrue(sm.id.hashCode() != 0, "ID wasn't set by insert statement");
     logger.info("ID is: " + sm.id);
 
-    sm.name = "testNameModified";
+    sm.name = TEST_NAME_MODIFIED;
     sm.setSecondProperty("my modified property");
     resultContainer = saveRecord(context, sm);
     we = resultContainer.writeResult.iterator().next();
     context.assertEquals(WriteAction.UPDATE, we.getAction());
 
     // SimpleQuery for all records
-    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    IQuery<SimpleMapper_NO_INDEX> query = getDataStore(context).createQuery(SimpleMapper_NO_INDEX.class);
     resultContainer = find(context, query, 1);
 
     resultContainer.queryResult.iterator().next(result -> {
@@ -88,13 +90,13 @@ public class TestSimpleMapper extends DatastoreBaseTest {
         logger.error("", result.cause());
         context.fail(result.cause().toString());
       } else {
-        SimpleMapper sm2 = (SimpleMapper) result.result();
-        context.assertEquals("testNameModified", sm2.name, "record was not updated");
+        SimpleMapper_NO_INDEX sm2 = (SimpleMapper_NO_INDEX) result.result();
+        context.assertEquals(TEST_NAME_MODIFIED, sm2.name, "record was not updated");
 
         context.assertTrue(sm.equals(result.result()));
 
         // search inside name field
-        query.setSearchCondition(ISearchCondition.isEqual(SimpleMapper.NAME, "testNameModified"));
+        query.setSearchCondition(ISearchCondition.isEqual("name", TEST_NAME_MODIFIED));
         try {
           ResultContainer resultContainer2 = find(context, query, 1);
           resultContainer2.queryResult.iterator().next(res2 -> {
@@ -102,11 +104,11 @@ public class TestSimpleMapper extends DatastoreBaseTest {
               logger.error("", result.cause());
               context.fail(result.cause().toString());
             } else {
-              SimpleMapper rsm = (SimpleMapper) result.result();
+              SimpleMapper_NO_INDEX rsm = (SimpleMapper_NO_INDEX) result.result();
               context.assertTrue(sm.equals(rsm));
-              context.assertEquals("succeeded", rsm.beforeSave);
-              context.assertEquals("succeeded", rsm.afterSave);
-              context.assertEquals("succeeded", rsm.afterLoad);
+              context.assertEquals(SUCCEEDED, rsm.beforeSave);
+              context.assertEquals(SUCCEEDED, rsm.afterSave);
+              context.assertEquals(SUCCEEDED, rsm.afterLoad);
             }
           });
         } catch (Throwable e) {

@@ -15,9 +15,11 @@ package de.braintags.vertx.jomnigate.sql;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.mauricio.async.db.mysql.exceptions.MySQLException;
 import com.google.common.collect.ImmutableSet;
 
 import de.braintags.vertx.jomnigate.annotation.Index;
+import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
 import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IIndexFieldDefinition;
 import de.braintags.vertx.jomnigate.sql.exception.SqlException;
@@ -26,9 +28,12 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.asyncsql.AsyncSQLClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
+import io.vertx.ext.sql.UpdateResult;
 
 /**
  * Utility methods working with {@link SqlDataStore}
@@ -47,6 +52,7 @@ public class SqlUtil {
   public static final short INDEX_EXISTS = 0;
   public static final short INDEX_NOT_EXISTS = 1;
   public static final short INDEX_MODIFIED = 2;
+  private static final String GAINED_SUCCESSFULLY_A_CONNECTION = "gained successfully a connection";
 
   private SqlUtil() {
   }
@@ -303,6 +309,127 @@ public class SqlUtil {
     IndexResult res = new IndexResult(INDEX_EXISTS);
     res.read = existingIndex;
     return res;
+  }
+
+  /**
+   * Executes the given update command and informs the {@link Handler}
+   * 
+   * @param datastore
+   *          the datastore to obtain the connection from
+   * @param command
+   *          the command to be executed
+   * @param resultHandler
+   *          a resulthandler to be informed
+   */
+  public static void updateWithParams(final SqlDataStore datastore, final String command, final JsonArray params,
+      final Handler<AsyncResult<UpdateResult>> resultHandler) {
+    updateWithParams((AsyncSQLClient) datastore.getClient(), command, params, resultHandler);
+  }
+
+  /**
+   * Executes the given command and informs the {@link Handler}
+   * 
+   * @param sqlClient
+   *          the sqlClient to obtain the connection from
+   * @param command
+   *          the command to be executed
+   * @param resultHandler
+   *          a resulthandler to be informed
+   */
+  public static void updateWithParams(final AsyncSQLClient sqlClient, final String command, final JsonArray params,
+      final Handler<AsyncResult<UpdateResult>> resultHandler) {
+    LOGGER.debug("updateWithParams: " + command + " | " + params);
+    sqlClient.getConnection(cr -> {
+      if (cr.failed()) {
+        Exception sqlEx = new SqlException(ERROR_GAINING_CONNECTION, cr.cause());
+        LOGGER.error("", sqlEx);
+        resultHandler.handle(Future.failedFuture(sqlEx));
+      } else {
+        SQLConnection connection = cr.result();
+        LOGGER.debug(GAINED_SUCCESSFULLY_A_CONNECTION);
+        executeUpdateWithParams(connection, command, params, resultHandler);
+      }
+    });
+  }
+
+  private static void executeUpdate(final SQLConnection connection, final String command,
+      final Handler<AsyncResult<UpdateResult>> resultHandler) {
+    connection.update(command, qr -> {
+      if (qr.failed()) {
+        Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command, qr.cause());
+        LOGGER.error("", sqlEx);
+        connection.close();
+        resultHandler.handle(Future.failedFuture(sqlEx));
+        return;
+      }
+      LOGGER.debug(COMMAND_SUCCESS);
+      connection.close();
+      LOGGER.debug(CONNECTION_CLOSED);
+      resultHandler.handle(Future.succeededFuture(qr.result()));
+    });
+  }
+
+  private static void executeUpdateWithParams(final SQLConnection connection, final String command,
+      final JsonArray params, final Handler<AsyncResult<UpdateResult>> resultHandler) {
+    connection.updateWithParams(command, params, qr -> {
+      if (qr.failed()) {
+        connection.close();
+        Throwable error = qr.cause();
+        if (error instanceof MySQLException && error.getMessage().indexOf("Duplicate entry") >= 0
+            && error.getMessage().indexOf("for key 'PRIMARY'") >= 0) {
+          resultHandler.handle(Future.failedFuture(new DuplicateKeyException(error)));
+        } else {
+          Exception sqlEx = new SqlException(ERROR_EXECUTING_COMMAND_STATEMENT + command + " | " + params, error);
+          resultHandler.handle(Future.failedFuture(sqlEx));
+        }
+      } else {
+        LOGGER.debug(COMMAND_SUCCESS);
+        connection.close();
+        LOGGER.debug(CONNECTION_CLOSED);
+        resultHandler.handle(Future.succeededFuture(qr.result()));
+      }
+    });
+  }
+
+  /**
+   * Executes the given update command and informs the {@link Handler}
+   * 
+   * @param datastore
+   *          the datastore to obtain the connection from
+   * @param command
+   *          the command to be executed
+   * @param resultHandler
+   *          a resulthandler to be informed
+   */
+  public static void update(final SqlDataStore datastore, final String command,
+      final Handler<AsyncResult<UpdateResult>> resultHandler) {
+    update((AsyncSQLClient) datastore.getClient(), command, resultHandler);
+  }
+
+  /**
+   * Executes the given command and informs the {@link Handler}
+   * 
+   * @param sqlClient
+   *          the sqlClient to obtain the connection from
+   * @param command
+   *          the command to be executed
+   * @param resultHandler
+   *          a resulthandler to be informed
+   */
+  public static void update(final AsyncSQLClient sqlClient, final String command,
+      final Handler<AsyncResult<UpdateResult>> resultHandler) {
+    LOGGER.debug("update: " + command);
+    sqlClient.getConnection(cr -> {
+      if (cr.failed()) {
+        Exception sqlEx = new SqlException(ERROR_GAINING_CONNECTION, cr.cause());
+        LOGGER.error("", sqlEx);
+        resultHandler.handle(Future.failedFuture(sqlEx));
+        return;
+      }
+      SQLConnection connection = cr.result();
+      LOGGER.debug(GAINED_SUCCESSFULLY_A_CONNECTION);
+      executeUpdate(connection, command, resultHandler);
+    });
   }
 
   private static class IndexResult {
