@@ -70,6 +70,7 @@ public class TMongoDirectMassInsert {
     dropTable(context);
     final long startTime = System.currentTimeMillis();
     List<Future> futureList = createFutureList(TABLENAME);
+
     CompositeFuture cf = CompositeFuture.all(futureList);
     cf.setHandler(result -> {
       if (result.failed()) {

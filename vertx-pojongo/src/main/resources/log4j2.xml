@@ -4,6 +4,19 @@
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%d %-5p [%t] [%c{1}] %m (%F:%L) %n"/>
     </Console>
+    
+    <RollingFile name="vertx_logs" append="true" fileName="/Users/mremme/tmp/log/vertx.log" 
+    	filePattern="/Users/mremme/tmp/log/vertx/$${date:yyyy-MM}/vertx-%d{MM-dd-yyyy}-%i.log.gz" >
+      <PatternLayout pattern="%d{ISO8601} %-5p %c:%L - %m%n" />
+      <Policies>
+        <TimeBasedTriggeringPolicy />
+        <SizeBasedTriggeringPolicy size="250 MB"/>
+      </Policies>
+    </RollingFile>
+    
+    <Async name="vertx_async">
+      <AppenderRef ref="vertx_logs"/>
+    </Async>
   </Appenders>
   <Loggers>
     <Logger name="com.mongodb" level="fatal">
@@ -16,6 +29,10 @@
     <Root level="debug">
       <AppenderRef ref="Console"/>
     </Root>
+    <Root level="DEBUG">
+      <AppenderRef ref="vertx_async" />
+    </Root>
   </Loggers>
 </Configuration>
+
 
