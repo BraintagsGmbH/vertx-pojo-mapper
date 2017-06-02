@@ -28,6 +28,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.util.QueryHelper;
 import de.braintags.vertx.util.ErrorObject;
@@ -532,9 +533,10 @@ public abstract class DatastoreBaseTest {
    * @param context
    * @param q
    */
-  protected void checkIndex(final TestContext context, final IMapper<?> mapper, final String indexName) {
+  protected void checkIndex(final TestContext context, final IMapper<?> mapper,
+      final IIndexDefinition indexDefinition) {
     Async async = context.async();
-    getDataStore(context).getMetaData().getIndexInfo(indexName, mapper, result -> {
+    getDataStore(context).getMetaData().getIndexInfo(indexDefinition.getName(), mapper, result -> {
       if (result.failed()) {
         context.fail(result.cause());
         async.complete();
@@ -542,6 +544,7 @@ public abstract class DatastoreBaseTest {
         Object indexInfo = result.result();
         LOGGER.info("indexInfo: " + indexInfo);
         context.assertNotNull(indexInfo, "Index wasn't created");
+        TestHelper.getDatastoreContainer(context).checkIndex(indexInfo, indexDefinition, context);
         async.complete();
       }
     });

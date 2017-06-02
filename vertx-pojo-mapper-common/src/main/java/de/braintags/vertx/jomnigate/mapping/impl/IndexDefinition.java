@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.annotation.IndexField;
 import de.braintags.vertx.jomnigate.annotation.IndexType;
@@ -74,6 +76,9 @@ public class IndexDefinition implements IIndexDefinition {
     }
     if (index.options() != null) {
       getIndexOptions().add(new IndexOption(IndexFeature.UNIQUE, index.options().unique()));
+      if (StringUtils.isNotBlank(index.options().partialFilterExpression()))
+        getIndexOptions()
+            .add(new IndexOption(IndexFeature.PARTIAL_FILTER_EXPRESSION, index.options().partialFilterExpression()));
     }
   }
 
@@ -107,15 +112,13 @@ public class IndexDefinition implements IIndexDefinition {
   }
 
   /**
-   * Create a unique identifier consisting of all field names sorted, combined, and transformed to lowercase. The
-   * resulting string is hashed to prevent overly long identifiers.
+   * Create a unique identifier consisting of all field names sorted, combined, and transformed to lowercase
    * 
    * @return a unique identifier for the fields of the definition
    */
   private String createIdentifier() {
     return fields.stream().map(field -> field.getName() + ":" + field.getType()).sorted()
-        .collect(Collectors.joining(".:"))
-        .toLowerCase(Locale.US);
+        .collect(Collectors.joining(".:")).toLowerCase(Locale.US);
   }
 
   @Override

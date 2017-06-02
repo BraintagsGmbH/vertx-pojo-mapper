@@ -63,7 +63,7 @@ public class MongoDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Js
   @Override
   protected void syncIndexes(final IMapper<?> mapper, final ImmutableSet<IIndexDefinition> indexes,
       final Handler<AsyncResult<Void>> resultHandler) {
-    MongoUtil.createIndexes(ds, mapper.getTableInfo().getName(), mapper.getIndexDefinitions(), result -> {
+    MongoUtil.createIndexes(ds, mapper, result -> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
