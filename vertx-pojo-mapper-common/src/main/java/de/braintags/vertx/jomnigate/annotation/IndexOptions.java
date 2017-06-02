@@ -36,5 +36,11 @@ public @interface IndexOptions {
    * Creates the index as a unique value index; inserting duplicates values in this field will cause errors
    */
   boolean unique() default false;
+  
+  /**
+   * Defines a filter expression. Only elements matching the filter will be added to the index, and be constrained by it
+   * if the "unique" flag is set
+   */
+  String partialFilterExpression() default "";
 
 }

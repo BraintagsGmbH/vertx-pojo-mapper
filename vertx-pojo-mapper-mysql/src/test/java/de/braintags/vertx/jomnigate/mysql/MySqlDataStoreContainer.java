@@ -19,6 +19,7 @@ import java.util.Map;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.IDataStoreInit;
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mysql.init.MySqlDataStoreinit;
 import de.braintags.vertx.jomnigate.mysql.typehandler.BooleanTypeHandler;
 import de.braintags.vertx.jomnigate.mysql.typehandler.SqlArrayTypeHandlerEmbedded;
@@ -61,6 +62,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.ext.unit.TestContext;
 
 /**
  * 
@@ -190,6 +192,11 @@ public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
       LOGGER.info("Deleted records " + tableName);
       handler.handle(Future.succeededFuture());
     });
+  }
+
+  @Override
+  public void checkIndex(Object indexInfo, IIndexDefinition sourceIndex, TestContext context) {
+    // TODO implement
   }
 
 }
