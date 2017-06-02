@@ -12,6 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.mongo;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +30,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
@@ -143,7 +143,7 @@ public final class MongoUtil {
   /**
    * Create indexes which are defined by the given {@link Index}
    * 
-   * @param ds
+   * @param dataStore
    *          the datastore
    * @param collection
    *          the name of the collection to be used
@@ -152,20 +152,19 @@ public final class MongoUtil {
    * @param handler
    *          the handler to be informed with the result of the index creation
    */
-  public static final void createIndexes(final MongoDataStore ds, IMapper<?> mapper,
+  public static final void createIndexes(final MongoDataStore dataStore, IMapper<?> mapper,
       final Handler<AsyncResult<JsonObject>> handler) {
     String collection = mapper.getTableInfo().getName();
     ImmutableSet<IIndexDefinition> indexDefinitions = mapper.getIndexDefinitions();
     JsonObject indexCommand = new JsonObject().put("createIndexes", collection);
 
-    CompositeFuture
-        .all(indexDefinitions.stream().map(def -> createIndexDefinition(def, mapper)).collect(Collectors.toList()))
-        .setHandler(rIndex -> {
+    CompositeFuture.all(indexDefinitions.stream().map(def -> createIndexDefinition(def, mapper, dataStore))
+        .collect(Collectors.toList())).setHandler(rIndex -> {
           if (rIndex.failed())
             handler.handle(Future.failedFuture(rIndex.cause()));
           else {
             indexCommand.put("indexes", rIndex.result().list());
-            ((MongoClient) ds.getClient()).runCommand("createIndexes", indexCommand, rCreate -> {
+            ((MongoClient) dataStore.getClient()).runCommand("createIndexes", indexCommand, rCreate -> {
               if (rCreate.failed()) {
                 handler.handle(Future.failedFuture(new RuntimeException(rCreate.cause())));
               } else {
@@ -176,7 +175,8 @@ public final class MongoUtil {
         });
   }
 
-  private static Future<JsonObject> createIndexDefinition(final IIndexDefinition indexDefinition, IMapper<?> mapper) {
+  private static Future<JsonObject> createIndexDefinition(final IIndexDefinition indexDefinition, IMapper<?> mapper,
+      final MongoDataStore dataStore) {
     Future<JsonObject> future = Future.future();
     JsonObject idxObject = new JsonObject();
     try {
@@ -191,7 +191,7 @@ public final class MongoUtil {
       future.fail(e);
       return future;
     }
-    addIndexOptions(idxObject, indexDefinition.getIndexOptions(), mapper, future);
+    addIndexOptions(idxObject, indexDefinition.getIndexOptions(), mapper, dataStore, future);
     return future;
   }
 
@@ -200,36 +200,47 @@ public final class MongoUtil {
   }
 
   private static void addIndexOptions(final JsonObject indexDef,
-      final List<de.braintags.vertx.jomnigate.mapping.IndexOption> indexOptions,
-      IMapper<?> mapper, Handler<AsyncResult<JsonObject>> handler) {
+      final List<de.braintags.vertx.jomnigate.mapping.IndexOption> indexOptions, IMapper<?> mapper,
+      final MongoDataStore dataStore, Handler<AsyncResult<JsonObject>> handler) {
     @SuppressWarnings("rawtypes")
     List<Future> futures = new ArrayList<>();
     for (IndexOption option : indexOptions) {
+      Object value = option.getValue();
       Future<Void> future = Future.future();
       futures.add(future);
 
-      Object value = option.getValue();
       switch (option.getFeature()) {
       case UNIQUE:
         indexDef.put("unique", value);
         future.complete();
         break;
       case PARTIAL_FILTER_EXPRESSION:
-        ISearchCondition condition = Json.decodeValue((String) value, ISearchCondition.class);
-        MongoQueryExpression mongoQueryExpression = new MongoQueryExpression();
-        mongoQueryExpression.setMapper(mapper);
-        mongoQueryExpression.buildSearchCondition(condition, null, result -> {
-          future.handle(result.map(v -> {
-            indexDef.put("partialFilterExpression", mongoQueryExpression.getQueryDefinition());
-            return null;
-          }));
-        });
+        convertFilterExpression((String) value, indexDef, mapper, dataStore, future);
         break;
       default:
         future.fail(new IllegalArgumentException("Unknown IndexFeature: " + option.getFeature()));
       }
     }
-
     CompositeFuture.all(futures).setHandler(result -> handler.handle(result.map(indexDef)));
+  }
+
+  private static void convertFilterExpression(String filterExpression, final JsonObject indexDef, IMapper<?> mapper,
+      final MongoDataStore dataStore, Future<Void> future) {
+    ISearchCondition condition;
+    try {
+      condition = dataStore.getJacksonMapper().readValue(filterExpression, ISearchCondition.class);
+    } catch (IOException e) {
+      future.fail(e);
+      return;
+    }
+
+    MongoQueryExpression mongoQueryExpression = new MongoQueryExpression();
+    mongoQueryExpression.setMapper(mapper);
+    mongoQueryExpression.buildSearchCondition(condition, null, result -> {
+      future.handle(result.map(v -> {
+        indexDef.put("partialFilterExpression", mongoQueryExpression.getQueryDefinition());
+        return null;
+      }));
+    });
   }
 }
