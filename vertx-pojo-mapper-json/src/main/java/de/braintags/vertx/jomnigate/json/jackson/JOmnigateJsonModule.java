@@ -29,4 +29,9 @@ public class JOmnigateJsonModule extends SimpleModule {
     }
   }
 
+  @Override
+  public Object getTypeId() {
+    return null;
+  }
+
 }
