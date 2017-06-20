@@ -303,7 +303,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
       if (!started) {
         try {
           retries++;
-          Thread.sleep((long) (Math.random() * 500));
+          Thread.sleep((long) (Math.random() * 100));
           port = new Net().getPort();
         } catch (IOException | InterruptedException e1) {
           throw new InitException(e1);
@@ -320,22 +320,23 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
 
   private boolean internalStartMongoExe(boolean startMongoLocal, int localPort) {
     if (startMongoLocal) {
-      try {
-        LOGGER.info("STARTING LOCAL MONGO ON PORT: " + localPort);
-      IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
-          .net(new Net(localPort, Network.localhostIsIPv6())).build();
-      Logger logger = (Logger) new SLF4JLogDelegateFactory().createDelegate(MongoDataStoreInit.class.getCanonicalName())
-          .unwrap();
-      IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaultsWithLogger(Command.MongoD, logger).build();
-      MongodExecutable temp = MongodStarter.getInstance(runtimeConfig).prepare(config);
-        temp.start();
-        // ensure client was successfully started before assigning to global field
-        exe = temp;
-      } catch (IOException e) {
-        return false;
+        try {
+          LOGGER.info("STARTING LOCAL MONGO ON PORT: " + localPort);
+          IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
+              .net(new Net(localPort, Network.localhostIsIPv6())).build();
+          Logger logger = (Logger) new SLF4JLogDelegateFactory()
+              .createDelegate(MongoDataStoreInit.class.getCanonicalName())
+              .unwrap();
+          IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaultsWithLogger(Command.MongoD, logger).build();
+          MongodExecutable temp = MongodStarter.getInstance(runtimeConfig).prepare(config);
+          temp.start();
+          // ensure client was successfully started before assigning to global field
+          exe = temp;
+        } catch (IOException e) {
+          return false;
+        }
       }
-    }
-    return true;
+      return true;
   }
 
 }
