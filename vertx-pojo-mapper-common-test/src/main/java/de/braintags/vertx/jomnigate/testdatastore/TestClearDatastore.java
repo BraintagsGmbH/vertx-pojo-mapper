@@ -12,6 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.testdatastore;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -43,6 +44,7 @@ public class TestClearDatastore {
    * @param context
    */
   @Test
+  @Ignore("can only test with real database, not locally started test database that loses its data on every init")
   public void testDatastore_noClearOnInit(final TestContext context) {
     testDatastore(false, context);
   }
