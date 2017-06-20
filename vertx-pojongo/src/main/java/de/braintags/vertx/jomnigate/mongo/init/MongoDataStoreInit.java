@@ -308,7 +308,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
         } catch (IOException | InterruptedException e1) {
           throw new InitException(e1);
         }
-        LOGGER.warn("Retry local mongo start. " + retries + " of " + 5 + " retries. New port " + port);
+        LOGGER.warn("Retry local mongo start. " + retries + " of " + maxRetries + " retries. New port " + port);
       }
 
     }
