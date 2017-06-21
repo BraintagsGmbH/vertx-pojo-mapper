@@ -23,7 +23,10 @@ import de.braintags.vertx.jomnigate.json.typehandler.handler.CollectionTypeHandl
 import de.braintags.vertx.jomnigate.json.typehandler.handler.MapTypeHandlerReferenced;
 import de.braintags.vertx.jomnigate.json.typehandler.handler.ObjectTypeHandler;
 import de.braintags.vertx.jomnigate.json.typehandler.handler.ObjectTypeHandlerReferenced;
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
+import de.braintags.vertx.jomnigate.mapping.IIndexFieldDefinition;
 import de.braintags.vertx.jomnigate.mapping.IKeyGenerator;
+import de.braintags.vertx.jomnigate.mapping.IndexOption;
 import de.braintags.vertx.jomnigate.mongo.MongoDataStore;
 import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
 import de.braintags.vertx.jomnigate.testdatastore.AbstractDataStoreContainer;
@@ -59,7 +62,9 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
+import io.vertx.ext.unit.TestContext;
 
 /**
  * 
@@ -248,10 +253,57 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   }
 
   @Override
-  public String getExpectedTypehandlerName(final Class<? extends AbstractTypeHandlerTest> testClass, final String defaultName) {
+  public String getExpectedTypehandlerName(final Class<? extends AbstractTypeHandlerTest> testClass,
+      final String defaultName) {
     if (thMap.containsKey(testClass.getName()))
       return thMap.get(testClass.getName());
     return defaultName;
+  }
+
+  @Override
+  public void checkIndex(Object indexInfo, IIndexDefinition sourceIndex, TestContext context) {
+    context.assertTrue(indexInfo instanceof JsonObject);
+    JsonObject index = (JsonObject) indexInfo;
+    context.assertEquals(sourceIndex.getName(), index.getString("name"));
+    JsonObject key = index.getJsonObject("key");
+    for (IIndexFieldDefinition field : sourceIndex.getFields()) {
+      Object indexValue = field.getType().toIndexValue();
+      switch (field.getType()) {
+      case ASC:
+      case DESC:
+        context.assertEquals(indexValue, key.getInteger(field.getName()));
+        break;
+      case TEXT:
+        context.assertEquals(indexValue, key.getString("_fts"));
+        JsonObject weights = index.getJsonObject("weights");
+        context.assertEquals(1, weights.getInteger(field.getName()));
+        break;
+      case GEO2D:
+      case GEO2DSPHERE:
+        context.assertEquals(indexValue, key.getString("position"));
+        break;
+      default:
+        context.fail("Unknown index type: " + field.getType());
+        return;
+      }
+    }
+
+    for (IndexOption option : sourceIndex.getIndexOptions()) {
+      switch (option.getFeature()) {
+      case UNIQUE:
+        boolean unique = (boolean) option.getValue();
+        if (unique)
+          context.assertEquals(true, index.getBoolean("unique"));
+        break;
+      case PARTIAL_FILTER_EXPRESSION:
+        // can not easily assert that the query matches the source definition as it is transformed to a mongoDB query
+        context.assertNotNull(index.getJsonObject("partialFilterExpression"));
+        break;
+      default:
+        context.fail("Unknown index option: " + option.getFeature());
+        return;
+      }
+    }
   }
 
 }
