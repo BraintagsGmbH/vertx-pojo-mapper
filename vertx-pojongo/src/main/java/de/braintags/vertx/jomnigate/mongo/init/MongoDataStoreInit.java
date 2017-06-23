@@ -318,17 +318,21 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     return port;
   }
 
+  private static Logger mongoLogger = (Logger) new SLF4JLogDelegateFactory()
+      .createDelegate(MongoDataStoreInit.class.getCanonicalName())
+      .unwrap();
+  private static IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
+      .defaultsWithLogger(Command.MongoD, mongoLogger)
+      .build();
+  private static final MongodStarter starter = MongodStarter.getInstance(runtimeConfig);
+
   private boolean internalStartMongoExe(boolean startMongoLocal, int localPort) {
     if (startMongoLocal) {
         try {
           LOGGER.info("STARTING LOCAL MONGO ON PORT: " + localPort);
           IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
               .net(new Net(localPort, Network.localhostIsIPv6())).build();
-          Logger logger = (Logger) new SLF4JLogDelegateFactory()
-              .createDelegate(MongoDataStoreInit.class.getCanonicalName())
-              .unwrap();
-          IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaultsWithLogger(Command.MongoD, logger).build();
-          MongodExecutable temp = MongodStarter.getInstance(runtimeConfig).prepare(config);
+        MongodExecutable temp = starter.prepare(config);
           temp.start();
           // ensure client was successfully started before assigning to global field
           exe = temp;
