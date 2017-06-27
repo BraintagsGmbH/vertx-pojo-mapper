@@ -303,7 +303,9 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
       if (!started) {
         try {
           retries++;
-          Thread.sleep((long) (Math.random() * 100));
+          if (retries > 0) {
+            Thread.sleep((long) (Math.random() * 100));
+          }
           port = new Net().getPort();
         } catch (IOException | InterruptedException e1) {
           throw new InitException(e1);
