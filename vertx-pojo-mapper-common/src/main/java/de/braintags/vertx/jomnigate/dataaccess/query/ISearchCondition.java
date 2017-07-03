@@ -439,17 +439,50 @@ public interface ISearchCondition {
    *
    * @param fieldName
    *          the field name for the comparison
-   * @param x
-   *          the x geo coordinate
-   * @param y
-   *          the y geo coordinate
+   * @param longitude
+   *          the longitude geo coordinate
+   * @param latitude
+   *          the latitude geo coordinate
+   * @return
+   */
+  static IFieldCondition near(String fieldName, double longitude, double latitude) {
+    return createFieldCondition(fieldName, QueryOperator.NEAR,
+        new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0]))));
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#NEAR} operator
+   *
+   * @param field
+   *          the field for the comparison
+   * @param longitude
+   *          the longitude coordinate
+   * @param latitude
+   *          the latitude coordinate
+   * @return
+   */
+  static IFieldCondition near(IIndexedField field, double longitude, double latitude) {
+    // don't change order of longitude/latitude, or else mongo doesn't work anymore
+    return createFieldCondition(field, QueryOperator.NEAR,
+        new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0]))));
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#NEAR} operator
+   *
+   * @param fieldName
+   *          the field name for the comparison
+   * @param longitude
+   *          the longitude geo coordinate
+   * @param latitude
+   *          the latitude geo coordinate
    * @param maxDistance
    *          the maximum distance to the given point
    * @return
    */
-  static IFieldCondition near(String fieldName, double x, double y, int maxDistance) {
+  static IFieldCondition near(String fieldName, double longitude, double latitude, int maxDistance) {
     return createFieldCondition(fieldName, QueryOperator.NEAR,
-        new GeoSearchArgument(new GeoPoint(new Position(x, y, new double[0])), maxDistance));
+        new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0])), maxDistance));
   }
 
   /**
