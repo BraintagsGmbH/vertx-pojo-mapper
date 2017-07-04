@@ -554,6 +554,17 @@ public interface ISearchCondition {
   }
 
   /**
+   * Connects the given query parts with the {@link QueryLogic#AND} connector
+   *
+   * @param searchConditions
+   *          the search conditions to connect
+   * @return
+   */
+  static ISearchConditionContainer and(Collection<ISearchCondition> searchConditions) {
+    return new QueryAnd(new ISearchCondition[searchConditions.size()]);
+  }
+
+  /**
    * Connects the given query parts with the {@link QueryLogic#OR} connector
    *
    * @param searchConditions
@@ -562,6 +573,17 @@ public interface ISearchCondition {
    */
   static ISearchConditionContainer or(ISearchCondition... searchConditions) {
     return new QueryOr(searchConditions);
+  }
+
+  /**
+   * Connects the given query parts with the {@link QueryLogic#OR} connector
+   *
+   * @param searchConditions
+   *          the search conditions to connect
+   * @return
+   */
+  static ISearchConditionContainer or(Collection<ISearchCondition> searchConditions) {
+    return new QueryOr(new ISearchCondition[searchConditions.size()]);
   }
 
 }
