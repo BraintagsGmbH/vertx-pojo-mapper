@@ -19,12 +19,12 @@ import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.QueryLogic;
 
 /**
- * Represents a container that joins search conditions with an {@link QueryLogic#AND}<br>
+ * Represents a container that joins search conditions with an {@link QueryLogic#NOT}<br>
  * <br>
- * Copyright: Copyright (c) 20.12.2016 <br>
+ * Copyright: Copyright (c) 19.07.2017 <br>
  * Company: Braintags GmbH <br>
  * 
- * @author sschmitt
+ * @author mpluecker
  */
 public class QueryNot extends AbstractSearchConditionContainer {
 
