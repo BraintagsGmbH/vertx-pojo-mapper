@@ -58,7 +58,7 @@ public class SqlDistanceSearchFunction {
    * @return the content
    */
   public Object getValue() {
-    return String.valueOf(source.getDistance());
+    return String.valueOf(source.getMaxDistance());
   }
 
 }

@@ -14,6 +14,8 @@ package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
@@ -37,7 +39,7 @@ import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPolygon;
  * @author Michael Remme
  * 
  */
-
+@JsonInclude(Include.NON_NULL)
 public class GeoSearchArgument {
 
   public static final String COORDINATES = "coordinates";
@@ -47,15 +49,19 @@ public class GeoSearchArgument {
   @JsonTypeIdResolver(GeoSearchArgumentTypeResolver.class)
   private GeoJsonObject geoJson;
   @JsonProperty("$maxDistance")
-  private int distance = -1;
+  private Integer maxDistance;
 
   protected GeoSearchArgument() {
     // default constructor for jackson
   }
 
-  public GeoSearchArgument(final GeoJsonObject geoJson, final int distance) {
+  public GeoSearchArgument(final GeoJsonObject geoJson) {
     this.geoJson = geoJson;
-    this.distance = distance;
+  }
+
+  public GeoSearchArgument(final GeoJsonObject geoJson, final int maxDistance) {
+    this.geoJson = geoJson;
+    this.maxDistance = maxDistance;
   }
 
   /**
@@ -66,10 +72,10 @@ public class GeoSearchArgument {
   }
 
   /**
-   * @return the distance
+   * @return the maximum distance for the search, may be null
    */
-  public int getDistance() {
-    return distance;
+  public Integer getMaxDistance() {
+    return maxDistance;
   }
 
   /**
