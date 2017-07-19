@@ -115,6 +115,8 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
       return "$and";
     case OR:
       return "$or";
+    case NOT:
+      return "$not";
     default:
       throw new UnknownQueryLogicException(logic);
     }

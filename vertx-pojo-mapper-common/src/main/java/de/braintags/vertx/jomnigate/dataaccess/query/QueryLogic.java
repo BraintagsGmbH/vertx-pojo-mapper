@@ -22,5 +22,6 @@ package de.braintags.vertx.jomnigate.dataaccess.query;
 public enum QueryLogic {
 
   AND,
-  OR;
+  OR,
+  NOT;
 }

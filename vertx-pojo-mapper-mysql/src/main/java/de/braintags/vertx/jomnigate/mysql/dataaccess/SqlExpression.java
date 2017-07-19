@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -58,14 +61,23 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
   private static final String DELETE_STATEMENT = "DELETE from %s";
   private static final String COUNT_STATEMENT = "SELECT count(*) from %s";
 
-  private String nativeCommand = null;
-  private StringBuilder select = new StringBuilder();
-  private StringBuilder delete = new StringBuilder();
-  private StringBuilder count = new StringBuilder();
+  private static final Pair<String, QueryOperatorPosition> AND = new ImmutablePair<>("AND",
+      QueryOperatorPosition.INFIX);
 
-  private StringBuilder whereClause = new StringBuilder();
-  private StringBuilder orderByClause = new StringBuilder();
-  private JsonArray parameters = new JsonArray();
+  private static final Pair<String, QueryOperatorPosition> OR = new ImmutablePair<>("OR",
+      QueryOperatorPosition.INFIX);
+
+  private static final Pair<String, QueryOperatorPosition> NOT = new ImmutablePair<>("NOT",
+      QueryOperatorPosition.PREFIX);
+
+  private String nativeCommand = null;
+  private final StringBuilder select = new StringBuilder();
+  private final StringBuilder delete = new StringBuilder();
+  private final StringBuilder count = new StringBuilder();
+
+  private final StringBuilder whereClause = new StringBuilder();
+  private final StringBuilder orderByClause = new StringBuilder();
+  private final JsonArray parameters = new JsonArray();
 
   /*
    * (non-Javadoc)
@@ -258,18 +270,24 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
   @Override
   protected SqlWhereFragment parseContainerContents(List<SqlWhereFragment> parsedConditionList,
       ISearchConditionContainer container) throws UnknownQueryLogicException {
-    String translatedConnector = translateQueryLogic(container.getQueryLogic());
+    Pair<String, QueryOperatorPosition> translatedConnector = translateQueryLogic(container.getQueryLogic());
 
     SqlWhereFragment fragment = new SqlWhereFragment();
     fragment.whereClause.append("(");
 
     Iterator<SqlWhereFragment> resultIterator = parsedConditionList.iterator();
     while (resultIterator.hasNext()) {
+      if (translatedConnector.getValue() == QueryOperatorPosition.PREFIX)
+        fragment.whereClause.append(translatedConnector.getKey()).append(" ");
       SqlWhereFragment subFragment = resultIterator.next();
       fragment.whereClause.append(subFragment.whereClause);
       fragment.parameters.addAll(subFragment.parameters);
-      if (resultIterator.hasNext())
-        fragment.whereClause.append(" ").append(translatedConnector).append(" ");
+      if (resultIterator.hasNext()) {
+        if (translatedConnector.getValue() == QueryOperatorPosition.INFIX) {
+          fragment.whereClause.append(" ").append(translatedConnector.getKey());
+        }
+        fragment.whereClause.append(" ");
+      }
     }
     fragment.whereClause.append(")");
     return fragment;
@@ -283,12 +301,14 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * @throws UnknownQueryLogicException
    *           if the logic value is unknown
    */
-  private String translateQueryLogic(QueryLogic logic) throws UnknownQueryLogicException {
+  private Pair<String, QueryOperatorPosition> translateQueryLogic(QueryLogic logic) throws UnknownQueryLogicException {
     switch (logic) {
     case AND:
-      return "AND";
+        return AND;
     case OR:
-      return "OR";
+        return OR;
+    case NOT:
+        return NOT;
     default:
       throw new UnknownQueryLogicException(logic);
     }
@@ -421,7 +441,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * POJO to hold the condition and optionally its parameters of a single fragment of the search condition
    */
   public static class SqlWhereFragment {
-    private StringBuilder whereClause = new StringBuilder();
-    private JsonArray parameters = new JsonArray();
+    private final StringBuilder whereClause = new StringBuilder();
+    private final JsonArray parameters = new JsonArray();
   }
 }

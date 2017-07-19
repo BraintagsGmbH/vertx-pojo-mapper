@@ -32,7 +32,7 @@ import io.vertx.codegen.annotations.Nullable;
  */
 public abstract class AbstractSearchConditionContainer implements ISearchConditionContainer {
 
-  private ConditionList conditions = new ConditionList();
+  private final ConditionList conditions = new ConditionList();
 
   /**
    * Initializes the container with zero or more sub conditions
@@ -64,7 +64,7 @@ public abstract class AbstractSearchConditionContainer implements ISearchConditi
   public String toString() {
     StringBuilder result = new StringBuilder();
     result.append(getQueryLogic().name()).append(" [");
-    result.append(StringUtils.join(getConditions(), " && "));
+    result.append(StringUtils.join(getConditions(), " " + getQueryLogic() + " "));
     result.append("]");
     return result.toString();
   }

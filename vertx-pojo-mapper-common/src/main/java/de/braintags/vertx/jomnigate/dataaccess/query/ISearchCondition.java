@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.FieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.GeoSearchArgument;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.QueryAnd;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.QueryNot;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.QueryOr;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.VariableFieldCondition;
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
@@ -48,6 +49,7 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({ @JsonSubTypes.Type(value = QueryAnd.class, name = "and"),
     @JsonSubTypes.Type(value = QueryOr.class, name = "or"),
+    @JsonSubTypes.Type(value = QueryNot.class, name = "not"),
     @JsonSubTypes.Type(value = FieldCondition.class, name = "condition"), })
 public interface ISearchCondition {
 
@@ -529,6 +531,17 @@ public interface ISearchCondition {
    */
   static ISearchConditionContainer or(ISearchCondition... searchConditions) {
     return new QueryOr(searchConditions);
+  }
+
+  /**
+   * Connects the given query parts with the {@link QueryLogic#NOT} connector
+   *
+   * @param searchCondition
+   *          the search condition to connect
+   * @return
+   */
+  static ISearchConditionContainer not(ISearchCondition searchCondition) {
+    return new QueryNot(searchCondition);
   }
 
 }
