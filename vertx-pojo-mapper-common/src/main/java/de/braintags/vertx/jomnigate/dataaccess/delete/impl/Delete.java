@@ -45,6 +45,7 @@ import io.vertx.core.Handler;
  */
 
 public abstract class Delete<T> extends AbstractDataAccessObject<T> implements IDelete<T> {
+
   private static final String ERROR_MESSAGE = "You can only use ONE source for deletion, either an IQuery or a list of instances";
   private IQuery<T> query;
   private final List<T> recordList = new ArrayList<>();
@@ -155,7 +156,8 @@ public abstract class Delete<T> extends AbstractDataAccessObject<T> implements I
    * @param wr
    * @param nextFuture
    */
-  protected void postDelete(final IDeleteResult dr, final IObserverContext context, final Future<IDeleteResult> nextFuture) {
+  protected void postDelete(final IDeleteResult dr, final IObserverContext context,
+      final Future<IDeleteResult> nextFuture) {
     Future<Void> f = getMapper().getObserverHandler().handleAfterDelete(this, dr, context);
     f.setHandler(res -> {
       if (res.failed()) {

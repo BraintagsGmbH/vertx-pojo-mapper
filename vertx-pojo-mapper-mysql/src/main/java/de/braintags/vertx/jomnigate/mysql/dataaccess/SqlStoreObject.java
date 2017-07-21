@@ -42,6 +42,7 @@ import io.vertx.core.json.JsonObject;
  */
 
 public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
+
   /**
    * Creates a new instance of SqlStoreObject with a {@link Map} as internal format
    * 
@@ -49,7 +50,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    * @param entity
    * @param container
    */
-  public SqlStoreObject(IMapper<T> mapper, T entity) {
+  public SqlStoreObject(final IMapper<T> mapper, final T entity) {
     super(mapper, entity, new HashMap<>());
   }
 
@@ -59,7 +60,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    * @param container
    * @param mapper
    */
-  public SqlStoreObject(JsonObject container, IMapper<T> mapper) {
+  public SqlStoreObject(final JsonObject container, final IMapper<T> mapper) {
     super(container, mapper);
   }
 
@@ -70,7 +71,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    */
   @SuppressWarnings("rawtypes")
   @Override
-  public Object get(IProperty field) {
+  public Object get(final IProperty field) {
     String colName = field.getColumnInfo().getName();
     return container instanceof JsonObject ? ((JsonObject) container).getValue(colName)
         : ((Map) container).get(colName);
@@ -101,7 +102,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    */
   @SuppressWarnings("rawtypes")
   @Override
-  public boolean hasProperty(IProperty field) {
+  public boolean hasProperty(final IProperty field) {
     String colName = field.getColumnInfo().getName();
     return container instanceof JsonObject ? ((JsonObject) container).containsKey(colName)
         : ((Map) container).containsKey(colName);
@@ -115,7 +116,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
-  public IStoreObject<T, Object> put(IProperty field, Object value) {
+  public IStoreObject<T, Object> put(final IProperty field, final Object value) {
     IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     if (ci == null) {
       throw new MappingException("Can't find a columninfo for field " + field.getFullName());
@@ -138,7 +139,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
    *          the handler to be informed
    * @return the sql statement to be executed
    */
-  public void generateSqlInsertStatement(Handler<AsyncResult<SqlSequence>> resultHandler) {
+  public void generateSqlInsertStatement(final Handler<AsyncResult<SqlSequence>> resultHandler) {
     try {
       ITableInfo tInfo = getMapper().getTableInfo();
       SqlSequence sequence = new SqlSequence(tInfo.getName());
@@ -155,7 +156,7 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
     }
   }
 
-  private void getNextId(SqlSequence sequence, Handler<AsyncResult<SqlSequence>> resultHandler) {
+  private void getNextId(final SqlSequence sequence, final Handler<AsyncResult<SqlSequence>> resultHandler) {
     IKeyGenerator gen = this.getMapper().getKeyGenerator();
     if (gen == null) {
       throw new UnsupportedOperationException(String.format(
@@ -205,19 +206,20 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
   }
 
   class SqlSequence {
+
     boolean added = false;
-    private StringBuilder headStatement;
-    private StringBuilder setStatement;
+    private final StringBuilder headStatement;
+    private final StringBuilder setStatement;
     private StringBuilder whereStatement;
     private Object id;
-    private JsonArray parameters = new JsonArray();
+    private final JsonArray parameters = new JsonArray();
 
     /**
      * Constructor for an insert command
      * 
      * @param tableName
      */
-    public SqlSequence(String tableName) {
+    public SqlSequence(final String tableName) {
       headStatement = new StringBuilder("Insert into ").append(tableName);
       setStatement = new StringBuilder(" set ");
     }
@@ -232,14 +234,14 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
      * @param idValue
      *          the id value
      */
-    public SqlSequence(String tableName, IColumnInfo idColInfo, Object idValue) {
+    public SqlSequence(final String tableName, final IColumnInfo idColInfo, final Object idValue) {
       headStatement = new StringBuilder("UPDATE ").append(tableName);
       setStatement = new StringBuilder(" set ");
       whereStatement = new StringBuilder(" WHERE ").append(idColInfo.getName()).append(" = ?");
       this.id = idValue;
     }
 
-    void addEntry(String colName, Object value) {
+    void addEntry(final String colName, final Object value) {
       if (added)
         setStatement.append(", ");
       if (value instanceof SqlFunction) {
@@ -270,6 +272,15 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
       if (whereStatement != null)
         ret.append(whereStatement);
       return ret.toString();
+    }
+
+    /**
+     * Append a condition to the where clause
+     * 
+     * @param condition
+     */
+    public final void combineExpressions(final SqlExpression expression) {
+      whereStatement.append(" AND " + expression.getWhereClause());
     }
 
     /**

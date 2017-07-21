@@ -33,7 +33,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.impl.TestIndexedFields;
     TestOnlyIdMapper.class, TestTrigger.class, TestMassInsert.class, TestKeyGenerator.class, TestGeoSearch.class,
     TestEncoder.class, TestListExtrems.class, TestReferenced.class, TestFieldConditionCache.class,
     TestQueryInterator.class, DataTypesTestSuite.class, ObserverVersioningSuite.class, TestClearDatastore.class,
-    TestIndexedFields.class })
+    TestIndexedFields.class, TestUpdate.class })
 public class AllTestsCommon {
 
 }

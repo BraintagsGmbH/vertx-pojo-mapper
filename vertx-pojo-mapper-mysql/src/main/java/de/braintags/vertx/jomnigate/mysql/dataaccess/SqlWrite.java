@@ -51,18 +51,19 @@ import io.vertx.ext.sql.UpdateResult;
  */
 
 public class SqlWrite<T> extends AbstractWrite<T> {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(SqlWrite.class);
 
   /**
    * @param mapperClass
    * @param datastore
    */
-  public SqlWrite(Class<T> mapperClass, IDataStore<?, ?> datastore) {
+  public SqlWrite(final Class<T> mapperClass, final IDataStore<?, ?> datastore) {
     super(mapperClass, datastore);
   }
 
   @Override
-  public Future<IWriteResult> internalSave(IObserverContext context) {
+  public Future<IWriteResult> internalSave(final IObserverContext context) {
     Future<IWriteResult> f = Future.future();
     if (getObjectsToSave().isEmpty()) {
       f.complete(new SqlWriteResult());
@@ -86,7 +87,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private CompositeFuture saveRecords(List<IStoreObject<T, ?>> storeObjects) {
+  private CompositeFuture saveRecords(final List<IStoreObject<T, ?>> storeObjects) {
     List<Future> fl = new ArrayList<>(storeObjects.size());
     for (IStoreObject<T, ?> storeObject : storeObjects) {
       fl.add(saveStoreObject((SqlStoreObject<T>) storeObject));
@@ -100,10 +101,13 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param storeObject
    * @param resultHandler
    */
-  private Future saveStoreObject(SqlStoreObject<T> storeObject) {
+  private Future saveStoreObject(final SqlStoreObject<T> storeObject) {
     Future<IWriteEntry> f = Future.future();
     Object currentId = storeObject.get(getMapper().getIdInfo().getField());
     if (currentId == null || (currentId instanceof Number && ((Number) currentId).intValue() == 0)) {
+      if (getQuery() != null) {
+        throw new IllegalStateException("Can not update with a query and objects without id");
+      }
       handleInsert(storeObject, f.completer());
     } else {
       handleUpdate(storeObject, f.completer());
@@ -122,15 +126,36 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    *          the {@link Handler} to be informed
    */
   @SuppressWarnings("rawtypes")
-  private void handleUpdate(SqlStoreObject<T> storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {
+  private void handleUpdate(final SqlStoreObject<T> storeObject,
+      final Handler<AsyncResult<IWriteEntry>> resultHandler) {
     SqlSequence seq = storeObject.generateSqlUpdateStatement();
+    if (getQuery() != null) {
+      if (getQuery().getNativeCommand() != null) {
+        throw new IllegalStateException("Cann not update with a native command");
+      }
+      getQuery().buildQueryExpression(null, res -> {
+        if (res.succeeded()) {
+          seq.combineExpressions(((SqlExpression) res.result()));
+          update(storeObject, resultHandler, seq);
+        } else {
+          resultHandler.handle(Future.failedFuture(res.cause()));
+        }
+      });
+    } else {
+      update(storeObject, resultHandler, seq);
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  private void update(final SqlStoreObject<T> storeObject, final Handler<AsyncResult<IWriteEntry>> resultHandler,
+      final SqlSequence seq) {
     if (seq.getParameters().isEmpty()) {
       SqlUtil.update((MySqlDataStore) getDataStore(), seq.getSqlStatement(),
           updateResult -> checkUpdateResult(updateResult, checkResult -> {
             if (checkResult.failed()) {
               resultHandler.handle(Future.failedFuture(checkResult.cause()));
             } else {
-              finishUpdate(storeObject, resultHandler);
+              finishUpdate(storeObject, updateResult.result(), resultHandler);
             }
           }));
     } else {
@@ -139,16 +164,19 @@ public class SqlWrite<T> extends AbstractWrite<T> {
             if (checkResult.failed()) {
               resultHandler.handle(Future.failedFuture(checkResult.cause()));
             } else {
-              finishUpdate(storeObject, resultHandler);
+              finishUpdate(storeObject, updateResult.result(), resultHandler);
             }
           }));
     }
-
   }
 
-  private void finishUpdate(SqlStoreObject<T> storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {
+  private void finishUpdate(final SqlStoreObject<T> storeObject, final UpdateResult updateResult,
+      final Handler<AsyncResult<IWriteEntry>> resultHandler) {
     Object id = getMapper().getIdInfo().getField().getPropertyAccessor().readData(storeObject.getEntity());
     LOGGER.debug("updated record with id " + id);
+    if (updateResult.getUpdated() == 0) {
+      resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.NOT_MATCHED)));
+    }
     try {
       executePostSave(storeObject.getEntity(), lcr -> {
         if (lcr.failed()) {
@@ -163,7 +191,8 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   }
 
   @SuppressWarnings("rawtypes")
-  private void handleInsert(SqlStoreObject<T> storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {
+  private void handleInsert(final SqlStoreObject<T> storeObject,
+      final Handler<AsyncResult<IWriteEntry>> resultHandler) {
     storeObject.generateSqlInsertStatement(isr -> {
       if (isr.failed()) {
         resultHandler.handle(Future.failedFuture(isr.cause()));
@@ -188,8 +217,8 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param resultHandler
    */
   @SuppressWarnings("rawtypes")
-  private void insertWithoutParameters(SqlStoreObject<T> storeObject, SqlSequence seq,
-      Handler<AsyncResult<IWriteEntry>> resultHandler) {
+  private void insertWithoutParameters(final SqlStoreObject<T> storeObject, final SqlSequence seq,
+      final Handler<AsyncResult<IWriteEntry>> resultHandler) {
     SqlUtil.update((MySqlDataStore) getDataStore(), seq.getSqlStatement(),
         updateResult -> checkUpdateResult(updateResult, checkResult -> {
           if (checkResult.failed()) {
@@ -201,8 +230,8 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   }
 
   @SuppressWarnings({ "rawtypes" })
-  private void insertWithParameters(SqlStoreObject<T> storeObject, SqlSequence seq,
-      Handler<AsyncResult<IWriteEntry>> resultHandler) {
+  private void insertWithParameters(final SqlStoreObject<T> storeObject, final SqlSequence seq,
+      final Handler<AsyncResult<IWriteEntry>> resultHandler) {
     SqlUtil.updateWithParams((MySqlDataStore) getDataStore(), seq.getSqlStatement(), seq.getParameters(),
         updateResult -> checkUpdateResult(updateResult, checkResult -> {
           if (checkResult.failed()) {
@@ -213,8 +242,8 @@ public class SqlWrite<T> extends AbstractWrite<T> {
         }));
   }
 
-  private void handleInsertError(Throwable t, SqlStoreObject<T> storeObject,
-      Handler<AsyncResult<IWriteEntry>> resultHandler) {
+  private void handleInsertError(final Throwable t, final SqlStoreObject<T> storeObject,
+      final Handler<AsyncResult<IWriteEntry>> resultHandler) {
     if (t instanceof DuplicateKeyException) {
       if (getMapper().getKeyGenerator() != null) {
         LOGGER.info("duplicate key, regenerating a new key");
@@ -243,7 +272,8 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * @param resultHandler
    *          the {@link Handler} to be informed
    */
-  private void checkUpdateResult(AsyncResult<UpdateResult> updateResult, Handler<AsyncResult<Void>> resultHandler) {
+  private void checkUpdateResult(final AsyncResult<UpdateResult> updateResult,
+      final Handler<AsyncResult<Void>> resultHandler) {
     if (updateResult.failed()) {
       Exception we = updateResult.cause() instanceof DuplicateKeyException
           ? (DuplicateKeyException) updateResult.cause() : new WriteException(updateResult.cause());
@@ -254,7 +284,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  private void finishInsert(SqlStoreObject storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {
+  private void finishInsert(final SqlStoreObject storeObject, final Handler<AsyncResult<IWriteEntry>> resultHandler) {
     try {
       Object id = storeObject.get(getMapper().getIdInfo().getField());
       Objects.requireNonNull(id, "Undefined ID when storing record");
@@ -283,7 +313,8 @@ public class SqlWrite<T> extends AbstractWrite<T> {
    * {@link IStoreObject}
    */
   @Override
-  protected void setIdValue(Object id, IStoreObject<T, ?> storeObject, Handler<AsyncResult<Void>> resultHandler) {
+  protected void setIdValue(final Object id, final IStoreObject<T, ?> storeObject,
+      final Handler<AsyncResult<Void>> resultHandler) {
     IProperty idField = getMapper().getIdInfo().getField();
     idField.getPropertyMapper().fromStoreObject(storeObject.getEntity(), storeObject, idField, resultHandler);
   }
