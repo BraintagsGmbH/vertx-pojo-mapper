@@ -12,6 +12,10 @@
  */
 package de.braintags.vertx.jomnigate.observer;
 
+import java.util.Properties;
+
+import de.braintags.vertx.jomnigate.annotation.Observer;
+import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import io.vertx.core.Future;
 
 /**
@@ -21,6 +25,14 @@ import io.vertx.core.Future;
  * 
  */
 public interface IObserver {
+
+  /**
+   * The properties, which can adjust the behaviour of an observer. Those properties can be defined by
+   * {@link ObserverDefinition} or by annotation {@link Observer}
+   * 
+   * @return
+   */
+  Properties getObserverProperties();
 
   /**
    * Checks wether the current instance can handle the given event

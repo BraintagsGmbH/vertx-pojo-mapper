@@ -14,6 +14,7 @@ package de.braintags.vertx.jomnigate.init;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
@@ -31,6 +32,7 @@ public class ObserverDefinition<T extends IObserver> {
   private List<ObserverEventType> eventTypeList = new ArrayList<>();
   private List<ObserverMapperSettings> mapperSettings = new ArrayList<>();
   private int priority;
+  private Properties observerProperties = new Properties();
 
   @SuppressWarnings("unused")
   private ObserverDefinition() {
@@ -118,6 +120,25 @@ public class ObserverDefinition<T extends IObserver> {
   }
 
   /**
+   * properties can be used to define the behaviour of an implementation of {@link IObserver}
+   * 
+   * @return the observerProperties
+   */
+  public final Properties getObserverProperties() {
+    return observerProperties;
+  }
+
+  /**
+   * properties can be used to define the behaviour of an implementation of {@link IObserver}
+   * 
+   * @param observerProperties
+   *          the observerProperties to set
+   */
+  public final void setObserverProperties(Properties observerProperties) {
+    this.observerProperties = observerProperties;
+  }
+
+  /**
    * Checks wether the current settings are applicable to the given IMapper. The definition is applicable, if no mapper
    * settings are defined or if mapper settings are defined and one is fitting
    * 
@@ -165,6 +186,7 @@ public class ObserverDefinition<T extends IObserver> {
   public ObserverDefinition<T> deepCopy() {
     ObserverDefinition<T> res = new ObserverDefinition<>(getObserverClass());
     res.eventTypeList.addAll(getEventTypeList());
+    res.observerProperties.putAll(observerProperties);
     res.priority = getPriority();
 
     for (ObserverMapperSettings mapperSetting : mapperSettings) {

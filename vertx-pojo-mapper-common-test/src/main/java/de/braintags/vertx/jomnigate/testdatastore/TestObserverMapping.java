@@ -56,6 +56,39 @@ public class TestObserverMapping extends AbstractObserverTest {
    * @param context
    */
   @Test
+  public void testObserverWithProperties(TestContext context) {
+    DataStoreSettings settings = getDataStore(context).getSettings();
+    ObserverDefinition<TestObserver4> os = new ObserverDefinition<>(TestObserver4.class);
+    os.setPriority(500);
+    settings.getObserverSettings().add(os);
+
+    ObserverDefinition<TestObserver2> os2 = new ObserverDefinition<>(TestObserver2.class);
+    os2.setPriority(200);
+    settings.getObserverSettings().add(os2);
+
+    ObserverDefinition<TestObserver3> os3 = new ObserverDefinition<>(TestObserver3.class);
+    os3.setPriority(501);
+    settings.getObserverSettings().add(os3);
+
+    IMapper<ObserverAnnotatedMapper> mapper = getDataStore(context).getMapperFactory()
+        .getMapper(ObserverAnnotatedMapper.class);
+    checkObserver_AllEvents(context, mapper, 4);
+
+    List<IObserver> ol = mapper.getObserverHandler().getObserver(ObserverEventType.AFTER_DELETE);
+    context.assertTrue(ol.get(0).getClass() == TestObserver.class, "wrong sort by priority");
+    context.assertTrue(ol.get(1).getClass() == TestObserver3.class, "wrong sort by priority");
+    context.assertTrue(ol.get(2).getClass() == TestObserver4.class, "wrong sort by priority");
+    context.assertTrue(ol.get(3).getClass() == TestObserver2.class, "wrong sort by priority");
+
+  }
+
+  /**
+   * Defines an observer, which should be executed for any event instanceof BaseRecord. TriggerMapper should not be
+   * handled by this mapper
+   * 
+   * @param context
+   */
+  @Test
   public void testObserverAndGlobal_Priority(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverDefinition<TestObserver4> os = new ObserverDefinition<>(TestObserver4.class);

@@ -13,9 +13,9 @@
 package de.braintags.vertx.jomnigate.testdatastore.observer;
 
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
-import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
+import de.braintags.vertx.jomnigate.observer.impl.AbstractObserver;
 import io.vertx.core.Future;
 
 /**
@@ -24,7 +24,7 @@ import io.vertx.core.Future;
  * @author Michael Remme
  * 
  */
-public class BeforeDeleteObserver implements IObserver {
+public class BeforeDeleteObserver extends AbstractObserver {
   public static boolean executed = false;
 
   /*
