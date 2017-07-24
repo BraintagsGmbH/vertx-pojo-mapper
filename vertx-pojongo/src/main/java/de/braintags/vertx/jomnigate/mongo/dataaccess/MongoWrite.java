@@ -236,13 +236,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   private void finishQueryUpdate(final Object id, final T entity, final MongoStoreObject<T> storeObject,
       final MongoClientUpdateResult updateResult, final Handler<AsyncResult<IWriteEntry>> resultHandler) {
     if (updateResult.getDocMatched() != 0 && updateResult.getDocMatched() == updateResult.getDocModified()) {
-      executePostSave(entity, lcr -> {
-        if (lcr.failed()) {
-          resultHandler.handle(Future.failedFuture(lcr.cause()));
-        } else {
-          resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.UPDATE)));
-        }
-      });
+      finishUpdate(id, entity, storeObject, resultHandler);
     } else if (updateResult.getDocMatched() == 0 && updateResult.getDocModified() == 0) {
       resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.NOT_MATCHED)));
     } else {

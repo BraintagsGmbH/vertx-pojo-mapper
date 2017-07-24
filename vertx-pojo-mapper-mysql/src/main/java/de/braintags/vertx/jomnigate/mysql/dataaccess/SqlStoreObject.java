@@ -275,11 +275,12 @@ public class SqlStoreObject<T> extends AbstractStoreObject<T, Object> {
     }
 
     /**
-     * Append a condition to the where clause
+     * Combine the where clauses of the passed expression to this expression
      * 
-     * @param condition
+     * @param expression
+     *          to take the where clause from
      */
-    public final void combineExpressions(final SqlExpression expression) {
+    public final void combineWhereClauses(final SqlExpression expression) {
       whereStatement.append(" AND " + expression.getWhereClause());
     }
 
