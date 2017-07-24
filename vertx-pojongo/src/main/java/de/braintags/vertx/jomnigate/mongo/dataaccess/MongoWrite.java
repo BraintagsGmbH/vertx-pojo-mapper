@@ -138,9 +138,6 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   private void doSave(final T entity, final MongoStoreObject<T> storeObject, final Future<IWriteEntry> future) {
     LOG.debug("now saving: " + storeObject.toString());
     if (storeObject.isNewInstance()) {
-      if (getQuery() != null) {
-        throw new IllegalStateException("Can not update with a query and objects without id");
-      }
       doInsert(entity, storeObject, future);
     } else {
       doUpdate(entity, storeObject, future);
@@ -149,6 +146,10 @@ public class MongoWrite<T> extends AbstractWrite<T> {
 
   private void doInsert(final T entity, final MongoStoreObject<T> storeObject,
       final Handler<AsyncResult<IWriteEntry>> resultHandler) {
+    if (getQuery() != null) {
+      throw new IllegalStateException("Can not update with a query and objects without id");
+    }
+
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     IMapper<T> mapper = getMapper();
     String collection = mapper.getTableInfo().getName();
