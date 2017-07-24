@@ -135,7 +135,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       }
       getQuery().buildQueryExpression(null, res -> {
         if (res.succeeded()) {
-          seq.combineWhereExpressions(((SqlExpression) res.result()));
+          seq.combineWhereClauses(((SqlExpression) res.result()));
           update(storeObject, resultHandler, seq);
         } else {
           resultHandler.handle(Future.failedFuture(res.cause()));
