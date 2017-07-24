@@ -57,6 +57,7 @@ import io.vertx.core.json.JsonArray;
  */
 
 public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
+
   private static final String SELECT_STATEMENT = "SELECT %s from %s";
   private static final String DELETE_STATEMENT = "DELETE from %s";
   private static final String COUNT_STATEMENT = "SELECT count(*) from %s";
@@ -87,7 +88,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * pojomapper.mapping.IMapper)
    */
   @Override
-  public void setMapper(IMapper<?> mapper) {
+  public void setMapper(final IMapper<?> mapper) {
     super.setMapper(mapper);
     select.append(
         String.format(SELECT_STATEMENT, ((SqlMapper<?>) mapper).getQueryFieldNames(), mapper.getTableInfo().getName()));
@@ -101,7 +102,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression#setNativeCommand(java.lang.Object)
    */
   @Override
-  public void setNativeCommand(Object nativeCommand) {
+  public void setNativeCommand(final Object nativeCommand) {
     if (nativeCommand instanceof CharSequence) {
       this.nativeCommand = nativeCommand.toString();
     } else {
@@ -118,7 +119,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * lang.Object)
    */
   @Override
-  protected void handleFinishedSearchCondition(SqlWhereFragment result) {
+  protected void handleFinishedSearchCondition(final SqlWhereFragment result) {
     whereClause.append(result.whereClause);
     parameters.addAll(result.parameters);
   }
@@ -131,8 +132,8 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
    */
   @Override
-  protected void handleNullConditionValue(IFieldCondition fieldCondition, final String columnName,
-      Handler<AsyncResult<SqlWhereFragment>> handler) {
+  protected void handleNullConditionValue(final IFieldCondition fieldCondition, final String columnName,
+      final Handler<AsyncResult<SqlWhereFragment>> handler) {
     SqlWhereFragment fragment = new SqlWhereFragment();
     fragment.whereClause.append(columnName).append(" ");
     if (fieldCondition.getOperator() == QueryOperator.EQUALS) {
@@ -155,23 +156,23 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
    */
   @Override
-  protected SqlWhereFragment buildFieldConditionResult(IFieldCondition fieldCondition, String columnName,
-      JsonNode value) throws UnknownQueryOperatorException {
+  protected SqlWhereFragment buildFieldConditionResult(final IFieldCondition fieldCondition, final String columnName,
+      final JsonNode value) throws UnknownQueryOperatorException {
     QueryOperator operator = fieldCondition.getOperator();
     JsonNode parsedValue;
     switch (operator) {
-    case CONTAINS:
-      parsedValue = new TextNode("%" + value.textValue() + "%");
-      break;
-    case STARTS:
-      parsedValue = new TextNode(value.textValue() + "%");
-      break;
-    case ENDS:
-      parsedValue = new TextNode("%" + value.textValue());
-      break;
-    default:
-      parsedValue = value;
-      break;
+      case CONTAINS:
+        parsedValue = new TextNode("%" + value.textValue() + "%");
+        break;
+      case STARTS:
+        parsedValue = new TextNode(value.textValue() + "%");
+        break;
+      case ENDS:
+        parsedValue = new TextNode("%" + value.textValue());
+        break;
+      default:
+        parsedValue = value;
+        break;
     }
     String parsedOperator = translateOperator(operator);
 
@@ -195,7 +196,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
     return fragment;
   }
 
-  private void parseArrayValue(JsonNode parsedValue, SqlWhereFragment fragment) {
+  private void parseArrayValue(final JsonNode parsedValue, final SqlWhereFragment fragment) {
     fragment.whereClause.append("(");
     Iterator<JsonNode> it = ((ArrayNode) parsedValue).iterator();
     while (it.hasNext()) {
@@ -211,7 +212,8 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
     fragment.whereClause.append(")");
   }
 
-  private void parseGeoSearchArgument(IFieldCondition fieldCondition, JsonNode parsedValue, SqlWhereFragment fragment) {
+  private void parseGeoSearchArgument(final IFieldCondition fieldCondition, final JsonNode parsedValue,
+      final SqlWhereFragment fragment) {
     GeoSearchArgument geoSearchArgument;
     try {
       geoSearchArgument = Json.mapper.convertValue(parsedValue, GeoSearchArgument.class);
@@ -232,31 +234,31 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * @throws UnknownQueryOperatorException
    *           if the operator is unknown
    */
-  private String translateOperator(QueryOperator operator) throws UnknownQueryOperatorException {
+  private String translateOperator(final QueryOperator operator) throws UnknownQueryOperatorException {
     switch (operator) {
-    case EQUALS:
-      return "=";
-    case NOT_EQUALS:
-      return "!=";
-    case LARGER:
-      return ">";
-    case LARGER_EQUAL:
-      return ">=";
-    case SMALLER:
-      return "<";
-    case SMALLER_EQUAL:
-    case NEAR:
-      return "<=";
-    case IN:
-      return "IN";
-    case NOT_IN:
-      return "NOT IN";
-    case STARTS:
-    case ENDS:
-    case CONTAINS:
-      return "LIKE";
-    default:
-      throw new UnknownQueryOperatorException(operator);
+      case EQUALS:
+        return "=";
+      case NOT_EQUALS:
+        return "!=";
+      case LARGER:
+        return ">";
+      case LARGER_EQUAL:
+        return ">=";
+      case SMALLER:
+        return "<";
+      case SMALLER_EQUAL:
+      case NEAR:
+        return "<=";
+      case IN:
+        return "IN";
+      case NOT_IN:
+        return "NOT IN";
+      case STARTS:
+      case ENDS:
+      case CONTAINS:
+        return "LIKE";
+      default:
+        throw new UnknownQueryOperatorException(operator);
     }
   }
 
@@ -268,8 +270,8 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * List, de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer)
    */
   @Override
-  protected SqlWhereFragment parseContainerContents(List<SqlWhereFragment> parsedConditionList,
-      ISearchConditionContainer container) throws UnknownQueryLogicException {
+  protected SqlWhereFragment parseContainerContents(final List<SqlWhereFragment> parsedConditionList,
+      final ISearchConditionContainer container) throws UnknownQueryLogicException {
     Pair<String, QueryOperatorPosition> translatedConnector = translateQueryLogic(container.getQueryLogic());
 
     SqlWhereFragment fragment = new SqlWhereFragment();
@@ -301,16 +303,17 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * @throws UnknownQueryLogicException
    *           if the logic value is unknown
    */
-  private Pair<String, QueryOperatorPosition> translateQueryLogic(QueryLogic logic) throws UnknownQueryLogicException {
+  private Pair<String, QueryOperatorPosition> translateQueryLogic(final QueryLogic logic)
+      throws UnknownQueryLogicException {
     switch (logic) {
-    case AND:
+      case AND:
         return AND;
-    case OR:
+      case OR:
         return OR;
-    case NOT:
+      case NOT:
         return NOT;
-    default:
-      throw new UnknownQueryLogicException(logic);
+      default:
+        throw new UnknownQueryLogicException(logic);
     }
   }
 
@@ -373,12 +376,16 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
     return deleteExpression.toString();
   }
 
+  String getWhereClause() {
+    return whereClause.toString();
+  }
+
   /**
    * Add the limit and offset to the given expression, if they are defined
    * 
    * @param expression
    */
-  private void appendLimitClause(StringBuilder expression) {
+  private void appendLimitClause(final StringBuilder expression) {
     if (getLimit() > 0) {
       expression.append(" LIMIT ").append(getLimit());
     }
@@ -392,7 +399,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * 
    * @param expression
    */
-  private void appendOrderByClause(StringBuilder expression) {
+  private void appendOrderByClause(final StringBuilder expression) {
     if (orderByClause.length() > 0) {
       expression.append(" ORDER BY ").append(orderByClause);
     }
@@ -403,7 +410,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * 
    * @param expression
    */
-  private void appendWhereClause(StringBuilder expression) {
+  private void appendWhereClause(final StringBuilder expression) {
     if (whereClause.length() > 0) {
       expression.append(" WHERE ").append(whereClause);
     }
@@ -418,7 +425,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    */
   @SuppressWarnings("rawtypes")
   @Override
-  public IQueryExpression addSort(ISortDefinition<?> sortDef) {
+  public IQueryExpression addSort(final ISortDefinition<?> sortDef) {
     SortDefinition<?> sd = (SortDefinition<?>) sortDef;
     for (SortArgument sa : sd.getSortArguments()) {
       orderByClause.append(orderByClause.length() == 0 ? "" : ", ").append(sa.fieldName)
@@ -441,6 +448,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * POJO to hold the condition and optionally its parameters of a single fragment of the search condition
    */
   public static class SqlWhereFragment {
+
     private final StringBuilder whereClause = new StringBuilder();
     private final JsonArray parameters = new JsonArray();
   }
