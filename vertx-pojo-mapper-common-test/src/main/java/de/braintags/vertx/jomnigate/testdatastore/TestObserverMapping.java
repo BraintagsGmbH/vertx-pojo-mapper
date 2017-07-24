@@ -25,6 +25,7 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.ObserverAnnotatedMapper;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.ObserverAnnotatedMapperWithProperties;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.ObserverAnnotatedMapper_TwoEvents;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.Person;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.PolyMapper;
@@ -36,6 +37,7 @@ import de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver;
 import de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver2;
 import de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver3;
 import de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver4;
+import de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver5;
 import de.braintags.vertx.jomnigate.testdatastore.observer.TestObserver_NoDefaultConstructor;
 import io.vertx.ext.unit.TestContext;
 
@@ -50,36 +52,45 @@ public class TestObserverMapping extends AbstractObserverTest {
       .getLogger(TestObserverMapping.class);
 
   /**
-   * Defines an observer, which should be executed for any event instanceof BaseRecord. TriggerMapper should not be
-   * handled by this mapper
+   * Defines an observer with properties by annotation
+   * 
+   * @param context
+   */
+  @Test
+  public void testObserverWithPropertiesByAnnotation(TestContext context) {
+
+    IMapper<ObserverAnnotatedMapperWithProperties> mapper = getDataStore(context).getMapperFactory()
+        .getMapper(ObserverAnnotatedMapperWithProperties.class);
+    List<IObserver> ol = mapper.getObserverHandler().getObserver(ObserverEventType.AFTER_LOAD);
+    context.assertFalse(ol.isEmpty(), "observer not found");
+    context.assertFalse(ol.get(0).getObserverProperties().isEmpty(), "observ er properties not found");
+  }
+
+  /**
+   * Defines an observer with properties
    * 
    * @param context
    */
   @Test
   public void testObserverWithProperties(TestContext context) {
     DataStoreSettings settings = getDataStore(context).getSettings();
-    ObserverDefinition<TestObserver4> os = new ObserverDefinition<>(TestObserver4.class);
-    os.setPriority(500);
+    ObserverDefinition<TestObserver5> os = new ObserverDefinition<>(TestObserver5.class);
+    os.getObserverProperties().setProperty("testProperty", "testValue");
     settings.getObserverSettings().add(os);
-
-    ObserverDefinition<TestObserver2> os2 = new ObserverDefinition<>(TestObserver2.class);
-    os2.setPriority(200);
-    settings.getObserverSettings().add(os2);
-
-    ObserverDefinition<TestObserver3> os3 = new ObserverDefinition<>(TestObserver3.class);
-    os3.setPriority(501);
-    settings.getObserverSettings().add(os3);
 
     IMapper<ObserverAnnotatedMapper> mapper = getDataStore(context).getMapperFactory()
         .getMapper(ObserverAnnotatedMapper.class);
-    checkObserver_AllEvents(context, mapper, 4);
+    List<IObserver> ol = mapper.getObserverHandler().getObserver(ObserverEventType.AFTER_LOAD);
+    context.assertFalse(ol.isEmpty(), "observer not found");
 
-    List<IObserver> ol = mapper.getObserverHandler().getObserver(ObserverEventType.AFTER_DELETE);
-    context.assertTrue(ol.get(0).getClass() == TestObserver.class, "wrong sort by priority");
-    context.assertTrue(ol.get(1).getClass() == TestObserver3.class, "wrong sort by priority");
-    context.assertTrue(ol.get(2).getClass() == TestObserver4.class, "wrong sort by priority");
-    context.assertTrue(ol.get(3).getClass() == TestObserver2.class, "wrong sort by priority");
-
+    TestObserver5 os5 = null;
+    for (IObserver tmp : ol) {
+      if (tmp.getClass() == TestObserver5.class) {
+        os5 = (TestObserver5) tmp;
+      }
+    }
+    context.assertNotNull(os5, "required ovbserver not found");
+    context.assertFalse(os5.getObserverProperties().isEmpty(), "observ er properties not found");
   }
 
   /**

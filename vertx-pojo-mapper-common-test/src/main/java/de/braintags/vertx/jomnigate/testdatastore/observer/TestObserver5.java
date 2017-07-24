@@ -32,7 +32,7 @@ public class TestObserver5 extends AbstractObserver {
 
   @Override
   public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return false;
+    return true;
   }
 
 }
