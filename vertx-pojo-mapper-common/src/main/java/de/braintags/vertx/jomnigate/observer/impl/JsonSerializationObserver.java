@@ -100,7 +100,7 @@ public class JsonSerializationObserver extends AbstractObserver {
   }
 
   private String createFileName(IObserverEvent event) {
-    return parentDir + event.getSource().getClass().getName() + "_" + UUID.randomUUID().toString();
+    return parentDir + event.getSource().getClass().getName() + "_" + UUID.randomUUID().toString() + ".json";
   }
 
   /*
