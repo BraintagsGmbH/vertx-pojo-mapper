@@ -21,11 +21,6 @@ import io.vertx.core.Future;
 public class DemoObserver extends AbstractObserver {
 
   @Override
-  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) { // <1>
-    return true;
-  }
-
-  @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) { // <2>
     ((SimpleMapper) event.getSource()).number = context.get("counter", 1);
     context.put("counter", ((SimpleMapper) event.getSource()).number + 1);

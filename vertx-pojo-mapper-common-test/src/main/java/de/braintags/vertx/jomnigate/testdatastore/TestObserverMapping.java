@@ -63,7 +63,7 @@ public class TestObserverMapping extends AbstractObserverTest {
         .getMapper(ObserverAnnotatedMapperWithProperties.class);
     List<IObserver> ol = mapper.getObserverHandler().getObserver(ObserverEventType.AFTER_LOAD);
     context.assertFalse(ol.isEmpty(), "observer not found");
-    context.assertFalse(ol.get(0).getObserverProperties().isEmpty(), "observ er properties not found");
+    context.assertFalse(ol.get(0).getObserverProperties().isEmpty(), "observer properties not found");
   }
 
   /**

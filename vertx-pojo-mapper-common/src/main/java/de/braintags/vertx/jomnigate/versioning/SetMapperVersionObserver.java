@@ -43,17 +43,6 @@ public class SetMapperVersionObserver extends AbstractObserver {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.vertx.jomnigate.observer.IObserver#canHandleEvent(de.braintags.vertx.jomnigate.observer.
-   * IObserverEvent, de.braintags.vertx.jomnigate.observer.IObserverContext)
-   */
-  @Override
-  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return true;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
    * @see
    * de.braintags.vertx.jomnigate.observer.IObserver#handleEvent(de.braintags.vertx.jomnigate.observer.IObserverEvent,
    * de.braintags.vertx.jomnigate.observer.IObserverContext)

@@ -34,9 +34,4 @@ public class TestObserver_NoDefaultConstructor extends AbstractObserver {
     return Future.succeededFuture();
   }
 
-  @Override
-  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return false;
-  }
-
 }

@@ -14,7 +14,6 @@ package de.braintags.vertx.jomnigate.testdatastore.observer;
 
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
-import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.observer.impl.AbstractObserver;
 import io.vertx.core.Future;
 
@@ -38,11 +37,6 @@ public class BeforeMappingObserver extends AbstractObserver {
     Class<?> mapperClass = (Class<?>) event.getSource();
     BeforeMappingObserver.executed = true;
     return Future.succeededFuture();
-  }
-
-  @Override
-  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return event.getEventType().equals(ObserverEventType.AFTER_MAPPING);
   }
 
 }

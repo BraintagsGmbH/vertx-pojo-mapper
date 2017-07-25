@@ -24,6 +24,7 @@ import io.vertx.core.Future;
  * 
  */
 public class TestObserver extends AbstractObserver {
+  public static boolean executed = false;
 
   /*
    * (non-Javadoc)
@@ -34,12 +35,8 @@ public class TestObserver extends AbstractObserver {
    */
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
+    executed = true;
     return Future.succeededFuture();
-  }
-
-  @Override
-  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return false;
   }
 
 }

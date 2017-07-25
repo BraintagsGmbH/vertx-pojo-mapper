@@ -30,9 +30,4 @@ public class TestObserver4 extends AbstractObserver {
     return Future.succeededFuture();
   }
 
-  @Override
-  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return false;
-  }
-
 }

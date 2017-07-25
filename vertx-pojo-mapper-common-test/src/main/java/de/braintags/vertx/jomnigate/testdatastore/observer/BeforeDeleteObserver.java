@@ -40,9 +40,4 @@ public class BeforeDeleteObserver extends AbstractObserver {
     return Future.succeededFuture();
   }
 
-  @Override
-  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return true;
-  }
-
 }

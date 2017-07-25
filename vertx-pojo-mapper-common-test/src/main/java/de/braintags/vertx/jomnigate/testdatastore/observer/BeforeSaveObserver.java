@@ -49,9 +49,4 @@ public class BeforeSaveObserver extends AbstractObserver {
     }
   }
 
-  @Override
-  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return true;
-  }
-
 }
