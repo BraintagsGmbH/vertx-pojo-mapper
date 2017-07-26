@@ -15,11 +15,13 @@ package de.braintags.vertx.jomnigate.testdatastore;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.testdatastore.typehandler.json.AbstractTypeHandlerTest;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.ext.unit.TestContext;
 
 /**
  * 
@@ -64,5 +66,17 @@ public interface IDatastoreContainer {
    * @return the expected typehandler class name
    */
   public String getExpectedTypehandlerName(Class<? extends AbstractTypeHandlerTest> testClass, String defaultName);
+
+  /**
+   * Check that the result of an index info request matches the index definition that created it
+   * 
+   * @param indexInfo
+   *          the info from the index info operation from the datastore
+   * @param sourceIndex
+   *          the source index definition that created the resulting index
+   * @param context
+   *          the test context
+   */
+  public void checkIndex(Object indexInfo, IIndexDefinition sourceIndex, TestContext context);
 
 }

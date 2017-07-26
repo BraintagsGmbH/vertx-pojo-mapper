@@ -78,4 +78,9 @@ public class SqlWrite<T> extends JsonWrite<T> {
     return e instanceof DuplicateKeyException;
   }
 
+  @Override
+  protected void doQueryUpdate(T entity, JsonStoreObject<T> storeObject, Handler<AsyncResult<Object>> resultHandler) {
+    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException()));
+  }
+
 }

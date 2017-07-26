@@ -67,6 +67,18 @@ public class TestQuery extends DatastoreBaseTest {
 
   }
 
+  /**
+   * Search:
+   */
+  @Test
+  public void testNot(TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    List<String> it = Arrays.asList("erste", "zweite");
+    query.setSearchCondition(ISearchCondition.not(ISearchCondition.in(SimpleMapper.SECOND_PROPERTY, it)));
+    find(context, query, 6);
+  }
+
   @Test
   public void testSimpleOr(TestContext context) {
     createDemoRecords(context);

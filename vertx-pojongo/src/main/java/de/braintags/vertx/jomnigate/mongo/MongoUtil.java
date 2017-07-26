@@ -12,16 +12,22 @@
  */
 package de.braintags.vertx.jomnigate.mongo;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
 
 import de.braintags.vertx.jomnigate.annotation.Index;
+import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IIndexFieldDefinition;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IndexOption;
+import de.braintags.vertx.jomnigate.mongo.dataaccess.MongoQueryExpression;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -61,7 +67,8 @@ public final class MongoUtil {
    * @param result
    *          returns the complete result with detailed information of every collection
    */
-  public static final void getCollectionNames(final MongoDataStore ds, final Handler<AsyncResult<List<String>>> result) {
+  public static final void getCollectionNames(final MongoDataStore ds,
+      final Handler<AsyncResult<List<String>>> result) {
     getCollections(ds, res -> {
       if (res.failed()) {
         result.handle(Future.failedFuture(res.cause()));
@@ -81,7 +88,8 @@ public final class MongoUtil {
    * @param collection
    * @param handler
    */
-  public static void createCollection(final MongoDataStore ds, final String collection, final Handler<AsyncResult<JsonObject>> handler) {
+  public static void createCollection(final MongoDataStore ds, final String collection,
+      final Handler<AsyncResult<JsonObject>> handler) {
     JsonObject jsonCommand = new JsonObject().put("create", collection);
     ((MongoClient) ds.getClient()).runCommand("create", jsonCommand, result -> {
       if (result.failed()) {
@@ -99,7 +107,8 @@ public final class MongoUtil {
    * @param collection
    * @param handler
    */
-  public static void getIndexes(final MongoDataStore ds, final String collection, final Handler<AsyncResult<JsonObject>> handler) {
+  public static void getIndexes(final MongoDataStore ds, final String collection,
+      final Handler<AsyncResult<JsonObject>> handler) {
     JsonObject jsonCommand = new JsonObject().put("listIndexes", collection);
     ((MongoClient) ds.getClient()).runCommand("listIndexes", jsonCommand, result -> {
       if (result.failed()) {
@@ -134,7 +143,7 @@ public final class MongoUtil {
   /**
    * Create indexes which are defined by the given {@link Index}
    * 
-   * @param ds
+   * @param dataStore
    *          the datastore
    * @param collection
    *          the name of the collection to be used
@@ -143,39 +152,47 @@ public final class MongoUtil {
    * @param handler
    *          the handler to be informed with the result of the index creation
    */
-  public static final void createIndexes(final MongoDataStore ds, final String collection,
-      final ImmutableSet<IIndexDefinition> indexDefinitions,
+  public static final void createIndexes(final MongoDataStore dataStore, IMapper<?> mapper,
       final Handler<AsyncResult<JsonObject>> handler) {
-    try {
-      JsonObject indexCommand = new JsonObject().put("createIndexes", collection);
-      JsonArray idx = new JsonArray();
-      for (IIndexDefinition indexDefinition : indexDefinitions) {
-        idx.add(createIndexDefinition(indexDefinition));
-      }
-      indexCommand.put("indexes", idx);
-      ((MongoClient) ds.getClient()).runCommand("createIndexes", indexCommand, result -> {
-        if (result.failed()) {
-          handler.handle(Future.failedFuture(new RuntimeException(result.cause())));
-        } else {
-          handler.handle(result);
-        }
-      });
-    } catch (Exception e) {
-      handler.handle(Future.failedFuture(e));
-    }
+    String collection = mapper.getTableInfo().getName();
+    ImmutableSet<IIndexDefinition> indexDefinitions = mapper.getIndexDefinitions();
+    JsonObject indexCommand = new JsonObject().put("createIndexes", collection);
+
+    CompositeFuture.all(indexDefinitions.stream().map(def -> createIndexDefinition(def, mapper, dataStore))
+        .collect(Collectors.toList())).setHandler(rIndex -> {
+          if (rIndex.failed())
+            handler.handle(Future.failedFuture(rIndex.cause()));
+          else {
+            indexCommand.put("indexes", rIndex.result().list());
+            ((MongoClient) dataStore.getClient()).runCommand("createIndexes", indexCommand, rCreate -> {
+              if (rCreate.failed()) {
+                handler.handle(Future.failedFuture(new RuntimeException(rCreate.cause())));
+              } else {
+                handler.handle(rCreate);
+              }
+            });
+          }
+        });
   }
 
-  private static JsonObject createIndexDefinition(final IIndexDefinition indexDefinition) {
+  private static Future<JsonObject> createIndexDefinition(final IIndexDefinition indexDefinition, IMapper<?> mapper,
+      final MongoDataStore dataStore) {
+    Future<JsonObject> future = Future.future();
     JsonObject idxObject = new JsonObject();
-    idxObject.put("name", indexDefinition.getName());
-    JsonObject keyObject = new JsonObject();
-    idxObject.put("key", keyObject);
+    try {
+      idxObject.put("name", indexDefinition.getName());
+      JsonObject keyObject = new JsonObject();
+      idxObject.put("key", keyObject);
 
-    for (IIndexFieldDefinition field : indexDefinition.getFields()) {
-      addIndexField(keyObject, field);
+      for (IIndexFieldDefinition field : indexDefinition.getFields()) {
+        addIndexField(keyObject, field);
+      }
+    } catch (Exception e) {
+      future.fail(e);
+      return future;
     }
-    addIndexOptions(idxObject, indexDefinition.getIndexOptions());
-    return idxObject;
+    addIndexOptions(idxObject, indexDefinition.getIndexOptions(), mapper, dataStore, future);
+    return future;
   }
 
   private static void addIndexField(final JsonObject keyObject, final IIndexFieldDefinition field) {
@@ -183,15 +200,47 @@ public final class MongoUtil {
   }
 
   private static void addIndexOptions(final JsonObject indexDef,
-      final List<de.braintags.vertx.jomnigate.mapping.IndexOption> indexOptions) {
+      final List<de.braintags.vertx.jomnigate.mapping.IndexOption> indexOptions, IMapper<?> mapper,
+      final MongoDataStore dataStore, Handler<AsyncResult<JsonObject>> handler) {
+    @SuppressWarnings("rawtypes")
+    List<Future> futures = new ArrayList<>();
     for (IndexOption option : indexOptions) {
+      Object value = option.getValue();
+      Future<Void> future = Future.future();
+      futures.add(future);
+
       switch (option.getFeature()) {
       case UNIQUE:
-        indexDef.put("unique", option.getValue());  
+        indexDef.put("unique", value);
+        future.complete();
+        break;
+      case PARTIAL_FILTER_EXPRESSION:
+        convertFilterExpression((String) value, indexDef, mapper, dataStore, future);
         break;
       default:
-        throw new IllegalArgumentException("Unknown IndexFeature: " + option.getFeature());
+        future.fail(new IllegalArgumentException("Unknown IndexFeature: " + option.getFeature()));
       }
     }
+    CompositeFuture.all(futures).setHandler(result -> handler.handle(result.map(indexDef)));
+  }
+
+  private static void convertFilterExpression(String filterExpression, final JsonObject indexDef, IMapper<?> mapper,
+      final MongoDataStore dataStore, Future<Void> future) {
+    ISearchCondition condition;
+    try {
+      condition = dataStore.getJacksonMapper().readValue(filterExpression, ISearchCondition.class);
+    } catch (IOException e) {
+      future.fail(e);
+      return;
+    }
+
+    MongoQueryExpression mongoQueryExpression = new MongoQueryExpression();
+    mongoQueryExpression.setMapper(mapper);
+    mongoQueryExpression.buildSearchCondition(condition, null, result -> {
+      future.handle(result.map(v -> {
+        indexDef.put("partialFilterExpression", mongoQueryExpression.getQueryDefinition());
+        return null;
+      }));
+    });
   }
 }

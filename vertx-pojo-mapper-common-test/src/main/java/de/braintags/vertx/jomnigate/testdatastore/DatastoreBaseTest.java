@@ -28,6 +28,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.util.QueryHelper;
 import de.braintags.vertx.util.ErrorObject;
@@ -52,6 +53,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
 public abstract class DatastoreBaseTest {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(DatastoreBaseTest.class);
 
   @SuppressWarnings("unused")
@@ -191,7 +193,8 @@ public abstract class DatastoreBaseTest {
    *          the limit the query should be executed with
    * @return ResultContainer with certain informations
    */
-  public static ResultContainer find(final TestContext context, final IQuery<?> query, final int expectedResult, final int limit) {
+  public static ResultContainer find(final TestContext context, final IQuery<?> query, final int expectedResult,
+      final int limit) {
     return find(context, query, expectedResult, limit, 0);
   }
 
@@ -211,7 +214,8 @@ public abstract class DatastoreBaseTest {
    * @return ResultContainer with certain informations
    */
   @SuppressWarnings("rawtypes")
-  public static ResultContainer find(final TestContext context, final IQuery<?> query, final int expectedResult, final int limit, final int offset) {
+  public static ResultContainer find(final TestContext context, final IQuery<?> query, final int expectedResult,
+      final int limit, final int offset) {
     Async async = context.async();
     ResultContainer resultContainer = new ResultContainer();
     ErrorObject err = new ErrorObject<>(null);
@@ -402,6 +406,42 @@ public abstract class DatastoreBaseTest {
     return null;
   }
 
+  public static ResultContainer write(final TestContext context, final IWrite<?> write, final IQuery<?> checkQuery,
+      final int expectedResult) {
+    Async async = context.async();
+    ResultContainer resultContainer = new ResultContainer();
+    ErrorObject err = new ErrorObject<>(null);
+    write.save(result -> {
+      try {
+        resultContainer.writeResult = result.result();
+        checkWriteResult(context, result);
+      } catch (Throwable e) {
+        err.setThrowable(e);
+      } finally {
+        async.complete();
+      }
+    });
+
+    async.await();
+    if (err.isError()) {
+      throw new AssertionError(err.getThrowable());
+    }
+
+    // Now perform the query check
+    if (checkQuery != null) {
+      ResultContainer queryResult = find(context, checkQuery, expectedResult);
+      resultContainer.queryResult = queryResult.queryResult;
+      return resultContainer;
+    }
+    return null;
+  }
+
+  public static void checkWriteResult(final TestContext context, final AsyncResult<? extends IWriteResult> dResult) {
+    resultFine(dResult);
+    IWriteResult dr = dResult.result();
+    context.assertNotNull(dr);
+  }
+
   public static void checkDeleteResult(final TestContext context, final AsyncResult<? extends IDeleteResult> dResult) {
     resultFine(dResult);
     IDeleteResult dr = dResult.result();
@@ -410,7 +450,8 @@ public abstract class DatastoreBaseTest {
     LOGGER.info(dr.getOriginalCommand());
   }
 
-  public static void checkQueryResultCount(final TestContext context, final AsyncResult<? extends IQueryCountResult> qResult,
+  public static void checkQueryResultCount(final TestContext context,
+      final AsyncResult<? extends IQueryCountResult> qResult,
       final int expectedResult) {
     resultFine(qResult);
     IQueryCountResult qr = qResult.result();
@@ -532,9 +573,10 @@ public abstract class DatastoreBaseTest {
    * @param context
    * @param q
    */
-  protected void checkIndex(final TestContext context, final IMapper<?> mapper, final String indexName) {
+  protected void checkIndex(final TestContext context, final IMapper<?> mapper,
+      final IIndexDefinition indexDefinition) {
     Async async = context.async();
-    getDataStore(context).getMetaData().getIndexInfo(indexName, mapper, result -> {
+    getDataStore(context).getMetaData().getIndexInfo(indexDefinition.getName(), mapper, result -> {
       if (result.failed()) {
         context.fail(result.cause());
         async.complete();
@@ -542,6 +584,7 @@ public abstract class DatastoreBaseTest {
         Object indexInfo = result.result();
         LOGGER.info("indexInfo: " + indexInfo);
         context.assertNotNull(indexInfo, "Index wasn't created");
+        TestHelper.getDatastoreContainer(context).checkIndex(indexInfo, indexDefinition, context);
         async.complete();
       }
     });

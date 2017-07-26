@@ -21,6 +21,7 @@ import java.util.List;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.annotation.lifecycle.AfterSave;
 import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractDataAccessObject;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
@@ -40,16 +41,18 @@ import io.vertx.core.Handler;
  */
 
 public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> implements IWrite<T> {
+
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(AbstractWrite.class);
 
-  private List<T> objectsToSave = new ArrayList<>();
+  private final List<T> objectsToSave = new ArrayList<>();
+  private IQuery<T> query;
 
   /**
    * @param mapperClass
    * @param datastore
    */
-  public AbstractWrite(final Class<T> mapperClass, IDataStore<?, ?> datastore) {
+  public AbstractWrite(final Class<T> mapperClass, final IDataStore<?, ?> datastore) {
     super(mapperClass, datastore);
   }
 
@@ -63,7 +66,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
   }
 
   @Override
-  public final void save(Handler<AsyncResult<IWriteResult>> resultHandler) {
+  public final void save(final Handler<AsyncResult<IWriteResult>> resultHandler) {
     sync(syncResult -> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
@@ -86,7 +89,8 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * @param wr
    * @param nextFuture
    */
-  protected void postSave(IWriteResult wr, IObserverContext context, Future<IWriteResult> nextFuture) {
+  protected void postSave(final IWriteResult wr, final IObserverContext context,
+      final Future<IWriteResult> nextFuture) {
     Future<Void> f = getMapper().getObserverHandler().handleAfterInsert(this, wr, context);
     f.setHandler(res -> {
       if (f.failed()) {
@@ -114,7 +118,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
   }
 
   @Override
-  public final void add(T mapper) {
+  public final void add(final T mapper) {
     objectsToSave.add(mapper);
   }
 
@@ -124,7 +128,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * @see de.braintags.vertx.jomnigate.dataaccess.write.IWrite#add(java.util.List)
    */
   @Override
-  public void addAll(Collection<T> mapperList) {
+  public void addAll(final Collection<T> mapperList) {
     for (T mapper : mapperList) {
       add(mapper);
     }
@@ -136,7 +140,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * @param entity
    *          the entity to be handled
    */
-  protected void executePostSave(T entity, Handler<AsyncResult<Void>> resultHandler) {
+  protected void executePostSave(final T entity, final Handler<AsyncResult<Void>> resultHandler) {
     getMapper().executeLifecycle(AfterSave.class, entity, resultHandler);
   }
 
@@ -150,7 +154,8 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
    * @param resultHandler
    *          the handler to be informed
    */
-  protected void setIdValue(Object id, IStoreObject<T, ?> storeObject, Handler<AsyncResult<Void>> resultHandler) {
+  protected void setIdValue(final Object id, final IStoreObject<T, ?> storeObject,
+      final Handler<AsyncResult<Void>> resultHandler) {
     try {
       IProperty idField = getMapper().getIdInfo().getField();
       // storeObject.put(idField, id.toString());
@@ -173,4 +178,15 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
     return objectsToSave.size();
   }
 
+  /**
+   * @return the query
+   */
+  protected IQuery<T> getQuery() {
+    return query;
+  }
+
+  @Override
+  public void setQuery(final IQuery<T> query) {
+    this.query = query;
+  }
 }

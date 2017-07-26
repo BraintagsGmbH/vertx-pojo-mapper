@@ -66,6 +66,11 @@ public class IndexOption {
     /**
      * Defines that the values of this index must be unique
      */
-    UNIQUE;
+    UNIQUE,
+    /**
+     * Defines a filter expression. Only elements matching the filter will be added to the index, and be constrained by
+     * it if the "unique" flag is set
+     */
+    PARTIAL_FILTER_EXPRESSION;
   }
 }

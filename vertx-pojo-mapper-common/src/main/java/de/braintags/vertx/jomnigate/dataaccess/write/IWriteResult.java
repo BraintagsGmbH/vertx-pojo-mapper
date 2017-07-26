@@ -12,10 +12,9 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.write;
 
-import java.util.Iterator;
+import java.util.Collection;
 
 import de.braintags.vertx.jomnigate.dataaccess.IAccessResult;
-import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 
 /**
  * This object is created by a save action and contains the information about the action itself and the objects saved
@@ -24,32 +23,6 @@ import de.braintags.vertx.jomnigate.mapping.IStoreObject;
  * @author Michael Remme
  *
  */
-public interface IWriteResult extends Iterable<IWriteEntry>, IAccessResult {
+public interface IWriteResult extends Collection<IWriteEntry>, IAccessResult {
 
-  /**
-   * The resulting list of {@link IWriteEntry}
-   * 
-   * @return
-   */
-  @Override
-  Iterator<IWriteEntry> iterator();
-
-  /**
-   * Add a new {@link IWriteEntry} from the given information
-   * 
-   * @param sto
-   *          the {@link IStoreObject} which was handled
-   * @param id
-   *          the id, which was generated or existing already
-   * @param action
-   *          the {@link WriteAction} used
-   */
-  void addEntry(IStoreObject<?, ?> sto, Object id, WriteAction action);
-
-  /**
-   * Get the number of {@link IWriteEntry}
-   * 
-   * @return the size
-   */
-  int size();
 }

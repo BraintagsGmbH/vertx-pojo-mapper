@@ -22,5 +22,6 @@ package de.braintags.vertx.jomnigate.dataaccess.write;
 public enum WriteAction {
   INSERT,
   UPDATE,
+  NOT_MATCHED,
   UNKNOWN;
 }

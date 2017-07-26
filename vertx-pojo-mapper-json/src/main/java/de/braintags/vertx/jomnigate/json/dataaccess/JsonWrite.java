@@ -30,6 +30,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.ext.mongo.MongoClientUpdateResult;
 
 /**
  * An abstract implementation of IWrite, which uses Json as internal format
@@ -130,13 +131,23 @@ public abstract class JsonWrite<T> extends AbstractWrite<T> {
   }
 
   protected void _doUpdate(T entity, JsonStoreObject<T> storeObject, Handler<AsyncResult<IWriteEntry>> resultHandler) {
-    doUpdate(entity, storeObject, result -> {
-      if (result.failed()) {
-        resultHandler.handle(Future.failedFuture(new WriteException(result.cause())));
-      } else {
-        finishUpdate(result.result(), entity, storeObject, resultHandler);
-      }
-    });
+    if (getQuery() != null) {
+      doQueryUpdate(entity, storeObject, result -> {
+        if (result.failed()) {
+          resultHandler.handle(Future.failedFuture(new WriteException(result.cause())));
+        } else {
+          finishQueryUpdate(result.result(), entity, storeObject, null, resultHandler);
+        }
+      });
+    } else {
+      doUpdate(entity, storeObject, result -> {
+        if (result.failed()) {
+          resultHandler.handle(Future.failedFuture(new WriteException(result.cause())));
+        } else {
+          finishUpdate(result.result(), entity, storeObject, resultHandler);
+        }
+      });
+    }
   }
 
   @SuppressWarnings("rawtypes")
@@ -151,6 +162,18 @@ public abstract class JsonWrite<T> extends AbstractWrite<T> {
     });
   }
 
+  private void finishQueryUpdate(final Object id, final T entity, final JsonStoreObject<T> storeObject,
+      final MongoClientUpdateResult updateResult, final Handler<AsyncResult<IWriteEntry>> resultHandler) {
+    if (updateResult.getDocMatched() != 0 && updateResult.getDocMatched() == updateResult.getDocModified()) {
+      finishUpdate(id, entity, storeObject, resultHandler);
+    } else if (updateResult.getDocMatched() == 0 && updateResult.getDocModified() == 0) {
+      resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.NOT_MATCHED)));
+    } else {
+      resultHandler.handle(Future.failedFuture(new WriteException("Matched " + updateResult.getDocMatched()
+          + "documents but modified: " + updateResult.getDocModified() + "documents")));
+    }
+  }
+
   /**
    * This is the client specific part, where the generated Json is updated into the datastore
    * 
@@ -160,6 +183,18 @@ public abstract class JsonWrite<T> extends AbstractWrite<T> {
    *          the handler, which gets the id of the new record
    */
   protected abstract void doUpdate(T entity, JsonStoreObject<T> storeObject,
+      Handler<AsyncResult<Object>> resultHandler);
+
+  /**
+   * This is the client specific part, where the generated Json is updated into the datastore for an update based on
+   * query
+   * 
+   * @param entity
+   * @param storeObject
+   * @param resultHandler
+   *          the handler, which gets the id of the new record
+   */
+  protected abstract void doQueryUpdate(T entity, JsonStoreObject<T> storeObject,
       Handler<AsyncResult<Object>> resultHandler);
 
   /**

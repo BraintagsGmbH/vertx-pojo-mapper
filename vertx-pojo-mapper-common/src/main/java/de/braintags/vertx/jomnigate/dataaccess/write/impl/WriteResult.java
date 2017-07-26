@@ -13,16 +13,12 @@
 package de.braintags.vertx.jomnigate.dataaccess.write.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
-import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
-import de.braintags.vertx.jomnigate.exception.InsertException;
-import de.braintags.vertx.jomnigate.mapping.IStoreObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 /**
  * Default implementation of {@link IWriteResult}
@@ -32,15 +28,13 @@ import io.vertx.core.logging.LoggerFactory;
  */
 
 public class WriteResult implements IWriteResult {
-  private static final Logger logger = LoggerFactory.getLogger(WriteResult.class);
+
   private List<IWriteEntry> resultList = new ArrayList<>();
-  @SuppressWarnings("rawtypes")
-  private List insertedIds = new ArrayList();
 
   public WriteResult() {
   }
 
-  public WriteResult(List<IWriteEntry> resultList) {
+  public WriteResult(final List<IWriteEntry> resultList) {
     this.resultList = resultList;
   }
 
@@ -52,30 +46,6 @@ public class WriteResult implements IWriteResult {
   @Override
   public Iterator<IWriteEntry> iterator() {
     return resultList.iterator();
-  }
-
-  /**
-   * Add a new entry
-   * 
-   * @param entry
-   *          the entry to be added
-   */
-  @SuppressWarnings("unchecked")
-  protected void addEntry(IWriteEntry entry) {
-    resultList.add(entry);
-    if (entry.getAction().equals(WriteAction.INSERT)) {
-      if (insertedIds.contains(entry.getId())) {
-        throw new InsertException(String.format("Trial to insert duplicate ID. Existing IDs: %s | new Id: %s ",
-            String.valueOf(insertedIds), String.valueOf(entry.getId())));
-      } else {
-        insertedIds.add(entry.getId());
-      }
-    }
-  }
-
-  @Override
-  public void addEntry(IStoreObject<?, ?> sto, Object id, WriteAction action) {
-    addEntry(new WriteEntry(sto, id, action));
   }
 
   @Override
@@ -90,6 +60,61 @@ public class WriteResult implements IWriteResult {
       builder.append(entry.toString()).append("\n");
     }
     return builder.toString();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return resultList.isEmpty();
+  }
+
+  @Override
+  public boolean contains(final Object o) {
+    return resultList.contains(o);
+  }
+
+  @Override
+  public Object[] toArray() {
+    return resultList.toArray();
+  }
+
+  @Override
+  public <T> T[] toArray(final T[] a) {
+    return resultList.toArray(a);
+  }
+
+  @Override
+  public boolean add(final IWriteEntry e) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean remove(final Object o) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean containsAll(final Collection<?> c) {
+    return resultList.containsAll(c);
+  }
+
+  @Override
+  public boolean addAll(final Collection<? extends IWriteEntry> c) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean removeAll(final Collection<?> c) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean retainAll(final Collection<?> c) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void clear() {
+    throw new UnsupportedOperationException();
   }
 
 }

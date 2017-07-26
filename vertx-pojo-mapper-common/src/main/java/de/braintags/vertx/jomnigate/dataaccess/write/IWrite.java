@@ -14,7 +14,9 @@ package de.braintags.vertx.jomnigate.dataaccess.write;
 
 import java.util.Collection;
 
+import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -58,5 +60,13 @@ public interface IWrite<T> extends IDataAccessObject<T> {
    * @return the count
    */
   public int size();
+
+  /**
+   * Defines the {@link IQuery} which is used match documents to update.
+   * 
+   * @param query
+   *          the {@link IQuery} which shall be used to specify the records to be updated from the {@link IDataStore}
+   */
+  public void setQuery(IQuery<T> query);
 
 }

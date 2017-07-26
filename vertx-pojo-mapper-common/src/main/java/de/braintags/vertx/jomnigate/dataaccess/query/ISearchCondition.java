@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.FieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.GeoSearchArgument;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.QueryAnd;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.QueryNot;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.QueryOr;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.VariableFieldCondition;
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
@@ -48,6 +49,7 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({ @JsonSubTypes.Type(value = QueryAnd.class, name = "and"),
     @JsonSubTypes.Type(value = QueryOr.class, name = "or"),
+    @JsonSubTypes.Type(value = QueryNot.class, name = "not"),
     @JsonSubTypes.Type(value = FieldCondition.class, name = "condition"), })
 public interface ISearchCondition {
 
@@ -439,17 +441,50 @@ public interface ISearchCondition {
    *
    * @param fieldName
    *          the field name for the comparison
-   * @param x
-   *          the x geo coordinate
-   * @param y
-   *          the y geo coordinate
+   * @param longitude
+   *          the longitude geo coordinate
+   * @param latitude
+   *          the latitude geo coordinate
+   * @return
+   */
+  static IFieldCondition near(String fieldName, double longitude, double latitude) {
+    return createFieldCondition(fieldName, QueryOperator.NEAR,
+        new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0]))));
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#NEAR} operator
+   *
+   * @param field
+   *          the field for the comparison
+   * @param longitude
+   *          the longitude coordinate
+   * @param latitude
+   *          the latitude coordinate
+   * @return
+   */
+  static IFieldCondition near(IIndexedField field, double longitude, double latitude) {
+    // don't change order of longitude/latitude, or else mongo doesn't work anymore
+    return createFieldCondition(field, QueryOperator.NEAR,
+        new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0]))));
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#NEAR} operator
+   *
+   * @param fieldName
+   *          the field name for the comparison
+   * @param longitude
+   *          the longitude geo coordinate
+   * @param latitude
+   *          the latitude geo coordinate
    * @param maxDistance
    *          the maximum distance to the given point
    * @return
    */
-  static IFieldCondition near(String fieldName, double x, double y, int maxDistance) {
+  static IFieldCondition near(String fieldName, double longitude, double latitude, int maxDistance) {
     return createFieldCondition(fieldName, QueryOperator.NEAR,
-        new GeoSearchArgument(new GeoPoint(new Position(x, y, new double[0])), maxDistance));
+        new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0])), maxDistance));
   }
 
   /**
@@ -521,6 +556,17 @@ public interface ISearchCondition {
   }
 
   /**
+   * Connects the given query parts with the {@link QueryLogic#AND} connector
+   *
+   * @param searchConditions
+   *          the search conditions to connect
+   * @return
+   */
+  static ISearchConditionContainer and(Collection<ISearchCondition> searchConditions) {
+    return new QueryAnd(new ISearchCondition[searchConditions.size()]);
+  }
+
+  /**
    * Connects the given query parts with the {@link QueryLogic#OR} connector
    *
    * @param searchConditions
@@ -531,4 +577,26 @@ public interface ISearchCondition {
     return new QueryOr(searchConditions);
   }
 
+  /**
+   * Connects the given query parts with the {@link QueryLogic#OR} connector
+   *
+   * @param searchConditions
+   *          the search conditions to connect
+   * @return
+   */
+  static ISearchConditionContainer or(Collection<ISearchCondition> searchConditions) {
+    return new QueryOr(new ISearchCondition[searchConditions.size()]);
+  }
+
+  /**
+   * Negates the  given query part with the {@link QueryLogic#NOT} operator
+   *
+   * @param searchCondition
+   *          the search condition to negate
+   * @return
+   */
+  static ISearchConditionContainer not(ISearchCondition searchCondition) {
+    return new QueryNot(searchCondition);
+  }
+  
 }

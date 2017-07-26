@@ -78,7 +78,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
   public static final String DEFAULT_CONNECTION = "mongodb://localhost:27017";
   private static final String DEFAULT_KEY_GENERATOR = DefaultKeyGenerator.NAME;
 
-  private static MongodExecutable exe;
+  private MongodExecutable exe;
   boolean startMongoLocal = false;
   private MongoClient mongoClient;
   private MongoDataStore mongoDataStore;
@@ -173,7 +173,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     try {
       checkMongoLocal();
       checkShared();
-      startMongoExe(startMongoLocal, localPort);
+      localPort = startMongoExe(startMongoLocal, localPort);
       initMongoClient(initResult -> {
         if (initResult.failed()) {
           LOGGER.error("could not start mongo client", initResult.cause());
@@ -202,7 +202,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
    * 
    * @return the instance of MongodExecutable or null, if not used
    */
-  public static MongodExecutable getMongodExecutable() {
+  public MongodExecutable getMongodExecutable() {
     return exe;
   }
 
@@ -293,34 +293,56 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
    * @param localPort
    *          the port where to start the instance
    */
-  private static void startMongoExe(boolean startMongoLocal, int localPort) {
-    try {
-      internalStartMongoExe(startMongoLocal, localPort);
-    } catch (IOException e) {
-      // retry once
-      LOGGER.error("Error starting local mongo, retrying..", e);
-      try {
-        internalStartMongoExe(startMongoLocal, localPort);
-        LOGGER.warn("Local mongo started on second try");
-      } catch (IOException e1) {
-        throw new InitException(e1);
+  private int startMongoExe(boolean startMongoLocal, int localPort) {
+    int retries = 0;
+    final int maxRetries = 5;
+    int port = localPort;
+    boolean started = false;
+    while (retries <= maxRetries && !started) {
+      started = internalStartMongoExe(startMongoLocal, port);
+      if (!started) {
+        try {
+          retries++;
+          if (retries > 0) {
+            Thread.sleep((long) (Math.random() * 100));
+          }
+          port = new Net().getPort();
+        } catch (IOException | InterruptedException e1) {
+          throw new InitException(e1);
+        }
+        LOGGER.warn("Retry local mongo start. " + retries + " of " + maxRetries + " retries. New port " + port);
       }
+
     }
+    if (!started) {
+      throw new InitException("Error starting local mongo");
+    }
+    return port;
   }
 
-  private static void internalStartMongoExe(boolean startMongoLocal, int localPort) throws IOException {
-    if (exe == null && startMongoLocal) {
-      LOGGER.info("STARTING LOCAL MONGO");
-      IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
-          .net(new Net(localPort, Network.localhostIsIPv6())).build();
-      Logger logger = (Logger) new SLF4JLogDelegateFactory().createDelegate(MongoDataStoreInit.class.getCanonicalName())
-          .unwrap();
-      IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaultsWithLogger(Command.MongoD, logger).build();
-      MongodExecutable temp = MongodStarter.getInstance(runtimeConfig).prepare(config);
-      temp.start();
-      // ensure client was successfully started before assigning to global field
-      exe = temp;
-    }
+  private static Logger mongoLogger = (Logger) new SLF4JLogDelegateFactory()
+      .createDelegate(MongoDataStoreInit.class.getCanonicalName())
+      .unwrap();
+  private static IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
+      .defaultsWithLogger(Command.MongoD, mongoLogger)
+      .build();
+  private static final MongodStarter starter = MongodStarter.getInstance(runtimeConfig);
+
+  private boolean internalStartMongoExe(boolean startMongoLocal, int localPort) {
+    if (startMongoLocal) {
+        try {
+          LOGGER.info("STARTING LOCAL MONGO ON PORT: " + localPort);
+          IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
+              .net(new Net(localPort, Network.localhostIsIPv6())).build();
+        MongodExecutable temp = starter.prepare(config);
+          temp.start();
+          // ensure client was successfully started before assigning to global field
+          exe = temp;
+        } catch (IOException e) {
+          return false;
+        }
+      }
+      return true;
   }
 
 }

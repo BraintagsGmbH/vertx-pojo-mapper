@@ -51,6 +51,9 @@ public class MongoWrite<T> extends JsonWrite<T> {
 
   @Override
   protected void doInsert(T entity, JsonStoreObject<T> storeObject, Handler<AsyncResult<Object>> resultHandler) {
+    if (getQuery() != null) {
+      throw new IllegalStateException("Can not update with a query and objects without id");
+    }
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     IMapper<T> mapper = getMapper();
     String collection = mapper.getTableInfo().getName();
@@ -90,6 +93,31 @@ public class MongoWrite<T> extends JsonWrite<T> {
       }
     }
     return false;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.json.dataaccess.JsonWrite#doQueryUpdate(java.lang.Object,
+   * de.braintags.vertx.jomnigate.json.dataaccess.JsonStoreObject, io.vertx.core.Handler)
+   */
+  @Override
+  protected void doQueryUpdate(T entity, JsonStoreObject<T> storeObject, Handler<AsyncResult<Object>> resultHandler) {
+    resultHandler.handle(Future.failedFuture(new UnsupportedOperationException("reimplement update with query")));
+    // IQuery<T> q = getDataStore().createQuery(getMapperClass());
+    // q.setSearchCondition(ISearchCondition.and(ISearchCondition.in(getMapper().getIdInfo().getIndexedField(),
+    // currentId),
+    // getQuery().getSearchCondition()));
+    // q.buildQueryExpression(null, queryExpRes -> {
+    // mongoClient.replaceDocuments(collection, ((MongoQueryExpression) queryExpRes.result()).getQueryDefinition(),
+    // storeObject.getContainer(), res -> {
+    // if (res.succeeded()) {
+    // finishQueryUpdate(currentId, entity, storeObject, res.result(), resultHandler);
+    // } else {
+    // resultHandler.handle(Future.failedFuture(new WriteException(res.cause())));
+    // }
+    // });
+    // });
   }
 
 }
