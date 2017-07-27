@@ -14,6 +14,7 @@ package de.braintags.vertx.jomnigate.testdatastore;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.junit.Test;
 
@@ -22,7 +23,6 @@ import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
 import de.braintags.vertx.jomnigate.observer.impl.JsonSerializationObserver;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.ext.unit.TestContext;
 
@@ -35,14 +35,6 @@ import io.vertx.ext.unit.TestContext;
 public class TestJsonSerializationObserver extends AbstractObserverTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TestJsonSerializationObserver.class);
-
-  @Test
-  public void test_Serialization(TestContext context) {
-    Vertx vertx = this.getDataStore(context).getVertx();
-    LOGGER.info("EXISTS: " + vertx.fileSystem()
-        .existsBlocking("/Users/mremme/workspace/vertx/vertx-pojo-mapper/vertx-pojo-mapper-common-test/tmp"));
-
-  }
 
   @Test
   public void testAfterInsertAndUpdate(TestContext context) throws IOException {
@@ -99,16 +91,16 @@ public class TestJsonSerializationObserver extends AbstractObserverTest {
     long start = System.currentTimeMillis();
     while (System.currentTimeMillis() - start < waitTicks) {
       File[] files = logDir.listFiles((dir, fileName) -> fileName.endsWith("json"));
-      if (files.length == fileCount) {
+      if (files.length >= fileCount) {
         break;
       }
     }
-    context.assertEquals(fileCount, logDir.listFiles().length, "expected files to be created");
-
+    context.assertEquals(fileCount, logDir.listFiles((dir, fileName) -> fileName.endsWith("json")).length,
+        "expected files to be created");
   }
 
   private File getLogDir() throws IOException {
-    File logDir = new File("tmp/jsonSerDirTmp");
+    File logDir = Files.createTempDirectory("jsonSerDirTmp").toFile();
     File[] fl = logDir.listFiles();
     for (File f : fl) {
       f.delete();
