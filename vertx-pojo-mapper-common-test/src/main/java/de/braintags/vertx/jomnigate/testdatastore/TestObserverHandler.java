@@ -44,7 +44,7 @@ public class TestObserverHandler extends AbstractObserverTest {
 
   @Test
   public void test_AfterMapping_SingleRecord(TestContext context) {
-    AfterMappingObserver.executed = false;
+    AfterMappingObserver.reset();
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverDefinition<AfterMappingObserver> os = new ObserverDefinition<>(AfterMappingObserver.class);
     os.getEventTypeList().add(ObserverEventType.AFTER_MAPPING);
@@ -54,6 +54,10 @@ public class TestObserverHandler extends AbstractObserverTest {
     sm.intValue = -1;
     IMapper<SimpleMapper> mapper = getDataStore(context).getMapperFactory().getMapper(SimpleMapper.class);
     context.assertTrue(AfterMappingObserver.executed, "Observer wasn't executed");
+    context.assertTrue(AfterMappingObserver.executedTypes.contains(ObserverEventType.AFTER_MAPPING),
+        "Observer wasn't executed");
+    context.assertFalse(AfterMappingObserver.executedTypes.contains(ObserverEventType.BEFORE_MAPPING),
+        "Observer should not be executed for event BEFORE_MAPPING");
   }
 
   @Test

@@ -56,4 +56,13 @@ public @interface Observer {
    * @return defined event types, default is an empty list
    */
   ObserverEventType[] eventTypes() default {};
+
+  /**
+   * Define possible options for the resulting IObserver, which can be retrived then as
+   * {@link IObserver#getObserverProperties()}
+   * 
+   * @return
+   */
+  ObserverOption[] observerOptions() default {};
+
 }

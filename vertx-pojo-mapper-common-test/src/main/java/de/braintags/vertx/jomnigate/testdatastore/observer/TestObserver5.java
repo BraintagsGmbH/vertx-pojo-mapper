@@ -23,7 +23,7 @@ import io.vertx.core.Future;
  * @author Michael Remme
  * 
  */
-public class TestObserver2 extends AbstractObserver {
+public class TestObserver5 extends AbstractObserver {
 
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {

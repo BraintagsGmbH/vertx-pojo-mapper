@@ -15,10 +15,10 @@ package de.braintags.vertx.jomnigate.versioning;
 import de.braintags.vertx.jomnigate.annotation.VersionInfo;
 import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import de.braintags.vertx.jomnigate.init.ObserverMapperSettings;
-import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
+import de.braintags.vertx.jomnigate.observer.impl.AbstractObserver;
 import io.vertx.core.Future;
 
 /**
@@ -28,7 +28,7 @@ import io.vertx.core.Future;
  * @author Michael Remme
  * 
  */
-public class SetMapperVersionObserver implements IObserver {
+public class SetMapperVersionObserver extends AbstractObserver {
 
   public static ObserverDefinition<SetMapperVersionObserver> createObserverSettings() {
     ObserverDefinition<SetMapperVersionObserver> settings = new ObserverDefinition<>(SetMapperVersionObserver.class);
@@ -38,17 +38,6 @@ public class SetMapperVersionObserver implements IObserver {
     ms.setInstanceOf(true);
     settings.getMapperSettings().add(ms);
     return settings;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.vertx.jomnigate.observer.IObserver#canHandleEvent(de.braintags.vertx.jomnigate.observer.
-   * IObserverEvent, de.braintags.vertx.jomnigate.observer.IObserverContext)
-   */
-  @Override
-  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return true;
   }
 
   /*

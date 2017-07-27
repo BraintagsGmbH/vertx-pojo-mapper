@@ -20,9 +20,9 @@ import java.util.List;
 import de.braintags.vertx.jomnigate.annotation.VersionConverterDefinition;
 import de.braintags.vertx.jomnigate.annotation.VersionInfo;
 import de.braintags.vertx.jomnigate.exception.MappingException;
-import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
+import de.braintags.vertx.jomnigate.observer.impl.AbstractObserver;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 
@@ -34,7 +34,7 @@ import io.vertx.core.Future;
  * @author Michael Remme
  * 
  */
-public class ExecuteVersionConverter implements IObserver {
+public class ExecuteVersionConverter extends AbstractObserver {
   private List<ConverterEntry> converterList = new ArrayList<>();
   private long currentVersion;
 
