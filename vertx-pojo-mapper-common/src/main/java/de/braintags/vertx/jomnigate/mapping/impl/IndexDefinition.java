@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.braintags.vertx.jomnigate.annotation.Index;
@@ -51,12 +52,21 @@ public class IndexDefinition implements IIndexDefinition {
    *          the mapper to fetch the column name of the field from
    */
   public IndexDefinition(final IIndexedField field, final IMapper<?> mapper) {
-    name = "IdxF_" + field.getFieldName();
+    name = createName(field);
     fields = new ArrayList<>();
     IndexFieldDefinition fieldDef = new IndexFieldDefinition();
     fieldDef.setName(field.getColumnName(mapper));
     fieldDef.setType(IndexType.ASC);
     fields.add(fieldDef);
+  }
+
+  private String createName(final IIndexedField field) {
+    String fieldName = field.getFieldName();
+    if (fieldName.length() > 80) {
+      // index names can not be longer than 127 bytes, including the database and collection name
+      return "IdxF_" + DigestUtils.sha256Hex(fieldName);
+    } else
+      return "IdxF_" + fieldName;
   }
 
   /**
