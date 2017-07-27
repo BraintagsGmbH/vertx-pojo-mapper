@@ -23,7 +23,7 @@ import org.junit.runners.Suite.SuiteClasses;
  * 
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TestObserverHandler.class, TestDataVersioning.class })
-public class ObserverVersioningSuite {
+@SuiteClasses({ TestObserverHandler.class, TestDataVersioning.class, TestJsonSerializationObserver.class })
+public class ObserverSuite {
 
 }

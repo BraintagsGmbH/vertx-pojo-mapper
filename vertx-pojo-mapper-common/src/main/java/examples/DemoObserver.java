@@ -12,18 +12,13 @@
  */
 package examples;
 
-import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
+import de.braintags.vertx.jomnigate.observer.impl.AbstractObserver;
 import examples.mapper.SimpleMapper;
 import io.vertx.core.Future;
 
-public class DemoObserver implements IObserver {
-
-  @Override
-  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) { // <1>
-    return true;
-  }
+public class DemoObserver extends AbstractObserver {
 
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) { // <2>

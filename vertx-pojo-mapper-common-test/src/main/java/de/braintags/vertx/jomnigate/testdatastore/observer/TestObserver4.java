@@ -12,9 +12,9 @@
  */
 package de.braintags.vertx.jomnigate.testdatastore.observer;
 
-import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
+import de.braintags.vertx.jomnigate.observer.impl.AbstractObserver;
 import io.vertx.core.Future;
 
 /**
@@ -23,16 +23,11 @@ import io.vertx.core.Future;
  * @author Michael Remme
  * 
  */
-public class TestObserver4 implements IObserver {
+public class TestObserver4 extends AbstractObserver {
 
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
     return Future.succeededFuture();
-  }
-
-  @Override
-  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return false;
   }
 
 }

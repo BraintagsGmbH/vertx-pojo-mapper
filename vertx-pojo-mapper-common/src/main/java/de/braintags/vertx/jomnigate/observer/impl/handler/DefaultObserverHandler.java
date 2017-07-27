@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.braintags.vertx.jomnigate.annotation.Observer;
+import de.braintags.vertx.jomnigate.annotation.ObserverOption;
 import de.braintags.vertx.jomnigate.annotation.VersionInfo;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
@@ -85,6 +86,10 @@ public class DefaultObserverHandler implements IObserverHandler {
       for (ObserverEventType t : tl) {
         os.getEventTypeList().add(t);
       }
+      ObserverOption[] ooptions = ob.observerOptions();
+      for (ObserverOption option : ooptions) {
+        os.getObserverProperties().setProperty(option.key(), option.value());
+      }
       tmpList.add(os);
     }
     tmpList.sort((os1, os2) -> Integer.compare(os2.getPriority(), os1.getPriority()));
@@ -97,7 +102,10 @@ public class DefaultObserverHandler implements IObserverHandler {
       List<IObserver> ol = new ArrayList<>();
       observerList.stream().filter(os -> os.isApplicableFor(event)).forEach(os -> {
         try {
-          ol.add(os.getObserverClass().newInstance());
+          IObserver observer = os.getObserverClass().newInstance();
+          observer.getObserverProperties().putAll(os.getObserverProperties());
+          observer.init(mapper.getMapperFactory().getDataStore().getVertx());
+          ol.add(observer);
         } catch (Exception e) {
           throw new MappingException(e);
         }

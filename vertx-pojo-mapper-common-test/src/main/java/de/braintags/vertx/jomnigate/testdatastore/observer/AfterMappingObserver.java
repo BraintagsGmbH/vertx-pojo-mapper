@@ -12,11 +12,14 @@
  */
 package de.braintags.vertx.jomnigate.testdatastore.observer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.braintags.vertx.jomnigate.mapping.IMapper;
-import de.braintags.vertx.jomnigate.observer.IObserver;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import de.braintags.vertx.jomnigate.observer.IObserverEvent;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
+import de.braintags.vertx.jomnigate.observer.impl.AbstractObserver;
 import io.vertx.core.Future;
 
 /**
@@ -25,8 +28,14 @@ import io.vertx.core.Future;
  * @author Michael Remme
  * 
  */
-public class AfterMappingObserver implements IObserver {
+public class AfterMappingObserver extends AbstractObserver {
   public static boolean executed = false;
+  public static List<ObserverEventType> executedTypes = new ArrayList<>();
+
+  public static void reset() {
+    executed = false;
+    executedTypes = new ArrayList<>();
+  }
 
   /*
    * (non-Javadoc)
@@ -36,14 +45,10 @@ public class AfterMappingObserver implements IObserver {
    */
   @Override
   public Future<Void> handleEvent(IObserverEvent event, IObserverContext context) {
+    executedTypes.add(event.getEventType());
     IMapper<?> mapper = (IMapper<?>) event.getSource();
     AfterMappingObserver.executed = true;
     return Future.succeededFuture();
-  }
-
-  @Override
-  public boolean canHandleEvent(IObserverEvent event, IObserverContext context) {
-    return event.getEventType().equals(ObserverEventType.AFTER_MAPPING);
   }
 
 }

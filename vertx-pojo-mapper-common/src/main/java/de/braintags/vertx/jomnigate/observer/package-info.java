@@ -119,7 +119,17 @@
  *       "eventTypeList": [],
  *       "mapperSettings": [],
  *       "priority": 501
+ *     },
+ *     {
+ *       "observerClass": "de.braintags.vertx.jomnigate.observer.impl.JsonSerializationObserver", // <6>
+ *       "eventTypeList": [],
+ *       "mapperSettings": [],
+ *       "observerProperties" : {
+ *          "directoryPath" : "/tmp/jsonLogDir"
+ *       }
+ *       "priority": 501
  *     }
+ * 
  *   ]
  * }
  * 
@@ -137,6 +147,8 @@
  * 
  * <5> An observer is registered for any event and mapper
  * 
+ * <6> A JsonSerializationObserver is registered, where properties define the directory, where inside the output is
+ * stored
  * 
  * ===== Register observer by annotation
  * The annotation {@link de.braintags.vertx.jomnigate.annotation.Observer} can be used to register an observer for a

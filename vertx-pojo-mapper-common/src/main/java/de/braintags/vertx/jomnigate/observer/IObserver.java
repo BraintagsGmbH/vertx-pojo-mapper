@@ -12,7 +12,12 @@
  */
 package de.braintags.vertx.jomnigate.observer;
 
+import java.util.Properties;
+
+import de.braintags.vertx.jomnigate.annotation.Observer;
+import de.braintags.vertx.jomnigate.init.ObserverDefinition;
 import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 
 /**
  * IObserver is the instance, which is executed on a given event
@@ -23,7 +28,26 @@ import io.vertx.core.Future;
 public interface IObserver {
 
   /**
-   * Checks wether the current instance can handle the given event
+   * The properties, which can adjust the behaviour of an observer. Those properties can be defined by
+   * {@link ObserverDefinition} or by annotation {@link Observer}
+   * 
+   * @return
+   */
+  Properties getObserverProperties();
+
+  /**
+   * This method is called directly after the properties are set and can be used to validate and prepare some
+   * information
+   * 
+   * @param vertx
+   */
+  void init(Vertx vertx);
+
+  /**
+   * Checks wether the current instance can handle the given event. NOTE: this method must not handle the event type or
+   * mapper class, which are defined inside the {@link ObserverDefinition} or by the annotation {@link Observer}, cause
+   * this decision is done already at the point, where this method is called. This method should return the decision
+   * based on some more complex information by usong the context or the event properties, for instance
    * 
    * @param event
    * @param context
