@@ -44,8 +44,7 @@ public @interface IndexOptions {
   String partialFilterExpression() default "";
 
   /**
-   * Creates the index as a unique value index and ignore null values; inserting duplicates in this field other than
-   * null will cause errors
+   * Ignores null values
    */
   boolean sparse() default false;
 }

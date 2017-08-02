@@ -75,7 +75,7 @@ public class IndexOption {
     PARTIAL_FILTER_EXPRESSION,
 
     /**
-     * Defines that the values of this index must be unique but allows null values
+     * Ignores null values
      */
     SPARSE;
   }
