@@ -90,7 +90,7 @@ public class IndexDefinition implements IIndexDefinition {
       } else if (index.options().unique()) {
         getIndexOptions().add(new IndexOption(IndexFeature.UNIQUE, index.options().unique()));
       } else if (index.options().sparse()) {
-
+        getIndexOptions().add(new IndexOption(IndexFeature.SPARSE, index.options().sparse()));
       }
 
       if (StringUtils.isNotBlank(index.options().partialFilterExpression()))
