@@ -64,7 +64,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * @param entity
    *          the entity to be used
    */
-  public JsonStoreObject(IMapper<T> mapper, T entity) {
+  public JsonStoreObject(final IMapper<T> mapper, final T entity) {
     super(mapper, entity, new JsonObject());
   }
 
@@ -76,7 +76,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * @param mapper
    *          the mapper to be used
    */
-  public JsonStoreObject(JsonObject jsonObject, IMapper<T> mapper) {
+  public JsonStoreObject(final JsonObject jsonObject, final IMapper<T> mapper) {
     super(jsonObject, mapper);
   }
 
@@ -86,7 +86,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * @see de.braintags.vertx.jomnigate.mapping.impl.AbstractStoreObject#initFromEntity(io.vertx.core.Handler)
    */
   @Override
-  public void initFromEntity(Handler<AsyncResult<Void>> handler) {
+  public void initFromEntity(final Handler<AsyncResult<Void>> handler) {
     try {
       JsonDatastore datastore = (JsonDatastore) getMapper().getMapperFactory().getDataStore();
       ObjectMapper mapper = datastore.getJacksonMapper();
@@ -109,7 +109,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * @param js
    * @param handler
    */
-  private void storeJson(String js, Handler<AsyncResult<Void>> handler) {
+  private void storeJson(final String js, final Handler<AsyncResult<Void>> handler) {
     try {
       LOGGER.debug("Storing json: " + js);
       container = new JsonObject(js);
@@ -136,29 +136,31 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * The implementation is calling jackson serializer first and afterwards it is calling single handlers
    */
   @Override
-  public void initToEntity(Handler<AsyncResult<Void>> handler) {
-    try {
-      IProperty idField = getMapper().getIdInfo().getField();
-      String id = (String) getContainer().remove(idField.getColumnInfo().getName());
-      getContainer().put(idField.getName(), id);
-      doMapping(res -> {
-        if (res.failed()) {
-          handler.handle(Future.failedFuture(res.cause()));
-        } else {
-          finishToEntity(res.result(), handler);
-        }
-      });
-    } catch (Exception e) {
-      handler.handle(Future.failedFuture(e));
-    }
+  public void initToEntity(final Handler<AsyncResult<Void>> handler) {
+    IProperty idField = getMapper().getIdInfo().getField();
+    String id = (String) getContainer().remove(idField.getColumnInfo().getName());
+    getContainer().put(idField.getName(), id);
+    doMapping(res -> {
+      if (res.failed()) {
+        handler.handle(Future.failedFuture(res.cause()));
+      } else {
+        finishToEntity(res.result(), handler);
+      }
+    });
   }
 
-  private void doMapping(Handler<AsyncResult<T>> handler) throws IOException {
+  private void doMapping(final Handler<AsyncResult<T>> handler) {
     ObjectMapper mapper = ((JsonDatastore) getMapper().getMapperFactory().getDataStore()).getJacksonMapper();
     List<ReferencedPostHandler> valueList = new ArrayList<>();
     InjectableValues iv = new InjectableValues.Std().addValue(REFERENCED_LIST, valueList);
     ObjectReader reader = mapper.reader(iv);
-    T instance = reader.forType(((JacksonMapper<T>) getMapper()).getCreatorClass()).readValue(getContainer().encode());
+    T instance;
+    try {
+      instance = reader.forType(((JacksonMapper<T>) getMapper()).getCreatorClass()).readValue(getContainer().encode());
+    } catch (IOException e) {
+      handler.handle(Future.failedFuture(e));
+      return;
+    }
     if (!valueList.isEmpty()) {
       prehandleReferenced(handler, instance, valueList);
     } else {
@@ -169,7 +171,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
   /**
    * Referenced instances were loaded async way, now its time to place them into the instance
    */
-  private void prehandleReferenced(Handler<AsyncResult<T>> handler, T mainInstance,
+  private void prehandleReferenced(final Handler<AsyncResult<T>> handler, final T mainInstance,
       final List<ReferencedPostHandler> valueList) {
     List<Future> fl = new ArrayList<>();
     valueList.stream().forEach(rp -> fl.add(rp.getFuture()));
@@ -184,7 +186,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
     });
   }
 
-  private void setReferencedValues(Handler<AsyncResult<T>> handler, T mainInstance,
+  private void setReferencedValues(final Handler<AsyncResult<T>> handler, final T mainInstance,
       final List<ReferencedPostHandler> valueList) {
     try {
       for (ReferencedPostHandler rp : valueList) {
@@ -205,7 +207,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * @see de.braintags.vertx.jomnigate.mapping.IStoreObject#get(de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public Object get(IProperty field) {
+  public Object get(final IProperty field) {
     String colName = field.getColumnInfo().getName();
     return getContainer().getValue(colName);
   }
@@ -217,7 +219,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * de.braintags.vertx.jomnigate.mapping.IStoreObject#hasProperty(de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public boolean hasProperty(IProperty field) {
+  public boolean hasProperty(final IProperty field) {
     String colName = field.getColumnInfo().getName();
     return getContainer().containsKey(colName);
   }
@@ -229,7 +231,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * java.lang.Object)
    */
   @Override
-  public IStoreObject<T, JsonObject> put(IProperty field, Object value) {
+  public IStoreObject<T, JsonObject> put(final IProperty field, final Object value) {
     IColumnInfo ci = field.getMapper().getTableInfo().getColumnInfo(field);
     if (ci == null) {
       throw new MappingException("Can't find columninfo for field " + field.getFullName());
@@ -250,7 +252,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    * 
    * @param handler
    */
-  public void getNextId(Handler<AsyncResult<Void>> handler) {
+  public void getNextId(final Handler<AsyncResult<Void>> handler) {
     IKeyGenerator gen = getMapper().getKeyGenerator();
     gen.generateKey(getMapper(), keyResult -> {
       if (keyResult.failed()) {
