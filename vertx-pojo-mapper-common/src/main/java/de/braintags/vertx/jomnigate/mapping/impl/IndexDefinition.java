@@ -85,7 +85,13 @@ public class IndexDefinition implements IIndexDefinition {
       fields.add(def);
     }
     if (index.options() != null) {
-      getIndexOptions().add(new IndexOption(IndexFeature.UNIQUE, index.options().unique()));
+
+      if (index.options().unique()) {
+        getIndexOptions().add(new IndexOption(IndexFeature.UNIQUE, index.options().unique()));
+      }
+      if (index.options().sparse()) {
+        getIndexOptions().add(new IndexOption(IndexFeature.SPARSE, index.options().sparse()));
+      }
       if (StringUtils.isNotBlank(index.options().partialFilterExpression()))
         getIndexOptions()
             .add(new IndexOption(IndexFeature.PARTIAL_FILTER_EXPRESSION, index.options().partialFilterExpression()));

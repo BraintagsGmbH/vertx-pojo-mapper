@@ -152,7 +152,7 @@ public final class MongoUtil {
    * @param handler
    *          the handler to be informed with the result of the index creation
    */
-  public static final void createIndexes(final MongoDataStore dataStore, IMapper<?> mapper,
+  public static final void createIndexes(final MongoDataStore dataStore, final IMapper<?> mapper,
       final Handler<AsyncResult<JsonObject>> handler) {
     String collection = mapper.getTableInfo().getName();
     ImmutableSet<IIndexDefinition> indexDefinitions = mapper.getIndexDefinitions();
@@ -175,8 +175,8 @@ public final class MongoUtil {
         });
   }
 
-  private static Future<JsonObject> createIndexDefinition(final IIndexDefinition indexDefinition, IMapper<?> mapper,
-      final MongoDataStore dataStore) {
+  private static Future<JsonObject> createIndexDefinition(final IIndexDefinition indexDefinition,
+      final IMapper<?> mapper, final MongoDataStore dataStore) {
     Future<JsonObject> future = Future.future();
     JsonObject idxObject = new JsonObject();
     try {
@@ -200,8 +200,8 @@ public final class MongoUtil {
   }
 
   private static void addIndexOptions(final JsonObject indexDef,
-      final List<de.braintags.vertx.jomnigate.mapping.IndexOption> indexOptions, IMapper<?> mapper,
-      final MongoDataStore dataStore, Handler<AsyncResult<JsonObject>> handler) {
+      final List<de.braintags.vertx.jomnigate.mapping.IndexOption> indexOptions, final IMapper<?> mapper,
+      final MongoDataStore dataStore, final Handler<AsyncResult<JsonObject>> handler) {
     @SuppressWarnings("rawtypes")
     List<Future> futures = new ArrayList<>();
     for (IndexOption option : indexOptions) {
@@ -210,22 +210,26 @@ public final class MongoUtil {
       futures.add(future);
 
       switch (option.getFeature()) {
-      case UNIQUE:
-        indexDef.put("unique", value);
-        future.complete();
-        break;
-      case PARTIAL_FILTER_EXPRESSION:
-        convertFilterExpression((String) value, indexDef, mapper, dataStore, future);
-        break;
-      default:
-        future.fail(new IllegalArgumentException("Unknown IndexFeature: " + option.getFeature()));
+        case UNIQUE:
+          indexDef.put("unique", value);
+          future.complete();
+          break;
+        case PARTIAL_FILTER_EXPRESSION:
+          convertFilterExpression((String) value, indexDef, mapper, dataStore, future);
+          break;
+        case SPARSE:
+          indexDef.put("sparse", value);
+          future.complete();
+          break;
+        default:
+          future.fail(new IllegalArgumentException("Unknown IndexFeature: " + option.getFeature()));
       }
     }
     CompositeFuture.all(futures).setHandler(result -> handler.handle(result.map(indexDef)));
   }
 
-  private static void convertFilterExpression(String filterExpression, final JsonObject indexDef, IMapper<?> mapper,
-      final MongoDataStore dataStore, Future<Void> future) {
+  private static void convertFilterExpression(final String filterExpression, final JsonObject indexDef,
+      final IMapper<?> mapper, final MongoDataStore dataStore, final Future<Void> future) {
     ISearchCondition condition;
     try {
       condition = dataStore.getJacksonMapper().readValue(filterExpression, ISearchCondition.class);

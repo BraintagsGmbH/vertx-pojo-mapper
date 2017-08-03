@@ -43,4 +43,8 @@ public @interface IndexOptions {
    */
   String partialFilterExpression() default "";
 
+  /**
+   * Ignores null values
+   */
+  boolean sparse() default false;
 }
