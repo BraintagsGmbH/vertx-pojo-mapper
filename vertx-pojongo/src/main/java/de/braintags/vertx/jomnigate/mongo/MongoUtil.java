@@ -176,8 +176,7 @@ public final class MongoUtil {
   }
 
   private static Future<JsonObject> createIndexDefinition(final IIndexDefinition indexDefinition,
-      final IMapper<?> mapper,
-      final MongoDataStore dataStore) {
+      final IMapper<?> mapper, final MongoDataStore dataStore) {
     Future<JsonObject> future = Future.future();
     JsonObject idxObject = new JsonObject();
     try {
@@ -230,8 +229,7 @@ public final class MongoUtil {
   }
 
   private static void convertFilterExpression(final String filterExpression, final JsonObject indexDef,
-      final IMapper<?> mapper,
-      final MongoDataStore dataStore, final Future<Void> future) {
+      final IMapper<?> mapper, final MongoDataStore dataStore, final Future<Void> future) {
     ISearchCondition condition;
     try {
       condition = dataStore.getJacksonMapper().readValue(filterExpression, ISearchCondition.class);
