@@ -19,6 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import de.braintags.vertx.jomnigate.dataaccess.DataTypesTestSuite;
 import de.braintags.vertx.jomnigate.dataaccess.query.TestFieldConditionCache;
 import de.braintags.vertx.jomnigate.dataaccess.query.TestQueryInterator;
+import de.braintags.vertx.jomnigate.dataaccess.query.TestQueryReadStream;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.TestIndexedFields;
 
 /**
@@ -32,8 +33,8 @@ import de.braintags.vertx.jomnigate.dataaccess.query.impl.TestIndexedFields;
     TestStoreObject.class, TestQuery.class, TestQueryHelper.class, TestIndex.class, TestRoundtrip.class,
     TestOnlyIdMapper.class, TestTrigger.class, TestMassInsert.class, TestKeyGenerator.class, TestGeoSearch.class,
     TestEncoder.class, TestListExtrems.class, TestReferenced.class, TestFieldConditionCache.class,
-    TestQueryInterator.class, DataTypesTestSuite.class, ObserverSuite.class, TestClearDatastore.class,
-    TestIndexedFields.class, TestUpdate.class })
+    TestQueryInterator.class, TestQueryReadStream.class, DataTypesTestSuite.class, ObserverSuite.class,
+    TestClearDatastore.class, TestIndexedFields.class, TestUpdate.class })
 public class AllTestsCommon {
 
 }
