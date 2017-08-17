@@ -45,10 +45,17 @@ public class TestQueryReadStream extends DatastoreBaseTest {
       .getLogger(TestQueryReadStream.class);
   private static int recCount = 100;
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testStream_Error(final TestContext context) throws IOException {
     IQuery<MiniMapper> q = getDataStore(context).createQuery(MiniMapper.class);
     QueryReadStreamError<MiniMapper> qr = new QueryReadStreamError<>(q);
+    execute(context, qr, false, 0, recCount);
+  }
+
+  @Test
+  public void testStream_BlockSizeEqualsRecordCount(final TestContext context) throws IOException {
+    IQuery<MiniMapper> q = getDataStore(context).createQuery(MiniMapper.class);
+    QueryReadStreamBuffer<MiniMapper> qr = new QueryReadStreamBuffer<>(q, 100);
     execute(context, qr);
   }
 
@@ -139,6 +146,12 @@ public class TestQueryReadStream extends DatastoreBaseTest {
   @SuppressWarnings("rawtypes")
   private void execute(final TestContext context, final QueryReadStreamBuffer qr,
       final boolean expectBufferWritten, final int recCount) {
+    execute(context, qr, expectBufferWritten, recCount, 0);
+  }
+
+  @SuppressWarnings("rawtypes")
+  private void execute(final TestContext context, final QueryReadStreamBuffer qr,
+      final boolean expectBufferWritten, final int succeededCount, final int failedCount) {
     BufferWriteStream ws = new BufferWriteStream();
     execute(context, qr, ws);
     if (expectBufferWritten) {
@@ -146,7 +159,10 @@ public class TestQueryReadStream extends DatastoreBaseTest {
     } else {
       context.assertFalse(ws.buffer.length() > 0, "buffer should not be written");
     }
-    context.assertEquals(recCount, ws.count, "not all instances were written");
+    context.assertEquals(succeededCount, ws.count, "not all instances were written");
+    context.assertEquals(succeededCount, qr.getStreamResult().getSucceeded(), "not all instances were written");
+    context.assertEquals(failedCount, qr.getStreamResult().getFailed(), "failed instances not correct");
+
     LOGGER.debug(ws.buffer);
   }
 
