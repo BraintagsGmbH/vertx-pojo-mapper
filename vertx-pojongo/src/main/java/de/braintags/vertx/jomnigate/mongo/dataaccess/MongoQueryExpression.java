@@ -46,6 +46,7 @@ import io.vertx.ext.mongo.FindOptions;
 public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
   private JsonObject searchCondition = new JsonObject();
   private JsonObject sortArguments;
+  private JsonObject fields;
 
   /**
    * Get the native query definition for Mongo
@@ -70,6 +71,9 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
     if (getSortArguments() != null && !getSortArguments().isEmpty()) {
       findOptions.setSort(getSortArguments());
     }
+    if (fields != null) {
+      findOptions.setFields(fields);
+    }
     return findOptions;
   }
 
@@ -80,7 +84,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    * Object)
    */
   @Override
-  protected void handleFinishedSearchCondition(JsonObject result) {
+  protected void handleFinishedSearchCondition(final JsonObject result) {
     this.searchCondition = result;
   }
 
@@ -92,7 +96,8 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    * List, de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer)
    */
   @Override
-  protected JsonObject parseContainerContents(List<JsonObject> parsedConditionList, ISearchConditionContainer container)
+  protected JsonObject parseContainerContents(final List<JsonObject> parsedConditionList,
+      final ISearchConditionContainer container)
       throws UnknownQueryLogicException {
     String queryLogic = translateQueryLogic(container.getQueryLogic());
     JsonArray subExpressions = new JsonArray(parsedConditionList);
@@ -109,16 +114,16 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    * @throws UnknownQueryLogicException
    *           if the logic value is unknown
    */
-  private String translateQueryLogic(QueryLogic logic) throws UnknownQueryLogicException {
+  private String translateQueryLogic(final QueryLogic logic) throws UnknownQueryLogicException {
     switch (logic) {
-    case AND:
-      return "$and";
-    case OR:
-      return "$or";
-    case NOT:
+      case AND:
+        return "$and";
+      case OR:
+        return "$or";
+      case NOT:
         return "$nor";
-    default:
-      throw new UnknownQueryLogicException(logic);
+      default:
+        throw new UnknownQueryLogicException(logic);
     }
   }
 
@@ -130,23 +135,24 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
    */
   @Override
-  protected JsonObject buildFieldConditionResult(IFieldCondition fieldCondition, String columnName, JsonNode value)
+  protected JsonObject buildFieldConditionResult(final IFieldCondition fieldCondition, final String columnName,
+      final JsonNode value)
       throws UnknownQueryOperatorException, InvalidQueryValueException {
     QueryOperator operator = fieldCondition.getOperator();
     JsonNode parsedValue;
     switch (operator) {
-    case CONTAINS:
-      parsedValue = new TextNode(".*" + value.textValue() + ".*");
-      break;
-    case STARTS:
-      parsedValue = new TextNode(value.textValue() + ".*");
-      break;
-    case ENDS:
-      parsedValue = new TextNode(".*" + value.textValue());
-      break;
-    default:
-      parsedValue = value;
-      break;
+      case CONTAINS:
+        parsedValue = new TextNode(".*" + value.textValue() + ".*");
+        break;
+      case STARTS:
+        parsedValue = new TextNode(value.textValue() + ".*");
+        break;
+      case ENDS:
+        parsedValue = new TextNode(".*" + value.textValue());
+        break;
+      default:
+        parsedValue = value;
+        break;
     }
 
     String parsedOperator = translateOperator(operator);
@@ -173,8 +179,8 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
    */
   @Override
-  protected void handleNullConditionValue(IFieldCondition condition, String columnName,
-      Handler<AsyncResult<JsonObject>> handler) {
+  protected void handleNullConditionValue(final IFieldCondition condition, final String columnName,
+      final Handler<AsyncResult<JsonObject>> handler) {
     // special case for query with null value
     if (condition.getOperator() == QueryOperator.EQUALS || condition.getOperator() == QueryOperator.NOT_EQUALS) {
       String parsedLogic;
@@ -204,32 +210,32 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    * @throws UnknownQueryOperatorException
    *           if the operator is unknown
    */
-  private String translateOperator(QueryOperator operator) throws UnknownQueryOperatorException {
+  private String translateOperator(final QueryOperator operator) throws UnknownQueryOperatorException {
     switch (operator) {
-    case EQUALS:
-      return "$eq";
-    case CONTAINS:
-    case STARTS:
-    case ENDS:
-      return "$regex";
-    case NOT_EQUALS:
-      return "$ne";
-    case LARGER:
-      return "$gt";
-    case LARGER_EQUAL:
-      return "$gte";
-    case SMALLER:
-      return "$lt";
-    case SMALLER_EQUAL:
-      return "$lte";
-    case IN:
-      return "$in";
-    case NOT_IN:
-      return "$nin";
-    case NEAR:
-      return "$geoNear";
-    default:
-      throw new UnknownQueryOperatorException(operator);
+      case EQUALS:
+        return "$eq";
+      case CONTAINS:
+      case STARTS:
+      case ENDS:
+        return "$regex";
+      case NOT_EQUALS:
+        return "$ne";
+      case LARGER:
+        return "$gt";
+      case LARGER_EQUAL:
+        return "$gte";
+      case SMALLER:
+        return "$lt";
+      case SMALLER_EQUAL:
+        return "$lte";
+      case IN:
+        return "$in";
+      case NOT_IN:
+        return "$nin";
+      case NEAR:
+        return "$geoNear";
+      default:
+        throw new UnknownQueryOperatorException(operator);
     }
   }
 
@@ -241,7 +247,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    * dataaccess.query.ISortDefinition)
    */
   @Override
-  public IQueryExpression addSort(ISortDefinition<?> sortDef) {
+  public IQueryExpression addSort(final ISortDefinition<?> sortDef) {
     SortDefinition<?> sd = (SortDefinition<?>) sortDef;
     if (!sd.getSortArguments().isEmpty()) {
       sortArguments = new JsonObject();
@@ -265,7 +271,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression#setNativeCommand(java.lang.Object)
    */
   @Override
-  public void setNativeCommand(Object nativeCommand) {
+  public void setNativeCommand(final Object nativeCommand) {
     if (nativeCommand instanceof JsonObject) {
       searchCondition = (JsonObject) nativeCommand;
     } else if (nativeCommand instanceof CharSequence) {
@@ -273,6 +279,14 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
     } else {
       throw new UnsupportedOperationException("Can not create a native command from an object of class: "
           + (nativeCommand != null ? nativeCommand.getClass() : "null"));
+    }
+  }
+
+  @Override
+  public void setUseFields(final List<String> useFields) {
+    if (useFields != null && !useFields.isEmpty()) {
+      fields = new JsonObject();
+      useFields.stream().forEach(useField -> fields.put(useField, 1));
     }
   }
 
@@ -284,7 +298,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
   @Override
   public String toString() {
     return String.valueOf(searchCondition) + " | sort: " + sortArguments + " | limit: " + getOffset() + "/"
-        + getLimit();
+        + getLimit() + " | fields: " + fields;
   }
 
 }
