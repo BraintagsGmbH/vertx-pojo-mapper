@@ -12,6 +12,7 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.query;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +23,12 @@ import org.junit.Test;
 import de.braintags.vertx.jomnigate.dataaccess.query.stream.QueryReadStreamBuffer;
 import de.braintags.vertx.jomnigate.testdatastore.DatastoreBaseTest;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapper;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.ReferenceMapper_Array;
+import de.braintags.vertx.util.ExceptionUtil;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.file.AsyncFile;
+import io.vertx.core.file.OpenOptions;
 import io.vertx.core.streams.Pump;
 import io.vertx.core.streams.WriteStream;
 import io.vertx.ext.unit.Async;
@@ -40,10 +45,17 @@ public class TestQueryReadStream extends DatastoreBaseTest {
       .getLogger(TestQueryReadStream.class);
   private static int recCount = 100;
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testStream_Error(final TestContext context) throws IOException {
     IQuery<MiniMapper> q = getDataStore(context).createQuery(MiniMapper.class);
     QueryReadStreamError<MiniMapper> qr = new QueryReadStreamError<>(q);
+    execute(context, qr, false, 0, recCount);
+  }
+
+  @Test
+  public void testStream_BlockSizeEqualsRecordCount(final TestContext context) throws IOException {
+    IQuery<MiniMapper> q = getDataStore(context).createQuery(MiniMapper.class);
+    QueryReadStreamBuffer<MiniMapper> qr = new QueryReadStreamBuffer<>(q, 100);
     execute(context, qr);
   }
 
@@ -61,6 +73,40 @@ public class TestQueryReadStream extends DatastoreBaseTest {
     execute(context, qr);
   }
 
+  @Test
+  public void testStream_Embedded(final TestContext context) throws IOException {
+    clearTable(context, ReferenceMapper_Array.class.getSimpleName());
+    List<ReferenceMapper_Array> rl = new ArrayList<>();
+    for (int i = 0; i < 5; i++) {
+      rl.add(new ReferenceMapper_Array(3));
+    }
+    saveRecords(context, rl);
+    IQuery<ReferenceMapper_Array> q = getDataStore(context).createQuery(ReferenceMapper_Array.class);
+    QueryReadStreamBuffer<ReferenceMapper_Array> qr = new QueryReadStreamBuffer<>(q);
+    execute(context, qr, true, 5);
+  }
+
+  @Test
+  public void testStream_Embedded_File(final TestContext context) throws IOException {
+    clearTable(context, ReferenceMapper_Array.class.getSimpleName());
+    List<ReferenceMapper_Array> rl = new ArrayList<>();
+    for (int i = 0; i < 5; i++) {
+      rl.add(new ReferenceMapper_Array(3));
+    }
+    saveRecords(context, rl);
+    IQuery<ReferenceMapper_Array> q = getDataStore(context).createQuery(ReferenceMapper_Array.class);
+    QueryReadStreamBuffer<ReferenceMapper_Array> qr = new QueryReadStreamBuffer<>(q);
+    executeFile(context, qr, true);
+  }
+
+  @Test
+  public void testStreamEmptySelection(final TestContext context) throws IOException {
+    IQuery<MiniMapper> q = getDataStore(context).createQuery(MiniMapper.class);
+    q.setSearchCondition(ISearchCondition.condition("name", QueryOperator.EQUALS, "NOT_EXISTS"));
+    QueryReadStreamBuffer<MiniMapper> qr = new QueryReadStreamBuffer<>(q);
+    execute(context, qr, false, 0);
+  }
+
   @BeforeClass
   public static final void beforeClass(final TestContext context) {
     clearTable(context, MiniMapper.class);
@@ -71,16 +117,80 @@ public class TestQueryReadStream extends DatastoreBaseTest {
     saveRecords(context, ml);
   }
 
-  private void execute(final TestContext context, final QueryReadStreamBuffer<MiniMapper> qr) {
+  @SuppressWarnings("rawtypes")
+  private void execute(final TestContext context, final QueryReadStreamBuffer qr) {
+    execute(context, qr, true, recCount);
+  }
+
+  @SuppressWarnings("rawtypes")
+  private void executeFile(final TestContext context, final QueryReadStreamBuffer qr,
+      final boolean expectBufferWritten) {
+    try {
+      String path = File.createTempFile("dumpRecords", ".json").getAbsolutePath();
+      LOGGER.debug("writing into " + path);
+      OpenOptions options = new OpenOptions();
+      AsyncFile af = getDataStore(context).getVertx().fileSystem().openBlocking(path, options);
+      execute(context, qr, af);
+      Buffer buffer = getDataStore(context).getVertx().fileSystem().readFileBlocking(path);
+      if (expectBufferWritten) {
+        context.assertTrue(buffer.length() > 0, "buffer was not written");
+      } else {
+        context.assertFalse(buffer.length() > 0, "buffer should not be written");
+      }
+      LOGGER.debug(buffer);
+    } catch (IOException e) {
+      throw ExceptionUtil.createRuntimeException(e);
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  private void execute(final TestContext context, final QueryReadStreamBuffer qr,
+      final boolean expectBufferWritten, final int recCount) {
+    execute(context, qr, expectBufferWritten, recCount, 0);
+  }
+
+  @SuppressWarnings("rawtypes")
+  private void execute(final TestContext context, final QueryReadStreamBuffer qr,
+      final boolean expectBufferWritten, final int succeededCount, final int failedCount) {
+    BufferWriteStream ws = new BufferWriteStream();
+    execute(context, qr, ws);
+    if (expectBufferWritten) {
+      context.assertTrue(ws.buffer.length() > 0, "buffer was not written");
+    } else {
+      context.assertFalse(ws.buffer.length() > 0, "buffer should not be written");
+    }
+    context.assertEquals(succeededCount, ws.count, "not all instances were written");
+    context.assertEquals(succeededCount, qr.getStreamResult().getSucceeded(), "not all instances were written");
+    context.assertEquals(failedCount, qr.getStreamResult().getFailed(), "failed instances not correct");
+
+    LOGGER.debug(ws.buffer);
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private void execute(final TestContext context, final QueryReadStreamBuffer qr, final WriteStream ws) {
     Async async = context.async();
     qr.endHandler(end -> async.complete());
-    BufferWriteStream ws = new BufferWriteStream();
+    qr.exceptionHandler(new ErrorHandler(context, async));
     Pump p = Pump.pump(qr, ws);
     p.start();
     async.await();
-    context.assertTrue(ws.buffer.length() > 0, "buffer was not written");
-    context.assertEquals(recCount, ws.count, "not all instances were written");
-    LOGGER.debug(ws.buffer);
+  }
+
+  public static class ErrorHandler implements Handler<Throwable> {
+    private final TestContext context;
+    private final Async async;
+
+    ErrorHandler(final TestContext context, final Async async) {
+      this.context = context;
+      this.async = async;
+    }
+
+    @Override
+    public void handle(final Throwable cause) {
+      async.complete();
+      context.fail(cause);
+    }
+
   }
 
   public static class QueryReadStreamError<T> extends QueryReadStreamBuffer<T> {

@@ -13,14 +13,12 @@
 package de.braintags.vertx.jomnigate.dataaccess.query.stream;
 
 import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.util.QueryHelper;
-import de.braintags.vertx.util.ResultObject;
+import de.braintags.vertx.util.ExceptionUtil;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -42,10 +40,12 @@ public abstract class QueryReadStream<T, U> implements ReadStream<U> {
 
   private final IQuery<T> query;
   private int blockSize = 2000;
-  private Handler<U> handler;
+  private Handler<U> contentHandler;
+  private Handler<Throwable> exceptionHandler = new DefaultExceptionHandler();
   private Handler<Void> endHandler;
   private Iterator<T> queryResult;
   private int nextStartPosition = 0;
+  private IStreamResult<T> streamResult = new DefaultStreamResult<>();
 
   private final AtomicBoolean paused = new AtomicBoolean(false);
   private final AtomicBoolean ended = new AtomicBoolean(false);
@@ -73,12 +73,13 @@ public abstract class QueryReadStream<T, U> implements ReadStream<U> {
 
   @Override
   public ReadStream<U> exceptionHandler(final Handler<Throwable> handler) {
+    this.exceptionHandler = handler;
     return this;
   }
 
   @Override
   public ReadStream<U> handler(@Nullable final Handler<U> handler) {
-    this.handler = handler;
+    this.contentHandler = handler;
     resume();
     return this;
   }
@@ -91,9 +92,91 @@ public abstract class QueryReadStream<T, U> implements ReadStream<U> {
 
   @Override
   public ReadStream<U> resume() {
+    LOGGER.debug("called resume");
     paused.set(false);
-    nextRow();
+    start();
     return this;
+  }
+
+  private void start() {
+    Future<Void> rootFuture = Future.future();
+    loop(rootFuture);
+    rootFuture.setHandler(res -> {
+      if (res.failed()) {
+        ended.set(true);
+        exceptionHandler.handle(res.cause());
+        close();
+      } else {
+        // mark as ended if the handler was registered too late
+        ended.set(true);
+        // automatically close resources
+        close(c -> {
+          if (endHandler != null) {
+            endHandler.handle(null);
+          }
+        });
+      }
+    });
+  }
+
+  private void loop(final Future<Void> parentFuture) {
+    query.execute(null, blockSize, nextStartPosition, qres -> {
+      if (qres.failed()) {
+        parentFuture.fail(qres.cause());
+      } else {
+        LOGGER.debug("executed query with startPosition " + nextStartPosition + ": " + qres.result().size());
+        setNextStartPosition(qres.result());
+        QueryHelper.queryResultToList(qres.result(), lres -> {
+          if (lres.failed()) {
+            parentFuture.fail(lres.cause());
+          } else {
+            try {
+              queryResult = lres.result().iterator();
+              LOGGER.debug("set next result");
+              subLoop();
+              if (nextStartPosition > 0) {
+                loop(parentFuture);
+              } else {
+                parentFuture.complete();
+              }
+            } catch (Exception e) {
+              parentFuture.fail(e);
+            }
+          }
+        });
+      }
+    });
+  }
+
+  private void subLoop() {
+    while (queryResult.hasNext()) {
+      T entity = queryResult.next();
+      try {
+        append(contentHandler, entity);
+        getStreamResult().succeededEntity(entity);
+      } catch (Throwable e) {
+        getStreamResult().failedEntity(entity, e);
+      }
+    }
+  }
+
+  /**
+   * Get the instance of IStreamResult, which contains the log of the execution
+   * 
+   * @return
+   */
+  public IStreamResult<T> getStreamResult() {
+    return streamResult;
+  }
+
+  /**
+   * The default implementation of IStreamResult used here is {@link DefaultStreamResult}. If you want to add a specific
+   * solution, you have to add it here before start of execution
+   * 
+   * @param streamResult
+   */
+  public void setStreamResult(final IStreamResult<T> streamResult) {
+    this.streamResult = streamResult;
   }
 
   @Override
@@ -107,25 +190,6 @@ public abstract class QueryReadStream<T, U> implements ReadStream<U> {
     return this;
   }
 
-  private void nextRow() {
-    if (!paused.get()) {
-      T next = getNext();
-      if (next != null) {
-        append(handler, next);
-        nextRow();
-      } else {
-        // mark as ended if the handler was registered too late
-        ended.set(true);
-        // automatically close resources
-        close(c -> {
-          if (endHandler != null) {
-            endHandler.handle(null);
-          }
-        });
-      }
-    }
-  }
-
   /**
    * Append the given instance to the result
    * 
@@ -133,53 +197,6 @@ public abstract class QueryReadStream<T, U> implements ReadStream<U> {
    * @param entity
    */
   protected abstract void append(Handler<U> handler, T entity);
-
-  private T getNext() {
-    if (getQueryResult().hasNext()) {
-      return getQueryResult().next();
-    } else {
-      return null;
-    }
-  }
-
-  private Iterator<T> getQueryResult() {
-    if (queryResult == null || (!queryResult.hasNext() && nextStartPosition > -1)) {
-      CountDownLatch latch = new CountDownLatch(1);
-      ResultObject<List<T>> ro = new ResultObject<>(null);
-      query.execute(null, blockSize, nextStartPosition, qres -> {
-        if (qres.failed()) {
-          ro.setThrowable(qres.cause());
-          latch.countDown();
-        } else {
-          setNextStartPosition(qres.result());
-          createResult(latch, ro, qres.result());
-        }
-      });
-
-      try {
-        latch.await();
-      } catch (InterruptedException e) {
-        LOGGER.error("error in latch await", e);
-      }
-      if (ro.isError()) {
-        throw ro.getRuntimeException();
-      } else {
-        queryResult = ro.getResult().iterator();
-      }
-    }
-    return queryResult;
-  }
-
-  private void createResult(final CountDownLatch latch, final ResultObject<List<T>> ro, final IQueryResult<T> qr) {
-    QueryHelper.queryResultToList(qr, res -> {
-      if (res.failed()) {
-        ro.setThrowable(res.cause());
-      } else {
-        ro.setResult(res.result());
-      }
-      latch.countDown();
-    });
-  }
 
   private void setNextStartPosition(final IQueryResult<T> res) {
     nextStartPosition = res.size() >= blockSize ? nextStartPosition + blockSize : -1;
@@ -204,6 +221,16 @@ public abstract class QueryReadStream<T, U> implements ReadStream<U> {
     if (handler != null) {
       handler.handle(Future.succeededFuture());
     }
+  }
+
+  class DefaultExceptionHandler implements Handler<Throwable> {
+
+    @Override
+    public void handle(final Throwable t) {
+      LOGGER.error("", t);
+      throw ExceptionUtil.createRuntimeException(t);
+    }
+
   }
 
 }
