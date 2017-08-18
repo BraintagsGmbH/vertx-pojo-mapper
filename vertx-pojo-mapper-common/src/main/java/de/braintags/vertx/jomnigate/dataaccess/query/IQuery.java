@@ -12,6 +12,8 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.query;
 
+import java.util.List;
+
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.IDataAccessObject;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression;
@@ -157,5 +159,28 @@ public interface IQuery<T> extends IDataAccessObject<T> {
    * @return the root condition that contains or builds the complete query search condition
    */
   ISearchCondition getSearchCondition();
- 
+
+  /**
+   * Add a use field to the query, restricting the result of the query to only the values of fields that were added
+   * 
+   * @param fieldName
+   *          the field to add to the result output
+   */
+  void addUseField(String fieldName);
+
+  /**
+   * Set the use fields that restrict the result of the query
+   * 
+   * @param useFields
+   *          the use fields to set
+   */
+  void setUseFields(List<String> useFields);
+
+  /**
+   * Get the use fields that restrict the result of the query
+   * 
+   * @return the use fields
+   */
+  List<String> getUseFields();
+
 }

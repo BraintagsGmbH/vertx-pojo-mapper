@@ -12,6 +12,9 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.impl.AbstractDataAccessObject;
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldValueResolver;
@@ -39,13 +42,14 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   private ISearchCondition searchCondition;
   private boolean returnCompleteCount = false;
   private final SortDefinition<T> sortDefs = new SortDefinition<>();
+  private List<String> useFields;
   private Object nativeCommand;
 
   /**
    * @param mapperClass
    * @param datastore
    */
-  public Query(Class<T> mapperClass, IDataStore datastore) {
+  public Query(final Class<T> mapperClass, final IDataStore datastore) {
     super(mapperClass, datastore);
   }
 
@@ -57,7 +61,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see #execute(IFieldValueResolver, int, int, Handler)
    */
   @Override
-  public final void execute(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  public final void execute(final Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     execute(null, getDataStore().getDefaultQueryLimit(), 0, resultHandler);
   }
 
@@ -67,8 +71,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.vertx.jomnigate.dataaccess.query.IQuery#execute(io.vertx.core.Handler)
    */
   @Override
-  public final void execute(IFieldValueResolver resolver, int limit, int offset,
-      Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  public final void execute(final IFieldValueResolver resolver, final int limit, final int offset,
+      final Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     sync(syncResult -> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
@@ -86,7 +90,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
     });
   }
 
-  private final Future<IQueryResult<T>> executeQuery(IFieldValueResolver resolver, int limit, int offset) {
+  private final Future<IQueryResult<T>> executeQuery(final IFieldValueResolver resolver, final int limit,
+      final int offset) {
     Future<IQueryResult<T>> f = Future.future();
     buildQueryExpression(resolver, result -> {
       if (result.failed()) {
@@ -106,7 +111,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @param context
    * @return
    */
-  protected Future<Void> preQuery(IObserverContext context) {
+  protected Future<Void> preQuery(final IObserverContext context) {
     return getMapper().getObserverHandler().handleBeforeLoad(this, context);
   }
 
@@ -117,7 +122,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @param context
    * @param nextFuture
    */
-  protected void postQuery(IQueryResult<T> qr, IObserverContext context, Future<IQueryResult<T>> nextFuture) {
+  protected void postQuery(final IQueryResult<T> qr, final IObserverContext context,
+      final Future<IQueryResult<T>> nextFuture) {
     Future<Void> f = getMapper().getObserverHandler().handleAfterLoad(this, qr, context);
     f.setHandler(res -> {
       if (f.failed()) {
@@ -135,7 +141,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see #executeCount(IFieldValueResolver, Handler)
    */
   @Override
-  public final void executeCount(Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+  public final void executeCount(final Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     executeCount(null, resultHandler);
   }
 
@@ -145,7 +151,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.vertx.jomnigate.dataaccess.query.IQuery#buildQueryExpression(io.vertx.core.Handler)
    */
   @Override
-  public void executeCount(IFieldValueResolver resolver, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+  public void executeCount(final IFieldValueResolver resolver,
+      final Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     sync(syncResult -> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
@@ -168,7 +175,8 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   }
 
   @Override
-  public void buildQueryExpression(IFieldValueResolver resolver, Handler<AsyncResult<IQueryExpression>> resultHandler) {
+  public void buildQueryExpression(final IFieldValueResolver resolver,
+      final Handler<AsyncResult<IQueryExpression>> resultHandler) {
     try {
       IQueryExpression expression = getQueryExpressionClass().newInstance();
       expression.setMapper(getMapper());
@@ -177,6 +185,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
       if (getSortDefinitions() != null && !getSortDefinitions().isEmpty()) {
         expression.addSort(getSortDefinitions());
       }
+      expression.setUseFields(getUseFields());
       if (getSearchCondition() != null) {
         expression.buildSearchCondition(getSearchCondition(), resolver, result -> {
           if (result.failed())
@@ -230,7 +239,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    *          if the complete number of results should be computed
    */
   @Override
-  public final IQuery<T> setReturnCompleteCount(boolean returnCompleteCount) {
+  public final IQuery<T> setReturnCompleteCount(final boolean returnCompleteCount) {
     this.returnCompleteCount = returnCompleteCount;
     return this;
   }
@@ -241,7 +250,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.vertx.jomnigate.dataaccess.query.IQuery#setOrderBy(java.lang.String)
    */
   @Override
-  public ISortDefinition<T> addSort(String fieldName) {
+  public ISortDefinition<T> addSort(final String fieldName) {
     return addSort(fieldName, true);
   }
 
@@ -251,7 +260,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.vertx.jomnigate.dataaccess.query.IQuery#addSort(java.lang.String, boolean)
    */
   @Override
-  public ISortDefinition<T> addSort(String fieldName, boolean ascending) {
+  public ISortDefinition<T> addSort(final String fieldName, final boolean ascending) {
     return sortDefs.addSort(fieldName, ascending);
   }
 
@@ -270,7 +279,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * @see de.braintags.vertx.jomnigate.dataaccess.query.IQuery#addNativeCommand(java.lang.Object)
    */
   @Override
-  public void setNativeCommand(Object command) {
+  public void setNativeCommand(final Object command) {
     this.nativeCommand = command;
   }
 
@@ -301,7 +310,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * dataaccess.query.ISearchCondition)
    */
   @Override
-  public void setSearchCondition(ISearchCondition searchCondition) {
+  public void setSearchCondition(final ISearchCondition searchCondition) {
     if (searchCondition != null) {
       searchCondition.validate(getMapper());
     }
@@ -316,5 +325,22 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   @Override
   public ISearchCondition getSearchCondition() {
     return searchCondition;
+  }
+
+  @Override
+  public void addUseField(final String fieldName) {
+    getUseFields().add(fieldName);
+  }
+
+  @Override
+  public List<String> getUseFields() {
+    if (useFields == null)
+      useFields = new ArrayList<>();
+    return useFields;
+  }
+
+  @Override
+  public void setUseFields(final List<String> useFields) {
+    this.useFields = useFields;
   }
 }

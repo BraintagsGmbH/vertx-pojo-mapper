@@ -12,6 +12,8 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 
+import java.util.List;
+
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldValueResolver;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISortDefinition;
@@ -89,4 +91,12 @@ public interface IQueryExpression {
    * @return the offset (starting position) for this query
    */
   public int getOffset();
+
+  /**
+   * Set the use fields that restrict the result of the query
+   * 
+   * @param useFields
+   *          the use fields to set
+   */
+  void setUseFields(List<String> useFields);
 }

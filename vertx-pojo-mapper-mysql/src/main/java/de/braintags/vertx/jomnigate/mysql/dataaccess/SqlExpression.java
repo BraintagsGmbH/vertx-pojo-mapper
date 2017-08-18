@@ -16,7 +16,9 @@ package de.braintags.vertx.jomnigate.mysql.dataaccess;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -72,13 +74,17 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
       QueryOperatorPosition.PREFIX);
 
   private String nativeCommand = null;
-  private final StringBuilder select = new StringBuilder();
-  private final StringBuilder delete = new StringBuilder();
-  private final StringBuilder count = new StringBuilder();
+  private StringBuilder select;
+  private StringBuilder delete;
+  private StringBuilder count;
 
   private final StringBuilder whereClause = new StringBuilder();
   private final StringBuilder orderByClause = new StringBuilder();
   private final JsonArray parameters = new JsonArray();
+
+  private String tableName;
+  private String mapperFieldNames;
+  private String useFields;
 
   /*
    * (non-Javadoc)
@@ -90,10 +96,39 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
   @Override
   public void setMapper(final IMapper<?> mapper) {
     super.setMapper(mapper);
-    select.append(
-        String.format(SELECT_STATEMENT, ((SqlMapper<?>) mapper).getQueryFieldNames(), mapper.getTableInfo().getName()));
-    delete.append(String.format(DELETE_STATEMENT, mapper.getTableInfo().getName()));
-    count.append(String.format(COUNT_STATEMENT, mapper.getTableInfo().getName()));
+    this.tableName = mapper.getTableInfo().getName();
+    this.mapperFieldNames = ((SqlMapper<?>) mapper).getQueryFieldNames();
+  }
+
+  /**
+   * Build the initial count statement, if it has not yet been built
+   */
+  private void buildCountStatement() {
+    if (count == null) {
+      count = new StringBuilder(String.format(COUNT_STATEMENT, tableName));
+    }
+  }
+
+  /**
+   * Build the initial delete statement, if it has not yet been built
+   */
+  private void buildDeleteStatement() {
+    if (delete == null)
+      delete = new StringBuilder(String.format(DELETE_STATEMENT, tableName));
+  }
+
+  /**
+   * Build the initial where statement, if it has not yet been built
+   */
+  private void buildSelectStatement() {
+    if (select == null) {
+      String fieldNames = "";
+      if (StringUtils.isNotBlank(useFields))
+        fieldNames = useFields;
+      else if (StringUtils.isNotBlank(mapperFieldNames))
+        fieldNames = mapperFieldNames;
+      select = new StringBuilder(String.format(SELECT_STATEMENT, fieldNames, tableName));
+    }
   }
 
   /*
@@ -344,6 +379,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
     if (nativeCommand != null) {
       return nativeCommand;
     }
+    buildCountStatement();
     StringBuilder countExpression = new StringBuilder(count);
     appendWhereClause(countExpression);
     return countExpression.toString();
@@ -358,6 +394,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
     if (nativeCommand != null) {
       return nativeCommand;
     }
+    buildSelectStatement();
     StringBuilder selectExpression = new StringBuilder(select);
     appendWhereClause(selectExpression);
     appendOrderByClause(selectExpression);
@@ -371,6 +408,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
    * @return the complete expression
    */
   public String getDeleteExpression() {
+    buildDeleteStatement();
     StringBuilder deleteExpression = new StringBuilder(delete);
     appendWhereClause(deleteExpression);
     return deleteExpression.toString();
@@ -432,6 +470,12 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
           .append(sa.ascending ? " asc" : " desc");
     }
     return this;
+  }
+
+  @Override
+  public void setUseFields(final List<String> useFields) {
+    if (useFields != null && !useFields.isEmpty())
+      this.useFields = useFields.stream().collect(Collectors.joining(","));
   }
 
   /*
