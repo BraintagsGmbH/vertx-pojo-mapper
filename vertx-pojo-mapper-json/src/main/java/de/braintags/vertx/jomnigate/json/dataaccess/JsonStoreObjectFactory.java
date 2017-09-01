@@ -32,7 +32,8 @@ import io.vertx.core.json.JsonObject;
 public class JsonStoreObjectFactory extends AbstractStoreObjectFactory<JsonObject> {
 
   @Override
-  public <T> void createStoreObject(IMapper<T> mapper, T entity, Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
+  public <T> void createStoreObject(final IMapper<T> mapper, final T entity,
+      final Handler<AsyncResult<IStoreObject<T, JsonObject>>> handler) {
     mapper.executeLifecycle(BeforeSave.class, entity, lcr -> {
       if (lcr.failed()) {
         handler.handle(Future.failedFuture(lcr.cause()));
@@ -50,8 +51,8 @@ public class JsonStoreObjectFactory extends AbstractStoreObjectFactory<JsonObjec
   }
 
   @Override
-  public <T> void createStoreObject(JsonObject storedObject, IMapper<T> mapper,
-      Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
+  public <T> void createStoreObject(final JsonObject storedObject, final IMapper<T> mapper,
+      final Handler<AsyncResult<IStoreObject<T, JsonObject>>> handler) {
     JsonStoreObject<T> storeObject = new JsonStoreObject<>(storedObject, mapper);
     storeObject.initToEntity(result -> {
       if (result.failed()) {

@@ -12,33 +12,36 @@
  */
 package de.braintags.vertx.jomnigate.mongo.dataaccess;
 
-import java.util.ArrayList;
-import java.util.List;
+import static java.util.stream.Collectors.toList;
 
-import com.mongodb.MongoException;
+import java.util.List;
+import java.util.stream.IntStream;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteEntry;
 import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
 import de.braintags.vertx.jomnigate.dataaccess.write.impl.AbstractWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.impl.WriteEntry;
-import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
 import de.braintags.vertx.jomnigate.exception.WriteException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.mongo.MongoDataStore;
+import de.braintags.vertx.jomnigate.mongo.MongoStoreObjectFactory;
+import de.braintags.vertx.jomnigate.mongo.mapper.datastore.MongoColumnInfo;
 import de.braintags.vertx.jomnigate.observer.IObserverContext;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.BulkOperation;
+import io.vertx.ext.mongo.BulkOperation.BulkOperationType;
 import io.vertx.ext.mongo.MongoClient;
-import io.vertx.ext.mongo.MongoClientUpdateResult;
+import io.vertx.ext.mongo.MongoClientBulkWriteResult;
 
 /**
  * An implementation of {@link IWrite} for Mongo
@@ -48,8 +51,6 @@ import io.vertx.ext.mongo.MongoClientUpdateResult;
  *          the type of the underlaying mapper
  */
 public class MongoWrite<T> extends AbstractWrite<T> {
-
-  private static final Logger LOG = LoggerFactory.getLogger(MongoWrite.class);
 
   /**
    * Constructor
@@ -66,42 +67,104 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   @Override
   public Future<IWriteResult> internalSave(final IObserverContext context) {
     Future<IWriteResult> f = Future.future();
-    if (getObjectsToSave().isEmpty()) {
+    List<T> entities = getObjectsToSave();
+    if (getQuery() != null && entities.size() > 1)
+      f.fail(new IllegalStateException("Can only update one entity at once if a query is defined"));
+    else if (entities.isEmpty()) {
       f.complete(new MongoWriteResult());
     } else {
-      CompositeFuture cf = saveRecords(context);
-      cf.setHandler(cfr -> {
-        if (cfr.failed()) {
-          f.fail(cfr.cause());
-        } else {
-          f.complete(new MongoWriteResult(cf.list()));
-        }
-      });
+      CompositeFuture.all(entities.stream().map(entity -> convertEntity(entity, context)).collect(toList()))
+          .compose(cfConvert -> {
+            List<StoreObjectHolder> holders = cfConvert.list();
+            IMapper<T> mapper = getMapper();
+            String collection = mapper.getTableInfo().getName();
+            Future<MongoClientBulkWriteResult> fBulk = Future.future();
+            List<BulkOperation> bulkOperations = holders.stream()
+                .map(storeObjectHolder -> storeObjectHolder.bulkOperation).collect(toList());
+            MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
+            mongoClient.bulkWrite(collection, bulkOperations, fBulk);
+            return fBulk.compose(writeResult -> {
+              @SuppressWarnings("rawtypes")
+              List<Future> futures = IntStream.range(0, holders.size())
+                  .mapToObj(i -> finishWrite(entities.get(i), holders.get(i), writeResult))
+                  .collect(toList());
+              return CompositeFuture.all(futures);
+            });
+          }).compose(cfWrite -> {
+            f.complete(new MongoWriteResult(cfWrite.list()));
+          }, f);
     }
     return f;
   }
 
-  @SuppressWarnings("rawtypes")
-  private CompositeFuture saveRecords(final IObserverContext context) {
-    List<Future> fl = new ArrayList<>(getObjectsToSave().size());
-    for (T entity : getObjectsToSave()) {
-      fl.add(save(entity, context));
+  private Future<IWriteEntry> finishWrite(final T entity, final StoreObjectHolder holder,
+      final MongoClientBulkWriteResult writeResult) {
+    BulkOperation bulkOperation = holder.bulkOperation;
+    MongoStoreObject<T> storeObject = holder.storeObject;
+    Future<IWriteEntry> fAfterWrite = Future.future();
+    if (bulkOperation.getType() == BulkOperationType.INSERT) {
+      Object newId = bulkOperation.getDocument().getString("_id");
+      if (newId == null)
+        newId = storeObject.getGeneratedId();
+      finishInsert(newId, entity, storeObject, fAfterWrite);
+    } else {
+      Object currentId = storeObject.get(getMapper().getIdInfo().getField());
+      if (getQuery() == null)
+        finishUpdate(currentId, entity, storeObject, fAfterWrite);
+      else
+        finishQueryUpdate(currentId, entity, storeObject, writeResult, fAfterWrite);
     }
-    return CompositeFuture.all(fl);
+    return fAfterWrite;
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  private Future<IWriteEntry> save(final T entity, final IObserverContext context) {
-    // TODO refactoring / abstraction will follow when refactoring MySql
-    Future<IWriteEntry> f = Future.future();
-    preSave(entity, context).compose(r1 -> createStoreObject(entity))
-        .compose(sto -> doSave(entity, (MongoStoreObject) sto, f), f);
-    return f;
+  private Future<StoreObjectHolder> convertEntity(final T entity, final IObserverContext context) {
+    return preSave(entity, context).compose(v -> createStoreObject(entity)).compose(this::createBulkOperation);
   }
 
-  private Future<IStoreObject<T, ?>> createStoreObject(final T entity) {
-    Future<IStoreObject<T, ?>> f = Future.future();
-    getDataStore().getStoreObjectFactory().createStoreObject(getMapper(), entity, f);
+  private Future<StoreObjectHolder> createBulkOperation(final MongoStoreObject<T> storeObject) {
+    if (storeObject.isNewInstance()) {
+      if (getQuery() != null) {
+        return Future.failedFuture(new IllegalStateException("Can not update with a query and objects without id"));
+      } else
+        return Future.succeededFuture(
+            new StoreObjectHolder(storeObject, BulkOperation.createInsert(storeObject.getContainer())));
+    } else {
+      IMapper<T> mapper = getMapper();
+      Object currentId = storeObject.get(mapper.getIdInfo().getField());
+      if (getQuery() != null) {
+        IQuery<T> q = getDataStore().createQuery(getMapperClass());
+        q.setSearchCondition(ISearchCondition.and(ISearchCondition.in(mapper.getIdInfo().getIndexedField(), currentId),
+            getQuery().getSearchCondition()));
+        Future<IQueryExpression> fQueryExp = Future.future();
+        q.buildQueryExpression(null, fQueryExp);
+        return fQueryExp.compose(queryExpression -> {
+          JsonObject filter = ((MongoQueryExpression) queryExpression).getQueryDefinition();
+          return Future.succeededFuture(new StoreObjectHolder(storeObject,
+              BulkOperation.createReplace(filter, storeObject.getContainer(), false)));
+        });
+      } else {
+        JsonObject filter = new JsonObject().put(MongoColumnInfo.ID_FIELD_NAME, currentId);
+        return Future.succeededFuture(
+            new StoreObjectHolder(storeObject, BulkOperation.createReplace(filter, storeObject.getContainer(), true)));
+      }
+    }
+  }
+
+  private class StoreObjectHolder {
+    private final MongoStoreObject<T> storeObject;
+    private final BulkOperation bulkOperation;
+
+    protected StoreObjectHolder(final MongoStoreObject<T> storeObject, final BulkOperation bulkOperation) {
+      this.storeObject = storeObject;
+      this.bulkOperation = bulkOperation;
+    }
+
+  }
+
+  private Future<MongoStoreObject<T>> createStoreObject(final T entity) {
+    Future<MongoStoreObject<T>> f = Future.future();
+    ((MongoStoreObjectFactory) getDataStore().getStoreObjectFactory()).createStoreObject(getMapper(), entity,
+        res -> f.handle(res.map(storeObject -> (MongoStoreObject<T>) storeObject)));
     return f;
   }
 
@@ -129,120 +192,15 @@ public class MongoWrite<T> extends AbstractWrite<T> {
     return javaValue == null;
   }
 
-  /**
-   * execute the action to store ONE instance in mongo
-   * 
-   * @param storeObject
-   * @param resultHandler
-   */
-  private void doSave(final T entity, final MongoStoreObject<T> storeObject, final Future<IWriteEntry> future) {
-    LOG.debug("now saving: " + storeObject.toString());
-    if (storeObject.isNewInstance()) {
-      doInsert(entity, storeObject, future);
-    } else {
-      doUpdate(entity, storeObject, future);
-    }
-  }
-
-  private void doInsert(final T entity, final MongoStoreObject<T> storeObject,
-      final Handler<AsyncResult<IWriteEntry>> resultHandler) {
-    if (getQuery() != null) {
-      throw new IllegalStateException("Can not update with a query and objects without id");
-    }
-
-    MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
-    IMapper<T> mapper = getMapper();
-    String collection = mapper.getTableInfo().getName();
-    mongoClient.insert(collection, storeObject.getContainer(), result -> {
-      if (result.failed()) {
-        handleInsertError(result.cause(), entity, storeObject, resultHandler);
-      } else {
-        Object id = result.result() == null ? storeObject.getGeneratedId() : result.result();
-        finishInsert(id, entity, storeObject, resultHandler);
-      }
-    });
-  }
-
-  /**
-   * In case of duplicate key exception, try to generate another one
-   * 
-   * @param t
-   * @param entity
-   * @param storeObject
-   * @param resultHandler
-   */
-  private void handleInsertError(final Throwable t, final T entity, final MongoStoreObject<T> storeObject,
-      final Handler<AsyncResult<IWriteEntry>> resultHandler) {
-    // 11000 is the code for duplicate key error
-    if (t instanceof MongoException && ((MongoException) t).getCode() == 11000) {
-      MongoException mongoException = (MongoException) t;
-      // duplicate key can mean any index with unique constraint, not just ID
-      if (mongoException.getMessage().indexOf("_id_") >= 0) {
-        if (getMapper().getKeyGenerator() != null) {
-          LOG.info("duplicate key, regenerating a new key");
-          storeObject.getNextId(niResult -> {
-            if (niResult.failed()) {
-              resultHandler.handle(Future.failedFuture(
-                  new DuplicateKeyException("Could not generate new ID after duplicate key error", niResult.cause())));
-            } else {
-              doInsert(entity, storeObject, resultHandler);
-            }
-          });
-        } else {
-          resultHandler.handle(Future.failedFuture(
-              new DuplicateKeyException("Duplicate key error on insert, but no KeyGenerator is defined", t)));
-        }
-      } else {
-        resultHandler.handle(Future.failedFuture(new DuplicateKeyException(t)));
-      }
-    } else {
-      resultHandler.handle(Future.failedFuture(new WriteException(t)));
-    }
-  }
-
-  private void doUpdate(final T entity, final MongoStoreObject<T> storeObject,
-      final Handler<AsyncResult<IWriteEntry>> resultHandler) {
-    MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
-    IMapper<T> mapper = getMapper();
-    String collection = mapper.getTableInfo().getName();
-    final Object currentId = storeObject.get(mapper.getIdInfo().getField());
-
-    if (getQuery() != null) {
-      IQuery<T> q = getDataStore().createQuery(getMapperClass());
-      q.setSearchCondition(ISearchCondition.and(ISearchCondition.in(mapper.getIdInfo().getIndexedField(), currentId),
-          getQuery().getSearchCondition()));
-      q.buildQueryExpression(null, queryExpRes -> {
-        mongoClient.replaceDocuments(collection, ((MongoQueryExpression) queryExpRes.result()).getQueryDefinition(),
-            storeObject.getContainer(), res -> {
-              if (res.succeeded()) {
-                finishQueryUpdate(currentId, entity, storeObject, res.result(), resultHandler);
-              } else {
-                resultHandler.handle(Future.failedFuture(new WriteException(res.cause())));
-              }
-            });
-      });
-    } else {
-      mongoClient.save(collection, storeObject.getContainer(), result -> {
-        if (result.failed()) {
-          resultHandler.handle(Future.failedFuture(new WriteException(result.cause())));
-        } else {
-          LOG.debug("updated");
-          finishUpdate(currentId, entity, storeObject, resultHandler);
-        }
-      });
-    }
-
-  }
-
   private void finishQueryUpdate(final Object id, final T entity, final MongoStoreObject<T> storeObject,
-      final MongoClientUpdateResult updateResult, final Handler<AsyncResult<IWriteEntry>> resultHandler) {
-    if (updateResult.getDocMatched() != 0 && updateResult.getDocMatched() == updateResult.getDocModified()) {
+      final MongoClientBulkWriteResult updateResult, final Handler<AsyncResult<IWriteEntry>> resultHandler) {
+    if (updateResult.getMatchedCount() != 0 && updateResult.getMatchedCount() == updateResult.getModifiedCount()) {
       finishUpdate(id, entity, storeObject, resultHandler);
-    } else if (updateResult.getDocMatched() == 0 && updateResult.getDocModified() == 0) {
+    } else if (updateResult.getMatchedCount() == 0 && updateResult.getModifiedCount() == 0) {
       resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.NOT_MATCHED)));
     } else {
-      resultHandler.handle(Future.failedFuture(new WriteException("Matched " + updateResult.getDocMatched()
-          + "documents but modified: " + updateResult.getDocModified() + "documents")));
+      resultHandler.handle(Future.failedFuture(new WriteException("Matched " + updateResult.getMatchedCount()
+          + "documents but modified: " + updateResult.getModifiedCount() + "documents")));
     }
   }
 
