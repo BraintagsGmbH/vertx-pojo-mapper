@@ -1,6 +1,10 @@
 package de.braintags.vertx.jomnigate.testdatastore;
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertThat;
+
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -121,6 +125,7 @@ public class TestUpdate extends DatastoreBaseTest {
 
   }
 
+  @SuppressWarnings("unchecked")
   private void checkUpdateWithQuery(final UpdateTester toWrite, final UpdateTester expected,
       final WriteAction expectedAction, final IQuery<UpdateTester> query, final TestContext context) {
     IWrite<UpdateTester> write = getDataStore(context).createWrite(UpdateTester.class);
@@ -130,8 +135,8 @@ public class TestUpdate extends DatastoreBaseTest {
     ResultContainer resultContainer = write(context, write, getDataStore(context).createQuery(UpdateTester.class), 1);
     IWriteEntry entry = resultContainer.writeResult.iterator().next();
     context.assertTrue(entry.getAction().equals(expectedAction));
-    QueryHelper.queryResultToList(resultContainer.queryResult, context.asyncAssertSuccess(list -> {
-      context.assertTrue(list.contains(expected));
+    QueryHelper.queryResultToList(resultContainer.queryResult, context.asyncAssertSuccess( list -> {
+      assertThat((List<UpdateTester>) list, hasItem(expected));
     }));
   }
 
@@ -147,15 +152,13 @@ public class TestUpdate extends DatastoreBaseTest {
     IQuery<UpdateTester> query = getDataStore(context).createQuery(UpdateTester.class);
     query.setSearchCondition(ISearchCondition.isEqual(SHOULD_BE_UPDATED_FIELD, true));
 
-    IWrite<UpdateTester> write = getDataStore(context).createWrite(UpdateTester.class);
-    UpdateTester updatedTest1 = tester1.setUpdated(true);
-    UpdateTester updatedTest2 = tester2.setUpdated(true);
-    UpdateTester updatedTest3 = tester3.setUpdated(true);
-    write.addAll(Arrays.asList(updatedTest1, updatedTest2, updatedTest3));
-    write.setQuery(query);
+    UpdateTester updatedTest1 = new UpdateTester(TEST_ID_1, true, false);
+    UpdateTester updatedTest2 = new UpdateTester(TEST_ID_2, true, false);
+    UpdateTester updatedTest3 = new UpdateTester(TEST_ID_3, true, false);
 
-    ResultContainer resultContainer = write(context, write, getDataStore(context).createQuery(UpdateTester.class), 3);
-    resultContainer.writeResult.forEach(entry -> context.assertTrue(entry.getAction().equals(WriteAction.NOT_MATCHED)));
+    checkUpdateWithQuery(updatedTest1, tester1, WriteAction.NOT_MATCHED, query, context);
+    checkUpdateWithQuery(updatedTest2, tester2, WriteAction.NOT_MATCHED, query, context);
+    checkUpdateWithQuery(updatedTest3, tester3, WriteAction.NOT_MATCHED, query, context);
   }
 
 }

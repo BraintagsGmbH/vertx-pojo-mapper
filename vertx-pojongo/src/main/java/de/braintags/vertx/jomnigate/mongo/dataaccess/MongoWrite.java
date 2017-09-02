@@ -17,6 +17,9 @@ import static java.util.stream.Collectors.toList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import com.mongodb.MongoBulkWriteException;
+import com.mongodb.bulk.BulkWriteError;
+
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression;
@@ -26,6 +29,7 @@ import de.braintags.vertx.jomnigate.dataaccess.write.IWriteResult;
 import de.braintags.vertx.jomnigate.dataaccess.write.WriteAction;
 import de.braintags.vertx.jomnigate.dataaccess.write.impl.AbstractWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.impl.WriteEntry;
+import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
 import de.braintags.vertx.jomnigate.exception.WriteException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
@@ -76,25 +80,56 @@ public class MongoWrite<T> extends AbstractWrite<T> {
       CompositeFuture.all(entities.stream().map(entity -> convertEntity(entity, context)).collect(toList()))
           .compose(cfConvert -> {
             List<StoreObjectHolder> holders = cfConvert.list();
-            IMapper<T> mapper = getMapper();
-            String collection = mapper.getTableInfo().getName();
-            Future<MongoClientBulkWriteResult> fBulk = Future.future();
-            List<BulkOperation> bulkOperations = holders.stream()
-                .map(storeObjectHolder -> storeObjectHolder.bulkOperation).collect(toList());
-            MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
-            mongoClient.bulkWrite(collection, bulkOperations, fBulk);
-            return fBulk.compose(writeResult -> {
-              @SuppressWarnings("rawtypes")
-              List<Future> futures = IntStream.range(0, holders.size())
-                  .mapToObj(i -> finishWrite(entities.get(i), holders.get(i), writeResult))
-                  .collect(toList());
-              return CompositeFuture.all(futures);
+            return writeEntities(holders).recover(e -> {
+              if (entities.size() == 1 && e instanceof MongoBulkWriteException)
+                return handleSingleWriteError(holders, (MongoBulkWriteException) e);
+              else
+                return Future.failedFuture(e);
             });
           }).compose(cfWrite -> {
             f.complete(new MongoWriteResult(cfWrite.list()));
           }, f);
     }
     return f;
+
+  }
+
+  private Future<CompositeFuture> handleSingleWriteError(final List<StoreObjectHolder> holders,
+      final MongoBulkWriteException bulkException) {
+    if (bulkException.getWriteErrors().size() == 1) {
+      BulkWriteError writeError = bulkException.getWriteErrors().get(0);
+      if (writeError.getCode() == 11000) {
+        if (writeError.getMessage().indexOf("_id_") >= 0) {
+          if (getMapper().getKeyGenerator() != null) {
+            Future<Void> fNextId = Future.future();
+            holders.get(0).storeObject.getNextId(fNextId);
+            return fNextId.compose(v -> writeEntities(holders));
+          } else {
+            return Future.failedFuture(new DuplicateKeyException(
+                "Duplicate key error on insert, but no KeyGenerator is defined", bulkException));
+          }
+        } else {
+          return Future.failedFuture(new DuplicateKeyException(bulkException));
+        }
+      }
+    }
+    return Future.failedFuture(bulkException);
+  }
+
+  private Future<CompositeFuture> writeEntities(final List<StoreObjectHolder> holders) {
+    IMapper<T> mapper = getMapper();
+    String collection = mapper.getTableInfo().getName();
+    Future<MongoClientBulkWriteResult> fBulk = Future.future();
+    List<BulkOperation> bulkOperations = holders.stream()
+        .map(storeObjectHolder -> storeObjectHolder.bulkOperation).collect(toList());
+    MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
+    mongoClient.bulkWrite(collection, bulkOperations, fBulk);
+    return fBulk.compose(writeResult -> {
+      @SuppressWarnings("rawtypes")
+      List<Future> futures = IntStream.range(0, holders.size())
+          .mapToObj(i -> finishWrite(getObjectsToSave().get(i), holders.get(i), writeResult)).collect(toList());
+      return CompositeFuture.all(futures);
+    });
   }
 
   private Future<IWriteEntry> finishWrite(final T entity, final StoreObjectHolder holder,

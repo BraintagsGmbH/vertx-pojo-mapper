@@ -40,7 +40,7 @@ public class TestKeyGenerator extends DatastoreBaseTest {
    * @param context
    */
   @Test
-  public void testNullKeyGenerator(TestContext context) {
+  public void testNullKeyGenerator(final TestContext context) {
     IKeyGenerator keyGen = getDataStore(context).getDefaultKeyGenerator();
     context.assertNotNull(keyGen, "keygenerator must not be null");
     context.assertTrue(keyGen instanceof DefaultKeyGenerator || keyGen instanceof DebugGenerator,
@@ -56,7 +56,7 @@ public class TestKeyGenerator extends DatastoreBaseTest {
    * @param context
    */
   @Test
-  public void testNullKeyGeneratorCheckId(TestContext context) {
+  public void testNullKeyGeneratorCheckId(final TestContext context) {
     IKeyGenerator keyGen = getDataStore(context).getDefaultKeyGenerator();
     context.assertNotNull(keyGen, "keygenerator must not be null");
     context.assertTrue(keyGen instanceof DefaultKeyGenerator || keyGen instanceof DebugGenerator,
@@ -81,7 +81,7 @@ public class TestKeyGenerator extends DatastoreBaseTest {
   }
 
   @Test
-  public void testKeyGenerator(TestContext context) {
+  public void testKeyGenerator(final TestContext context) {
     if (getDataStore(context).getClass().getName().equals("de.braintags.vertx.jomnigate.mysql.MySqlDataStore")) {
       // all fine
     } else if (getDataStore(context).getClass().getName()
@@ -97,7 +97,7 @@ public class TestKeyGenerator extends DatastoreBaseTest {
    * @param context
    * @throws AssertionError
    */
-  private void testKeyGeneratorMongo(TestContext context) throws AssertionError {
+  private void testKeyGeneratorMongo(final TestContext context) throws AssertionError {
     IKeyGenerator keyGen = getDataStore(context).getDefaultKeyGenerator();
     context.assertNotNull(keyGen, "keygenerator must not be null");
     context.assertTrue(keyGen instanceof DefaultKeyGenerator,
@@ -129,7 +129,7 @@ public class TestKeyGenerator extends DatastoreBaseTest {
   }
 
   @Test
-  public void testKeyExists(TestContext context) {
+  public void testKeyExists(final TestContext context) {
     clearTable(context, "KeyGeneratorMapperDebugGenerator");
     DebugGenerator gen = (DebugGenerator) getDataStore(context).getKeyGenerator(DebugGenerator.NAME);
     gen.resetCounter();
@@ -137,22 +137,17 @@ public class TestKeyGenerator extends DatastoreBaseTest {
     KeyGeneratorMapperDebugGenerator km = doInsert(context, "testName");
     int id = Integer.parseInt(km.id);
     context.assertEquals(id, 1, "expected first id as 1");
-    km = doInsert(context, "testName2");
-    km = doInsert(context, "testName3");
-    id = Integer.parseInt(km.id);
-    context.assertEquals(id, 3, "expected id as 3");
-
     gen.resetCounter();
     km = doInsert(context, "testId Exists");
     id = Integer.parseInt(km.id);
-    context.assertEquals(id, 4, "expected first id as 4 cause of existing record");
+    context.assertEquals(id, 2, "expected first id as 2 cause of existing record");
   }
 
   /**
    * @param context
    * @return
    */
-  private KeyGeneratorMapperDebugGenerator doInsert(TestContext context, String name) {
+  private KeyGeneratorMapperDebugGenerator doInsert(final TestContext context, final String name) {
     KeyGeneratorMapperDebugGenerator km = new KeyGeneratorMapperDebugGenerator();
     km.name = name;
     ResultContainer resultContainer = saveRecord(context, km);
@@ -160,7 +155,7 @@ public class TestKeyGenerator extends DatastoreBaseTest {
     return km;
   }
 
-  private void checkWriteAction(TestContext context, ResultContainer resultContainer, WriteAction we) {
+  private void checkWriteAction(final TestContext context, final ResultContainer resultContainer, final WriteAction we) {
     IWriteEntry we1 = resultContainer.writeResult.iterator().next();
     context.assertEquals(we1.getAction(), we);
   }
