@@ -140,25 +140,4 @@ public class TestUpdate extends DatastoreBaseTest {
     }));
   }
 
-  @Test
-  public void testUpdateWithNoneMatchingQuery(final TestContext context) {
-    clearTable(context, UpdateTester.class);
-    UpdateTester tester1 = new UpdateTester(TEST_ID_1, false, false);
-    UpdateTester tester2 = new UpdateTester(TEST_ID_2, false, false);
-    UpdateTester tester3 = new UpdateTester(TEST_ID_3, false, false);
-
-    saveRecords(context, Arrays.asList(tester1, tester2, tester3));
-
-    IQuery<UpdateTester> query = getDataStore(context).createQuery(UpdateTester.class);
-    query.setSearchCondition(ISearchCondition.isEqual(SHOULD_BE_UPDATED_FIELD, true));
-
-    UpdateTester updatedTest1 = new UpdateTester(TEST_ID_1, true, false);
-    UpdateTester updatedTest2 = new UpdateTester(TEST_ID_2, true, false);
-    UpdateTester updatedTest3 = new UpdateTester(TEST_ID_3, true, false);
-
-    checkUpdateWithQuery(updatedTest1, tester1, WriteAction.NOT_MATCHED, query, context);
-    checkUpdateWithQuery(updatedTest2, tester2, WriteAction.NOT_MATCHED, query, context);
-    checkUpdateWithQuery(updatedTest3, tester3, WriteAction.NOT_MATCHED, query, context);
-  }
-
 }
