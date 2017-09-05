@@ -26,6 +26,7 @@ import de.braintags.vertx.jomnigate.dataaccess.write.impl.AbstractWrite;
 import de.braintags.vertx.jomnigate.dataaccess.write.impl.WriteEntry;
 import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
 import de.braintags.vertx.jomnigate.exception.WriteException;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.mysql.MySqlDataStore;
@@ -65,29 +66,33 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   @Override
   public Future<IWriteResult> internalSave(final IObserverContext context) {
     Future<IWriteResult> f = Future.future();
-    if (getObjectsToSave().isEmpty()) {
+    List<T> entities = getObjectsToSave();
+    IMapper<T> mapper = getMapper();
+    if (entities.isEmpty()) {
       f.complete(new SqlWriteResult());
     } else {
-      getDataStore().getStoreObjectFactory().createStoreObjects(getMapper(), getObjectsToSave(), stoResult -> {
-        if (stoResult.failed()) {
-          f.fail(stoResult.cause());
-        } else {
-          CompositeFuture cf = saveRecords(stoResult.result());
-          cf.setHandler(cfr -> {
-            if (cfr.failed()) {
-              f.fail(cfr.cause());
+      ((SqlStoreObjectFactory) getDataStore().getStoreObjectFactory()).createStoreObjects(mapper, entities,
+          stoResult -> {
+            if (stoResult.failed()) {
+              f.fail(stoResult.cause());
             } else {
-              f.complete(new SqlWriteResult(cf.list()));
+              List<IStoreObject<T, Object>> storeObjects = stoResult.result();
+              CompositeFuture cf = saveRecords(storeObjects);
+              cf.setHandler(cfr -> {
+                if (cfr.failed()) {
+                  f.fail(cfr.cause());
+                } else {
+                  f.complete(new SqlWriteResult(cf.list()));
+                }
+              });
             }
           });
-        }
-      });
     }
     return f;
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private CompositeFuture saveRecords(final List<IStoreObject<T, ?>> storeObjects) {
+  private CompositeFuture saveRecords(final List<IStoreObject<T, Object>> storeObjects) {
     List<Future> fl = new ArrayList<>(storeObjects.size());
     for (IStoreObject<T, ?> storeObject : storeObjects) {
       fl.add(saveStoreObject((SqlStoreObject<T>) storeObject));
@@ -276,7 +281,8 @@ public class SqlWrite<T> extends AbstractWrite<T> {
       final Handler<AsyncResult<Void>> resultHandler) {
     if (updateResult.failed()) {
       Exception we = updateResult.cause() instanceof DuplicateKeyException
-          ? (DuplicateKeyException) updateResult.cause() : new WriteException(updateResult.cause());
+          ? (DuplicateKeyException) updateResult.cause()
+          : new WriteException(updateResult.cause());
       resultHandler.handle(Future.failedFuture(we));
     } else {
       resultHandler.handle(Future.succeededFuture());
