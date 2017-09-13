@@ -57,8 +57,8 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    * pojomapper.dataaccess.query.ISearchCondition, io.vertx.core.Handler)
    */
   @Override
-  public void buildSearchCondition(ISearchCondition searchCondition, IFieldValueResolver resolver,
-      Handler<AsyncResult<Void>> handler) {
+  public void buildSearchCondition(final ISearchCondition searchCondition, final IFieldValueResolver resolver,
+      final Handler<AsyncResult<Void>> handler) {
     internalBuildSearchCondition(searchCondition, resolver, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -90,8 +90,9 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    *          returns the internal object that represents the given search condition
    */
   @SuppressWarnings("unchecked")
-  protected void internalBuildSearchCondition(ISearchCondition searchCondition, IFieldValueResolver resolver,
-      Handler<AsyncResult<T>> handler) {
+  protected void internalBuildSearchCondition(final ISearchCondition searchCondition,
+      final IFieldValueResolver resolver,
+      final Handler<AsyncResult<T>> handler) {
     if (searchCondition instanceof IFieldCondition) {
       IFieldCondition fieldCondition = (IFieldCondition) searchCondition;
       Object cachedResult = fieldCondition.getIntermediateResult(getClass());
@@ -129,8 +130,8 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    * @param handler
    *          returns the internal object that represents the given field condition
    */
-  protected void parseFieldCondition(IFieldCondition fieldCondition, IFieldValueResolver resolver,
-      Handler<AsyncResult<T>> handler) {
+  protected void parseFieldCondition(final IFieldCondition fieldCondition, final IFieldValueResolver resolver,
+      final Handler<AsyncResult<T>> handler) {
     String columnName = fieldCondition.getField().getColumnName(getMapper());
     JsonNode fieldValue = fieldCondition.getValue();
     if (fieldValue != null) {
@@ -190,8 +191,9 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    * @param handler
    *          returns the result of the condition parsing
    */
-  protected void parseSearchConditionContainer(ISearchConditionContainer container, IFieldValueResolver resolver,
-      Handler<AsyncResult<T>> handler) {
+  protected void parseSearchConditionContainer(final ISearchConditionContainer container,
+      final IFieldValueResolver resolver,
+      final Handler<AsyncResult<T>> handler) {
     @SuppressWarnings("rawtypes")
     List<Future> futures = new ArrayList<>();
     for (ISearchCondition searchCondition : container.getConditions()) {
@@ -234,7 +236,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression#setLimit(int, int)
    */
   @Override
-  public void setLimit(int limit, int offset) {
+  public void setLimit(final int limit, final int offset) {
     this.limit = limit;
     this.offset = offset;
   }
@@ -263,7 +265,7 @@ public abstract class AbstractQueryExpression<T> implements IQueryExpression {
    * mapping.IMapper)
    */
   @Override
-  public void setMapper(IMapper<?> mapper) {
+  public void setMapper(final IMapper<?> mapper) {
     this.mapper = mapper;
   }
 

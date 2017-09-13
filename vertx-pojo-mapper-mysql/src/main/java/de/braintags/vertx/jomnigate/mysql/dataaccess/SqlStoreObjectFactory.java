@@ -39,7 +39,8 @@ public class SqlStoreObjectFactory extends AbstractStoreObjectFactory<Object> {
    *      java.lang.Object, io.vertx.core.Handler)
    */
   @Override
-  public <T> void createStoreObject(IMapper<T> mapper, T entity, Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
+  public <T> void createStoreObject(final IMapper<T> mapper, final T entity,
+      final Handler<AsyncResult<IStoreObject<T, Object>>> handler) {
     mapper.executeLifecycle(BeforeSave.class, entity, lcr -> {
       if (lcr.failed()) {
         handler.handle(Future.failedFuture(lcr.cause()));
@@ -57,8 +58,8 @@ public class SqlStoreObjectFactory extends AbstractStoreObjectFactory<Object> {
   }
 
   @Override
-  public <T> void createStoreObject(Object storedObject, IMapper<T> mapper,
-      Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
+  public <T> void createStoreObject(final Object storedObject, final IMapper<T> mapper,
+      final Handler<AsyncResult<IStoreObject<T, Object>>> handler) {
     SqlStoreObject<T> storeObject = new SqlStoreObject<>((JsonObject) storedObject, mapper);
     storeObject.initToEntity(result -> {
       if (result.failed()) {

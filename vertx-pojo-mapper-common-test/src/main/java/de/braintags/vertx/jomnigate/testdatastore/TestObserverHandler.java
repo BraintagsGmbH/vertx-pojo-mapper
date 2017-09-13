@@ -21,8 +21,10 @@ import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.ObserverDefinition;
+import de.braintags.vertx.jomnigate.init.ObserverMapperSettings;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.ObserverEventType;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.Person;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.SimpleMapper;
 import de.braintags.vertx.jomnigate.testdatastore.observer.AfterMappingObserver;
 import de.braintags.vertx.jomnigate.testdatastore.observer.BeforeDeleteObserver;
@@ -42,8 +44,47 @@ public class TestObserverHandler extends AbstractObserverTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TestObserverHandler.class);
 
+  /**
+   * Add two observers with the same observer implementation for different mappers
+   * 
+   * @param context
+   */
   @Test
-  public void test_AfterMapping_SingleRecord(TestContext context) {
+  public void test_TwoObserverDefs(final TestContext context) {
+    DataStoreSettings settings = getDataStore(context).getSettings();
+
+    ObserverDefinition<AfterMappingObserver> os = new ObserverDefinition<>(AfterMappingObserver.class);
+    os.getMapperSettings().add(new ObserverMapperSettings(SimpleMapper.class.getName()));
+    os.getEventTypeList().add(ObserverEventType.AFTER_MAPPING);
+    settings.getObserverSettings().add(os);
+
+    ObserverDefinition<AfterMappingObserver> os2 = new ObserverDefinition<>(AfterMappingObserver.class);
+    os2.getMapperSettings().add(new ObserverMapperSettings(Person.class.getName()));
+    os2.getEventTypeList().add(ObserverEventType.AFTER_MAPPING);
+    settings.getObserverSettings().add(os2);
+
+    SimpleMapper sm = new SimpleMapper("testname", "nix");
+    sm.intValue = -1;
+    mapAndCheck(context, sm);
+
+    Person p = new Person();
+    p.setName("personname");
+    mapAndCheck(context, p);
+
+  }
+
+  private void mapAndCheck(final TestContext context, final Object record) {
+    AfterMappingObserver.reset();
+    IMapper<?> mapper = getDataStore(context).getMapperFactory().getMapper(record.getClass());
+    context.assertTrue(AfterMappingObserver.executed, "Observer wasn't executed for class " + record.getClass());
+    context.assertTrue(AfterMappingObserver.executedTypes.contains(ObserverEventType.AFTER_MAPPING),
+        "Observer wasn't executed");
+    context.assertFalse(AfterMappingObserver.executedTypes.contains(ObserverEventType.BEFORE_MAPPING),
+        "Observer should not be executed for event BEFORE_MAPPING");
+  }
+
+  @Test
+  public void test_AfterMapping_SingleRecord(final TestContext context) {
     AfterMappingObserver.reset();
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverDefinition<AfterMappingObserver> os = new ObserverDefinition<>(AfterMappingObserver.class);
@@ -61,7 +102,7 @@ public class TestObserverHandler extends AbstractObserverTest {
   }
 
   @Test
-  public void test_BeforeMapping_SingleRecord(TestContext context) {
+  public void test_BeforeMapping_SingleRecord(final TestContext context) {
     BeforeMappingObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverDefinition<BeforeMappingObserver> os = new ObserverDefinition<>(BeforeMappingObserver.class);
@@ -80,7 +121,7 @@ public class TestObserverHandler extends AbstractObserverTest {
    * @param context
    */
   @Test
-  public void test_AfterDelete_SingleRecord(TestContext context) {
+  public void test_AfterDelete_SingleRecord(final TestContext context) {
     SimpleMapperObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverDefinition<SimpleMapperObserver> os = new ObserverDefinition<>(SimpleMapperObserver.class);
@@ -110,7 +151,7 @@ public class TestObserverHandler extends AbstractObserverTest {
    */
   @SuppressWarnings({ "unused", "unchecked" })
   @Test
-  public void test_BeforeDelete_SingleRecord(TestContext context) {
+  public void test_BeforeDelete_SingleRecord(final TestContext context) {
     BeforeLoadObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverDefinition<BeforeDeleteObserver> os = new ObserverDefinition<>(BeforeDeleteObserver.class);
@@ -138,7 +179,7 @@ public class TestObserverHandler extends AbstractObserverTest {
    * @param context
    */
   @Test
-  public void test_AfterLoad_SingleRecord(TestContext context) {
+  public void test_AfterLoad_SingleRecord(final TestContext context) {
     SimpleMapperObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverDefinition<SimpleMapperObserver> os = new ObserverDefinition<>(SimpleMapperObserver.class);
@@ -163,7 +204,7 @@ public class TestObserverHandler extends AbstractObserverTest {
    */
   @SuppressWarnings({ "unused", "unchecked" })
   @Test
-  public void test_BeforeLoad_SingleRecord(TestContext context) {
+  public void test_BeforeLoad_SingleRecord(final TestContext context) {
     BeforeLoadObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverDefinition<BeforeLoadObserver> os = new ObserverDefinition<>(BeforeLoadObserver.class);
@@ -181,7 +222,7 @@ public class TestObserverHandler extends AbstractObserverTest {
    * @param context
    */
   @Test
-  public void test_AfterInsert_SingleRecord(TestContext context) {
+  public void test_AfterInsert_SingleRecord(final TestContext context) {
     SimpleMapperObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverDefinition<SimpleMapperObserver> os = new ObserverDefinition<>(SimpleMapperObserver.class);
@@ -204,7 +245,7 @@ public class TestObserverHandler extends AbstractObserverTest {
    * @param context
    */
   @Test
-  public void test_BeforeInsert_SingleRecord(TestContext context) {
+  public void test_BeforeInsert_SingleRecord(final TestContext context) {
     BeforeSaveObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverDefinition<BeforeSaveObserver> os = new ObserverDefinition<>(BeforeSaveObserver.class);
@@ -225,7 +266,7 @@ public class TestObserverHandler extends AbstractObserverTest {
    * @param context
    */
   @Test
-  public void test_BeforeUpdate_SingleRecord(TestContext context) {
+  public void test_BeforeUpdate_SingleRecord(final TestContext context) {
     BeforeSaveObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();
     ObserverDefinition<BeforeSaveObserver> os = new ObserverDefinition<>(BeforeSaveObserver.class);
@@ -254,7 +295,7 @@ public class TestObserverHandler extends AbstractObserverTest {
    * @param context
    */
   @Test
-  public void test_BeforeInsert_Selection(TestContext context) {
+  public void test_BeforeInsert_Selection(final TestContext context) {
     clearTable(context, SimpleMapper.class);
     BeforeSaveObserver.executed = false;
     DataStoreSettings settings = getDataStore(context).getSettings();

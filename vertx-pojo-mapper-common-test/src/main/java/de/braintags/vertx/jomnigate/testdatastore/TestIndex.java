@@ -13,6 +13,7 @@
 package de.braintags.vertx.jomnigate.testdatastore;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
@@ -97,7 +98,7 @@ public class TestIndex extends DatastoreBaseTest {
     filtered2.name = "unique";
     IWrite<MiniMapperIndexUniqueFilter> write = getDataStore(context).createWrite(MiniMapperIndexUniqueFilter.class);
     write.add(filtered2);
-    write.save(context.asyncAssertFailure(e -> context.assertTrue(e instanceof DuplicateKeyException)));
+    write.save(context.asyncAssertFailure(e -> assertThat(e, instanceOf(DuplicateKeyException.class))));
   }
 
   @BeforeClass
@@ -105,7 +106,7 @@ public class TestIndex extends DatastoreBaseTest {
     dropTable(context, GeoMapper2.class.getSimpleName());
   }
 
-  private IIndexDefinition getIndexDefinition(Class<?> mapperClass, final TestContext context) {
+  private IIndexDefinition getIndexDefinition(final Class<?> mapperClass, final TestContext context) {
     ImmutableSet<IIndexDefinition> indexDefinitions = getDataStore(context).getMapperFactory().getMapper(mapperClass)
         .getIndexDefinitions();
     assertThat(indexDefinitions, hasSize(1));

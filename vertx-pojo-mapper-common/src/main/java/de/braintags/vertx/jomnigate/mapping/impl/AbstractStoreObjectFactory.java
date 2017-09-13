@@ -42,8 +42,8 @@ public abstract class AbstractStoreObjectFactory<F> implements IStoreObjectFacto
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
-  public <T> void createStoreObjects(IMapper<T> mapper, List<T> entities,
-      Handler<AsyncResult<List<IStoreObject<T, ?>>>> handler) {
+  public <T> void createStoreObjects(final IMapper<T> mapper, final List<T> entities,
+      final Handler<AsyncResult<List<IStoreObject<T, F>>>> handler) {
     List<Future> fl = createFutureList(mapper, entities);
     CompositeFuture cf = CompositeFuture.all(fl);
     cf.setHandler(result -> {
@@ -57,14 +57,14 @@ public abstract class AbstractStoreObjectFactory<F> implements IStoreObjectFacto
   }
 
   @SuppressWarnings("unchecked")
-  private <T> List<IStoreObject<T, ?>> createStoreObjectList(CompositeFuture cf) {
+  private <T> List<IStoreObject<T, ?>> createStoreObjectList(final CompositeFuture cf) {
     List<IStoreObject<T, ?>> stl = new ArrayList<>();
     cf.list().forEach(f -> stl.add((IStoreObject<T, ?>) f));
     return stl;
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private <T> List<Future> createFutureList(IMapper<T> mapper, List<T> entities) {
+  private <T> List<Future> createFutureList(final IMapper<T> mapper, final List<T> entities) {
     List<Future> fl = new ArrayList<>();
     for (T entity : entities) {
       Future f = Future.future();

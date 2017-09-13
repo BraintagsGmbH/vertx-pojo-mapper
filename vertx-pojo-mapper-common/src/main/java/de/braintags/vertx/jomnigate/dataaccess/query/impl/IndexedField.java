@@ -12,6 +12,8 @@
  */
 package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 
 /**
@@ -22,10 +24,15 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
  */
 public class IndexedField implements IIndexedField {
 
+  /**
+   * Character to use to separate subfields in queries and other database functions
+   */
+  private static final char FIELD_SEPARATOR = '.';
+
   private final String fieldName;
 
-  public IndexedField(final String name) {
-    this.fieldName = name;
+  public IndexedField(final String... names) {
+    this.fieldName = StringUtils.join(names, FIELD_SEPARATOR);
   }
 
   @Override

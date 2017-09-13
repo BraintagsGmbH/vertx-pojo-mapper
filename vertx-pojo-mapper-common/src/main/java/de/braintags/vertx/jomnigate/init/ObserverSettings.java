@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.observer.IObserver;
@@ -31,7 +32,8 @@ import de.braintags.vertx.jomnigate.versioning.SetMapperVersionObserver;
  */
 @JsonIgnoreProperties(value = { "empty" })
 public class ObserverSettings {
-  private List<ObserverDefinition<?>> observerDefinitions = new ArrayList<>();
+  @JsonProperty(value = "observerDefinitions")
+  private final List<ObserverDefinition<?>> observerDefinitions = new ArrayList<>();
 
   /**
    * Default creator which initializes the default observer
@@ -45,7 +47,7 @@ public class ObserverSettings {
    * 
    * @param source
    */
-  public ObserverSettings(ObserverSettings source) {
+  public ObserverSettings(final ObserverSettings source) {
     for (ObserverDefinition<?> observer : source.getObserverDefinitions()) {
       observerDefinitions.add(observer.deepCopy());
     }
@@ -64,7 +66,7 @@ public class ObserverSettings {
    * @param observerClass
    * @return
    */
-  public ObserverDefinition<?> getDefinition(Class<? extends IObserver> observerClass) {
+  public ObserverDefinition<?> getDefinition(final Class<? extends IObserver> observerClass) {
     for (ObserverDefinition os : observerDefinitions) {
       if (os.getObserverClass() == observerClass) {
         return os;
@@ -113,7 +115,7 @@ public class ObserverSettings {
    * 
    * @param definition
    */
-  public void add(ObserverDefinition<?> definition) {
+  public void add(final ObserverDefinition<?> definition) {
     observerDefinitions.add(definition);
   }
 
