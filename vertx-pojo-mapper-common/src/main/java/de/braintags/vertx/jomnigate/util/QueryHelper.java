@@ -82,8 +82,9 @@ public class QueryHelper {
    * @param handler
    *          the handler, which will receive the first object
    */
-  public static <T> void executeToFirstRecord(final IQuery<T> query, final boolean required, final Handler<AsyncResult<T>> handler) {
-    query.execute(result -> {
+  public static <T> void executeToFirstRecord(final IQuery<T> query, final boolean required,
+      final Handler<AsyncResult<T>> handler) {
+    query.execute(null, 1, 0, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
@@ -137,7 +138,8 @@ public class QueryHelper {
    *          the handler to be informed
    */
   @SuppressWarnings("unchecked")
-  public static final <T> void queryResultToList(final IQueryResult<T> queryResult, final Handler<AsyncResult<List<T>>> handler) {
+  public static final <T> void queryResultToList(final IQueryResult<T> queryResult,
+      final Handler<AsyncResult<List<T>>> handler) {
     queryResult.toArray(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
