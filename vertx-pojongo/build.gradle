@@ -1,8 +1,8 @@
 dependencies {
   compile project(':vertx-pojo-mapper-common')
   compile project(':vertx-pojo-mapper-json')
-  compile group: 'io.vertx', name: 'vertx-mongo-embedded-db', version:vertxVersion
-  compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.7'
+  compile group: "de.flapdoodle.embed", name: "de.flapdoodle.embed.mongo", version: "2.0.0"
+  compile "org.slf4j:slf4j-api:1.7.25"
   
   commonTestCompile project(':vertx-pojo-mapper-common-test')
   testCompile project(':vertx-pojo-mapper-json').sourceSets.test.output
