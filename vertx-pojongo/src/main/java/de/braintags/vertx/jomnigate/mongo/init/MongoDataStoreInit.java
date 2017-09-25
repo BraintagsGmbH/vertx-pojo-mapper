@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.init.AbstractDataStoreInit;
@@ -43,7 +43,6 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.SLF4JLogDelegateFactory;
 import io.vertx.ext.mongo.MongoClient;
 
 /**
@@ -115,7 +114,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     LOGGER.info("SETTINGS ARE: " + settings.toString());
     return settings;
   }
-  
+
   /**
    * This method applies the system properties to settings for mongo:
    * <UL>
@@ -128,7 +127,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
    * 
    * @return
    */
-  public static DataStoreSettings applySystemProperties(DataStoreSettings settings) {
+  public static DataStoreSettings applySystemProperties(final DataStoreSettings settings) {
     String connectionString = System.getProperty(MongoDataStoreInit.CONNECTION_STRING_PROPERTY, null);
     if (connectionString != null) {
       settings.getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY, connectionString);
@@ -145,7 +144,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     settings.getProperties().put(IKeyGenerator.DEFAULT_KEY_GENERATOR, keyGenerator);
     LOGGER.info("SETTINGS ARE: " + settings.toString());
     return settings;
-  }  
+  }
 
   /**
    * Helper method which creates the default settings for an instance of {@link MongoDataStore}
@@ -169,7 +168,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
   }
 
   @Override
-  protected void internalInit(Handler<AsyncResult<IDataStore>> handler) {
+  protected void internalInit(final Handler<AsyncResult<IDataStore>> handler) {
     try {
       checkMongoLocal();
       checkShared();
@@ -206,7 +205,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     return exe;
   }
 
-  private void initMongoClient(Handler<AsyncResult<Void>> handler) {
+  private void initMongoClient(final Handler<AsyncResult<Void>> handler) {
     try {
       LOGGER.info("init MongoClient with " + settings);
       JsonObject jconfig = getConfig();
@@ -293,7 +292,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
    * @param localPort
    *          the port where to start the instance
    */
-  private int startMongoExe(boolean startMongoLocal, int localPort) {
+  private int startMongoExe(final boolean startMongoLocal, final int localPort) {
     int retries = 0;
     final int maxRetries = 5;
     int port = localPort;
@@ -320,29 +319,27 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     return port;
   }
 
-  private static Logger mongoLogger = (Logger) new SLF4JLogDelegateFactory()
-      .createDelegate(MongoDataStoreInit.class.getCanonicalName())
-      .unwrap();
   private static IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
-      .defaultsWithLogger(Command.MongoD, mongoLogger)
+      .defaultsWithLogger(Command.MongoD, LoggerFactory.getLogger(MongoDataStoreInit.class))
       .build();
   private static final MongodStarter starter = MongodStarter.getInstance(runtimeConfig);
 
-  private boolean internalStartMongoExe(boolean startMongoLocal, int localPort) {
+  private boolean internalStartMongoExe(final boolean startMongoLocal, final int localPort) {
+
     if (startMongoLocal) {
-        try {
-          LOGGER.info("STARTING LOCAL MONGO ON PORT: " + localPort);
-          IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
-              .net(new Net(localPort, Network.localhostIsIPv6())).build();
+      try {
+        LOGGER.info("STARTING LOCAL MONGO ON PORT: " + localPort);
+        IMongodConfig config = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
+            .net(new Net(localPort, Network.localhostIsIPv6())).build();
         MongodExecutable temp = starter.prepare(config);
-          temp.start();
-          // ensure client was successfully started before assigning to global field
-          exe = temp;
-        } catch (IOException e) {
-          return false;
-        }
+        temp.start();
+        // ensure client was successfully started before assigning to global field
+        exe = temp;
+      } catch (IOException e) {
+        return false;
       }
-      return true;
+    }
+    return true;
   }
 
 }
