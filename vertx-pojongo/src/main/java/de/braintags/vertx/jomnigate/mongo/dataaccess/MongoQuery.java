@@ -41,7 +41,7 @@ import io.vertx.ext.mongo.MongoClient;
 public class MongoQuery<T> extends Query<T> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(MongoQuery.class);
-  private static final String SEARCH_LOG = "executing query in collection %s with %s";
+  private static final String SEARCH_LOG = "executing query in database %s collection %s with %s";
 
   /**
    * Constructor
@@ -51,7 +51,7 @@ public class MongoQuery<T> extends Query<T> {
    * @param datastore
    *          the datastore to be used
    */
-  public MongoQuery(Class<T> mapperClass, IDataStore datastore) {
+  public MongoQuery(final Class<T> mapperClass, final IDataStore datastore) {
     super(mapperClass, datastore);
   }
 
@@ -62,7 +62,8 @@ public class MongoQuery<T> extends Query<T> {
    * dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
    */
   @Override
-  public void internalExecute(IQueryExpression queryExpression, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  public void internalExecute(final IQueryExpression queryExpression,
+      final Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     try {
       doFind((MongoQueryExpression) queryExpression, resultHandler);
     } catch (Exception e) {
@@ -77,7 +78,7 @@ public class MongoQuery<T> extends Query<T> {
    * @see de.braintags.vertx.jomnigate.dataaccess.query.IQuery#executeExplain(io.vertx.core.Handler)
    */
   @Override
-  public void executeExplain(Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  public void executeExplain(final Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     resultHandler.handle(Future.failedFuture(new UnsupportedOperationException("Not implemented yet")));
   }
 
@@ -89,8 +90,8 @@ public class MongoQuery<T> extends Query<T> {
    * dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
    */
   @Override
-  public void internalExecuteCount(IQueryExpression queryExpression,
-      Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+  public void internalExecuteCount(final IQueryExpression queryExpression,
+      final Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     try {
       doFindCount(queryExpression, resultHandler);
     } catch (Exception e) {
@@ -99,7 +100,8 @@ public class MongoQuery<T> extends Query<T> {
     }
   }
 
-  private void doFindCount(IQueryExpression queryExpression, Handler<AsyncResult<IQueryCountResult>> resultHandler) {
+  private void doFindCount(final IQueryExpression queryExpression,
+      final Handler<AsyncResult<IQueryCountResult>> resultHandler) {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     String column = getMapper().getTableInfo().getName();
     mongoClient.count(column, ((MongoQueryExpression) queryExpression).getQueryDefinition(), qResult -> {
@@ -114,10 +116,12 @@ public class MongoQuery<T> extends Query<T> {
     });
   }
 
-  private void doFind(MongoQueryExpression queryExpression, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  private void doFind(final MongoQueryExpression queryExpression,
+      final Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     String collection = getMapper().getTableInfo().getName();
-    LOGGER.debug(String.format(SEARCH_LOG, collection, queryExpression.getQueryDefinition()));
+    LOGGER.debug(String.format(SEARCH_LOG, getDataStore().getSettings().getDatabaseName(), collection,
+        queryExpression.getQueryDefinition()));
 
     JsonObject qDef = queryExpression.getQueryDefinition();
     FindOptions fo = queryExpression.getFindOptions();
@@ -131,8 +135,8 @@ public class MongoQuery<T> extends Query<T> {
     });
   }
 
-  private void createQueryResult(List<JsonObject> findList, MongoQueryExpression queryExpression,
-      Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  private void createQueryResult(final List<JsonObject> findList, final MongoQueryExpression queryExpression,
+      final Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     MongoQueryResult<T> qR = new MongoQueryResult<>(findList, (MongoDataStore) getDataStore(),
         (MongoMapper) getMapper(), queryExpression);
     if (isReturnCompleteCount()) {
@@ -149,7 +153,8 @@ public class MongoQuery<T> extends Query<T> {
     }
   }
 
-  private void fetchCompleteCount(MongoQueryResult<T> qR, Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+  private void fetchCompleteCount(final MongoQueryResult<T> qR,
+      final Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
     executeCount(cr -> {
       if (cr.failed()) {
         resultHandler.handle(Future.failedFuture(cr.cause()));
