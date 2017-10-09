@@ -14,6 +14,7 @@ package de.braintags.vertx.jomnigate.mongo.dataaccess;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -97,8 +98,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    */
   @Override
   protected JsonObject parseContainerContents(final List<JsonObject> parsedConditionList,
-      final ISearchConditionContainer container)
-      throws UnknownQueryLogicException {
+      final ISearchConditionContainer container) throws UnknownQueryLogicException {
     String queryLogic = translateQueryLogic(container.getQueryLogic());
     JsonArray subExpressions = new JsonArray(parsedConditionList);
     JsonObject expression = new JsonObject();
@@ -136,19 +136,18 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    */
   @Override
   protected JsonObject buildFieldConditionResult(final IFieldCondition fieldCondition, final String columnName,
-      final JsonNode value)
-      throws UnknownQueryOperatorException, InvalidQueryValueException {
+      final JsonNode value) throws UnknownQueryOperatorException, InvalidQueryValueException {
     QueryOperator operator = fieldCondition.getOperator();
     JsonNode parsedValue;
     switch (operator) {
       case CONTAINS:
-        parsedValue = new TextNode(".*" + value.textValue() + ".*");
+        parsedValue = new TextNode(Pattern.quote(value.textValue()));
         break;
       case STARTS:
-        parsedValue = new TextNode(value.textValue() + ".*");
+        parsedValue = new TextNode("^" + Pattern.quote(value.textValue()));
         break;
       case ENDS:
-        parsedValue = new TextNode(".*" + value.textValue());
+        parsedValue = new TextNode(Pattern.quote(value.textValue()) + "$");
         break;
       default:
         parsedValue = value;
@@ -297,8 +296,8 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
    */
   @Override
   public String toString() {
-    return String.valueOf(searchCondition) + " | sort: " + sortArguments + " | limit: " + getOffset() + "/"
-        + getLimit() + " | fields: " + fields;
+    return String.valueOf(searchCondition) + " | sort: " + sortArguments + " | limit: " + getOffset() + "/" + getLimit()
+        + " | fields: " + fields;
   }
 
 }
