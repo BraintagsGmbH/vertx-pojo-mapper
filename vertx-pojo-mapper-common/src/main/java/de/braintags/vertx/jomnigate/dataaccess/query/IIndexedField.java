@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.annotation.IndexType;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IndexedField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IProperty;
@@ -51,6 +52,10 @@ public interface IIndexedField {
    */
   @JsonValue
   String getFieldName();
+
+  default IndexType getType() {
+    return IndexType.ASC;
+  }
 
   static IIndexedField getIndexedField(final String name, final Class<?> pojoClass)
       throws NoSuchFieldException, IllegalAccessException {

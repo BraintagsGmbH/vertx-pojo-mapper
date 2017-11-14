@@ -14,6 +14,7 @@ package de.braintags.vertx.jomnigate.dataaccess.query.impl;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.braintags.vertx.jomnigate.annotation.IndexType;
 import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 
 /**
@@ -30,14 +31,25 @@ public class IndexedField implements IIndexedField {
   private static final char FIELD_SEPARATOR = '.';
 
   private final String fieldName;
+  private final IndexType type;
+
+  public IndexedField(final IndexType type, final String... names) {
+    this.type = type;
+    this.fieldName = StringUtils.join(names, FIELD_SEPARATOR);
+  }
 
   public IndexedField(final String... names) {
-    this.fieldName = StringUtils.join(names, FIELD_SEPARATOR);
+    this(IndexType.ASC, names);
   }
 
   @Override
   public String getFieldName() {
     return fieldName;
+  }
+
+  @Override
+  public IndexType getType() {
+    return type;
   }
 
   @Override

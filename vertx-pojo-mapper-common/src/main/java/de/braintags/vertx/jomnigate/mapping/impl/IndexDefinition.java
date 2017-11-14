@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.braintags.vertx.jomnigate.annotation.Index;
 import de.braintags.vertx.jomnigate.annotation.IndexField;
-import de.braintags.vertx.jomnigate.annotation.IndexType;
 import de.braintags.vertx.jomnigate.dataaccess.query.IIndexedField;
 import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mapping.IIndexFieldDefinition;
@@ -56,7 +55,7 @@ public class IndexDefinition implements IIndexDefinition {
     fields = new ArrayList<>();
     IndexFieldDefinition fieldDef = new IndexFieldDefinition();
     fieldDef.setName(field.getColumnName(mapper));
-    fieldDef.setType(IndexType.ASC);
+    fieldDef.setType(field.getType());
     fields.add(fieldDef);
   }
 
