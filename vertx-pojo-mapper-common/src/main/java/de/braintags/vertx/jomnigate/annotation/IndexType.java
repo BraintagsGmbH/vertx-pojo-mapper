@@ -19,25 +19,21 @@ package de.braintags.vertx.jomnigate.annotation;
  * 
  */
 public enum IndexType {
-  ASC(
-      1),
-  DESC(
-      -1),
-  GEO2D(
-      "2d"),
-  GEO2DSPHERE(
-      "2dsphere"),
-  TEXT(
-      "text");
+  ASC(1),
+  DESC(-1),
+  GEO2D("2d"),
+  GEO2DSPHERE("2dsphere"),
+  TEXT("text"),
+  HASHED("hashed");
 
-  private final Object direction;
+  private final Object type;
 
   IndexType(final Object o) {
-    direction = o;
+    type = o;
   }
 
   public Object toIndexValue() {
-    return direction;
+    return type;
   }
 
 }

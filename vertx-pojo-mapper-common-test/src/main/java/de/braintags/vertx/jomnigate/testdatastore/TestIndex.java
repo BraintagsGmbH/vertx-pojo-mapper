@@ -29,6 +29,7 @@ import de.braintags.vertx.jomnigate.exception.DuplicateKeyException;
 import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.GeoMapper2;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapperIndex;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapperIndexHashed;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapperIndexPartialFilter;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapperIndexUnique;
 import de.braintags.vertx.jomnigate.testdatastore.mapper.MiniMapperIndexUniqueFilter;
@@ -75,6 +76,14 @@ public class TestIndex extends DatastoreBaseTest {
     IQuery<MiniMapperIndexUnique> q = getDataStore(context).createQuery(MiniMapperIndexUnique.class);
     findAll(context, q);
     checkIndex(context, q.getMapper(), getIndexDefinition(MiniMapperIndexUnique.class, context));
+  }
+
+  @Test
+  public void testIndexMiniMapper_hashed(final TestContext context) {
+    clearTable(context, MiniMapperIndexHashed.class.getSimpleName());
+    IQuery<MiniMapperIndexHashed> q = getDataStore(context).createQuery(MiniMapperIndexHashed.class);
+    findAll(context, q);
+    checkIndex(context, q.getMapper(), getIndexDefinition(MiniMapperIndexHashed.class, context));
   }
 
   @Test

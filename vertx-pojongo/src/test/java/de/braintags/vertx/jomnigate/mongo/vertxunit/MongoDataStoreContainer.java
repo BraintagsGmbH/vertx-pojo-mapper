@@ -261,7 +261,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   }
 
   @Override
-  public void checkIndex(Object indexInfo, IIndexDefinition sourceIndex, TestContext context) {
+  public void checkIndex(final Object indexInfo, final IIndexDefinition sourceIndex, final TestContext context) {
     context.assertTrue(indexInfo instanceof JsonObject);
     JsonObject index = (JsonObject) indexInfo;
     context.assertEquals(sourceIndex.getName(), index.getString("name"));
@@ -282,6 +282,9 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
       case GEO2DSPHERE:
         context.assertEquals(indexValue, key.getString("position"));
         break;
+        case HASHED:
+          context.assertEquals(indexValue, key.getString("name"));
+          break;
       default:
         context.fail("Unknown index type: " + field.getType());
         return;
