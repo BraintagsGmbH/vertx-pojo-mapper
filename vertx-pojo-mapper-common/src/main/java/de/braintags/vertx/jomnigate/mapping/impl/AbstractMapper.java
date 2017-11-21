@@ -119,7 +119,8 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * Initialize the mapping process
    */
   protected void init() {
-    LOGGER.debug("examining " + getMapperClass().getName());
+    if (LOGGER.isDebugEnabled())
+      LOGGER.debug("examining " + getMapperClass().getName());
     computePersistentFields();
     computeLifeCycleAnnotations();
     computeClassAnnotations();
@@ -217,7 +218,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   /**
    * @param definitions
    */
-  private void computeIndexes(Map<String, IIndexDefinition> definitions) {
+  private void computeIndexes(final Map<String, IIndexDefinition> definitions) {
     Field[] fields = getMapperClass().getFields();
     for (Field field : fields) {
       computeIndexByField(definitions, field);
@@ -228,7 +229,7 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    * @param definitions
    * @param field
    */
-  private void computeIndexByField(Map<String, IIndexDefinition> definitions, Field field) {
+  private void computeIndexByField(final Map<String, IIndexDefinition> definitions, final Field field) {
     int modifiers = field.getModifiers();
     Class<?> type = field.getType();
     if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && IIndexedField.class.isAssignableFrom(type)
@@ -336,10 +337,12 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
   @Override
   public void executeLifecycle(final Class<? extends Annotation> annotationClass, final T entity,
       final Handler<AsyncResult<Void>> handler) {
-    LOGGER.debug("start executing Lifecycle " + annotationClass.getSimpleName());
+    if (LOGGER.isDebugEnabled())
+      LOGGER.debug("start executing Lifecycle " + annotationClass.getSimpleName());
     List<IMethodProxy> methods = getLifecycleMethods(annotationClass);
     if (methods == null || methods.isEmpty()) {
-      LOGGER.debug("nothing to execute");
+      if (LOGGER.isDebugEnabled())
+        LOGGER.debug("nothing to execute");
       handler.handle(Future.succeededFuture());
     } else {
       executeLifecycleMethods(entity, handler, methods);
@@ -368,7 +371,9 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
     List<Future> fl = new ArrayList<>();
     for (IMethodProxy mp : methods) {
       Future f = Future.future();
-      LOGGER.debug("execute lifecycle method: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
+      if (LOGGER.isDebugEnabled())
+        LOGGER
+            .debug("execute lifecycle method: " + getMapperClass().getSimpleName() + " - " + mp.getMethod().getName());
       executeMethod(mp, entity, f.completer());
       fl.add(f);
     }
@@ -390,13 +395,15 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
         : new Object[] {
             getMapperFactory().getDataStore().getTriggerContextFactory().createTriggerContext(this, handler) };
     try {
-      LOGGER.debug("invoking trigger method " + getMapperClass().getSimpleName() + " - " + method.getName());
+      if (LOGGER.isDebugEnabled())
+        LOGGER.debug("invoking trigger method " + getMapperClass().getSimpleName() + " - " + method.getName());
       method.invoke(entity, args);
       if (args == null) {
         // ONLY INFORM HANDLER, if no TriggerContext is given
         handler.handle(Future.succeededFuture());
       }
-      LOGGER.debug("trigger method invokement finished");
+      if (LOGGER.isDebugEnabled())
+        LOGGER.debug("trigger method invokement finished");
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }
