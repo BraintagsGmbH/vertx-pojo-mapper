@@ -30,6 +30,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 public enum QueryOperator {
 
   EQUALS(false, "="),
+  EQUALS_IGNORE_CASE(false),
   NOT_EQUALS(false, "!="),
 
   LARGER(false, ">"),
@@ -58,7 +59,7 @@ public enum QueryOperator {
    * @param synonyms
    *          the synonyms of this value, with which text values can be translated to enum values
    */
-  private QueryOperator(boolean multiValueOperator, String... synonyms) {
+  private QueryOperator(final boolean multiValueOperator, final String... synonyms) {
     this.multiValueOperator = multiValueOperator;
     this.synonyms = synonyms;
   }
@@ -92,7 +93,7 @@ public enum QueryOperator {
    * @return
    */
   @JsonCreator
-  public static QueryOperator translate(String value) {
+  public static QueryOperator translate(final String value) {
     return translationMap.get(StringUtils.lowerCase(value, Locale.US));
   }
 

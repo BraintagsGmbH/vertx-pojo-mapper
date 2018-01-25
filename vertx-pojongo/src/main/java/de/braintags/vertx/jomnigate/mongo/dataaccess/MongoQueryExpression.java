@@ -140,6 +140,9 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
     QueryOperator operator = fieldCondition.getOperator();
     JsonNode parsedValue;
     switch (operator) {
+      case EQUALS_IGNORE_CASE:
+        parsedValue = new TextNode("^" + Pattern.quote(value.textValue()) + "$");
+        break;
       case CONTAINS:
         parsedValue = new TextNode(Pattern.quote(value.textValue()));
         break;
@@ -162,7 +165,8 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
       throw new InvalidQueryValueException(e);
     }
     // make RegEx comparisons case insensitive
-    if (operator == QueryOperator.CONTAINS || operator == QueryOperator.STARTS || operator == QueryOperator.ENDS)
+    if (operator == QueryOperator.EQUALS_IGNORE_CASE || operator == QueryOperator.CONTAINS
+        || operator == QueryOperator.STARTS || operator == QueryOperator.ENDS)
       logicCondition.put("$options", "i");
 
     JsonObject expression = new JsonObject();
@@ -181,7 +185,8 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
   protected void handleNullConditionValue(final IFieldCondition condition, final String columnName,
       final Handler<AsyncResult<JsonObject>> handler) {
     // special case for query with null value
-    if (condition.getOperator() == QueryOperator.EQUALS || condition.getOperator() == QueryOperator.NOT_EQUALS) {
+    if (condition.getOperator() == QueryOperator.EQUALS || condition.getOperator() == QueryOperator.EQUALS_IGNORE_CASE
+        || condition.getOperator() == QueryOperator.NOT_EQUALS) {
       String parsedLogic;
       try {
         parsedLogic = translateOperator(condition.getOperator());
@@ -213,6 +218,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
     switch (operator) {
       case EQUALS:
         return "$eq";
+      case EQUALS_IGNORE_CASE:
       case CONTAINS:
       case STARTS:
       case ENDS:

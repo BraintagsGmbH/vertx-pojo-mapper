@@ -48,8 +48,7 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
  */
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({ @JsonSubTypes.Type(value = QueryAnd.class, name = "and"),
-    @JsonSubTypes.Type(value = QueryOr.class, name = "or"),
-    @JsonSubTypes.Type(value = QueryNot.class, name = "not"),
+    @JsonSubTypes.Type(value = QueryOr.class, name = "or"), @JsonSubTypes.Type(value = QueryNot.class, name = "not"),
     @JsonSubTypes.Type(value = FieldCondition.class, name = "condition"), })
 public interface ISearchCondition {
 
@@ -70,7 +69,7 @@ public interface ISearchCondition {
    *          the value that the record must be equal to
    * @return
    */
-  static IFieldCondition isEqual(IIndexedField field, Object value) {
+  static IFieldCondition isEqual(final IIndexedField field, final Object value) {
     return createFieldCondition(field, QueryOperator.EQUALS, value);
   }
 
@@ -84,8 +83,36 @@ public interface ISearchCondition {
    *          the value that the record must be equal to
    * @return
    */
-  static IFieldCondition isEqual(String fieldName, Object value) {
+  static IFieldCondition isEqual(final String fieldName, final Object value) {
     return createFieldCondition(fieldName, QueryOperator.EQUALS, value);
+  }
+
+  /**
+   *
+   * Create a query condition for the {@link QueryOperator#EQUALS_IGNORE_CASE} operator
+   *
+   * @param field
+   *          the field for the comparison
+   * @param value
+   *          the value that the record must be equal to
+   * @return
+   */
+  static IFieldCondition isEqualIgnoreCase(final IIndexedField field, final Object value) {
+    return createFieldCondition(field, QueryOperator.EQUALS_IGNORE_CASE, value);
+  }
+
+  /**
+   *
+   * Create a query condition for the {@link QueryOperator#EQUALS_IGNORE_CASE} operator with an unindexed field
+   *
+   * @param fieldName
+   *          the name of the field
+   * @param value
+   *          the value that the record must be equal to
+   * @return
+   */
+  static IFieldCondition isEqualIgnoreCase(final String fieldName, final Object value) {
+    return createFieldCondition(fieldName, QueryOperator.EQUALS_IGNORE_CASE, value);
   }
 
   /**
@@ -100,7 +127,7 @@ public interface ISearchCondition {
    *          the value that the record must be equal to
    * @return
    */
-  static IFieldCondition condition(String fieldName, QueryOperator operator, Object value) {
+  static IFieldCondition condition(final String fieldName, final QueryOperator operator, final Object value) {
     return createFieldCondition(fieldName, operator, value);
   }
 
@@ -116,7 +143,7 @@ public interface ISearchCondition {
    *          the value that the record must be equal to
    * @return
    */
-  static IFieldCondition condition(IIndexedField field, QueryOperator operator, Object value) {
+  static IFieldCondition condition(final IIndexedField field, final QueryOperator operator, final Object value) {
     return createFieldCondition(field, operator, value);
   }
 
@@ -130,7 +157,7 @@ public interface ISearchCondition {
    *          the value that the record must not be equal to
    * @return
    */
-  static IFieldCondition notEqual(String fieldName, Object value) {
+  static IFieldCondition notEqual(final String fieldName, final Object value) {
     return createFieldCondition(fieldName, QueryOperator.NOT_EQUALS, value);
   }
 
@@ -144,7 +171,7 @@ public interface ISearchCondition {
    *          the value that the record must not be equal to
    * @return
    */
-  static IFieldCondition notEqual(IIndexedField field, Object value) {
+  static IFieldCondition notEqual(final IIndexedField field, final Object value) {
     return createFieldCondition(field, QueryOperator.NOT_EQUALS, value);
   }
 
@@ -157,7 +184,7 @@ public interface ISearchCondition {
    *          the value that the record must be larger than
    * @return
    */
-  static IFieldCondition larger(String fieldName, Object value) {
+  static IFieldCondition larger(final String fieldName, final Object value) {
     return createFieldCondition(fieldName, QueryOperator.LARGER, value);
   }
 
@@ -170,7 +197,7 @@ public interface ISearchCondition {
    *          the value that the record must be larger than
    * @return
    */
-  static IFieldCondition larger(IIndexedField field, Object value) {
+  static IFieldCondition larger(final IIndexedField field, final Object value) {
     return createFieldCondition(field, QueryOperator.LARGER, value);
   }
 
@@ -183,7 +210,7 @@ public interface ISearchCondition {
    *          the value that the record must be larger or equal to
    * @return
    */
-  static IFieldCondition largerOrEqual(String fieldName, Object value) {
+  static IFieldCondition largerOrEqual(final String fieldName, final Object value) {
     return createFieldCondition(fieldName, QueryOperator.LARGER_EQUAL, value);
   }
 
@@ -196,7 +223,7 @@ public interface ISearchCondition {
    *          the value that the record must be larger or equal to
    * @return
    */
-  static IFieldCondition largerOrEqual(IIndexedField field, Object value) {
+  static IFieldCondition largerOrEqual(final IIndexedField field, final Object value) {
     return createFieldCondition(field, QueryOperator.LARGER_EQUAL, value);
   }
 
@@ -209,7 +236,7 @@ public interface ISearchCondition {
    *          the value that the record must be smaller than
    * @return
    */
-  static IFieldCondition smaller(String fieldName, Object value) {
+  static IFieldCondition smaller(final String fieldName, final Object value) {
     return createFieldCondition(fieldName, QueryOperator.SMALLER, value);
   }
 
@@ -222,7 +249,7 @@ public interface ISearchCondition {
    *          the value that the record must be smaller than
    * @return
    */
-  static IFieldCondition smaller(IIndexedField field, Object value) {
+  static IFieldCondition smaller(final IIndexedField field, final Object value) {
     return createFieldCondition(field, QueryOperator.SMALLER, value);
   }
 
@@ -235,7 +262,7 @@ public interface ISearchCondition {
    *          the value that the record must be smaller or equal to
    * @return
    */
-  static IFieldCondition smallerOrEqual(String fieldName, Object value) {
+  static IFieldCondition smallerOrEqual(final String fieldName, final Object value) {
     return createFieldCondition(fieldName, QueryOperator.SMALLER_EQUAL, value);
   }
 
@@ -248,7 +275,7 @@ public interface ISearchCondition {
    *          the value that the record must be smaller or equal to
    * @return
    */
-  static IFieldCondition smallerOrEqual(IIndexedField field, Object value) {
+  static IFieldCondition smallerOrEqual(final IIndexedField field, final Object value) {
     return createFieldCondition(field, QueryOperator.SMALLER_EQUAL, value);
   }
 
@@ -261,7 +288,7 @@ public interface ISearchCondition {
    *          the values for the comparison
    * @return
    */
-  static IFieldCondition in(String fieldName, Object... values) {
+  static IFieldCondition in(final String fieldName, final Object... values) {
     return in(fieldName, Arrays.asList(values));
   }
 
@@ -274,7 +301,7 @@ public interface ISearchCondition {
    *          the values for the comparison
    * @return
    */
-  static IFieldCondition in(IIndexedField field, Object... values) {
+  static IFieldCondition in(final IIndexedField field, final Object... values) {
     return in(field, Arrays.asList(values));
   }
 
@@ -288,7 +315,7 @@ public interface ISearchCondition {
    *          the values for the comparison
    * @return
    */
-  static IFieldCondition in(String fieldName, Collection<?> values) {
+  static IFieldCondition in(final String fieldName, final Collection<?> values) {
     return createFieldCondition(fieldName, QueryOperator.IN, values);
   }
 
@@ -302,7 +329,7 @@ public interface ISearchCondition {
    *          the values for the comparison
    * @return
    */
-  static IFieldCondition in(IIndexedField field, Collection<?> values) {
+  static IFieldCondition in(final IIndexedField field, final Collection<?> values) {
     return createFieldCondition(field, QueryOperator.IN, values);
   }
 
@@ -315,7 +342,7 @@ public interface ISearchCondition {
    *          the values for the comparison
    * @return
    */
-  static IFieldCondition notIn(String fieldName, Object... values) {
+  static IFieldCondition notIn(final String fieldName, final Object... values) {
     return notIn(fieldName, Arrays.asList(values));
   }
 
@@ -328,7 +355,7 @@ public interface ISearchCondition {
    *          the values for the comparison
    * @return
    */
-  static IFieldCondition notIn(IIndexedField field, Object... values) {
+  static IFieldCondition notIn(final IIndexedField field, final Object... values) {
     return notIn(field, Arrays.asList(values));
   }
 
@@ -341,7 +368,7 @@ public interface ISearchCondition {
    *          the values for the comparison
    * @return
    */
-  static IFieldCondition notIn(String fieldName, Collection<?> values) {
+  static IFieldCondition notIn(final String fieldName, final Collection<?> values) {
     return createFieldCondition(fieldName, QueryOperator.NOT_IN, values);
   }
 
@@ -354,7 +381,7 @@ public interface ISearchCondition {
    *          the values for the comparison
    * @return
    */
-  static IFieldCondition notIn(IIndexedField field, Collection<?> values) {
+  static IFieldCondition notIn(final IIndexedField field, final Collection<?> values) {
     return createFieldCondition(field, QueryOperator.NOT_IN, values);
   }
 
@@ -367,7 +394,7 @@ public interface ISearchCondition {
    *          the value that the record must start with
    * @return
    */
-  static IFieldCondition startsWith(String fieldName, Object value) {
+  static IFieldCondition startsWith(final String fieldName, final Object value) {
     return createFieldCondition(fieldName, QueryOperator.STARTS, value);
   }
 
@@ -380,7 +407,7 @@ public interface ISearchCondition {
    *          the value that the record must start with
    * @return
    */
-  static IFieldCondition startsWith(IIndexedField field, Object value) {
+  static IFieldCondition startsWith(final IIndexedField field, final Object value) {
     return createFieldCondition(field, QueryOperator.STARTS, value);
   }
 
@@ -393,7 +420,7 @@ public interface ISearchCondition {
    *          the value that the record must end with
    * @return
    */
-  static IFieldCondition endsWith(String fieldName, Object value) {
+  static IFieldCondition endsWith(final String fieldName, final Object value) {
     return createFieldCondition(fieldName, QueryOperator.ENDS, value);
   }
 
@@ -406,7 +433,7 @@ public interface ISearchCondition {
    *          the value that the record must end with
    * @return
    */
-  static IFieldCondition endsWith(IIndexedField field, Object value) {
+  static IFieldCondition endsWith(final IIndexedField field, final Object value) {
     return createFieldCondition(field, QueryOperator.ENDS, value);
   }
 
@@ -419,7 +446,7 @@ public interface ISearchCondition {
    *          the value that must be contained
    * @return
    */
-  static IFieldCondition contains(String fieldName, Object value) {
+  static IFieldCondition contains(final String fieldName, final Object value) {
     return createFieldCondition(fieldName, QueryOperator.CONTAINS, value);
   }
 
@@ -432,7 +459,7 @@ public interface ISearchCondition {
    *          the value that must be contained
    * @return
    */
-  static IFieldCondition contains(IIndexedField field, Object value) {
+  static IFieldCondition contains(final IIndexedField field, final Object value) {
     return createFieldCondition(field, QueryOperator.CONTAINS, value);
   }
 
@@ -447,7 +474,7 @@ public interface ISearchCondition {
    *          the latitude geo coordinate
    * @return
    */
-  static IFieldCondition near(String fieldName, double longitude, double latitude) {
+  static IFieldCondition near(final String fieldName, final double longitude, final double latitude) {
     return createFieldCondition(fieldName, QueryOperator.NEAR,
         new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0]))));
   }
@@ -463,7 +490,7 @@ public interface ISearchCondition {
    *          the latitude coordinate
    * @return
    */
-  static IFieldCondition near(IIndexedField field, double longitude, double latitude) {
+  static IFieldCondition near(final IIndexedField field, final double longitude, final double latitude) {
     // don't change order of longitude/latitude, or else mongo doesn't work anymore
     return createFieldCondition(field, QueryOperator.NEAR,
         new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0]))));
@@ -482,7 +509,7 @@ public interface ISearchCondition {
    *          the maximum distance to the given point
    * @return
    */
-  static IFieldCondition near(String fieldName, double longitude, double latitude, int maxDistance) {
+  static IFieldCondition near(final String fieldName, final double longitude, final double latitude, final int maxDistance) {
     return createFieldCondition(fieldName, QueryOperator.NEAR,
         new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0])), maxDistance));
   }
@@ -500,7 +527,7 @@ public interface ISearchCondition {
    *          the maximum distance in meters to the given point
    * @return
    */
-  static IFieldCondition near(IIndexedField field, double longitude, double latitude, int maxDistance) {
+  static IFieldCondition near(final IIndexedField field, final double longitude, final double latitude, final int maxDistance) {
     // don't change order of longitude/latitude, or else mongo doesn't work anymore
     return createFieldCondition(field, QueryOperator.NEAR,
         new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0])), maxDistance));
@@ -518,7 +545,7 @@ public interface ISearchCondition {
    *          the value of the condition
    * @return a new field condition object
    */
-  static IFieldCondition createFieldCondition(String fieldName, QueryOperator operator, Object value) {
+  static IFieldCondition createFieldCondition(final String fieldName, final QueryOperator operator, final Object value) {
     return createFieldCondition(IIndexedField.create(fieldName), operator, value);
   }
 
@@ -534,7 +561,7 @@ public interface ISearchCondition {
    *          the value of the condition
    * @return a new field condition object
    */
-  static IFieldCondition createFieldCondition(IIndexedField field, QueryOperator operator, Object value) {
+  static IFieldCondition createFieldCondition(final IIndexedField field, final QueryOperator operator, final Object value) {
     if (value instanceof String && StringUtils.isNotBlank((String) value)) {
       String stringValue = (String) value;
       if (stringValue.startsWith("${") && stringValue.endsWith("}")) {
@@ -551,7 +578,7 @@ public interface ISearchCondition {
    *          the search conditions to connect
    * @return
    */
-  static ISearchConditionContainer and(ISearchCondition... searchConditions) {
+  static ISearchConditionContainer and(final ISearchCondition... searchConditions) {
     return new QueryAnd(searchConditions);
   }
 
@@ -562,7 +589,7 @@ public interface ISearchCondition {
    *          the search conditions to connect
    * @return
    */
-  static ISearchConditionContainer and(Collection<ISearchCondition> searchConditions) {
+  static ISearchConditionContainer and(final Collection<ISearchCondition> searchConditions) {
     return new QueryAnd(new ISearchCondition[searchConditions.size()]);
   }
 
@@ -573,7 +600,7 @@ public interface ISearchCondition {
    *          the search conditions to connect
    * @return
    */
-  static ISearchConditionContainer or(ISearchCondition... searchConditions) {
+  static ISearchConditionContainer or(final ISearchCondition... searchConditions) {
     return new QueryOr(searchConditions);
   }
 
@@ -584,19 +611,19 @@ public interface ISearchCondition {
    *          the search conditions to connect
    * @return
    */
-  static ISearchConditionContainer or(Collection<ISearchCondition> searchConditions) {
+  static ISearchConditionContainer or(final Collection<ISearchCondition> searchConditions) {
     return new QueryOr(new ISearchCondition[searchConditions.size()]);
   }
 
   /**
-   * Negates the  given query part with the {@link QueryLogic#NOT} operator
+   * Negates the given query part with the {@link QueryLogic#NOT} operator
    *
    * @param searchCondition
    *          the search condition to negate
    * @return
    */
-  static ISearchConditionContainer not(ISearchCondition searchCondition) {
+  static ISearchConditionContainer not(final ISearchCondition searchCondition) {
     return new QueryNot(searchCondition);
   }
-  
+
 }
