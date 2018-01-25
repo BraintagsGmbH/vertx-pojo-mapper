@@ -136,12 +136,21 @@ public class TestQuery extends DatastoreBaseTest {
   }
 
   @Test
+  public void testIsIgnoreCase(final TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    query.setSearchCondition(ISearchCondition.isEqual(SimpleMapper.NAME, "Dublette"));
+    ResultContainer resultContainer = find(context, query, 1);
+    logger.info(resultContainer.queryResult.getOriginalQuery().toString());
+  }
+
+  @Test
   public void testSimpleAnd(final TestContext context) {
     createDemoRecords(context);
 
     IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
-    query.setSearchCondition(ISearchCondition.and(ISearchCondition.isEqual(SimpleMapper.NAME, "Dublette"),
-        ISearchCondition.isEqual(SimpleMapper.SECOND_PROPERTY, "erste")));
+    query.setSearchCondition(ISearchCondition.and(ISearchCondition.isEqualIgnoreCase(SimpleMapper.NAME, "dublette"),
+        ISearchCondition.isEqualIgnoreCase(SimpleMapper.SECOND_PROPERTY, "ERSTE")));
     ResultContainer resultContainer = find(context, query, 1);
     logger.info(resultContainer.queryResult.getOriginalQuery().toString());
   }

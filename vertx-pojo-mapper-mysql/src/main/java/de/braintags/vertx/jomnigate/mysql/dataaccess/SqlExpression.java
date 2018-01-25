@@ -272,6 +272,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
   private String translateOperator(final QueryOperator operator) throws UnknownQueryOperatorException {
     switch (operator) {
       case EQUALS:
+      case EQUALS_IGNORE_CASE:
         return "=";
       case NOT_EQUALS:
         return "!=";
