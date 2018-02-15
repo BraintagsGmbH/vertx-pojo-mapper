@@ -39,8 +39,8 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
  * mapper. If at one time the field name changes for instance, you are sure that your defined queries are still working,
  * cause the content of the defined variable will be changed wither.<br/>
  * By using a String expression as field specifyer, you are more flexibled, but this version is more unsecure as well.
- * 
- * 
+ *
+ *
  * Copyright: Copyright (c) 20.12.2016 <br>
  * Company: Braintags GmbH <br>
  *
@@ -54,7 +54,7 @@ public interface ISearchCondition {
 
   /**
    * Method validates the query arguments like field existence, to avoid wrong results
-   * 
+   *
    * @param mapper
    */
   <T> void validate(IMapper<T> mapper);
@@ -334,6 +334,46 @@ public interface ISearchCondition {
   }
 
   /**
+   * Create a query condition for the {@link QueryOperator#IN_IGNORE_CASE} operator
+   *
+   * @param fieldName
+   *          the field name for the comparison
+   * @param values
+   *          the values for the comparison
+   * @return
+   */
+  static IFieldCondition inIgnoreCase(final String fieldName, final Object... values) {
+    return inIgnoreCase(fieldName, Arrays.asList(values));
+  }
+
+  /**
+   * Create a query condition for the {@link QueryOperator#IN_IGNORE_CASE} operator
+   *
+   * @param field
+   *          the field for the comparison
+   * @param values
+   *          the values for the comparison
+   * @return
+   */
+  static IFieldCondition inIgnoreCase(final IIndexedField field, final Object... values) {
+    return inIgnoreCase(field, Arrays.asList(values));
+  }
+
+  /**
+   *
+   * Create a query condition for the {@link QueryOperator#IN_IGNORE_CASE} operator
+   *
+   * @param field
+   *          the field for the comparison
+   * @param values
+   *          the values for the comparison
+   * @return
+   */
+  static IFieldCondition inIgnoreCase(final IIndexedField field, final Collection<?> values) {
+    return createFieldCondition(field, QueryOperator.IN_IGNORE_CASE, values);
+  }
+
+  /**
    * Create a query condition for the {@link QueryOperator#NOT_IN} operator
    *
    * @param fieldName
@@ -509,7 +549,8 @@ public interface ISearchCondition {
    *          the maximum distance to the given point
    * @return
    */
-  static IFieldCondition near(final String fieldName, final double longitude, final double latitude, final int maxDistance) {
+  static IFieldCondition near(final String fieldName, final double longitude, final double latitude,
+      final int maxDistance) {
     return createFieldCondition(fieldName, QueryOperator.NEAR,
         new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0])), maxDistance));
   }
@@ -527,7 +568,8 @@ public interface ISearchCondition {
    *          the maximum distance in meters to the given point
    * @return
    */
-  static IFieldCondition near(final IIndexedField field, final double longitude, final double latitude, final int maxDistance) {
+  static IFieldCondition near(final IIndexedField field, final double longitude, final double latitude,
+      final int maxDistance) {
     // don't change order of longitude/latitude, or else mongo doesn't work anymore
     return createFieldCondition(field, QueryOperator.NEAR,
         new GeoSearchArgument(new GeoPoint(new Position(longitude, latitude, new double[0])), maxDistance));
@@ -545,7 +587,8 @@ public interface ISearchCondition {
    *          the value of the condition
    * @return a new field condition object
    */
-  static IFieldCondition createFieldCondition(final String fieldName, final QueryOperator operator, final Object value) {
+  static IFieldCondition createFieldCondition(final String fieldName, final QueryOperator operator,
+      final Object value) {
     return createFieldCondition(IIndexedField.create(fieldName), operator, value);
   }
 
@@ -561,7 +604,8 @@ public interface ISearchCondition {
    *          the value of the condition
    * @return a new field condition object
    */
-  static IFieldCondition createFieldCondition(final IIndexedField field, final QueryOperator operator, final Object value) {
+  static IFieldCondition createFieldCondition(final IIndexedField field, final QueryOperator operator,
+      final Object value) {
     if (value instanceof String && StringUtils.isNotBlank((String) value)) {
       String stringValue = (String) value;
       if (stringValue.startsWith("${") && stringValue.endsWith("}")) {

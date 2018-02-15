@@ -53,9 +53,9 @@ import io.vertx.core.json.JsonArray;
 /**
  * A helper object, which contains all elements of an sql expression, like the select part, where clause and additional
  * parts
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 
 public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
@@ -67,8 +67,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
   private static final Pair<String, QueryOperatorPosition> AND = new ImmutablePair<>("AND",
       QueryOperatorPosition.INFIX);
 
-  private static final Pair<String, QueryOperatorPosition> OR = new ImmutablePair<>("OR",
-      QueryOperatorPosition.INFIX);
+  private static final Pair<String, QueryOperatorPosition> OR = new ImmutablePair<>("OR", QueryOperatorPosition.INFIX);
 
   private static final Pair<String, QueryOperatorPosition> NOT = new ImmutablePair<>("NOT",
       QueryOperatorPosition.PREFIX);
@@ -88,7 +87,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#setMapper(de.braintags.vertx.
    * pojomapper.mapping.IMapper)
@@ -133,7 +132,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression#setNativeCommand(java.lang.Object)
    */
   @Override
@@ -148,7 +147,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#handleFinishedSearchCondition(java.
    * lang.Object)
@@ -161,7 +160,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#handleNullConditionValue(de.braintags.
    * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
@@ -185,7 +184,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#buildFieldConditionResult(de.braintags.
    * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
@@ -263,7 +262,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /**
    * Parses the query operator into native SQL format
-   * 
+   *
    * @param operator
    * @return
    * @throws UnknownQueryOperatorException
@@ -285,6 +284,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
       case SMALLER_EQUAL:
       case NEAR:
         return "<=";
+      case IN_IGNORE_CASE:
       case IN:
         return "IN";
       case NOT_IN:
@@ -300,7 +300,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#parseContainerContents(java.util.
    * List, de.braintags.vertx.jomnigate.dataaccess.query.ISearchConditionContainer)
@@ -333,7 +333,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /**
    * Translate the logic connector into native SQL format
-   * 
+   *
    * @param logic
    * @return the native SQL connector value
    * @throws UnknownQueryLogicException
@@ -355,7 +355,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /**
    * Checks if the query has parameters
-   * 
+   *
    * @return true, iff the query has parameters
    */
   public boolean hasQueryParameters() {
@@ -364,7 +364,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /**
    * Get the parameters of the expression
-   * 
+   *
    * @return
    */
   public JsonArray getParameters() {
@@ -373,7 +373,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /**
    * Get the composite statement for a count
-   * 
+   *
    * @return the complete expression
    */
   public String getCountExpression() {
@@ -388,7 +388,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /**
    * Get the composite select statement
-   * 
+   *
    * @return the complete expression
    */
   public String getSelectExpression() {
@@ -405,7 +405,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /**
    * Get the composite delete statement
-   * 
+   *
    * @return the complete expression
    */
   public String getDeleteExpression() {
@@ -421,7 +421,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /**
    * Add the limit and offset to the given expression, if they are defined
-   * 
+   *
    * @param expression
    */
   private void appendLimitClause(final StringBuilder expression) {
@@ -435,7 +435,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /**
    * Append the order by to the expression
-   * 
+   *
    * @param expression
    */
   private void appendOrderByClause(final StringBuilder expression) {
@@ -446,7 +446,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /**
    * Append the where condition to the expression
-   * 
+   *
    * @param expression
    */
   private void appendWhereClause(final StringBuilder expression) {
@@ -457,7 +457,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression#addSort(de.braintags.vertx.jomnigate.
    * dataaccess.query.ISortDefinition)
@@ -481,7 +481,7 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
