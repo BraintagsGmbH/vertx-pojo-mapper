@@ -45,6 +45,7 @@ public enum QueryOperator {
   NEAR(false, "near"),
 
   IN(true, "in"),
+  IN_IGNORE_CASE(true),
   NOT_IN(true, "not in");
 
   private static final Map<String, QueryOperator> translationMap = new HashMap<>();

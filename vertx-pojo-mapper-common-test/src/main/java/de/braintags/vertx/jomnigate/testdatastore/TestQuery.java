@@ -145,6 +145,15 @@ public class TestQuery extends DatastoreBaseTest {
   }
 
   @Test
+  public void testInIgnoreCase(final TestContext context) {
+    createDemoRecords(context);
+    IQuery<SimpleMapper> query = getDataStore(context).createQuery(SimpleMapper.class);
+    List<String> it = Arrays.asList("dublette", "andOr");
+    query.setSearchCondition(ISearchCondition.in(SimpleMapper.NAME, it));
+    find(context, query, 5);
+  }
+
+  @Test
   public void testSimpleAnd(final TestContext context) {
     createDemoRecords(context);
 

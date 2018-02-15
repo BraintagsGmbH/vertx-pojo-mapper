@@ -13,10 +13,12 @@
 package de.braintags.vertx.jomnigate.mongo.dataaccess;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 import de.braintags.vertx.jomnigate.dataaccess.query.IFieldCondition;
@@ -34,6 +36,7 @@ import de.braintags.vertx.util.json.JsonConverter;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.FindOptions;
@@ -129,7 +132,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#buildFieldConditionResult(de.braintags.
    * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, java.lang.Object)
@@ -141,7 +144,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
     JsonNode parsedValue;
     switch (operator) {
       case EQUALS_IGNORE_CASE:
-        parsedValue = new TextNode("^" + Pattern.quote(value.textValue()) + "$");
+        parsedValue = new TextNode(createEqualsRegex(value));
         break;
       case CONTAINS:
         parsedValue = new TextNode(Pattern.quote(value.textValue()));
@@ -151,6 +154,19 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
         break;
       case ENDS:
         parsedValue = new TextNode(Pattern.quote(value.textValue()) + "$");
+        break;
+      case IN_IGNORE_CASE:
+        if (value.isArray()) {
+          ArrayNode arrayNode = Json.mapper.getNodeFactory().arrayNode();
+          for (Iterator<JsonNode> iterator = ((ArrayNode) value).elements(); iterator.hasNext();) {
+            JsonNode node = iterator.next();
+            arrayNode.add(new TextNode(createEqualsRegex(node)));
+          }
+          parsedValue = arrayNode;
+        } else {
+          parsedValue = new TextNode(createEqualsRegex(value));
+        }
+
         break;
       default:
         parsedValue = value;
@@ -166,7 +182,8 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
     }
     // make RegEx comparisons case insensitive
     if (operator == QueryOperator.EQUALS_IGNORE_CASE || operator == QueryOperator.CONTAINS
-        || operator == QueryOperator.STARTS || operator == QueryOperator.ENDS)
+        || operator == QueryOperator.STARTS || operator == QueryOperator.ENDS
+        || operator == QueryOperator.IN_IGNORE_CASE)
       logicCondition.put("$options", "i");
 
     JsonObject expression = new JsonObject();
@@ -174,9 +191,13 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
     return expression;
   }
 
+  private String createEqualsRegex(final JsonNode value) {
+    return "^" + Pattern.quote(value.textValue()) + "$";
+  }
+
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression#handleNullConditionValue(de.braintags.
    * vertx.jomnigate.dataaccess.query.IFieldCondition, java.lang.String, io.vertx.core.Handler)
@@ -218,6 +239,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
     switch (operator) {
       case EQUALS:
         return "$eq";
+      case IN_IGNORE_CASE:
       case EQUALS_IGNORE_CASE:
       case CONTAINS:
       case STARTS:
