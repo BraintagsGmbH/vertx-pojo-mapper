@@ -36,9 +36,9 @@ import io.vertx.ext.unit.TestContext;
 
 /**
  * Tests to improve correct mapping information for defined observers ( or by settings or annotation )
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class TestObserverHandler extends AbstractObserverTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
@@ -46,7 +46,7 @@ public class TestObserverHandler extends AbstractObserverTest {
 
   /**
    * Add two observers with the same observer implementation for different mappers
-   * 
+   *
    * @param context
    */
   @Test
@@ -117,7 +117,7 @@ public class TestObserverHandler extends AbstractObserverTest {
 
   /**
    * The value of the field intValue must be set to 1 through the observer
-   * 
+   *
    * @param context
    */
   @Test
@@ -146,10 +146,9 @@ public class TestObserverHandler extends AbstractObserverTest {
 
   /**
    * The value of the field intValue must be set to 1 through the observer
-   * 
+   *
    * @param context
    */
-  @SuppressWarnings({ "unused", "unchecked" })
   @Test
   public void test_BeforeDelete_SingleRecord(final TestContext context) {
     BeforeLoadObserver.executed = false;
@@ -175,7 +174,7 @@ public class TestObserverHandler extends AbstractObserverTest {
 
   /**
    * The value of the field intValue must be set to 1 through the observer
-   * 
+   *
    * @param context
    */
   @Test
@@ -199,7 +198,7 @@ public class TestObserverHandler extends AbstractObserverTest {
 
   /**
    * The value of the field intValue must be set to 1 through the observer
-   * 
+   *
    * @param context
    */
   @SuppressWarnings({ "unused", "unchecked" })
@@ -218,7 +217,7 @@ public class TestObserverHandler extends AbstractObserverTest {
 
   /**
    * The value of the field intValue must be set to 1 through the observer
-   * 
+   *
    * @param context
    */
   @Test
@@ -241,7 +240,7 @@ public class TestObserverHandler extends AbstractObserverTest {
 
   /**
    * The value of the field intValue must be set to 1 through the observer
-   * 
+   *
    * @param context
    */
   @Test
@@ -262,7 +261,7 @@ public class TestObserverHandler extends AbstractObserverTest {
 
   /**
    * The value of the field intValue must be set to 1 through the observer
-   * 
+   *
    * @param context
    */
   @Test
@@ -291,7 +290,7 @@ public class TestObserverHandler extends AbstractObserverTest {
 
   /**
    * The value of the field intValue must be set to 1 through the observer
-   * 
+   *
    * @param context
    */
   @Test

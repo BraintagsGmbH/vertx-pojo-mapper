@@ -35,10 +35,10 @@ import de.braintags.vertx.jomnigate.util.QueryHelper;
 import io.vertx.core.Future;
 
 /**
- * 
- * 
+ *
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Map<?, ?>> {
   private static final String ERROR_RESULT = "length of rawMap = %d; length of resultMap = %d";
@@ -48,30 +48,31 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
    */
   private static final long serialVersionUID = 1L;
   private final MapType rawMapType;
-  private final Class mapperClass;
+  private final Class<?> mapperClass;
 
   /**
    * @param datastore
    * @param beanProperty
    */
-  public ReferencedMapDeserializer(final IDataStore datastore, final SettableBeanProperty beanProperty) {
+  public ReferencedMapDeserializer(final IDataStore<?, ?> datastore, final SettableBeanProperty beanProperty) {
     super(datastore, beanProperty);
     MapType type = (MapType) getBeanProperty().getType();
     TypeFactory tf = ((JsonDatastore) getDatastore()).getJacksonMapper().getTypeFactory();
-    Class keyClass = type.getKeyType().getRawClass();
+    Class<?> keyClass = type.getKeyType().getRawClass();
     rawMapType = tf.constructMapType(HashMap.class, keyClass, String.class);
     mapperClass = type.getContentType().getRawClass();
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.fasterxml.jackson.databind.JsonDeserializer#deserialize(com.fasterxml.jackson.core.JsonParser,
    * com.fasterxml.jackson.databind.DeserializationContext)
    */
-  @SuppressWarnings({ "rawtypes", "unused" })
+  @SuppressWarnings("rawtypes")
   @Override
-  public Map<?, ?> deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException, JsonProcessingException {
+  public Map<?, ?> deserialize(final JsonParser p, final DeserializationContext ctxt)
+      throws IOException, JsonProcessingException {
     Map rawMap = ctxt.readValue(p, rawMapType);
     Map<?, ?> resultMap = null;
     if (rawMap != null) {
@@ -83,7 +84,7 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
   }
 
   @Override
-  protected Map instantiateInternal(final DeserializationContext ct, final JavaType type) {
+  protected Map<?, ?> instantiateInternal(final DeserializationContext ct, final JavaType type) {
     return new HashMap<>();
   }
 
@@ -92,13 +93,14 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
    * NOTE: IN-query does not gurantee the order to be the same as the arguments. Thus we are executing ONE in query and
    * add the instances in the order like inside the source map.
    * Alternative would be to execute single queries for each entry of the
-   * 
+   *
    * @param node
    * @param mapperClass
    * @return
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected Future<Void> getReferencedObjectsById(final Class mapperClass, final Map rawMap, final Map<?, ?> resultMap) {
+  protected Future<Void> getReferencedObjectsById(final Class mapperClass, final Map rawMap,
+      final Map<?, ?> resultMap) {
     if (rawMap == null) {
       return null;
     }
@@ -134,7 +136,7 @@ public class ReferencedMapDeserializer extends AbstractReferencedDeserializer<Ma
   /**
    * Fetches the instance with the given id.
    * NOTE: do NOT remove found entries, in case values are stored more than one time
-   * 
+   *
    * @param idField
    * @param id
    * @param queryResult

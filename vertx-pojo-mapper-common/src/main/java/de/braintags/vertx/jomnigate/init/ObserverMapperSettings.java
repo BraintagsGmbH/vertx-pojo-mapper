@@ -18,7 +18,8 @@ import de.braintags.vertx.jomnigate.exception.MappingException;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 
 /**
- * The part of {@link ObserverDefinition} which defines, on which {@link IMapper} the ObserverSettings shall be executed.
+ * The part of {@link ObserverDefinition} which defines, on which {@link IMapper} the ObserverSettings shall be
+ * executed.
  * The property classDefinition and annotation contain the definition. Examples for a class definition are:
  * <UL>
  * <LI>my.mapper.class<br/>
@@ -26,9 +27,9 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
  * <LI>instanceof my.mapper.class<br/>
  * the parent ObserverSettings will be applied for all classes, which are instanceof my.mapper.class
  * </UL>
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class ObserverMapperSettings {
   private String classDefinition;
@@ -36,7 +37,6 @@ public class ObserverMapperSettings {
   private Class<?> mapperClass;
   private Class<? extends Annotation> annotation;
 
-  @SuppressWarnings("unused")
   private ObserverMapperSettings() {
     // only usable for serialization
   }
@@ -44,7 +44,7 @@ public class ObserverMapperSettings {
   /**
    * Constructor for a new instance. The class definition can be something like "my.mapper.class" or "instanceof
    * my.mapper.class"
-   * 
+   *
    * @param classDefinition
    */
   public ObserverMapperSettings(final String classDefinition) {
@@ -54,7 +54,7 @@ public class ObserverMapperSettings {
   /**
    * Constructor for a new instance, which shall be executed on mapper classes, which are annotated with the given
    * annotation
-   * 
+   *
    * @param annotation
    */
   public ObserverMapperSettings(final Class<? extends Annotation> annotation) {
@@ -74,7 +74,7 @@ public class ObserverMapperSettings {
 
   /**
    * The class definition which defines for which mapper classes the definition shall be applied
-   * 
+   *
    * @return the classDefinition
    */
   public String getClassDefinition() {
@@ -83,7 +83,7 @@ public class ObserverMapperSettings {
 
   /**
    * The class definition which defines for which mapper classes the definition shall be applied
-   * 
+   *
    * @param classDefinition
    *          the classDefinition to set
    */
@@ -95,7 +95,7 @@ public class ObserverMapperSettings {
   /**
    * If an observer shall be executed for mapper classes, which are annotated with a certain Annotation, the annotation
    * must be defined here
-   * 
+   *
    * @return the annotation
    */
   public Class<? extends Annotation> getAnnotation() {
@@ -105,7 +105,7 @@ public class ObserverMapperSettings {
   /**
    * If an observer shall be executed for mapper classes, which are annotated with a certain Annotation, the annotation
    * must be defined here
-   * 
+   *
    * @param annotation
    *          the annotation to set
    */
@@ -115,7 +115,7 @@ public class ObserverMapperSettings {
 
   /**
    * This method checks, whether the current definition is applicable to the given instance of IMapper.
-   * 
+   *
    * @param mapper
    * @return true, if applicable
    */
@@ -129,7 +129,7 @@ public class ObserverMapperSettings {
 
   /**
    * If a class definition is contained, shall the observer hit just that class or instanceof as well?
-   * 
+   *
    * @return the instanceOf
    */
   public boolean isInstanceOf() {
@@ -138,7 +138,7 @@ public class ObserverMapperSettings {
 
   /**
    * If a class definition is contained, shall the observer hit just that class or instanceof as well?
-   * 
+   *
    * @param instanceOf
    *          the instanceOf to set
    */
@@ -148,7 +148,7 @@ public class ObserverMapperSettings {
 
   /**
    * This method checks, whether the current definition is applicable for the given class
-   * 
+   *
    * @param mapperClass
    *          the class to be checked
    * @return if the current definition contains a class specification, it will check wether the given checkClass fits;
