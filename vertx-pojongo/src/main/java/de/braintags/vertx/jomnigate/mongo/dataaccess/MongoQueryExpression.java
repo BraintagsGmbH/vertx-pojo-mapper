@@ -15,6 +15,7 @@ package de.braintags.vertx.jomnigate.mongo.dataaccess;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,7 +37,6 @@ import de.braintags.vertx.util.json.JsonConverter;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.FindOptions;
@@ -157,12 +157,12 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
         break;
       case IN_IGNORE_CASE:
         if (value.isArray()) {
-          ArrayNode arrayNode = Json.mapper.getNodeFactory().arrayNode();
+          StringJoiner join = new StringJoiner("|");
           for (Iterator<JsonNode> iterator = ((ArrayNode) value).elements(); iterator.hasNext();) {
             JsonNode node = iterator.next();
-            arrayNode.add(new TextNode(createEqualsRegex(node)));
+            join.add(Pattern.quote(node.textValue()));
           }
-          parsedValue = arrayNode;
+          parsedValue = new TextNode("^(" + join.toString() + ")$");
         } else {
           parsedValue = new TextNode(createEqualsRegex(value));
         }
