@@ -15,6 +15,7 @@ package de.braintags.vertx.jomnigate.mongo.dataaccess;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.stream.IntStream;
 
 import com.mongodb.MongoBulkWriteException;
@@ -49,16 +50,19 @@ import io.vertx.ext.mongo.MongoClientBulkWriteResult;
 
 /**
  * An implementation of {@link IWrite} for Mongo
- * 
+ *
  * @author Michael Remme
  * @param <T>
  *          the type of the underlaying mapper
  */
 public class MongoWrite<T> extends AbstractWrite<T> {
 
+  protected Class<?> view;
+  private JsonObject setOnInsertFields;
+
   /**
    * Constructor
-   * 
+   *
    * @param mapperClass
    *          the mapper class
    * @param datastore
@@ -120,8 +124,8 @@ public class MongoWrite<T> extends AbstractWrite<T> {
     IMapper<T> mapper = getMapper();
     String collection = mapper.getTableInfo().getName();
     Future<MongoClientBulkWriteResult> fBulk = Future.future();
-    List<BulkOperation> bulkOperations = holders.stream()
-        .map(storeObjectHolder -> storeObjectHolder.bulkOperation).collect(toList());
+    List<BulkOperation> bulkOperations = holders.stream().map(storeObjectHolder -> storeObjectHolder.bulkOperation)
+        .collect(toList());
     MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
     mongoClient.bulkWrite(collection, bulkOperations, fBulk);
     return fBulk.compose(writeResult -> {
@@ -174,15 +178,36 @@ public class MongoWrite<T> extends AbstractWrite<T> {
         q.buildQueryExpression(null, fQueryExp);
         return fQueryExp.compose(queryExpression -> {
           JsonObject filter = ((MongoQueryExpression) queryExpression).getQueryDefinition();
-          return Future.succeededFuture(new StoreObjectHolder(storeObject,
-              BulkOperation.createReplace(filter, storeObject.getContainer(), false)));
+          BulkOperation bulkOperation;
+          if (partialUpdate)
+            bulkOperation = createPartialUpdate(filter, storeObject.getContainer(), false);
+          else
+            bulkOperation = BulkOperation.createReplace(filter, storeObject.getContainer(), false);
+          return Future.succeededFuture(new StoreObjectHolder(storeObject, bulkOperation));
         });
       } else {
         JsonObject filter = new JsonObject().put(MongoColumnInfo.ID_FIELD_NAME, currentId);
-        return Future.succeededFuture(
-            new StoreObjectHolder(storeObject, BulkOperation.createReplace(filter, storeObject.getContainer(), true)));
+        BulkOperation bulkOperation;
+        if (partialUpdate)
+          bulkOperation = createPartialUpdate(filter, storeObject.getContainer(), true);
+        else
+          bulkOperation = BulkOperation.createReplace(filter, storeObject.getContainer(), true);
+        return Future.succeededFuture(new StoreObjectHolder(storeObject, bulkOperation));
       }
     }
+  }
+
+  private BulkOperation createPartialUpdate(final JsonObject filter, final JsonObject object, final boolean upsert) {
+    JsonObject jsonData = object;
+    JsonObject set = new JsonObject();
+    for (Entry<String, Object> updateEntry : jsonData.getMap().entrySet()) {
+      set.put(updateEntry.getKey(), updateEntry.getValue());
+    }
+    JsonObject document = new JsonObject().put("$set", set);
+    if (setOnInsertFields != null) {
+      document.put("$setOnInsert", setOnInsertFields);
+    }
+    return BulkOperation.createUpdate(filter, document, upsert, false);
   }
 
   private class StoreObjectHolder {
@@ -198,14 +223,14 @@ public class MongoWrite<T> extends AbstractWrite<T> {
 
   private Future<MongoStoreObject<T>> createStoreObject(final T entity) {
     Future<MongoStoreObject<T>> f = Future.future();
-    ((MongoStoreObjectFactory) getDataStore().getStoreObjectFactory()).createStoreObject(getMapper(), entity,
+    ((MongoStoreObjectFactory) getDataStore().getStoreObjectFactory()).createStoreObject(getMapper(), entity, view,
         res -> f.handle(res.map(storeObject -> (MongoStoreObject<T>) storeObject)));
     return f;
   }
 
   /**
    * Execution done before instances are stored into the datastore
-   * 
+   *
    * @return
    */
   protected Future<Void> preSave(final T entity, final IObserverContext context) {
@@ -218,7 +243,7 @@ public class MongoWrite<T> extends AbstractWrite<T> {
 
   /**
    * We need the info before the {@link IStoreObject} is created for the event beforeSave
-   * 
+   *
    * @param entity
    * @return
    */
@@ -266,6 +291,14 @@ public class MongoWrite<T> extends AbstractWrite<T> {
         resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.UPDATE)));
       }
     });
+  }
+
+  public void setView(final Class<?> view) {
+    this.view = view;
+  }
+
+  public void setSetOnInsertFields(final JsonObject setOnInsertFields) {
+    this.setOnInsertFields = setOnInsertFields;
   }
 
 }

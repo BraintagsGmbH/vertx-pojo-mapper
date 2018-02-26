@@ -20,9 +20,9 @@ import io.vertx.core.Handler;
 
 /**
  * A factory which creates instances of {@link IStoreObject} which are suitable for the current {@link IDataStore}
- * 
+ *
  * @author Michael Remme
- * 
+ *
  * @param F
  *          defines the format, which is used to save into and to read from the underlaying datastore
  */
@@ -32,7 +32,7 @@ public interface IStoreObjectFactory<F> {
   /**
    * Creates a new instance of {@link IStoreObject} by using the information from the given entity. The entity is
    * converted into the format, which can be used to save it into the {@link IDataStore}
-   * 
+   *
    * @param mapper
    *          the mapper for the entity to be handled
    * @param entity
@@ -45,7 +45,7 @@ public interface IStoreObjectFactory<F> {
   /**
    * Creates a {@link List} of {@link IStoreObject} by using the informations of the given instances. All entities are
    * converted into the format, which can be used to save into the {@link IDataStore}
-   * 
+   *
    * @param mapper
    *          the mapper for the entity to be handled
    * @param entities
@@ -59,7 +59,7 @@ public interface IStoreObjectFactory<F> {
   /**
    * Creates a new instance of {@link IStoreObject} by using the information from the given stored object from the
    * {@link IDataStore}. The informations from the storedObject are used to create a suitable POJO
-   * 
+   *
    * @param storedObject
    *          the stored object from the {@link IDataStore}
    * @param mapper
