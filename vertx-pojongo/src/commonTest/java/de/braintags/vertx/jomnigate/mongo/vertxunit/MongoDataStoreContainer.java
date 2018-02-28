@@ -67,10 +67,10 @@ import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * 
- * 
+ *
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   private static final io.vertx.core.logging.Logger logger = io.vertx.core.logging.LoggerFactory
@@ -87,7 +87,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   private final Map<String, String> thMap = new HashMap<>();
 
   /**
-   * 
+   *
    */
   public MongoDataStoreContainer() {
     thMap.put(StringTest.class.getName(), ObjectTypeHandler.class.getName());
@@ -125,7 +125,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.datastoretest.IDatastoreContainer#startup(io.vertx.core.Vertx,
    * io.vertx.core.Handler)
    */
@@ -175,7 +175,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.datastoretest.IDatastoreContainer#getDataStore()
    */
   @Override
@@ -185,7 +185,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.datastoretest.IDatastoreContainer#shutdown(io.vertx.core.Handler)
    */
   @Override
@@ -206,7 +206,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.datastoretest.IDatastoreContainer#dropTable(java.lang.String,
    * io.vertx.core.Handler)
    */
@@ -225,7 +225,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.testdatastore.IDatastoreContainer#clearTable(java.lang.String,
    * io.vertx.core.Handler)
    */
@@ -236,7 +236,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
 
   /**
    * Get a property with the given key
-   * 
+   *
    * @param name
    *          the key of the property to be fetched
    * @return a valid value or null
@@ -261,7 +261,7 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
   }
 
   @Override
-  public void checkIndex(Object indexInfo, IIndexDefinition sourceIndex, TestContext context) {
+  public void checkIndex(final Object indexInfo, final IIndexDefinition sourceIndex, final TestContext context) {
     context.assertTrue(indexInfo instanceof JsonObject);
     JsonObject index = (JsonObject) indexInfo;
     context.assertEquals(sourceIndex.getName(), index.getString("name"));
@@ -269,39 +269,42 @@ public class MongoDataStoreContainer extends AbstractDataStoreContainer {
     for (IIndexFieldDefinition field : sourceIndex.getFields()) {
       Object indexValue = field.getType().toIndexValue();
       switch (field.getType()) {
-      case ASC:
-      case DESC:
-        context.assertEquals(indexValue, key.getInteger(field.getName()));
-        break;
-      case TEXT:
-        context.assertEquals(indexValue, key.getString("_fts"));
-        JsonObject weights = index.getJsonObject("weights");
-        context.assertEquals(1, weights.getInteger(field.getName()));
-        break;
-      case GEO2D:
-      case GEO2DSPHERE:
-        context.assertEquals(indexValue, key.getString("position"));
-        break;
-      default:
-        context.fail("Unknown index type: " + field.getType());
-        return;
+        case ASC:
+        case DESC:
+          context.assertEquals(indexValue, key.getInteger(field.getName()));
+          break;
+        case TEXT:
+          context.assertEquals(indexValue, key.getString("_fts"));
+          JsonObject weights = index.getJsonObject("weights");
+          context.assertEquals(1, weights.getInteger(field.getName()));
+          break;
+        case GEO2D:
+        case GEO2DSPHERE:
+          context.assertEquals(indexValue, key.getString("position"));
+          break;
+        case HASHED:
+          context.assertEquals(indexValue, key.getString("name"));
+          break;
+        default:
+          context.fail("Unknown index type: " + field.getType());
+          return;
       }
     }
 
     for (IndexOption option : sourceIndex.getIndexOptions()) {
       switch (option.getFeature()) {
-      case UNIQUE:
-        boolean unique = (boolean) option.getValue();
-        if (unique)
-          context.assertEquals(true, index.getBoolean("unique"));
-        break;
-      case PARTIAL_FILTER_EXPRESSION:
-        // can not easily assert that the query matches the source definition as it is transformed to a mongoDB query
-        context.assertNotNull(index.getJsonObject("partialFilterExpression"));
-        break;
-      default:
-        context.fail("Unknown index option: " + option.getFeature());
-        return;
+        case UNIQUE:
+          boolean unique = (boolean) option.getValue();
+          if (unique)
+            context.assertEquals(true, index.getBoolean("unique"));
+          break;
+        case PARTIAL_FILTER_EXPRESSION:
+          // can not easily assert that the query matches the source definition as it is transformed to a mongoDB query
+          context.assertNotNull(index.getJsonObject("partialFilterExpression"));
+          break;
+        default:
+          context.fail("Unknown index option: " + option.getFeature());
+          return;
       }
     }
   }
