@@ -1,4 +1,3 @@
-package de.braintags.vertx.jomnigate.mysql;
 /*
  * #%L
  * vertx-pojo-mapper-mysql
@@ -12,7 +11,7 @@ package de.braintags.vertx.jomnigate.mysql;
  * #L%
  */
 
-
+package de.braintags.vertx.jomnigate.mysql;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +19,7 @@ import java.util.Map;
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.init.DataStoreSettings;
 import de.braintags.vertx.jomnigate.init.IDataStoreInit;
+import de.braintags.vertx.jomnigate.mapping.IIndexDefinition;
 import de.braintags.vertx.jomnigate.mysql.init.MySqlDataStoreinit;
 import de.braintags.vertx.jomnigate.mysql.typehandler.BooleanTypeHandler;
 import de.braintags.vertx.jomnigate.mysql.typehandler.SqlArrayTypeHandlerEmbedded;
@@ -62,11 +62,12 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.ext.unit.TestContext;
 
 /**
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 
 public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
@@ -74,10 +75,10 @@ public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
       .getLogger(MySqlDataStoreContainer.class);
 
   private MySqlDataStore datastore;
-  private Map<String, String> thMap = new HashMap<>();
+  private final Map<String, String> thMap = new HashMap<>();
 
   /**
-   * 
+   *
    */
   public MySqlDataStoreContainer() {
     thMap.put(BooleanTest.class.getName(), BooleanTypeHandler.class.getName());
@@ -101,11 +102,11 @@ public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
   }
 
   @Override
-  public void startup(Vertx vertx, Handler<AsyncResult<Void>> handler) {
+  public void startup(final Vertx vertx, final Handler<AsyncResult<Void>> handler) {
     LOGGER.info("Startup of " + getClass().getSimpleName());
     try {
       if (datastore == null) {
-        DataStoreSettings settings = MySqlDataStoreinit.createSettings();
+        DataStoreSettings settings = createSettings();
         IDataStoreInit dsInit = settings.getDatastoreInit().newInstance();
         dsInit.initDataStore(vertx, settings, initResult -> {
           if (initResult.failed()) {
@@ -125,9 +126,14 @@ public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
     }
   }
 
+  @Override
+  public DataStoreSettings createSettings() {
+    return MySqlDataStoreinit.createSettings();
+  }
+
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.test.IDatastoreContainer#getDataStore()
    */
   @Override
@@ -136,7 +142,7 @@ public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
   }
 
   @Override
-  public void shutdown(Handler<AsyncResult<Void>> handler) {
+  public void shutdown(final Handler<AsyncResult<Void>> handler) {
     LOGGER.info("shutdown performed");
     datastore.shutdown(result -> {
       if (result.failed()) {
@@ -148,7 +154,7 @@ public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
   }
 
   @Override
-  public void dropTable(String tableName, Handler<AsyncResult<Void>> handler) {
+  public void dropTable(final String tableName, final Handler<AsyncResult<Void>> handler) {
     String command = "DROP TABLE IF EXISTS " + tableName;
     SqlUtil.execute(datastore, command, dr -> {
       if (dr.failed()) {
@@ -162,7 +168,8 @@ public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
   }
 
   @Override
-  public String getExpectedTypehandlerName(Class<? extends AbstractTypeHandlerTest> testClass, String defaultName) {
+  public String getExpectedTypehandlerName(final Class<? extends AbstractTypeHandlerTest> testClass,
+      final String defaultName) {
     if (thMap.containsKey(testClass.getName()))
       return thMap.get(testClass.getName());
     return defaultName;
@@ -170,12 +177,12 @@ public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.testdatastore.IDatastoreContainer#clearTable(java.lang.String,
    * io.vertx.core.Handler)
    */
   @Override
-  public void clearTable(String tableName, Handler<AsyncResult<Void>> handler) {
+  public void clearTable(final String tableName, final Handler<AsyncResult<Void>> handler) {
     String command = "DELETE from " + tableName;
     SqlUtil.execute(datastore, command, dr -> {
       if (dr.failed()) {
@@ -186,6 +193,11 @@ public class MySqlDataStoreContainer extends AbstractDataStoreContainer {
       LOGGER.info("Deleted records " + tableName);
       handler.handle(Future.succeededFuture());
     });
+  }
+
+  @Override
+  public void checkIndex(final Object indexInfo, final IIndexDefinition sourceIndex, final TestContext context) {
+    // TODO implement
   }
 
 }
