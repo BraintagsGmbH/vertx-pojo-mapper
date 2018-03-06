@@ -634,7 +634,7 @@ public interface ISearchCondition {
    * @return
    */
   static ISearchConditionContainer and(final Collection<ISearchCondition> searchConditions) {
-    return new QueryAnd(new ISearchCondition[searchConditions.size()]);
+    return new QueryAnd(searchConditions.toArray(new ISearchCondition[searchConditions.size()]));
   }
 
   /**
@@ -656,7 +656,7 @@ public interface ISearchCondition {
    * @return
    */
   static ISearchConditionContainer or(final Collection<ISearchCondition> searchConditions) {
-    return new QueryOr(new ISearchCondition[searchConditions.size()]);
+    return new QueryOr(searchConditions.toArray(new ISearchCondition[searchConditions.size()]));
   }
 
   /**
