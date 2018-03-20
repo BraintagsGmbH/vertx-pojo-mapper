@@ -34,7 +34,7 @@ import io.vertx.core.Handler;
 
 /**
  * Abstract implementation of {@link IWrite}
- * 
+ *
  * @author Michael Remme
  * @param <T>
  *          the underlaying mapper to be used
@@ -48,6 +48,8 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
   private final List<T> objectsToSave = new ArrayList<>();
   private IQuery<T> query;
 
+  protected boolean partialUpdate;
+
   /**
    * @param mapperClass
    * @param datastore
@@ -58,7 +60,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
 
   /**
    * Get the objects, which were defined to be saved
-   * 
+   *
    * @return
    */
   Iterator<T> getSelection() {
@@ -85,7 +87,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
 
   /**
    * Execution done after entities were stored into the datastore
-   * 
+   *
    * @param wr
    * @param nextFuture
    */
@@ -103,14 +105,14 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
 
   /**
    * This method is called after the sync call to execute the write action
-   * 
+   *
    * @param resultHandler
    */
   protected abstract Future<IWriteResult> internalSave(IObserverContext context);
 
   /**
    * Get the objects that shall be saved
-   * 
+   *
    * @return the objectsToSave
    */
   protected final List<T> getObjectsToSave() {
@@ -124,7 +126,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.dataaccess.write.IWrite#add(java.util.List)
    */
   @Override
@@ -136,7 +138,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
 
   /**
    * execute the methods marked with {@link AfterSave}
-   * 
+   *
    * @param entity
    *          the entity to be handled
    */
@@ -146,7 +148,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
 
   /**
    * After inserting an instance, the id is placed into the entity and into the IStoreObject.
-   * 
+   *
    * @param id
    *          the id to be stored
    * @param storeObject
@@ -170,7 +172,7 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.dataaccess.write.IWrite#size()
    */
   @Override
@@ -189,4 +191,10 @@ public abstract class AbstractWrite<T> extends AbstractDataAccessObject<T> imple
   public void setQuery(final IQuery<T> query) {
     this.query = query;
   }
+
+  @Override
+  public void setPartialUpdate(final boolean partialUpdate) {
+    this.partialUpdate = partialUpdate;
+  }
+
 }

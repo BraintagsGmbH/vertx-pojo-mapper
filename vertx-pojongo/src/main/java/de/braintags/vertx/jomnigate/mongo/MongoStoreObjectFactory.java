@@ -26,7 +26,7 @@ import io.vertx.core.json.JsonObject;
  * An implementation for Mongo
  *
  * @author Michael Remme
- * 
+ *
  */
 
 public class MongoStoreObjectFactory extends AbstractStoreObjectFactory<JsonObject> {
@@ -59,6 +59,24 @@ public class MongoStoreObjectFactory extends AbstractStoreObjectFactory<JsonObje
         handler.handle(Future.failedFuture(result.cause()));
       } else {
         handler.handle(Future.succeededFuture(storeObject));
+      }
+    });
+  }
+
+  public <T> void createStoreObject(final IMapper<T> mapper, final T entity, final Class<?> view,
+      final Handler<AsyncResult<IStoreObject<T, JsonObject>>> handler) {
+    mapper.executeLifecycle(BeforeSave.class, entity, lcr -> {
+      if (lcr.failed()) {
+        handler.handle(Future.failedFuture(lcr.cause()));
+      } else {
+        MongoStoreObject<T> storeObject = new MongoStoreObject<>(mapper, entity, view);
+        storeObject.initFromEntity(initResult -> {
+          if (initResult.failed()) {
+            handler.handle(Future.failedFuture(initResult.cause()));
+          } else {
+            handler.handle(Future.succeededFuture(storeObject));
+          }
+        });
       }
     });
   }

@@ -12,6 +12,9 @@
  */
 package de.braintags.vertx.jomnigate.json;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -30,9 +33,9 @@ import io.vertx.core.json.JsonObject;
 
 /**
  * an abstract implementation of {@link IDataStore} which uses jackson as mapper base
- * 
+ *
  * @author Michael Remme
- * 
+ *
  * @param <S>
  *          the type of the {@link IStoreObjectFactory}
  * @param <U>
@@ -42,11 +45,13 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
   private final ObjectMapper jacksonMapper;
   private final ObjectMapper jacksonPrettyMapper;
 
+  private final Map<Class<?>, ObjectMapper> viewMapper = new ConcurrentHashMap<>();
+
   /**
    * @param vertx
    * @param properties
    */
-  public JsonDatastore(Vertx vertx, JsonObject properties, DataStoreSettings settings) {
+  public JsonDatastore(final Vertx vertx, final JsonObject properties, final DataStoreSettings settings) {
     super(vertx, properties, settings);
     // Do not change factory type, it is used by the @link{JomnigateJsonModule} to detect jOmnigate environment
     JOmnigateFactory jOmnigateFactory = new JOmnigateFactory(this, Json.mapper.getFactory(), Json.mapper);
@@ -67,7 +72,7 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
 
   /**
    * The jackson mapper which is used to serialize and deserialize instances
-   * 
+   *
    * @return the jacksonMapper
    */
   public ObjectMapper getJacksonMapper() {
@@ -76,11 +81,22 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
 
   /**
    * The jackson mapper which is used to serialize and deserialize instances as pretty source
-   * 
+   *
    * @return the jacksonPrettyMapper
    */
   public ObjectMapper getJacksonPrettyMapper() {
     return jacksonPrettyMapper;
+  }
+
+  public ObjectMapper getMapperForView(final Class<?> viewClass) {
+    if (viewClass == null) {
+      return getJacksonMapper();
+    }
+    return viewMapper.computeIfAbsent(viewClass, requestedViewClass -> {
+      ObjectMapper mapper = getJacksonMapper().copy();
+      mapper.setConfig(mapper.getSerializationConfig().withView(requestedViewClass));
+      return mapper;
+    });
   }
 
 }

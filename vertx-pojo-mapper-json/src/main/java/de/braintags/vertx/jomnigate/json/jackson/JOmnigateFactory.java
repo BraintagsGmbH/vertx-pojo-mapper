@@ -31,12 +31,12 @@ import de.braintags.vertx.util.ExceptionUtil;
 /**
  * An extension of {@link JsonFactory} to allow ReferencedSerializers and Embedded Serializers to store Future, which
  * are executed to serialize fields, which are annotated as {@link Referenced} or {@link Embedded}
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class JOmnigateFactory extends MappingJsonFactory {
-  private JsonDatastore datastore;
+  private final JsonDatastore datastore;
 
   /**
    * Comment for <code>serialVersionUID</code>
@@ -47,30 +47,30 @@ public class JOmnigateFactory extends MappingJsonFactory {
    * @param src
    * @param mapper
    */
-  public JOmnigateFactory(JsonDatastore datastore, JsonFactory src, ObjectMapper mapper) {
+  public JOmnigateFactory(final JsonDatastore datastore, final JsonFactory src, final ObjectMapper mapper) {
     super(src, mapper);
     this.datastore = datastore;
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.fasterxml.jackson.core.JsonFactory#_createGenerator(java.io.Writer,
    * com.fasterxml.jackson.core.io.IOContext)
    */
   @Override
-  protected JsonGenerator _createGenerator(Writer out, IOContext ctxt) throws IOException {
+  protected JsonGenerator _createGenerator(final Writer out, final IOContext ctxt) throws IOException {
     return new JOmnigateGenerator(datastore, super._createGenerator(out, ctxt), (SegmentedStringWriter) out);
   }
 
   /**
    * Create a new instance of JOmnigateGenerator
-   * 
+   *
    * @param datastore
    *          the datastore to be used
    * @return
    */
-  public static final JOmnigateGenerator createGenerator(JsonDatastore datastore) {
+  public static final JOmnigateGenerator createGenerator(final JsonDatastore datastore) {
     try {
       ObjectMapper mapper = datastore.getJacksonMapper();
       SegmentedStringWriter sw = new SegmentedStringWriter(mapper.getFactory()._getBufferRecycler());
@@ -79,4 +79,10 @@ public class JOmnigateFactory extends MappingJsonFactory {
       throw ExceptionUtil.createRuntimeException(e);
     }
   }
+
+  @Override
+  public JsonFactory copy() {
+    return new MappingJsonFactory(this, null);
+  }
+
 }

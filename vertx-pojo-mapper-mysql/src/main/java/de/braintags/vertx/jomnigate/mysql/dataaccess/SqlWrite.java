@@ -42,13 +42,13 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.UpdateResult;
 
 /**
- * 
+ *
  * An implementation of {@link IWrite} for sql databases
- * 
+ *
  * @param <T>
  *          the type of the mapper, which is handled here
  * @author Michael Remme
- * 
+ *
  */
 
 public class SqlWrite<T> extends AbstractWrite<T> {
@@ -65,6 +65,9 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   @Override
   public Future<IWriteResult> internalSave(final IObserverContext context) {
+    if (partialUpdate) {
+      throw new UnsupportedOperationException("Partial updates are not supported for sql right now");
+    }
     Future<IWriteResult> f = Future.future();
     List<T> entities = getObjectsToSave();
     IMapper<T> mapper = getMapper();
@@ -102,7 +105,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   /**
    * execute the action to store ONE instance in mongo
-   * 
+   *
    * @param storeObject
    * @param resultHandler
    */
@@ -122,7 +125,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   /**
    * Perform an update of a record into the datastore
-   * 
+   *
    * @param storeObject
    *          the {@link IStoreObject}
    * @param writeResult
@@ -214,7 +217,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   /**
    * This can happen, when a record is inserted which has only the ID field
-   * 
+   *
    * @param storeObject
    * @param writeResult
    * @param connection
@@ -271,7 +274,7 @@ public class SqlWrite<T> extends AbstractWrite<T> {
 
   /**
    * Checks the UpdateResult and informs the Handler with an error, if needed
-   * 
+   *
    * @param updateResult
    *          the result to be checked
    * @param resultHandler

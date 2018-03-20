@@ -40,7 +40,7 @@ import io.vertx.core.json.JsonObject;
 
 /**
  * An implementation of {@link IStoreObject}, which uses a JsonObject as internal container
- * 
+ *
  * @author Michael Remme
  * @param <T>
  *          the type of the entity
@@ -56,9 +56,11 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
   public static final String REFERENCED_LIST = "referencedList";
   private Object generatedId = null;
 
+  private final Class<?> view;
+
   /**
    * Constructor
-   * 
+   *
    * @param mapper
    *          the {@link IMapper} to be used
    * @param entity
@@ -66,11 +68,26 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    */
   public JsonStoreObject(final IMapper<T> mapper, final T entity) {
     super(mapper, entity, new JsonObject());
+    this.view = null;
   }
 
   /**
    * Constructor
-   * 
+   *
+   * @param mapper
+   *          the {@link IMapper} to be used
+   * @param entity
+   *          the entity to be used
+   * @view view used to specifiy special jsonview during serialization
+   */
+  public JsonStoreObject(final IMapper<T> mapper, final T entity, final Class<?> view) {
+    super(mapper, entity, new JsonObject());
+    this.view = view;
+  }
+
+  /**
+   * Constructor
+   *
    * @param jsonObject
    *          the {@link JsonObject} read from the datastore
    * @param mapper
@@ -78,19 +95,21 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    */
   public JsonStoreObject(final JsonObject jsonObject, final IMapper<T> mapper) {
     super(jsonObject, mapper);
+    view = null;
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.impl.AbstractStoreObject#initFromEntity(io.vertx.core.Handler)
    */
   @Override
   public void initFromEntity(final Handler<AsyncResult<Void>> handler) {
     try {
       JsonDatastore datastore = (JsonDatastore) getMapper().getMapperFactory().getDataStore();
-      ObjectMapper mapper = datastore.getJacksonMapper();
+
       JOmnigateGenerator jgen = JOmnigateFactory.createGenerator(datastore);
+      ObjectMapper mapper = datastore.getMapperForView(view);
       mapper.writer().writeValue(jgen, getEntity());
       jgen.getResult(res -> {
         if (res.failed()) {
@@ -203,7 +222,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IStoreObject#get(de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
@@ -214,7 +233,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.braintags.vertx.jomnigate.mapping.IStoreObject#hasProperty(de.braintags.vertx.jomnigate.mapping.IField)
    */
@@ -226,7 +245,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IStoreObject#put(de.braintags.vertx.jomnigate.mapping.IField,
    * java.lang.Object)
    */
@@ -249,7 +268,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
 
   /**
    * In case of a defined {@link IKeyGenerator} the next id is requested for a new record
-   * 
+   *
    * @param handler
    */
   public void getNextId(final Handler<AsyncResult<Void>> handler) {
@@ -269,7 +288,7 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
 
   /**
    * Get a generated id
-   * 
+   *
    * @return an instance, if a new id was generated for a new record or null
    */
   public Object getGeneratedId() {
