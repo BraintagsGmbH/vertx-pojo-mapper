@@ -45,7 +45,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.BulkOperation;
 import io.vertx.ext.mongo.BulkOperation.BulkOperationType;
-import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.mongo.MongoClientBulkWriteResult;
 
 /**
@@ -55,7 +54,7 @@ import io.vertx.ext.mongo.MongoClientBulkWriteResult;
  * @param <T>
  *          the type of the underlaying mapper
  */
-public class MongoWrite<T> extends AbstractWrite<T> {
+public class MongoWrite<T> extends AbstractWrite<T> implements MongoDataAccesObject<T> {
 
   protected Class<?> view;
   private JsonObject setOnInsertFields;
@@ -121,19 +120,20 @@ public class MongoWrite<T> extends AbstractWrite<T> {
   }
 
   private Future<CompositeFuture> writeEntities(final List<StoreObjectHolder> holders) {
-    IMapper<T> mapper = getMapper();
-    String collection = mapper.getTableInfo().getName();
-    Future<MongoClientBulkWriteResult> fBulk = Future.future();
     List<BulkOperation> bulkOperations = holders.stream().map(storeObjectHolder -> storeObjectHolder.bulkOperation)
         .collect(toList());
-    MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
-    mongoClient.bulkWrite(collection, bulkOperations, fBulk);
-    return fBulk.compose(writeResult -> {
+    return write(bulkOperations, START_TRY_COUNT).compose(writeResult -> {
       @SuppressWarnings("rawtypes")
       List<Future> futures = IntStream.range(0, holders.size())
           .mapToObj(i -> finishWrite(getObjectsToSave().get(i), holders.get(i), writeResult)).collect(toList());
       return CompositeFuture.all(futures);
     });
+  }
+
+  private Future<MongoClientBulkWriteResult> write(final List<BulkOperation> bulkOperations, final int tryCount) {
+    Future<MongoClientBulkWriteResult> fBulk = Future.future();
+    getMongoClient().bulkWrite(getCollection(), bulkOperations, fBulk);
+    return fBulk.recover(retryMethod(tryCount, count -> write(bulkOperations, count)));
   }
 
   private Future<IWriteEntry> finishWrite(final T entity, final StoreObjectHolder holder,

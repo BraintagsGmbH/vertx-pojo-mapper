@@ -17,13 +17,12 @@ import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDelete;
 import de.braintags.vertx.jomnigate.dataaccess.delete.IDeleteResult;
 import de.braintags.vertx.jomnigate.dataaccess.delete.impl.Delete;
-import de.braintags.vertx.jomnigate.dataaccess.delete.impl.DeleteResult;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
-import de.braintags.vertx.jomnigate.mongo.MongoDataStore;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.ext.mongo.MongoClient;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.MongoClientDeleteResult;
 
 /**
  * An implementation of {@link IDelete} for Mongo
@@ -32,7 +31,7 @@ import io.vertx.ext.mongo.MongoClient;
  * @param <T>
  *          the type of the underlaying mapper
  */
-public class MongoDelete<T> extends Delete<T> {
+public class MongoDelete<T> extends Delete<T> implements MongoDataAccesObject<T> {
 
   /**
    * Constructor
@@ -42,36 +41,33 @@ public class MongoDelete<T> extends Delete<T> {
    * @param datastore
    *          the datastore to be used
    */
-  public MongoDelete(Class<T> mapperClass, IDataStore datastore) {
+  public MongoDelete(final Class<T> mapperClass, final IDataStore datastore) {
     super(mapperClass, datastore);
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.dataaccess.delete.impl.Delete#deleteQuery(de.braintags.vertx.jomnigate.
    * dataaccess.query.IQuery, io.vertx.core.Handler)
    */
   @Override
-  protected void deleteQuery(IQuery<T> q, Handler<AsyncResult<IDeleteResult>> resultHandler) {
-    MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
-    String collection = getMapper().getTableInfo().getName();
-    MongoQuery<T> query = (MongoQuery<T>) q;
-    query.buildQueryExpression(null, qDefResult -> {
+  protected void deleteQuery(final IQuery<T> q, final Handler<AsyncResult<IDeleteResult>> resultHandler) {
+    q.buildQueryExpression(null, qDefResult -> {
       if (qDefResult.failed()) {
         resultHandler.handle(Future.failedFuture(qDefResult.cause()));
       } else {
-        mongoClient.removeDocuments(collection, ((MongoQueryExpression) qDefResult.result()).getQueryDefinition(),
-            deleteHandler -> {
-              if (deleteHandler.failed()) {
-                resultHandler.handle(Future.failedFuture(deleteHandler.cause()));
-              } else {
-                DeleteResult deleteResult = new MongoDeleteResult(getDataStore(), getMapper(), qDefResult.result());
-                resultHandler.handle(Future.succeededFuture(deleteResult));
-              }
-            });
+        removeDocuments(((MongoQueryExpression) qDefResult.result()).getQueryDefinition(), START_TRY_COUNT)
+            .<IDeleteResult> map(result -> new MongoDeleteResult(getDataStore(), getMapper(), result))
+            .setHandler(resultHandler);
       }
     });
+  }
+
+  private Future<MongoClientDeleteResult> removeDocuments(final JsonObject queryExpression, final int tryCount) {
+    Future<MongoClientDeleteResult> f = Future.future();
+    getMongoClient().removeDocuments(getCollection(), queryExpression, f);
+    return f.recover(retryMethod(tryCount, count -> removeDocuments(queryExpression, count)));
   }
 
 }

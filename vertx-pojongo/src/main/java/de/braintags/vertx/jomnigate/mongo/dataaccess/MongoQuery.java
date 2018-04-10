@@ -28,8 +28,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.mongo.FindOptions;
-import io.vertx.ext.mongo.MongoClient;
 
 /**
  * An implementation of {@link IQuery} for Mongo
@@ -38,7 +36,7 @@ import io.vertx.ext.mongo.MongoClient;
  * @param <T>
  *          the type of the underlaying mapper
  */
-public class MongoQuery<T> extends Query<T> {
+public class MongoQuery<T> extends Query<T> implements MongoDataAccesObject<T> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(MongoQuery.class);
   private static final String SEARCH_LOG = "executing query in database %s collection %s with %s";
@@ -57,7 +55,7 @@ public class MongoQuery<T> extends Query<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.dataaccess.query.impl.Query#internalExecute(de.braintags.vertx.jomnigate.
    * dataaccess.query.impl.IQueryExpression, io.vertx.core.Handler)
    */
@@ -92,47 +90,38 @@ public class MongoQuery<T> extends Query<T> {
   @Override
   public void internalExecuteCount(final IQueryExpression queryExpression,
       final Handler<AsyncResult<IQueryCountResult>> resultHandler) {
-    try {
-      doFindCount(queryExpression, resultHandler);
-    } catch (Exception e) {
-      Future<IQueryCountResult> future = Future.failedFuture(e);
-      resultHandler.handle(future);
-    }
+    count(((MongoQueryExpression) queryExpression).getQueryDefinition(), START_TRY_COUNT)
+        .<IQueryCountResult> map(
+            queryResult -> new QueryCountResult(getMapper(), getDataStore(), queryResult, queryExpression))
+        .setHandler(resultHandler);
   }
 
-  private void doFindCount(final IQueryExpression queryExpression,
-      final Handler<AsyncResult<IQueryCountResult>> resultHandler) {
-    MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
-    String column = getMapper().getTableInfo().getName();
-    mongoClient.count(column, ((MongoQueryExpression) queryExpression).getQueryDefinition(), qResult -> {
-      if (qResult.failed()) {
-        Future<IQueryCountResult> future = Future.failedFuture(qResult.cause());
-        resultHandler.handle(future);
-      } else {
-        QueryCountResult qcr = new QueryCountResult(getMapper(), getDataStore(), qResult.result(), queryExpression);
-        Future<IQueryCountResult> future = Future.succeededFuture(qcr);
-        resultHandler.handle(future);
-      }
-    });
+  private Future<Long> count(final JsonObject queryDefinition, final int tryCount) {
+    Future<Long> f = Future.future();
+    getMongoClient().count(getCollection(), queryDefinition, f);
+    return f.recover(retryMethod(tryCount, count -> count(queryDefinition, count)));
   }
 
   private void doFind(final MongoQueryExpression queryExpression,
       final Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
-    MongoClient mongoClient = (MongoClient) ((MongoDataStore) getDataStore()).getClient();
-    String collection = getMapper().getTableInfo().getName();
-    LOGGER.debug(String.format(SEARCH_LOG, getDataStore().getSettings().getDatabaseName(), collection,
-        queryExpression.getQueryDefinition()));
+    if (LOGGER.isDebugEnabled())
+      LOGGER.debug(String.format(SEARCH_LOG, getDataStore().getSettings().getDatabaseName(), getCollection(),
+          queryExpression.getQueryDefinition()));
 
-    JsonObject qDef = queryExpression.getQueryDefinition();
-    FindOptions fo = queryExpression.getFindOptions();
-    mongoClient.findWithOptions(collection, qDef, fo, qResult -> {
-      if (qResult.failed()) {
-        Future<IQueryResult<T>> future = Future.failedFuture(new QueryException(queryExpression, qResult.cause()));
-        resultHandler.handle(future);
+    find(queryExpression, 1).setHandler(res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(new QueryException(queryExpression, res.cause())));
       } else {
-        createQueryResult(qResult.result(), queryExpression, resultHandler);
+        createQueryResult(res.result(), queryExpression, resultHandler);
       }
     });
+  }
+
+  private Future<List<JsonObject>> find(final MongoQueryExpression queryExpression, final int tryCount) {
+    Future<List<JsonObject>> f = Future.future();
+    getMongoClient().findWithOptions(getCollection(), queryExpression.getQueryDefinition(),
+        queryExpression.getFindOptions(), f);
+    return f.recover(retryMethod(tryCount, count -> find(queryExpression, count)));
   }
 
   private void createQueryResult(final List<JsonObject> findList, final MongoQueryExpression queryExpression,
