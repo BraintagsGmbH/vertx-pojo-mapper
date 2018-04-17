@@ -40,6 +40,8 @@ import de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.SortDefinition;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.SortDefinition.SortArgument;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
+import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
 import de.braintags.vertx.jomnigate.mysql.dataaccess.SqlExpression.SqlWhereFragment;
 import de.braintags.vertx.jomnigate.mysql.mapping.SqlMapper;
 import de.braintags.vertx.jomnigate.mysql.typehandler.SqlDistanceSearchFunction;
@@ -466,8 +468,11 @@ public class SqlExpression extends AbstractQueryExpression<SqlWhereFragment> {
   @Override
   public IQueryExpression addSort(final ISortDefinition<?> sortDef) {
     SortDefinition<?> sd = (SortDefinition<?>) sortDef;
+    ITableInfo tableInfo = getMapper().getTableInfo();
     for (SortArgument sa : sd.getSortArguments()) {
-      orderByClause.append(orderByClause.length() == 0 ? "" : ", ").append(sa.fieldName)
+      IColumnInfo columnInfo = tableInfo.getColumnInfo(getMapper().getField(sa.fieldName));
+      orderByClause.append(orderByClause.length() == 0 ? "" : ", ")
+          .append(columnInfo != null ? columnInfo.getName() : sa.fieldName)
           .append(sa.ascending ? " asc" : " desc");
     }
     return this;
