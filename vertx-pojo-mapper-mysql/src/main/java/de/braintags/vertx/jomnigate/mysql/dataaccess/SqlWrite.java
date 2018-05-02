@@ -181,7 +181,9 @@ public class SqlWrite<T> extends AbstractWrite<T> {
   private void finishUpdate(final SqlStoreObject<T> storeObject, final UpdateResult updateResult,
       final Handler<AsyncResult<IWriteEntry>> resultHandler) {
     Object id = getMapper().getIdInfo().getField().getPropertyAccessor().readData(storeObject.getEntity());
-    LOGGER.debug("updated record with id " + id);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("updated record with id " + id);
+    }
     if (updateResult.getUpdated() == 0) {
       resultHandler.handle(Future.succeededFuture(new WriteEntry(storeObject, id, WriteAction.NOT_MATCHED)));
     }
@@ -297,7 +299,9 @@ public class SqlWrite<T> extends AbstractWrite<T> {
     try {
       Object id = storeObject.get(getMapper().getIdInfo().getField());
       Objects.requireNonNull(id, "Undefined ID when storing record");
-      LOGGER.debug("==>>>> inserted record " + storeObject.getMapper().getTableInfo().getName() + " with id " + id);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("==>>>> inserted record " + storeObject.getMapper().getTableInfo().getName() + " with id " + id);
+      }
       executePostSave((T) storeObject.getEntity(), lcr -> {
         if (lcr.failed()) {
           resultHandler.handle(Future.failedFuture(lcr.cause()));

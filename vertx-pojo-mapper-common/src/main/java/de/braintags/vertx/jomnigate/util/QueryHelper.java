@@ -123,7 +123,9 @@ public class QueryHelper {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
-        LOGGER.debug("executed query: " + result.result().toString());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("executed query: " + result.result().toString());
+        }
         queryResultToList(result.result(), handler);
       }
     });

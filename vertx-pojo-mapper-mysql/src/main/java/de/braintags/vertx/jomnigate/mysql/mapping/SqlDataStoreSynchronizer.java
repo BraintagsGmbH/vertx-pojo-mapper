@@ -74,7 +74,9 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
 
   @Override
   public void syncTable(final IMapper mapper, final Handler<AsyncResult<Void>> resultHandler) {
-    LOGGER.debug("starting synchronization for mapper " + mapper.getClass().getSimpleName());
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("starting synchronization for mapper " + mapper.getClass().getSimpleName());
+    }
     readTableFromDatabase(mapper, res -> checkTable((Mapper) mapper, res, result -> {
       if (result.failed()) {
         resultHandler.handle(Future.failedFuture(result.cause()));
@@ -284,10 +286,14 @@ public class SqlDataStoreSynchronizer extends AbstractDataStoreSynchronizer<Stri
       final Handler<AsyncResult<Void>> resultHandler) {
     SqlUtil.createIndexes(datastore, mapper.getTableInfo().getName(), mapper.getIndexDefinitions(), result -> {
       if (result.failed()) {
-        LOGGER.debug("Error creating indexes: " + result.cause());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Error creating indexes: " + result.cause());
+        }
         resultHandler.handle(Future.failedFuture(result.cause()));
       } else {
-        LOGGER.debug("Indexes created: " + result.result());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Indexes created: " + result.result());
+        }
         resultHandler.handle(Future.succeededFuture());
       }
     });

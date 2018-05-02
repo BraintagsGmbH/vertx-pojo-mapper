@@ -39,9 +39,9 @@ import de.braintags.vertx.jomnigate.json.jackson.deserializer.referenced.Referen
 public class JOmnigateBeanDeserializerModifyer extends BeanDeserializerModifier {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(JOmnigateBeanDeserializerModifyer.class);
-  private IDataStore datastore;
+  private final IDataStore datastore;
 
-  public JOmnigateBeanDeserializerModifyer(IDataStore datastore) {
+  public JOmnigateBeanDeserializerModifyer(final IDataStore datastore) {
     this.datastore = datastore;
   }
 
@@ -53,8 +53,8 @@ public class JOmnigateBeanDeserializerModifyer extends BeanDeserializerModifier 
    * com.fasterxml.jackson.databind.deser.BeanDeserializerBuilder)
    */
   @Override
-  public BeanDeserializerBuilder updateBuilder(DeserializationConfig config, BeanDescription beanDesc,
-      BeanDeserializerBuilder builder) {
+  public BeanDeserializerBuilder updateBuilder(final DeserializationConfig config, final BeanDescription beanDesc,
+      final BeanDeserializerBuilder builder) {
     Iterator<SettableBeanProperty> it = builder.getProperties();
     while (it.hasNext()) {
       SettableBeanProperty p = it.next();
@@ -69,10 +69,12 @@ public class JOmnigateBeanDeserializerModifyer extends BeanDeserializerModifier 
    * @param p
    * @return
    */
-  private AbstractReferencedDeserializer findReferencedDeserializer(BeanDeserializerBuilder builder,
-      BeanDescription beanDesc, SettableBeanProperty p) {
+  private AbstractReferencedDeserializer findReferencedDeserializer(final BeanDeserializerBuilder builder,
+      final BeanDescription beanDesc, final SettableBeanProperty p) {
     JavaType jt = p.getType();
-    LOGGER.debug("finding deserializer for " + p + " : " + jt);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("finding deserializer for " + p + " : " + jt);
+    }
     if (jt.isArrayType()) {
       return new ReferencedArrayDeserializer(datastore, p);
     } else if (jt.isMapLikeType()) {

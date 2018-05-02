@@ -124,7 +124,9 @@ public abstract class QueryReadStream<T, U> implements ReadStream<U> {
       if (qres.failed()) {
         parentFuture.fail(qres.cause());
       } else {
-        LOGGER.debug("executed query with startPosition " + nextStartPosition + ": " + qres.result().size());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("executed query with startPosition " + nextStartPosition + ": " + qres.result().size());
+        }
         setNextStartPosition(qres.result());
         QueryHelper.queryResultToList(qres.result(), lres -> {
           if (lres.failed()) {

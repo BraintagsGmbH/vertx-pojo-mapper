@@ -130,7 +130,9 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    */
   private void storeJson(final String js, final Handler<AsyncResult<Void>> handler) {
     try {
-      LOGGER.debug("Storing json: " + js);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Storing json: " + js);
+      }
       container = new JsonObject(js);
       IProperty idField = getMapper().getIdInfo().getField();
       container.remove(idField.getName()); // do not write the java fieldname of id, but the column

@@ -42,15 +42,15 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(AbstractMapperFactory.class);
 
-  private IDataStore<?, ?> datastore;
+  private final IDataStore<?, ?> datastore;
   private Map<String, IMapper<?>> mappedClasses = new HashMap<>();
-  private BeforeMappingHandler beforeMappingHandler = new BeforeMappingHandler();
-  private Object so = new Object();
+  private final BeforeMappingHandler beforeMappingHandler = new BeforeMappingHandler();
+  private final Object so = new Object();
 
   /**
    * @param dataStore
    */
-  public AbstractMapperFactory(IDataStore<?, ?> dataStore) {
+  public AbstractMapperFactory(final IDataStore<?, ?> dataStore) {
     this.datastore = dataStore;
   }
 
@@ -73,7 +73,7 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
 
   @SuppressWarnings("unchecked")
   @Override
-  public final <T> IMapper<T> getMapper(Class<T> mapperClass) {
+  public final <T> IMapper<T> getMapper(final Class<T> mapperClass) {
     String className = mapperClass.getName();
     if (mappedClasses.containsKey(className)) {
       return (IMapper<T>) mappedClasses.get(className);
@@ -92,18 +92,24 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
     return mapper;
   }
 
-  private final <T> IMapper<T> createMapperBlocking(Class<T> mapperClass) {
+  private final <T> IMapper<T> createMapperBlocking(final Class<T> mapperClass) {
     IObserverContext context = IObserverContext.createInstance();
-    LOGGER.debug("pre mapping for " + mapperClass.getName());
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("pre mapping for " + mapperClass.getName());
+    }
     preMapping(mapperClass, context);
-    LOGGER.debug("createMapper for " + mapperClass.getName());
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("createMapper for " + mapperClass.getName());
+    }
     IMapper<T> mapper = createMapper(mapperClass);
-    LOGGER.debug("post mapping for " + mapperClass.getName());
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("post mapping for " + mapperClass.getName());
+    }
     postMapping(mapper, context);
     return mapper;
   }
 
-  private void preMapping(Class<?> mapperClass, IObserverContext context) {
+  private void preMapping(final Class<?> mapperClass, final IObserverContext context) {
     CountDownLatch latch = new CountDownLatch(1);
     ResultObject<Void> ro = new ResultObject<>(null);
 
@@ -146,7 +152,7 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
    * @param context
    * @return
    */
-  private <T> Future<Void> handleBeforeMapping(Class<T> mapperClass, IObserverContext context) {
+  private <T> Future<Void> handleBeforeMapping(final Class<T> mapperClass, final IObserverContext context) {
     List<IObserver> ol = getObserver(mapperClass, ObserverEventType.BEFORE_MAPPING);
     Future<Void> f = null;
     if (ol.isEmpty()) {
@@ -177,7 +183,7 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
     return ol;
   }
 
-  private void postMapping(IMapper<?> mapper, IObserverContext context) {
+  private void postMapping(final IMapper<?> mapper, final IObserverContext context) {
     CountDownLatch latch = new CountDownLatch(1);
     ResultObject<Void> ro = new ResultObject<>(null);
 
@@ -213,7 +219,7 @@ public abstract class AbstractMapperFactory implements IMapperFactory {
   }
 
   @Override
-  public final boolean isMapper(Class<?> mapperClass) {
+  public final boolean isMapper(final Class<?> mapperClass) {
     if (mappedClasses.containsKey(mapperClass.getName()) || mapperClass.isAnnotationPresent(Entity.class))
       return true;
     return false;
