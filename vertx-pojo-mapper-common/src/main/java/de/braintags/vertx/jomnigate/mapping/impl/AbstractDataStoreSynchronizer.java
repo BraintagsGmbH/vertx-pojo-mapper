@@ -49,12 +49,16 @@ public abstract class AbstractDataStoreSynchronizer<T> implements IDataStoreSync
     if (synchronizedInstances.contains(mapper.getMapperClass().getName())) {
       resultHandler.handle(Future.succeededFuture(getSyncResult()));
     } else {
-      LOGGER.debug("starting synchronization for mapper " + mapper.getClass().getSimpleName());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("starting synchronization for mapper " + mapper.getClass().getSimpleName());
+      }
       syncTable(mapper, res -> {
         if (res.failed()) {
           resultHandler.handle(Future.failedFuture(res.cause()));
         } else {
-          LOGGER.debug("successful synchronized for mapper " + mapper.getClass().getSimpleName());
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("successful synchronized for mapper " + mapper.getClass().getSimpleName());
+          }
           syncIndexDefinitions(mapper, idxResult -> {
             if (idxResult.failed()) {
               resultHandler.handle(Future.failedFuture(idxResult.cause()));

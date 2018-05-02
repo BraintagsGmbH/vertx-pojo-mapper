@@ -15,7 +15,6 @@ package de.braintags.vertx.jomnigate.mongo.dataaccess;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.stream.IntStream;
 
 import com.mongodb.MongoBulkWriteException;
@@ -198,12 +197,7 @@ public class MongoWrite<T> extends AbstractWrite<T> implements MongoDataAccesObj
   }
 
   private BulkOperation createPartialUpdate(final JsonObject filter, final JsonObject object, final boolean upsert) {
-    JsonObject jsonData = object;
-    JsonObject set = new JsonObject();
-    for (Entry<String, Object> updateEntry : jsonData.getMap().entrySet()) {
-      set.put(updateEntry.getKey(), updateEntry.getValue());
-    }
-    JsonObject document = new JsonObject().put("$set", set);
+    JsonObject document = new JsonObject().put("$set", object);
     if (setOnInsertFields != null) {
       document.put("$setOnInsert", setOnInsertFields);
     }

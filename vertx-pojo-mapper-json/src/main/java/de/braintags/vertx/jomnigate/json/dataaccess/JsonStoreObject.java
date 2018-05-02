@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.InjectableValues;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
@@ -130,7 +131,9 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
    */
   private void storeJson(final String js, final Handler<AsyncResult<Void>> handler) {
     try {
-      LOGGER.debug("Storing json: " + js);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Storing json: " + js);
+      }
       container = new JsonObject(js);
       IProperty idField = getMapper().getIdInfo().getField();
       container.remove(idField.getName()); // do not write the java fieldname of id, but the column
@@ -175,7 +178,8 @@ public class JsonStoreObject<T> extends AbstractStoreObject<T, JsonObject> {
     ObjectReader reader = mapper.reader(iv);
     T instance;
     try {
-      instance = reader.forType(((JacksonMapper<T>) getMapper()).getCreatorClass()).readValue(getContainer().encode());
+      instance = reader.forType(((JacksonMapper<T>) getMapper()).getCreatorClass())
+          .readValue(mapper.<JsonNode> valueToTree(getContainer().getMap()));
     } catch (IOException e) {
       handler.handle(Future.failedFuture(e));
       return;

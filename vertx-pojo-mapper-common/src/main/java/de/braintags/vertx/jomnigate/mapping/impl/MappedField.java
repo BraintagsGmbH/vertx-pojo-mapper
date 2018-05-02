@@ -65,7 +65,7 @@ public class MappedField extends AbstractProperty {
   private final List<IProperty> typeParameters = new ArrayList<>();
 
   private Class<?> realType;
-  private Type genericType;
+  private final Type genericType;
   private boolean isSet;
   private boolean isMap; // indicated if it implements Map interface
   private boolean isArray; // indicated if it is an Array
@@ -74,7 +74,7 @@ public class MappedField extends AbstractProperty {
 
   private Type mapKeyType;
   private Type subType;
-  private Map<String, Constructor<?>> constructors = new HashMap<>();
+  private final Map<String, Constructor<?>> constructors = new HashMap<>();
   /**
    * Class annotations which were found inside the current definition
    */
@@ -90,7 +90,7 @@ public class MappedField extends AbstractProperty {
    * @param mapper
    *          the parent {@link IMapper}
    */
-  public MappedField(Field field, IPropertyAccessor accessor, Mapper mapper) {
+  public MappedField(final Field field, final IPropertyAccessor accessor, final Mapper mapper) {
     super(mapper);
     this.accessor = accessor;
     this.field = field;
@@ -108,7 +108,7 @@ public class MappedField extends AbstractProperty {
    * @param mapper
    *          the parent {@link IMapper}
    */
-  public MappedField(Type type, Mapper mapper) {
+  public MappedField(final Type type, final Mapper mapper) {
     super(mapper);
     genericType = type;
     computeType();
@@ -352,7 +352,7 @@ public class MappedField extends AbstractProperty {
    * @param isMap
    *          the isMap to set
    */
-  void setIsMap(boolean isMap) {
+  void setIsMap(final boolean isMap) {
     this.isMap = isMap;
   }
 
@@ -485,7 +485,7 @@ public class MappedField extends AbstractProperty {
    * @see de.braintags.vertx.jomnigate.mapping.IField#getConstructor(java.lang.Class[])
    */
   @Override
-  public Constructor<?> getConstructor(Class<?>... parameters) {
+  public Constructor<?> getConstructor(final Class<?>... parameters) {
     String code = generateKey(parameters);
     if (constructors.containsKey(code))
       return constructors.get(code);
@@ -495,13 +495,15 @@ public class MappedField extends AbstractProperty {
       constructor = clz.getDeclaredConstructor(parameters);
       constructors.put(code, constructor);
     } catch (NoSuchMethodException | SecurityException e) {
-      LOGGER.debug("unaccessible constructor because of " + e);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("unaccessible constructor because of " + e);
+      }
       constructors.put(code, constructor);
     }
     return constructor;
   }
 
-  private String generateKey(Class<?>... parameters) {
+  private String generateKey(final Class<?>... parameters) {
     if (parameters.length == 0)
       return "default";
     String key = "";
@@ -517,7 +519,7 @@ public class MappedField extends AbstractProperty {
    * @see de.braintags.vertx.jomnigate.mapping.IField#getAnnotation(java.lang.Class)
    */
   @Override
-  public Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
+  public Annotation getAnnotation(final Class<? extends Annotation> annotationClass) {
     return existingPropertyAnnotations.get(annotationClass);
   }
 

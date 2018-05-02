@@ -165,7 +165,9 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
             try {
               internalExecuteCount(queryExpression, resultHandler);
             } catch (Exception e) {
-              LOGGER.debug("error occured", e);
+              if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("error occured", e);
+              }
               resultHandler.handle(Future.failedFuture(e));
             }
           }

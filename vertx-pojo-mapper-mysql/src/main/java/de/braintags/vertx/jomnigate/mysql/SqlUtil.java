@@ -357,7 +357,9 @@ public class SqlUtil {
    */
   public static void queryWithParams(final AsyncSQLClient sqlClient, final String command, final JsonArray params,
       final Handler<AsyncResult<ResultSet>> resultHandler) {
-    LOGGER.debug("queryWithParams: " + command + " | " + params);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("queryWithParams: " + command + " | " + params);
+    }
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
         Exception sqlEx = new SqlException(ERROR_GAINING_CONNECTION, cr.cause());
@@ -422,7 +424,9 @@ public class SqlUtil {
    *          a resulthandler to be informed
    */
   public static void execute(final AsyncSQLClient sqlClient, final String command, final Handler<AsyncResult<Void>> resultHandler) {
-    LOGGER.debug("execute: " + command);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("execute: " + command);
+    }
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
         Exception sqlEx = new SqlException(ERROR_GAINING_CONNECTION, cr.cause());
@@ -489,7 +493,9 @@ public class SqlUtil {
    */
   public static void update(final AsyncSQLClient sqlClient, final String command,
       final Handler<AsyncResult<UpdateResult>> resultHandler) {
-    LOGGER.debug("update: " + command);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("update: " + command);
+    }
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
         Exception sqlEx = new SqlException(ERROR_GAINING_CONNECTION, cr.cause());
@@ -530,7 +536,9 @@ public class SqlUtil {
    */
   public static void updateWithParams(final AsyncSQLClient sqlClient, final String command, final JsonArray params,
       final Handler<AsyncResult<UpdateResult>> resultHandler) {
-    LOGGER.debug("updateWithParams: " + command + " | " + params);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("updateWithParams: " + command + " | " + params);
+    }
     sqlClient.getConnection(cr -> {
       if (cr.failed()) {
         Exception sqlEx = new SqlException(ERROR_GAINING_CONNECTION, cr.cause());

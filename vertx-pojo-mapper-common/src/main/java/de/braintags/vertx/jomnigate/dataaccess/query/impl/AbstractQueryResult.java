@@ -34,10 +34,10 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(AbstractQueryResult.class);
 
-  private IMapper<T> mapper;
-  private IDataStore datastore;
-  private T[] pojoResult;
-  private IQueryExpression originalQuery;
+  private final IMapper<T> mapper;
+  private final IDataStore datastore;
+  private final T[] pojoResult;
+  private final IQueryExpression originalQuery;
   private long completeResult;
 
   /**
@@ -53,7 +53,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
    *          the original query which was processed to create the current result
    */
   @SuppressWarnings("unchecked")
-  public AbstractQueryResult(IDataStore datastore, IMapper<T> mapper, int resultSize, IQueryExpression originalQuery) {
+  public AbstractQueryResult(final IDataStore datastore, final IMapper<T> mapper, final int resultSize, final IQueryExpression originalQuery) {
     this.datastore = datastore;
     this.mapper = mapper;
     this.originalQuery = originalQuery;
@@ -124,11 +124,13 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
     }
 
     @Override
-    public void next(Handler<AsyncResult<T>> handler) {
+    public void next(final Handler<AsyncResult<T>> handler) {
       int thisIndex = currentIndex++;
       if (pojoResult[thisIndex] == null) {
-        LOGGER
-            .debug("generating pojo on index " + thisIndex + " for mapper " + mapper.getMapperClass().getSimpleName());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(
+              "generating pojo on index " + thisIndex + " for mapper " + mapper.getMapperClass().getSimpleName());
+        }
         generatePojo(thisIndex, result -> {
           if (result.failed()) {
             handler.handle(Future.failedFuture(result.cause()));
@@ -138,7 +140,9 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
           }
         });
       } else {
-        LOGGER.debug("reusing pojo on index " + thisIndex + " for mapper " + mapper.getMapperClass().getSimpleName());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("reusing pojo on index " + thisIndex + " for mapper " + mapper.getMapperClass().getSimpleName());
+        }
         handler.handle(Future.succeededFuture(pojoResult[thisIndex]));
       }
     }
@@ -157,7 +161,7 @@ public abstract class AbstractQueryResult<T> extends AbstractCollectionAsync<T> 
    * @param completeResult
    *          the completeResult to set
    */
-  public final void setCompleteResult(long completeResult) {
+  public final void setCompleteResult(final long completeResult) {
     this.completeResult = completeResult;
   }
 

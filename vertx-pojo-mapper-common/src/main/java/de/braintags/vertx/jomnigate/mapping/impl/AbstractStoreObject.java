@@ -40,13 +40,13 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(AbstractStoreObject.class);
 
-  private IMapper<T> mapper;
+  private final IMapper<T> mapper;
   private T entity = null;
-  private Collection<IObjectReference> objectReferences = new ArrayList<>();
+  private final Collection<IObjectReference> objectReferences = new ArrayList<>();
   private boolean newInstance = true;
   protected F container;
 
-  public AbstractStoreObject(IMapper<T> mapper, T entity, F container) {
+  public AbstractStoreObject(final IMapper<T> mapper, final T entity, final F container) {
     if (mapper == null)
       throw new NullPointerException("Mapper must not be null");
     if (entity == null)
@@ -56,7 +56,7 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
     this.container = container;
   }
 
-  public AbstractStoreObject(F container, IMapper<T> mapper) {
+  public AbstractStoreObject(final F container, final IMapper<T> mapper) {
     if (mapper == null)
       throw new NullPointerException("Mapper must not be null");
     if (container == null)
@@ -77,7 +77,7 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
    * @param newInstance
    *          the newInstance to set
    */
-  public final void setNewInstance(boolean newInstance) {
+  public final void setNewInstance(final boolean newInstance) {
     this.newInstance = newInstance;
   }
 
@@ -113,7 +113,7 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
    * 
    * @param handler
    */
-  public void initToEntity(Handler<AsyncResult<Void>> handler) {
+  public void initToEntity(final Handler<AsyncResult<Void>> handler) {
     T tmpObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
     LOGGER.debug("start initToEntity");
     iterateFields(tmpObject, fieldResult -> {
@@ -132,21 +132,25 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
     });
   }
 
-  protected void finishToEntity(T tmpObject, Handler<AsyncResult<Void>> handler) {
+  protected void finishToEntity(final T tmpObject, final Handler<AsyncResult<Void>> handler) {
     this.entity = tmpObject;
     getMapper().executeLifecycle(AfterLoad.class, entity, handler);
   }
 
   @SuppressWarnings("rawtypes")
-  protected final void iterateFields(T tmpObject, Handler<AsyncResult<Void>> handler) {
-    LOGGER.debug("start iterateFields");
+  protected final void iterateFields(final T tmpObject, final Handler<AsyncResult<Void>> handler) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("start iterateFields");
+    }
     Set<String> fieldNames = getMapper().getFieldNames();
     List<Future> fl = new ArrayList<>(fieldNames.size());
     for (String fieldName : fieldNames) {
       Future<Void> f = Future.future();
       fl.add(f);
       IProperty field = getMapper().getField(fieldName);
-      LOGGER.debug("handling field " + field.getFullName());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("handling field " + field.getFullName());
+      }
       field.getPropertyMapper().fromStoreObject(tmpObject, this, field, f.completer());
     }
     CompositeFuture cf = CompositeFuture.all(fl);
@@ -159,7 +163,7 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
     });
   }
 
-  protected void iterateObjectReferences(Object tmpObject, Handler<AsyncResult<Void>> handler) {
+  protected void iterateObjectReferences(final Object tmpObject, final Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start iterateObjectReferences");
     if (getObjectReferences().isEmpty()) {
       LOGGER.debug("nothing to do");
@@ -169,7 +173,9 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
     Collection<IObjectReference> refs = getObjectReferences();
     List<Future> fl = new ArrayList<>(refs.size());
     for (IObjectReference ref : refs) {
-      LOGGER.debug("handling object reference " + ref.getField().getFullName());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("handling object reference " + ref.getField().getFullName());
+      }
       Future<Void> f = Future.future();
       fl.add(f);
       ref.getField().getPropertyMapper().fromObjectReference(tmpObject, ref, f.completer());
@@ -190,7 +196,7 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
    * @param handler
    */
   @SuppressWarnings("rawtypes")
-  public void initFromEntity(Handler<AsyncResult<Void>> handler) {
+  public void initFromEntity(final Handler<AsyncResult<Void>> handler) {
     List<Future> fl = new ArrayList<>();
     for (String fieldName : mapper.getFieldNames()) {
       fl.add(initFieldFromEntity(fieldName));
@@ -206,7 +212,7 @@ public abstract class AbstractStoreObject<T, F> implements IStoreObject<T, F> {
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected Future initFieldFromEntity(String fieldName) {
+  protected Future initFieldFromEntity(final String fieldName) {
     Future f = Future.future();
     IProperty field = mapper.getField(fieldName);
     field.getPropertyMapper().intoStoreObject(entity, this, field, f.completer());
