@@ -33,8 +33,6 @@ import de.braintags.vertx.jomnigate.dataaccess.query.exception.UnknownQueryOpera
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.AbstractQueryExpression;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.IQueryExpression;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.SortDefinition;
-import de.braintags.vertx.jomnigate.mapping.datastore.IColumnInfo;
-import de.braintags.vertx.jomnigate.mapping.datastore.ITableInfo;
 import de.braintags.vertx.util.json.JsonConverter;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -280,11 +278,7 @@ public class MongoQueryExpression extends AbstractQueryExpression<JsonObject> {
     SortDefinition<?> sd = (SortDefinition<?>) sortDef;
     if (!sd.getSortArguments().isEmpty()) {
       sortArguments = new JsonObject();
-      ITableInfo tableInfo = getMapper().getTableInfo();
-      sd.getSortArguments().forEach(sda -> {
-        IColumnInfo columnInfo = tableInfo.getColumnInfo(getMapper().getField(sda.fieldName));
-        sortArguments.put(columnInfo != null ? columnInfo.getName() : sda.fieldName, sda.ascending ? 1 : -1);
-      });
+      sd.getSortArguments().forEach(sda -> sortArguments.put(sda.fieldName, sda.ascending ? 1 : -1));
     }
     return this;
   }
