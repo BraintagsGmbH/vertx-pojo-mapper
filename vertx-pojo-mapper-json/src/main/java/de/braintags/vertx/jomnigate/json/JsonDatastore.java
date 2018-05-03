@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 import de.braintags.vertx.jomnigate.IDataStore;
 import de.braintags.vertx.jomnigate.impl.AbstractDataStore;
@@ -43,7 +42,6 @@ import io.vertx.core.json.JsonObject;
  */
 public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonObject> {
   private final ObjectMapper jacksonMapper;
-  private final ObjectMapper jacksonPrettyMapper;
 
   private final Map<Class<?>, ObjectMapper> viewMapper = new ConcurrentHashMap<>();
 
@@ -59,15 +57,7 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
     jacksonMapper.registerModule(new JacksonModuleJomnigate(this));
     jacksonMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
 
-    JOmnigateFactory prettyJOmnigateFactory = new JOmnigateFactory(this, Json.prettyMapper.getFactory(),
-        Json.prettyMapper);
-    jacksonPrettyMapper = new ObjectMapper(prettyJOmnigateFactory);
-    jacksonPrettyMapper.registerModule(new JacksonModuleJomnigate(this));
-    jacksonPrettyMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-    jacksonPrettyMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-
     JsonConfig.configureObjectMapper(jacksonMapper);
-    JsonConfig.configureObjectMapper(jacksonPrettyMapper);
   }
 
   /**
@@ -77,15 +67,6 @@ public abstract class JsonDatastore extends AbstractDataStore<JsonObject, JsonOb
    */
   public ObjectMapper getJacksonMapper() {
     return jacksonMapper;
-  }
-
-  /**
-   * The jackson mapper which is used to serialize and deserialize instances as pretty source
-   *
-   * @return the jacksonPrettyMapper
-   */
-  public ObjectMapper getJacksonPrettyMapper() {
-    return jacksonPrettyMapper;
   }
 
   public ObjectMapper getMapperForView(final Class<?> viewClass) {
