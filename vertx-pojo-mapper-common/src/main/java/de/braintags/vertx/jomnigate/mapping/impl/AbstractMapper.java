@@ -438,6 +438,8 @@ public abstract class AbstractMapper<T> implements IMapper<T> {
    */
   @Override
   public final List<IMethodProxy> getLifecycleMethods(final Class<? extends Annotation> annotation) {
+    if (lifecycleMethods.isEmpty())
+      return null;
     return lifecycleMethods.get(annotation);
   }
 
