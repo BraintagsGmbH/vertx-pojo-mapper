@@ -29,6 +29,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.impl.VariableFieldCondition
 import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
 import de.braintags.vertx.jomnigate.datatypes.geojson.Position;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.util.interfaces.SimpleImmutable;
 
 /**
  * The parts that make up the search condition of the query<br>
@@ -50,7 +51,7 @@ import de.braintags.vertx.jomnigate.mapping.IMapper;
 @JsonSubTypes({ @JsonSubTypes.Type(value = QueryAnd.class, name = "and"),
     @JsonSubTypes.Type(value = QueryOr.class, name = "or"), @JsonSubTypes.Type(value = QueryNot.class, name = "not"),
     @JsonSubTypes.Type(value = FieldCondition.class, name = "condition"), })
-public interface ISearchCondition {
+public interface ISearchCondition extends SimpleImmutable {
 
   /**
    * Method validates the query arguments like field existence, to avoid wrong results
