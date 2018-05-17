@@ -43,13 +43,12 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.mongo.MongoClient;
 
 /**
  * An initializer for {@link MongoDataStore}
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataStoreInit {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
@@ -79,7 +78,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
 
   private MongodExecutable exe;
   boolean startMongoLocal = false;
-  private MongoClient mongoClient;
+  private JomnigateMongoClient mongoClient;
   private MongoDataStore mongoDataStore;
   protected int localPort = 27017;
 
@@ -92,7 +91,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
    * used. Default is 27017
    * <LI>defaultKeyGenerator to set the name of the default keygenerator to be used
    * </UL>
-   * 
+   *
    * @return
    */
   public static DataStoreSettings createSettings() {
@@ -124,7 +123,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
    * used. Default is 27017
    * <LI>defaultKeyGenerator to set the name of the default keygenerator to be used
    * </UL>
-   * 
+   *
    * @return
    */
   public static DataStoreSettings applySystemProperties(final DataStoreSettings settings) {
@@ -148,7 +147,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
 
   /**
    * Helper method which creates the default settings for an instance of {@link MongoDataStore}
-   * 
+   *
    * @return default instance of {@link DataStoreSettings} to init a {@link MongoDataStore}
    */
   public static final DataStoreSettings createDefaultSettings() {
@@ -189,16 +188,16 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
 
   /**
    * Get the instance of MongoClient, which was created during init.
-   * 
+   *
    * @return
    */
-  public MongoClient getMongoClient() {
+  public JomnigateMongoClient getMongoClient() {
     return mongoClient;
   }
 
   /**
    * If for debugging purpose an internal MongodExecutable was started, it is returned here
-   * 
+   *
    * @return the instance of MongodExecutable or null, if not used
    */
   public MongodExecutable getMongodExecutable() {
@@ -209,8 +208,8 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     try {
       LOGGER.info("init MongoClient with " + settings);
       JsonObject jconfig = getConfig();
-      MongoClient tempClient = shared ? MongoClient.createShared(vertx, jconfig)
-          : MongoClient.createNonShared(vertx, jconfig);
+      JomnigateMongoClient tempClient = shared ? JomnigateMongoClient.createShared(vertx, jconfig)
+          : JomnigateMongoClient.createNonShared(vertx, jconfig);
       if (tempClient == null) {
         handler.handle(Future.failedFuture(new InitException("No MongoClient created")));
       } else {
@@ -263,7 +262,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
 
   /**
    * Get the connection String for the mongo db
-   * 
+   *
    * @return
    */
   private String getConnectionString() {
@@ -276,7 +275,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
 
   /**
    * returns true if a local instance of Mongo shall be started
-   * 
+   *
    * @return
    */
   private void checkMongoLocal() {
@@ -286,7 +285,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
 
   /**
    * Starts an instance of a local mongo, if startMongoLocal is true
-   * 
+   *
    * @param startMongoLocal
    *          defines wether to start a local instance
    * @param localPort
@@ -320,8 +319,7 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
   }
 
   private static IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
-      .defaultsWithLogger(Command.MongoD, LoggerFactory.getLogger(MongoDataStoreInit.class))
-      .build();
+      .defaultsWithLogger(Command.MongoD, LoggerFactory.getLogger(MongoDataStoreInit.class)).build();
   private static final MongodStarter starter = MongodStarter.getInstance(runtimeConfig);
 
   private boolean internalStartMongoExe(final boolean startMongoLocal, final int localPort) {
