@@ -208,7 +208,8 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     try {
       LOGGER.info("init MongoClient with " + settings);
       JsonObject jconfig = getConfig();
-      JomnigateMongoClient tempClient = shared ? JomnigateMongoClient.createShared(vertx, jconfig)
+      JomnigateMongoClient tempClient = shared
+          ? JomnigateMongoClient.createShared(vertx, jconfig, settings.getDatabaseName())
           : JomnigateMongoClient.createNonShared(vertx, jconfig);
       if (tempClient == null) {
         handler.handle(Future.failedFuture(new InitException("No MongoClient created")));
