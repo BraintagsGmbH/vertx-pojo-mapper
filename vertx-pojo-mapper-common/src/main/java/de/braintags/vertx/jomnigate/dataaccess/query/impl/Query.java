@@ -39,6 +39,8 @@ import io.vertx.core.Handler;
 public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQuery<T> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory.getLogger(Query.class);
 
+  private static final long SLOW_QUERY_WARNING_MS = 4000;
+
   private ISearchCondition searchCondition;
   private boolean returnCompleteCount = false;
   private final SortDefinition<T> sortDefs = new SortDefinition<>();
@@ -73,6 +75,7 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   @Override
   public final void execute(final IFieldValueResolver resolver, final int limit, final int offset,
       final Handler<AsyncResult<IQueryResult<T>>> resultHandler) {
+    long startTime = System.currentTimeMillis();
     sync(syncResult -> {
       if (syncResult.failed()) {
         resultHandler.handle(Future.failedFuture(syncResult.cause()));
@@ -82,7 +85,13 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
           rf.setHandler(resultHandler);
           IObserverContext context = IObserverContext.createInstance();
           preQuery(context).compose(pre -> executeQuery(resolver, limit, offset))
-              .compose(wr -> postQuery(wr, context, rf), rf);
+              .compose(wr -> postQuery(wr, context).map(v -> {
+                long queryTime = System.currentTimeMillis() - startTime;
+                if (queryTime > SLOW_QUERY_WARNING_MS) {
+                  LOGGER.warn("[queryTime: " + queryTime + " ms] Slow query", new SlowQueryException(this));
+                }
+                return wr;
+              })).setHandler(resultHandler);
         } catch (Exception e) {
           resultHandler.handle(Future.failedFuture(e));
         }
@@ -120,18 +129,9 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
    * 
    * @param qr
    * @param context
-   * @param nextFuture
    */
-  protected void postQuery(final IQueryResult<T> qr, final IObserverContext context,
-      final Future<IQueryResult<T>> nextFuture) {
-    Future<Void> f = getMapper().getObserverHandler().handleAfterLoad(this, qr, context);
-    f.setHandler(res -> {
-      if (f.failed()) {
-        nextFuture.fail(f.cause());
-      } else {
-        nextFuture.complete(qr);
-      }
-    });
+  protected Future<Void> postQuery(final IQueryResult<T> qr, final IObserverContext context) {
+    return getMapper().getObserverHandler().handleAfterLoad(this, qr, context);
   }
 
   /**
@@ -345,4 +345,12 @@ public abstract class Query<T> extends AbstractDataAccessObject<T> implements IQ
   public void setUseFields(final List<String> useFields) {
     this.useFields = useFields;
   }
+
+  @Override
+  public String toString() {
+    return "Query [mapperClass=" + getMapperClass() + ", searchCondition=" + searchCondition + ", returnCompleteCount="
+        + returnCompleteCount + ", sortDefs=" + sortDefs + ", useFields=" + useFields + ", nativeCommand="
+        + nativeCommand + "]";
+  }
+
 }
