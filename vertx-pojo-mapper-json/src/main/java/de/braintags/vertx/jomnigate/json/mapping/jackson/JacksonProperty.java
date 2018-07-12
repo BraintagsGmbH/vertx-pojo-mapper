@@ -30,20 +30,20 @@ import de.braintags.vertx.jomnigate.typehandler.ITypeHandler;
 
 /**
  * An implementation of IProperty which uses
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class JacksonProperty extends AbstractProperty {
-  private BeanPropertyDefinition beanDefinition;
+  private final BeanPropertyDefinition beanDefinition;
   private boolean isSingleValue;
   private IPropertyAccessor propertyAccessor;
   private IPropertyMapper propertyMapper;
 
   /**
-   * 
+   *
    */
-  public JacksonProperty(JacksonMapper<?> mapper, BeanPropertyDefinition definition) {
+  public JacksonProperty(final JacksonMapper<?> mapper, final BeanPropertyDefinition definition) {
     super(mapper);
     this.beanDefinition = definition;
     init();
@@ -58,7 +58,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /**
    * Get the underlaying instance of {@link BeanPropertyDefinition}
-   * 
+   *
    * @return
    */
   public BeanPropertyDefinition getBeanPropertyDefinition() {
@@ -67,7 +67,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getName()
    */
   @Override
@@ -77,7 +77,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getFullName()
    */
   @Override
@@ -87,7 +87,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#isMap()
    */
   @Override
@@ -97,7 +97,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getMapKeyClass()
    */
   @Override
@@ -107,7 +107,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getType()
    */
   @Override
@@ -117,7 +117,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getSubClass()
    */
   @Override
@@ -131,7 +131,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#isSingleValue()
    */
   @Override
@@ -141,7 +141,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#isArray()
    */
   @Override
@@ -151,7 +151,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#isCollection()
    */
   @Override
@@ -161,7 +161,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getGenericType()
    */
   @Override
@@ -171,37 +171,38 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#isIgnore()
    */
   @Override
   public boolean isIgnore() {
-    return hasAnnotation(JsonIgnore.class);
+    JsonIgnore annotation = beanDefinition.getAccessor().getAnnotation(JsonIgnore.class);
+    return annotation != null && annotation.value();
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getAnnotation(java.lang.Class)
    */
   @Override
-  public Annotation getAnnotation(Class<? extends Annotation> annotationClass) {
+  public Annotation getAnnotation(final Class<? extends Annotation> annotationClass) {
     return beanDefinition.getAccessor().getAnnotation(annotationClass);
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#hasAnnotation(java.lang.Class)
    */
   @Override
-  public boolean hasAnnotation(Class<? extends Annotation> annotationClass) {
+  public boolean hasAnnotation(final Class<? extends Annotation> annotationClass) {
     return beanDefinition.getAccessor().getAnnotation(annotationClass) != null;
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getPropertyAccessor()
    */
   @Override
@@ -217,7 +218,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getTypeHandler()
    */
   @Override
@@ -227,7 +228,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getPropertyMapper()
    */
   @Override
@@ -237,7 +238,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getField()
    */
   @Override
@@ -247,7 +248,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#isSet()
    */
   @Override
@@ -257,7 +258,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getSubTypeHandler()
    */
   @Override
@@ -267,7 +268,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getSubType()
    */
   @Override
@@ -277,7 +278,7 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getTypeParameters()
    */
   @Override
@@ -287,11 +288,11 @@ public class JacksonProperty extends AbstractProperty {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.jomnigate.mapping.IProperty#getConstructor(java.lang.Class[])
    */
   @Override
-  public Constructor getConstructor(Class<?>... parameters) {
+  public Constructor getConstructor(final Class<?>... parameters) {
     throw new UnsupportedOperationException("should not be used anymore: getConstructor");
   }
 
