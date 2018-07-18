@@ -71,6 +71,16 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
   public static final String LOCAL_PORT_PROP = "localPort";
 
   /**
+   * If READ_CONCERN_PROP is set to a value, then this defines the read concern
+   */
+  public static final String READ_CONCERN_PROP = "readConcernLevel";
+
+  /**
+   * If WRITE_CONCERN_PROP is set to a value, then this defines the write concern
+   */
+  public static final String WRITE_CONCERN_PROP = "writeConcern";
+
+  /**
    * The default connection to be used, if CONNECTION_STRING_PROPERTY is undefined
    */
   public static final String DEFAULT_CONNECTION = "mongodb://localhost:27017";
@@ -257,7 +267,14 @@ public class MongoDataStoreInit extends AbstractDataStoreInit implements IDataSt
     config.put(IDataStore.HANDLE_REFERENCED_RECURSIVE, handleReferencedRecursive);
     String prop = getProperty(IKeyGenerator.DEFAULT_KEY_GENERATOR, null);
     config.put(IKeyGenerator.DEFAULT_KEY_GENERATOR, prop);
-
+    String readConcern = getProperty(READ_CONCERN_PROP, null);
+    if (readConcern != null) {
+      config.put(READ_CONCERN_PROP, readConcern);
+    }
+    String writeConcern = getProperty(WRITE_CONCERN_PROP, null);
+    if (writeConcern != null) {
+      config.put(WRITE_CONCERN_PROP, writeConcern);
+    }
     return config;
   }
 
