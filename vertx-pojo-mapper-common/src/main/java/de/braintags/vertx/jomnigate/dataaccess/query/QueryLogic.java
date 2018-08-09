@@ -23,5 +23,6 @@ public enum QueryLogic {
 
   AND,
   OR,
-  NOT;
+  NOT,
+  NOR;
 }
