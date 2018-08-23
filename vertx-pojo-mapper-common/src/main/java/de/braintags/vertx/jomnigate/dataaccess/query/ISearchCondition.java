@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.FieldCondition;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.GeoSearchArgument;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.QueryAnd;
+import de.braintags.vertx.jomnigate.dataaccess.query.impl.QueryNor;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.QueryNot;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.QueryOr;
 import de.braintags.vertx.jomnigate.dataaccess.query.impl.VariableFieldCondition;
@@ -658,6 +659,28 @@ public interface ISearchCondition extends SimpleImmutable {
    */
   static ISearchConditionContainer or(final Collection<ISearchCondition> searchConditions) {
     return new QueryOr(searchConditions.toArray(new ISearchCondition[searchConditions.size()]));
+  }
+
+  /**
+   * Connects the given query parts with the {@link QueryLogic#NOR} connector
+   *
+   * @param searchConditions
+   *          the search conditions to connect
+   * @return
+   */
+  static ISearchConditionContainer nor(final ISearchCondition... searchConditions) {
+    return new QueryNor(searchConditions);
+  }
+
+  /**
+   * Connects the given query parts with the {@link QueryLogic#NOR} connector
+   *
+   * @param searchConditions
+   *          the search conditions to connect
+   * @return
+   */
+  static ISearchConditionContainer nor(final Collection<ISearchCondition> searchConditions) {
+    return new QueryNor(searchConditions.toArray(new ISearchCondition[searchConditions.size()]));
   }
 
   /**
