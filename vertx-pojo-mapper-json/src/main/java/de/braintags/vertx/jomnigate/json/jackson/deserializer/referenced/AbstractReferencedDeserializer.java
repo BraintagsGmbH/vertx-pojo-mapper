@@ -21,6 +21,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.deser.ValueInstantiator;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -202,8 +203,12 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void storePostHandler(final DeserializationContext ct, final Future f) {
-    List<ReferencedPostHandler> list = (List<ReferencedPostHandler>) ct
-        .findInjectableValue(JsonStoreObject.REFERENCED_LIST, null, null);
+    List<ReferencedPostHandler> list;
+    try {
+      list = (List<ReferencedPostHandler>) ct.findInjectableValue(JsonStoreObject.REFERENCED_LIST, null, null);
+    } catch (JsonMappingException e) {
+      throw new IllegalStateException("unable to find injectable value", e);
+    }
     if (list == null) {
       throw new IllegalArgumentException("Referenced needs a List<ReferencedPreHandler> as injectable ");
     }
@@ -220,8 +225,12 @@ public abstract class AbstractReferencedDeserializer<T> extends AbstractDataStor
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void storePostHandler(final DeserializationContext ct, final Object instance, final Future f) {
-    List<ReferencedPostHandler> list = (List<ReferencedPostHandler>) ct
-        .findInjectableValue(JsonStoreObject.REFERENCED_LIST, null, null);
+    List<ReferencedPostHandler> list;
+    try {
+      list = (List<ReferencedPostHandler>) ct.findInjectableValue(JsonStoreObject.REFERENCED_LIST, null, null);
+    } catch (JsonMappingException e) {
+      throw new IllegalStateException("unable to find injectable value", e);
+    }
     if (list == null) {
       throw new IllegalArgumentException("Referenced needs a List<ReferencedPreHandler> as injectable ");
     }
